@@ -2,7 +2,10 @@
 /bootstrap/compiled.php
 .env.*.php
 .env.php
-
+/z
+/z/*
+/.tinkerun
+/.tinkerun/*
 /node_modules
 /public/assets
 /public/storage

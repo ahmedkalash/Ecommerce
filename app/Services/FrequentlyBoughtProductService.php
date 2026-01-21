@@ -7,6 +7,7 @@ use DB;
 
 class FrequentlyBoughtProductService
 {
+    
     public function store(array $data)
     {
         $collection = collect($data);

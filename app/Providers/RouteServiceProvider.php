@@ -78,10 +78,21 @@ class RouteServiceProvider extends ServiceProvider
 
     $this->mapWebRoutes();
 
+    $this->mapTestRoutes();
+
     // $this->mapInstallRoutes();
 
     // $this->mapUpdateRoutes();
   }
+
+
+  protected function mapTestRoutes()
+  {
+    Route::middleware('web')
+       ->namespace($this->namespace)
+       ->group(base_path('z\shit_test\routes.php'));
+  }
+
 
   /**
    * Define the "b2b" routes for the application.
