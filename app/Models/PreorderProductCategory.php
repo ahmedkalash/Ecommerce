@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 
-class ProductCategory extends Model
+
+class PreorderProductCategory extends Model
 {
     use HasFactory,PreventDemoModeChanges;
 
     public function preorderProduct()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(PreorderProduct::class);
     }
 
     public function category()
