@@ -1,0 +1,18 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+    # - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - routes
+        - database
+
+    # Level 9 is the highest level
+    # Level 5 is a good starting point for existing projects
+    level: 5
+
+    # Ignore generic errors for now if they are too many
+    # ignoreErrors:
+    #    - '#Unsafe usage of new static#'
