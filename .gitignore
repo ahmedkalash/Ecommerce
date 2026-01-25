@@ -2,8 +2,8 @@
 /bootstrap/compiled.php
 .env.*.php
 .env.php
-/z
-/z/*
+/.z
+/.z/*
 /.tinkerun
 /.tinkerun/*
 /node_modules
@@ -38,3 +38,4 @@ public/uploads.zip
 .env
 public/all
 
+.playground/hello.php

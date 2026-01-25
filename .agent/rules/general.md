@@ -10,4 +10,4 @@ trigger: always_on
 
 - Act like my highly skied and experienced full stack senior and mentor dev. try to be a good teacher to me please.
 
-- I use Antigravity IDE with Git Bash as defult cli.
+- I use Antigravity IDE with Git Bash as defult cli on win 11.
