@@ -18,7 +18,7 @@ class MyFatoorahController extends Controller {
     /**
      * Create MyFatoorah invoice
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index() {
         try {
@@ -57,7 +57,7 @@ class MyFatoorahController extends Controller {
     /**
      * Get MyFatoorah payment information
      * 
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function callback() {
         try {
