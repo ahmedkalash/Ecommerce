@@ -57,7 +57,7 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
-use App\Http\Controllers\Cybersource\CybersourceSettingController;
+// use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\ElementController;
 
 /*
@@ -83,9 +83,9 @@ Route::get('/admin', [AdminController::class, 'admin_dashboard'])->name('admin.d
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-back-history']], function () {
 
     // cyber sources
-    Route::controller(CybersourceSettingController::class)->group(function () {
-        Route::get('/cybersource-configuration', 'configuration')->name('cybersource_configuration');
-    });
+    // Route::controller(CybersourceSettingController::class)->group(function () {
+    //     Route::get('/cybersource-configuration', 'configuration')->name('cybersource_configuration');
+    // });
     
     // category
     Route::resource('categories', CategoryController::class);

@@ -17,6 +17,8 @@ use Illuminate\Http\Request;
 use Session;
 use Redirect;
 
+// Todo: update myfatoorah usage to align with the latest package updates. the last version has breaking change. 
+// here is the last possible working version: "myfatoorah/laravel-package": "2.0.0". the laravel-package implicitly will requires the myfatoorah/library with a working version
 class MyfatoorahController extends Controller
 {
     public $mfObj;
@@ -25,7 +27,7 @@ class MyfatoorahController extends Controller
      */
     public function __construct()
     {
-
+        
         // If you want to set the credentials and the mode manually.
         $this->mfObj = new PaymentMyfatoorahApiV2(env('MYFATOORAH_TOKEN'), env('MYFATOORAH_COUNTRY_ISO'), get_setting('myfatoorah_sandbox') == 1 ? true : false);
     }

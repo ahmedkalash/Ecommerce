@@ -225,12 +225,12 @@ Route::controller(PaypalController::class)->group(function () {
     Route::get('/paypal/payment/cancel', 'getCancel')->name('payment.cancel');
 });
 //Cybersource START
-Route::controller(CybersourceController::class)->group(function () {
-    Route::post('/cyber-source/payment/process', 'process')->name('cybersource.process');
-    Route::any('/cyber-source/payment/callback', 'callback')->name('cybersource.callback');
-    Route::any('/cyber-source/payment/webhook', 'webhook')->name('cybersource.webhook');
-    Route::get('/cyber-source/payment/cancel', 'getCancel')->name('cybersource.cancel');
-});
+// Route::controller(CybersourceController::class)->group(function () {
+//     Route::post('/cyber-source/payment/process', 'process')->name('cybersource.process');
+//     Route::any('/cyber-source/payment/callback', 'callback')->name('cybersource.callback');
+//     Route::any('/cyber-source/payment/webhook', 'webhook')->name('cybersource.webhook');
+//     Route::get('/cyber-source/payment/cancel', 'getCancel')->name('cybersource.cancel');
+// });
 
 //Mercadopago START
 Route::controller(MercadopagoController::class)->group(function () {
