@@ -444,10 +444,10 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::get('instamojo/failed', 'App\Http\Controllers\Api\V2\InstamojoController@failed');
 
         // Cybersource
-        Route::post('cyber-source/payment/pay', 'App\Http\Controllers\Api\V2\CybersourceController@pay')->name('cybersource.pay');
-        Route::any('cyber-source/payment/process', 'App\Http\Controllers\Api\V2\CybersourceController@process')->name('cybersource.process');
-        Route::any('cyber-source/payment/callback', 'App\Http\Controllers\Api\V2\CybersourceController@callback')->name('cybersource.callback');
-        Route::any('cyber-source/payment/webhook', 'App\Http\Controllers\Api\V2\CybersourceController@webhook')->name('cybersource.webhook');
+        // Route::post('cyber-source/payment/pay', 'App\Http\Controllers\Api\V2\CybersourceController@pay')->name('cybersource.pay');
+        // Route::any('cyber-source/payment/process', 'App\Http\Controllers\Api\V2\CybersourceController@process')->name('cybersource.process');
+        // Route::any('cyber-source/payment/callback', 'App\Http\Controllers\Api\V2\CybersourceController@callback')->name('cybersource.callback');
+        // Route::any('cyber-source/payment/webhook', 'App\Http\Controllers\Api\V2\CybersourceController@webhook')->name('cybersource.webhook');
         
         //Payfast routes <starts>
         Route::controller(PayfastController::class)->group(function () {

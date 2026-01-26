@@ -29,7 +29,7 @@ class PaymentTypesController
             $all_online_payment_methods = get_activate_payment_methods();
             if (count($all_online_payment_methods) > 0) {
                 $available_online_payment_methods = [
-                    "paypal", "stripe", "instamojo", "razorpay", "paystack", "iyzico", "bkash", "nagad", "sslcommerz", "aamarpay", "flutterwave", "payfast", "paytm", "khalti", "myfatoorah", "phonepe", "cybersource"
+                    "paypal", "stripe", "instamojo", "razorpay", "paystack", "iyzico", "bkash", "nagad", "sslcommerz", "aamarpay", "flutterwave", "payfast", "paytm", "khalti", /*"myfatoorah",*/ "phonepe", /*"cybersource"*/
                 ];
                 if (get_setting('phonepe_version', '1') != 2) {
                     $available_online_payment_methods = array_diff($available_online_payment_methods, ['phonepe']);

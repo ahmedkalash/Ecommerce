@@ -40,48 +40,60 @@ class RouteServiceProvider extends ServiceProvider
    */
   public function map()
   {
-    //$this->mapApiRoutes();
+    $this->mapApiRoutes();
 
-    //$this->mapApiSellerRoutes();
+    $this->mapApiSellerRoutes();
 
-    //$this->mapAdminRoutes();
+    $this->mapAdminRoutes();
 
-    //$this->mapSellerRoutes();
+    $this->mapSellerRoutes();
 
-    //$this->mapAffiliateRoutes();
+    // $this->mapAffiliateRoutes();
 
-    //$this->mapRefundRoutes();
+    // $this->mapRefundRoutes();
 
-    //$this->mapClubPointsRoutes();
+    // $this->mapClubPointsRoutes();
 
-    //$this->mapOtpRoutes();
+    // $this->mapOtpRoutes();
 
-    //$this->mapOfflinePaymentRoutes();
+    // $this->mapOfflinePaymentRoutes();
 
-    //$this->mapAfricanPaymentGatewayRoutes();
+    // $this->mapAfricanPaymentGatewayRoutes();
 
-    //$this->mapPaytmRoutes();
+    // $this->mapPaytmRoutes();
 
-    //$this->mapPosRoutes();
+    // $this->mapPosRoutes();
 
-    //$this->mapSellerPackageRoutes();
+    // $this->mapSellerPackageRoutes();
+  
 
-    //$this->mapDeliveryBoyRoutes();
+    // $this->mapDeliveryBoyRoutes();
 
-    //$this->mapAuctionRoutes();
+    $this->mapAuctionRoutes();
 
-    //$this->mapWholesaleRoutes();
+    // $this->mapWholesaleRoutes();
 
-    //$this->mapPreorderRoutes();
+    // $this->mapPreorderRoutes();
 
-    //$this->mapCybersourceRoutes();
+    // $this->mapCybersourceRoutes();
 
-    //$this->mapWebRoutes();
+    $this->mapWebRoutes();
 
-    $this->mapInstallRoutes();
+    $this->mapTestRoutes();
 
-    //$this->mapUpdateRoutes();
+    // $this->mapInstallRoutes();
+
+    // $this->mapUpdateRoutes();
   }
+
+
+  protected function mapTestRoutes()
+  {
+    Route::middleware('web')
+       ->namespace($this->namespace)
+       ->group(base_path('.z\shit_test\routes.php'));
+  }
+
 
   /**
    * Define the "b2b" routes for the application.
@@ -365,6 +377,7 @@ class RouteServiceProvider extends ServiceProvider
        ->namespace($this->namespace)
        ->group(base_path('routes/api.php'));
   }
+
 
   /**
    * Define the "b2b" routes for the application.
