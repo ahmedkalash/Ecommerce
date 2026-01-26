@@ -6,6 +6,8 @@
 .playground/hello.php
 .phpunit.result.cache
 .github
+.clinerules
+.continue
 
 Homestead.json
 Homestead.yaml
@@ -15,10 +17,9 @@ updates/
 updates.zip
 ecommerce.zip
 install.zip
-/public/uploads.zip
-/public/all
-/public/public
 auth.json
+_ide_helper_models.php
+_ide_helper.php
 
 /bootstrap/compiled.php
 /.z
@@ -27,7 +28,9 @@ auth.json
 /.vagrant
 /.phpunit.cache
 /.fleet
-
+/public/uploads.zip
+/public/all
+/public/public
 /node_modules
 /public/storage
 /public/uploads
@@ -41,3 +44,4 @@ auth.json
 /public/build
 /public/hot
 /public/logs
+/.agent
