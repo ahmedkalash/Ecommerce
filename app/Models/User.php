@@ -2,23 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\Cart;
 use App\Notifications\EmailVerificationNotification;
-use App\Traits\PreventDemoModeChanges;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use Notifiable, HasApiTokens, HasRoles;
-
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new EmailVerificationNotification());
+        $this->notify(new EmailVerificationNotification);
     }
 
     /**
@@ -27,7 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'address', 'city', 'postal_code', 'phone', 'country', 'provider_id', 'email_verified_at', 'verification_code'
+        'name', 'email', 'password', 'address', 'city', 'postal_code', 'phone', 'country', 'provider_id', 'email_verified_at', 'verification_code',
     ];
 
     /**
@@ -68,11 +66,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(Shop::class);
     }
+
     public function seller()
     {
         return $this->hasOne(Seller::class);
     }
-
 
     public function staff()
     {
@@ -86,11 +84,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function seller_orders()
     {
-        return $this->hasMany(Order::class, "seller_id");
+        return $this->hasMany(Order::class, 'seller_id');
     }
+
     public function seller_sales()
     {
-        return $this->hasMany(OrderDetail::class, "seller_id");
+        return $this->hasMany(OrderDetail::class, 'seller_id');
     }
 
     public function wallets()
@@ -148,15 +147,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AuctionProductBid::class);
     }
 
-    public function product_queries(){
-        return $this->hasMany(ProductQuery::class,'customer_id');
+    public function product_queries()
+    {
+        return $this->hasMany(ProductQuery::class, 'customer_id');
     }
 
-    public function uploads(){
+    public function uploads()
+    {
         return $this->hasMany(Upload::class);
     }
 
-    public function userCoupon(){
+    public function userCoupon()
+    {
         return $this->hasOne(UserCoupon::class);
     }
 
@@ -164,6 +166,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(PreorderProduct::class);
     }
+
     public function preorders()
     {
         return $this->hasMany(Preorder::class);
