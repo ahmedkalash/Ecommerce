@@ -60,16 +60,14 @@
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "10.5.63",
         "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/Http/Helpers.php"
@@ -101,8 +99,10 @@
         ],
         "analyse": [
             "vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "debug-test": [
+            "php artisan test --recreate-databases --verbose"
         ]
-
     },
     "config": {
         "preferred-install": "dist",
@@ -111,8 +111,10 @@
         "allow-plugins": {
             "symfony/thanks": true
         },
-         "audit": {
-            "ignore": ["PKSA-4g5g-4rkv-myqs"]
+        "audit": {
+            "ignore": [
+                "PKSA-4g5g-4rkv-myqs"
+            ]
         }
     },
     "minimum-stability": "stable",

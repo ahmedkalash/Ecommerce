@@ -81,7 +81,7 @@ class ImportBaseData extends Migration
     }
 
     /**
-     * Determine which data files to import based on environment.
+     * Determine which data files to import based on the environment.
      *
      * @return array List of filenames to import (in order)
      */
@@ -89,17 +89,17 @@ class ImportBaseData extends Migration
     {
         // Todo: Determine what are the minimal and basic data files required for testing and development/production environments
         // Check if running in the test environment
-        // $isTestEnvironment = app()->runningUnitTests();
-        // if ($isTestEnvironment) {
-        //     // TESTING ENVIRONMENT: Import minimal data only
-        //     // Total: ~18KB, ~0.5s import time
-        //     return [
-        //         '0_init_db_config.sql',             // DB initialization (required)
-        //         '2_business_settings_table.sql',    // Critical app settings (required)
-        //         '6.multiple_tables.sql',            // UI elements (486KB)
-        //         '100_final_db_config.sql',          // Finalization/COMMIT (required)
-        //     ];
-        // }
+        $isTestEnvironment = app()->runningUnitTests();
+        if ($isTestEnvironment) {
+            // TESTING ENVIRONMENT: Import minimal data only
+            // Total: ~18KB, ~0.5s import time
+            return [
+                join_paths('for_testing_env', '0_init_db_config.sql'),             // DB initialization (required)
+                join_paths('for_testing_env', '2_business_settings_table.sql'),    // Critical app settings (required)
+                join_paths('for_testing_env', '6.multiple_tables.sql'),            // UI elements (486KB)
+                join_paths('for_testing_env', '100_final_db_config.sql'),          // Finalization/COMMIT (required)
+            ];
+        }
 
         // DEVELOPMENT/PRODUCTION ENVIRONMENT: Import full data
         // Total: ~4-8MB depending on selections
@@ -129,7 +129,7 @@ class ImportBaseData extends Migration
 
         if (! file_exists($filePath)) {
             if ($filename == '0_init_db_config.sql' || $filename == '100_final_db_config.sql') {
-                throw new RuntimeException("Critical: Config files (0_init_db_config.sql and 100_final_db_config.sql) must exist: {$filePath}");
+                throw new RuntimeException("Critical: Config files (\"0_init_db_config.sql\" and \"100_final_db_config.sql\") must exist: {$filePath}");
             }
             $output = new ConsoleOutput;
             $output->writeln("<comment>Warning: Data file not found: {$filePath}\n</comment>");
