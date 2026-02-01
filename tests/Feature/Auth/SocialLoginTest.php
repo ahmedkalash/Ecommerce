@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\SocialProvider;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
@@ -233,7 +234,7 @@ class SocialLoginTest extends AuthTestCase
     public function existing_social_user_can_login_again(): void
     {
         // Arrange - Create existing social user
-        $existingUser = User::factory()->socialAuth('google', 'google-repeat')->create([
+        $existingUser = User::factory()->socialAuth(SocialProvider::GOOGLE, 'google-repeat')->create([
             'email' => 'repeat@gmail.com',
         ]);
 

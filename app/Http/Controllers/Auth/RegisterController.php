@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Session;
 
 class RegisterController extends Controller
@@ -60,7 +61,8 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
             'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1, ['required', new Recaptcha], ['sometimes']),
+                Rule::when(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1,
+                    ['required', new Recaptcha], ['sometimes']),
             ],
         ]);
     }
@@ -69,6 +71,8 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @return User
+     *
+     * @throws ValidationException
      */
     protected function create(array $data)
     {
@@ -95,32 +99,12 @@ class RegisterController extends Controller
 
             }
         }
-
-        if (session('temp_user_id') != null) {
-            if (auth()->user()->user_type == 'customer') {
-                Cart::where('temp_user_id', session('temp_user_id'))
-                    ->update(
-                        [
-                            'user_id' => auth()->user()->id,
-                            'temp_user_id' => null,
-                        ]
-                    );
-            } else {
-                Cart::where('temp_user_id', session('temp_user_id'))->delete();
-            }
-            Session::forget('temp_user_id');
+        // Todo: fix this mess
+        if (!isset($user)) {
+            throw new ValidationException('User creation failed');
         }
 
-        if (Cookie::has('referral_code')) {
-            $referral_code = Cookie::get('referral_code');
-            $referred_by_user = User::where('referral_code', $referral_code)->first();
-            if ($referred_by_user != null) {
-                $user->referred_by = $referred_by_user->id;
-                $user->save();
-            }
-        }
-
-        return $user;
+        return $user->refresh();
     }
 
     public function register(Request $request)
@@ -148,11 +132,13 @@ class RegisterController extends Controller
         $this->validator($request->all())->validate();
 
         $user = $this->create($request->all());
-
         $this->guard()->login($user);
+        $this->handelCart();
+        $this->handelReferralCode($user);
 
         if ($user->email != null) {
-            if (BusinessSetting::where('type', 'email_verification')->first()->value != 1 || get_setting('customer_registration_verify') === '1') {
+            if (BusinessSetting::where('type',
+                    'email_verification')->first()->value != 1 || get_setting('customer_registration_verify') === '1') {
                 $user->email_verified_at = date('Y-m-d H:m:s');
                 $user->save();
                 offerUserWelcomeCoupon();
@@ -206,6 +192,36 @@ class RegisterController extends Controller
             return redirect(session('link'));
         } else {
             return redirect()->route('home');
+        }
+    }
+
+    private function handelCart()
+    {
+        if (session('temp_user_id') != null) {
+            if (auth()->user()?->user_type == 'customer') {
+
+                Cart::where('temp_user_id', session('temp_user_id'))
+                    ->update(
+                        [
+                            'user_id' => auth()->user()->id,
+                            'temp_user_id' => null,
+                        ]
+                    );
+            } else {
+                Cart::where('temp_user_id', session('temp_user_id'))->delete();
+            }
+            Session::forget('temp_user_id');
+        }
+    }
+
+    private function handelReferralCode(User $user)
+    {
+        if ($referral_code = Cookie::get('referral_code')) {
+            $referred_by_user = User::where('referral_code', $referral_code)->first();
+            if ($referred_by_user != null) {
+                $user->referred_by = $referred_by_user->id;
+                $user->save();
+            }
         }
     }
 }

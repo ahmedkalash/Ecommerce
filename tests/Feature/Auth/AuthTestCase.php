@@ -86,19 +86,11 @@ abstract class AuthTestCase extends TestCase
     /**
      * Seed essential data for tests.
      *
-     * This runs the base data import migration to ensure business settings
-     * and other required data exists.
+     * This Seed essential data for tests to ensure business settings and other required data exist.
      */
     protected function seedEssentialData(): void
     {
-        // The RefreshDatabase trait will automatically run migrations
-        // which includes our 0000_00_00_000001_import_base_data.php migration
-
-        // Create admin user for email utilities that need get_admin()
-        \App\Models\User::factory()->admin()->create([
-            'email' => 'admin@test.com',
-            'name' => 'Test Admin',
-        ]);
+        //
     }
 
     /**

@@ -11,13 +11,17 @@
 |
 */
 
-use App\Http\Controllers\AuctionProductController;
-use App\Http\Controllers\AuctionProductBidController;
+use App\Http\Controllers\Api\V2\AuctionProductBidController;
+use App\Http\Controllers\Api\V2\AuctionProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
 
-//Admin
-Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function(){
+// use App\Http\Controllers\AuctionProductBidController;
+
+// use App\Http\Controllers\AuctionProductController;
+
+// Admin
+Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
     // Auction product lists
     Route::controller(AuctionProductController::class)->group(function () {
         Route::get('auction/all-products', 'all_auction_product_list')->name('auction.all_products');
@@ -39,7 +43,7 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
     });
 });
 
-Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user']], function() {
+Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user']], function () {
     Route::controller(AuctionProductController::class)->group(function () {
         Route::get('/auction_products', 'auction_product_list_seller')->name('auction_products.seller.index');
 
@@ -57,7 +61,7 @@ Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user
     });
 });
 
-Route::group(['middleware' => ['auth']], function() {
+Route::group(['middleware' => ['auth']], function () {
     Route::resource('auction_product_bids', AuctionProductBidController::class);
 
     Route::post('/auction/cart/show-cart-modal', [CartController::class, 'showCartModalAuction'])->name('auction.cart.showCartModal');

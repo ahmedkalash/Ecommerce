@@ -7,6 +7,7 @@
 ---
 
 ## Table of Contents
+
 1. [Module Overview](#module-overview)
 2. [Authentication Features](#authentication-features)
 3. [Technical Architecture](#technical-architecture)
@@ -21,9 +22,12 @@
 ## Module Overview
 
 ### Purpose
-The Authentication and User Management Module manages the complete lifecycle of user identities and access control in the multi-vendor e-commerce platform. It handles **four actor types**: Admin, Seller, Customer, and Delivery Boy.
+
+The Authentication and User Management Module manages the complete lifecycle of user identities and access control in
+the multi-vendor e-commerce platform. It handles **four actor types**: Admin, Seller, Customer, and Delivery Boy.
 
 ### Current State
+
 - **Status**: Functional but containing significant code smells
 - **Framework**: Laravel 10 with built-in Auth + custom implementations
 - **Architecture**: Traditional MVC with procedural logic embedded in controllers
@@ -33,47 +37,50 @@ The Authentication and User Management Module manages the complete lifecycle of 
 
 ## Authentication Features
 
-### 1. **Registration** 
+### 1. **Registration**
 
 #### Customer Registration
+
 - **Routes**:
-  - `GET /users/registration` → HomeController@registration
-  - `POST /register` → RegisterController@register (Laravel default)
-  
+    - `GET /users/registration` → HomeController@registration
+    - `POST /register` → RegisterController@register (Laravel default)
+
 - **Flow**:
-  1. User visits registration page
-  2. Optionally verify email/phone first (if `customer_registration_verify` setting enabled)
-  3. Submit registration form with:
-     - Name (required
-     - Email OR Phone (required)
-     - Password (required, min 6 chars, confirmed)
-     - Google reCAPTCHA (if enabled)
-  4. System checks for existing email/phone
-  5. Creates User record with `user_type='customer'`
-  6. Sends welcome email (if enabled)
-  7. Assigns welcome coupon (if enabled)
-  8. Transfers guest cart items to authenticated user
+    1. User visits registration page
+    2. Optionally verify email/phone first (if `customer_registration_verify` setting enabled)
+    3. Submit registration form with:
+        - Name (required
+        - Email OR Phone (required)
+        - Password (required, min 6 chars, confirmed)
+        - Google reCAPTCHA (if enabled)
+    4. System checks for existing email/phone
+    5. Creates User record with `user_type='customer'`
+    6. Sends welcome email (if enabled)
+    7. Assigns welcome coupon (if enabled)
+    8. Transfers guest cart items to authenticated user
 
 - **Pre-registration Verification** (Optional Flow):
-  - `POST /registration/verification-code-send` → sends OTP code
-  - `GET /registration/verify-code/{id}` → shows verification form
-  - `POST /registration/verification-code-confirmation` → confirms code
-  - Only after verification, user can complete registration
+    - `POST /registration/verification-code-send` → sends OTP code
+    - `GET /registration/verify-code/{id}` → shows verification form
+    - `POST /registration/verification-code-confirmation` → confirms code
+    - Only after verification, user can complete registration
 
 - **Key Files**:
-  - `app/Http/Controllers/Auth/RegisterController.php`
-  - `app/Http/Controllers/HomeController.php` (verification methods)
-  - `resources/views/auth/{theme}/user_registration.blade.php`
+    - `app/Http/Controllers/Auth/RegisterController.php`
+    - `app/Http/Controllers/HomeController.php` (verification methods)
+    - `resources/views/auth/{theme}/user_registration.blade.php`
 
 #### Seller Registration
+
 - **Route**: `POST /shops` → ShopController@store
 - Similar flow to customer but creates:
-  - User record with `user_type='seller'`
-  - Shop record
-  - Seller record
-  - Requires shop verification approval by admin
+    - User record with `user_type='seller'`
+    - Shop record
+    - Seller record
+    - Requires shop verification approval by admin
 
 #### Key Code Locations
+
 ```php
 // Registration Controller
 app/Http/Controllers/Auth/RegisterController.php
@@ -97,6 +104,7 @@ app/Http/Controllers/HomeController.php
 #### Email Verification Methods
 
 **Method 1: Laravel Built-in Email Verification**
+
 - Triggered if `email_verification` setting = 1 AND NOT using pre-verification
 - Sends email with signed URL
 - Route: `GET /email/resend` → VerificationController@resend
@@ -104,18 +112,21 @@ app/Http/Controllers/HomeController.php
 - Custom notification: `App\Notifications\EmailVerificationNotification`
 
 **Method 2: Code-based Verification**
+
 - Triggered if using pre-registration verification OR verification link
 - Generates 6-digit `verification_code`
 - Route: `GET /verification-confirmation/{code}` → VerificationController@verification_confirmation
 - Sets `email_verified_at` timestamp on success
 
 #### Phone Verification (OTP System Addon)
+
 - Only if `otp_system` addon is activated
 - Sends SMS with 6-digit code
 - Uses `App\Http\Controllers\OTPVerificationController`
 - SMS templates stored in `sms_templates` table
 
 #### Key Files
+
 ```php
 app/Http/Controllers/Auth/VerificationController.php
   - show()                        // Show verification notice
@@ -131,32 +142,35 @@ app/Utility/EmailUtility.php
 ### 3. **Login**
 
 #### Standard Login
+
 - **Routes**:
-  - `GET /login` → Login form (Laravel default)
-  - `POST /login` → LoginController@login
-  - `GET /logout` → LoginController@logout
+    - `GET /login` → Login form (Laravel default)
+    - `POST /login` → LoginController@login
+    - `GET /logout` → LoginController@logout
 
 - **Login Credentials**:
-  - Email + Password OR Phone + Password
-  - reCAPTCHA (if enabled)
+    - Email + Password OR Phone + Password
+    - reCAPTCHA (if enabled)
 
 - **Flow**:
-  1. Validate input (email/phone + password)
-  2. Check credentials
-  3. Check if user is banned (`banned` column)
-  4. Transfer guest cart items to user
-  5. Redirect based on `user_type`:
-     - `admin` or `staff` → `/admin`
-     - `seller` → `/seller/dashboard`
-     - `delivery_boy` → `/delivery-boys/dashboard`
-     - `customer` → Previous URL or `/`
+    1. Validate input (email/phone + password)
+    2. Check credentials
+    3. Check if user is banned (`banned` column)
+    4. Transfer guest cart items to user
+    5. Redirect based on `user_type`:
+        - `admin` or `staff` → `/admin`
+        - `seller` → `/seller/dashboard`
+        - `delivery_boy` → `/delivery-boys/dashboard`
+        - `customer` → Previous URL or `/`
 
 #### Cart-specific Login
+
 - **Route**: `POST /users/login/cart` → HomeController@cart_login
 - Special login during checkout process
 - Preserves cart state before authentication
 
 #### Key Methods in LoginController
+
 ```php
 app/Http/Controllers/Auth/LoginController.php
   - validateLogin()           // Validate credentials
@@ -167,6 +181,7 @@ app/Http/Controllers/Auth/LoginController.php
 ```
 
 #### Multiple Login Pages
+
 - Customer: `/users/login`
 - Seller: `/seller/login`
 - Delivery Boy: `/deliveryboy/login`
@@ -177,12 +192,14 @@ app/Http/Controllers/Auth/LoginController.php
 ### 4. **Social Login**
 
 #### Supported Providers
+
 - **Google** (OAuth2)
 - **Facebook** (OAuth2)
 - **Twitter** (OAuth)
 - **Apple** (OAuth2 with special callback)
 
 #### Configuration
+
 ```php
 // config/services.php
 'google' => [
@@ -194,27 +211,29 @@ app/Http/Controllers/Auth/LoginController.php
 ```
 
 #### Flow
+
 1. **Initiate**: `GET /social-login/redirect/{provider}` → LoginController@redirectToProvider
-   - Redirects to provider's OAuth page
+    - Redirects to provider's OAuth page
 
 2. **Callback**: `GET /social-login/{provider}/callback` → LoginController@handleProviderCallback
-   - Receives OAuth token
-   - Fetches user info from provider
-   - Checks if user exists by `provider_id` or `email`
-   - If exists: Login
-   - If not: Create new user with:
-     - `provider` = 'google' | 'facebook' | 'twitter' | 'apple'
-     - `provider_id` = OAuth user ID
-     - `email` from social account
-     - `email_verified_at` = now (auto-verified)
-     - Random password (user can reset later)
+    - Receives OAuth token
+    - Fetches user info from provider
+    - Checks if user exists by `provider_id` or `email`
+    - If exists: Login
+    - If not: Create new user with:
+        - `provider` = 'google' | 'facebook' | 'twitter' | 'apple'
+        - `provider_id` = OAuth user ID
+        - `email` from social account
+        - `email_verified_at` = now (auto-verified)
+        - Random password (user can reset later)
 
 3. **Apple Special**: `POST /apple-callback` → LoginController@handleAppleCallback
-   - Apple uses POST method for callback
-   - Validates JWT token
-   - Extracts user info
+    - Apple uses POST method for callback
+    - Validates JWT token
+    - Extracts user info
 
 #### Key Code
+
 ```php
 app/Http/Controllers/Auth/LoginController.php
   - redirectToProvider($provider)
@@ -224,6 +243,7 @@ app/Http/Controllers/Auth/LoginController.php
 ```
 
 #### Libraries Used
+
 - `laravel/socialite` - OAuth abstraction
 - `genealabs/laravel-socialiter` - Extended Socialite facade
 
@@ -234,6 +254,7 @@ app/Http/Controllers/Auth/LoginController.php
 #### Flow
 
 **Step 1: Request Reset**
+
 - `GET /password/reset` → Shows email/phone input form
 - `POST /password/email` → ForgotPasswordController@sendResetLinkEmail
 - Validates with reCAPTCHA (if enabled)
@@ -243,15 +264,17 @@ app/Http/Controllers/Auth/LoginController.php
 - Sends email with code OR SMS (if phone)
 
 **Step 2: Enter Code & New Password**
+
 - User receives email/SMS with code
 - `GET /password/reset` (from email link) → Shows form
 - User enters:
-  - Email/Phone
-  - Verification code
-  - New password
-  - Confirm password
+    - Email/Phone
+    - Verification code
+    - New password
+    - Confirm password
 
 **Step 3: Reset Password**
+
 - `POST /password/reset/email/submit` → HomeController@reset_password_with_code
 - Validates verification code matches email
 - Updates password with bcrypt hash
@@ -261,11 +284,13 @@ app/Http/Controllers/Auth/LoginController.php
 - Redirects based on user type
 
 #### Email Template
+
 - Uses `password_reset_email_to_all` template
 - Stored in `email_templates` table
 - Supports variables: `[[user_email]]`, `[[code]]`, `[[store_name]]`
 
 #### Key Files
+
 ```php
 app/Http/Controllers/Auth/ForgotPasswordController.php
   - sendResetLinkEmail() // Send reset code
@@ -282,12 +307,14 @@ app/Http/Controllers/HomeController.php
 ### 6. **Password Change** (Authenticated Users)
 
 #### Update Email
+
 - `POST /new-user-email` → HomeController@update_email
 - Sends OTP to new email
 - `POST /send-otp-update-email` → HomeController@sendEmailUpdateVerificationCode
 - Verifies OTP and updates email
 
 #### Update Profile
+
 - `POST /user/update-profile` → HomeController@userProfileUpdate
 - Can update: name, phone, address, city, country, etc.
 - Does NOT allow changing email directly (requires OTP flow)
@@ -299,6 +326,7 @@ app/Http/Controllers/HomeController.php
 ### Controllers
 
 #### Authentication Controllers (Laravel Default)
+
 ```
 app/Http/Controllers/Auth/
 ├── LoginController.php          // Login + Social auth + Logout
@@ -309,6 +337,7 @@ app/Http/Controllers/Auth/
 ```
 
 #### Custom Controllers
+
 ```
 app/Http/Controllers/
 ├── HomeController.php           // Custom registration verification, password reset
@@ -317,6 +346,7 @@ app/Http/Controllers/
 ```
 
 ### Traits Used
+
 - `Illuminate\Foundation\Auth\AuthenticatesUsers` (LoginController)
 - `Illuminate\Foundation\Auth\RegistersUsers` (RegisterController)
 - `Illuminate\Foundation\Auth\VerifiesEmails` (VerificationController)
@@ -326,6 +356,7 @@ app/Http/Controllers/
 ### Middleware
 
 #### Auth Middleware
+
 ```php
 // app/Http/Middleware/
 IsAdmin.php          // Checks user_type = 'admin' OR 'staff'
@@ -337,6 +368,7 @@ IsAppUserUnbanned.php // API version of unbanned check
 ```
 
 #### Other Middleware
+
 ```php
 HandleDemoLogin.php          // Prevents actions on demo accounts
 PreventBackHistory.php       // Prevents browser back after logout
@@ -344,6 +376,7 @@ RedirectIfAuthenticated.php  // Redirects authenticated users away from login
 ```
 
 #### Middleware Registration (app/Http/Kernel.php)
+
 ```php
 protected $routeMiddleware = [
     'auth' => \App\Http\Middleware\Authenticate::class,
@@ -359,15 +392,18 @@ protected $routeMiddleware = [
 ### Models
 
 #### User Model (`app/Models/User.php`)
+
 **Implements**: `MustVerifyEmail`  
 **Traits**: `Notifiable`, `HasApiTokens`, `HasRoles` (Spatie)
 
 **Fillable Attributes**:
+
 - name, email, password
 - address, city, postal_code, phone, country
 - provider_id, email_verified_at, verification_code
 
 **Relationships** (30+ relationships - God Model!):
+
 - `hasOne`: customer, shop, seller, staff, club_point, customer_package, userCoupon
 - `hasMany`: wishlists, orders, seller_orders, carts, reviews, addresses, products, etc.
 - `belongsTo`: customer_package
@@ -375,6 +411,7 @@ protected $routeMiddleware = [
 **⚠️ Problem**: User model has TOO MANY responsibilities!
 
 #### Supporting Models
+
 ```
 Customer.php         // Customer-specific data
 Seller.php          // Seller-specific data  
@@ -391,43 +428,47 @@ Permission.php      // Permissions (Spatie)
 ### `users` Table
 
 ```sql
-CREATE TABLE `users` (
-  `id` int(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `referred_by` int(11) DEFAULT NULL,                    -- Referral system
-  `provider` varchar(255) DEFAULT NULL,                  -- 'google', 'facebook', 'twitter', 'apple'
-  `provider_id` varchar(50) DEFAULT NULL,                -- OAuth user ID
-  `refresh_token` text DEFAULT NULL,                     -- OAuth refresh token
-  `access_token` longtext DEFAULT NULL,                  -- OAuth access token
-  `user_type` varchar(20) NOT NULL DEFAULT 'customer',   -- 'admin', 'seller', 'customer', 'delivery_boy', 'staff'
-  `name` varchar(191) NOT NULL,
-  `email` varchar(191) DEFAULT NULL,                     -- Can be NULL for phone-only registration
-  `email_verified_at` timestamp NULL DEFAULT NULL,
-  `verification_code` text DEFAULT NULL,                 -- 6-digit code for email/password verification
-  `new_email_verificiation_code` text DEFAULT NULL,      -- For email change
-  `password` varchar(191) DEFAULT NULL,                  -- Bcrypt hash (NULL for social login initially)
-  `remember_token` varchar(100) DEFAULT NULL,            -- Laravel remember me
-  `device_token` varchar(255) DEFAULT NULL,              -- For push notifications
-  `avatar` varchar(256) DEFAULT NULL,                    -- Avatar file ID
-  `avatar_original` varchar(256) DEFAULT NULL,           -- Original avatar path
-  `address` varchar(300) DEFAULT NULL,
-  `country` varchar(30) DEFAULT NULL,
-  `state` varchar(30) DEFAULT NULL,
-  `city` varchar(30) DEFAULT NULL,
-  `postal_code` varchar(20) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `balance` double(20,2) NOT NULL DEFAULT 0.00,          -- ⚠️ PROBLEM: Should be decimal, not double!
-  `banned` tinyint(4) NOT NULL DEFAULT 0,                -- Ban status
-  `is_suspicious` tinyint(4) DEFAULT 0,                  -- Fraud detection flag
-  `referral_code` varchar(255) DEFAULT NULL,             -- User's unique referral code
-  `customer_package_id` int(11) DEFAULT NULL,            -- Subscription package FK
-  `remaining_uploads` int(11) DEFAULT 0,                 -- Upload quota
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `users`
+(
+    `id`                           int(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `referred_by`                  int(11)                  DEFAULT NULL,       -- Referral system
+    `provider`                     varchar(255)             DEFAULT NULL,       -- 'google', 'facebook', 'twitter', 'apple'
+    `provider_id`                  varchar(50)              DEFAULT NULL,       -- OAuth user ID
+    `refresh_token`                text                     DEFAULT NULL,       -- OAuth refresh token
+    `access_token`                 longtext                 DEFAULT NULL,       -- OAuth access token
+    `user_type`                    varchar(20)     NOT NULL DEFAULT 'customer', -- 'admin', 'seller', 'customer', 'delivery_boy', 'staff'
+    `name`                         varchar(191)    NOT NULL,
+    `email`                        varchar(191)             DEFAULT NULL,       -- Can be NULL for phone-only registration
+    `email_verified_at`            timestamp       NULL     DEFAULT NULL,
+    `verification_code`            text                     DEFAULT NULL,       -- 6-digit code for email/password verification
+    `new_email_verificiation_code` text                     DEFAULT NULL,       -- For email change
+    `password`                     varchar(191)             DEFAULT NULL,       -- Bcrypt hash (NULL for social login initially)
+    `remember_token`               varchar(100)             DEFAULT NULL,       -- Laravel remember me
+    `device_token`                 varchar(255)             DEFAULT NULL,       -- For push notifications
+    `avatar`                       varchar(256)             DEFAULT NULL,       -- Avatar file ID
+    `avatar_original`              varchar(256)             DEFAULT NULL,       -- Original avatar path
+    `address`                      varchar(300)             DEFAULT NULL,
+    `country`                      varchar(30)              DEFAULT NULL,
+    `state`                        varchar(30)              DEFAULT NULL,
+    `city`                         varchar(30)              DEFAULT NULL,
+    `postal_code`                  varchar(20)              DEFAULT NULL,
+    `phone`                        varchar(20)              DEFAULT NULL,
+    `balance`                      double(20, 2)   NOT NULL DEFAULT 0.00,       -- ⚠️ PROBLEM: Should be decimal, not double!
+    `banned`                       tinyint(4)      NOT NULL DEFAULT 0,          -- Ban status
+    `is_suspicious`                tinyint(4)               DEFAULT 0,          -- Fraud detection flag
+    `referral_code`                varchar(255)             DEFAULT NULL,       -- User's unique referral code
+    `customer_package_id`          int(11)                  DEFAULT NULL,       -- Subscription package FK
+    `remaining_uploads`            int(11)                  DEFAULT 0,          -- Upload quota
+    `created_at`                   timestamp       NULL     DEFAULT NULL,
+    `updated_at`                   timestamp       NULL     DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 ```
 
 ### `customers` Table
+
 ```sql
 -- Stores customer-specific extended data
 - user_id (FK to users)
@@ -435,6 +476,7 @@ CREATE TABLE `users` (
 ```
 
 ### `sellers` Table
+
 ```sql
 -- Stores seller-specific data
 - user_id (FK to users)
@@ -444,6 +486,7 @@ CREATE TABLE `users` (
 ```
 
 ### `staffs` Table
+
 ```sql
 -- Stores staff-specific data
 - user_id (FK to users)
@@ -451,6 +494,7 @@ CREATE TABLE `users` (
 ```
 
 ### `roles` Table (Spatie Permission)
+
 ```sql
 -- Role-based access control
 - name
@@ -458,6 +502,7 @@ CREATE TABLE `users` (
 ```
 
 ### `registration_verification_codes` Table
+
 ```sql
 -- Temporary storage for pre-registration verification
 - email
@@ -701,67 +746,67 @@ CREATE TABLE `users` (
 ### 🔴 Critical Issues
 
 1. **Financial Data Type Mismatch**
-   - **Issue**: `balance` column is `double(20,2)` instead of `decimal(15,2)`
-   - **Risk**: Floating-point precision errors in financial calculations
-   - **Impact**: HIGH - Can cause money loss in transactions
-   - **Location**: `users` table, line 23 in schema
-   - **Fix**: Migration to change column type to `DECIMAL(15,2)`
+    - **Issue**: `balance` column is `double(20,2)` instead of `decimal(15,2)`
+    - **Risk**: Floating-point precision errors in financial calculations
+    - **Impact**: HIGH - Can cause money loss in transactions
+    - **Location**: `users` table, line 23 in schema
+    - **Fix**: Migration to change column type to `DECIMAL(15,2)`
 
-2. **Insecure Direct Object References (IDOR)** 
-   - **Issue**: User IDs are auto-increment integers, easily guessable
-   - **Risk**: Attackers can enumerate users by incrementing ID
-   - **Impact**: HIGH - Data leakage, unauthorized access
-   - **Vulnerable Endpoints**:
-     - `/purchase_history/details/{id}`
-     - `/addresses/destroy/{id}`
-     - `/user-profile/{id}`
-   - **Fix**: Use UUIDs or implement proper authorization checks
+2. **Insecure Direct Object References (IDOR)**
+    - **Issue**: User IDs are auto-increment integers, easily guessable
+    - **Risk**: Attackers can enumerate users by incrementing ID
+    - **Impact**: HIGH - Data leakage, unauthorized access
+    - **Vulnerable Endpoints**:
+        - `/purchase_history/details/{id}`
+        - `/addresses/destroy/{id}`
+        - `/user-profile/{id}`
+    - **Fix**: Use UUIDs or implement proper authorization checks
 
 3. **Password Reset Verification Code**
-   - **Issue**: 6-digit numeric code (100000-999999) = only 900,000 combinations
-   - **Risk**: Brute force attack possible
-   - **Impact**: MEDIUM - Account takeover
-   - **Location**: `ForgotPasswordController.php`, line 65
-   - **Fix**: Add rate limiting + use alphanumeric codes + expire codes
+    - **Issue**: 6-digit numeric code (100000-999999) = only 900,000 combinations
+    - **Risk**: Brute force attack possible
+    - **Impact**: MEDIUM - Account takeover
+    - **Location**: `ForgotPasswordController.php`, line 65
+    - **Fix**: Add rate limiting + use alphanumeric codes + expire codes
 
 4. **No Rate Limiting on Login**
-   - **Issue**: No protection against brute force login attempts
-   - **Risk**: Account takeover via password guessing
-   - **Impact**: HIGH
-   - **Fix**: Implement Laravel throttle middleware on login route
+    - **Issue**: No protection against brute force login attempts
+    - **Risk**: Account takeover via password guessing
+    - **Impact**: HIGH
+    - **Fix**: Implement Laravel throttle middleware on login route
 
 5. **Session Not Invalidated on Password Reset**
-   - **Issue**: Old sessions remain valid after password reset
-   - **Risk**: If attacker has active session, password reset doesn't help
-   - **Impact**: MEDIUM
-   - **Fix**: Call `Auth::logoutOtherDevices()` after password reset
+    - **Issue**: Old sessions remain valid after password reset
+    - **Risk**: If attacker has active session, password reset doesn't help
+    - **Impact**: MEDIUM
+    - **Fix**: Call `Auth::logoutOtherDevices()` after password reset
 
 ### ⚠️ Medium Issues
 
 6. **SQL Injection Risk in User Search**
-   - **Issue**: If user search uses raw queries without parameter binding
-   - **Risk**: Database breach
-   - **Impact**: CRITICAL if exists
-   - **Action**: Audit all User::where() calls for raw SQL
+    - **Issue**: If user search uses raw queries without parameter binding
+    - **Risk**: Database breach
+    - **Impact**: CRITICAL if exists
+    - **Action**: Audit all User::where() calls for raw SQL
 
 7. **Mass Assignment Vulnerability**
-   - **Issue**: User model has `$fillable` array including sensitive fields
-   - **Risk**: Attackers can modify fields like `balance`, `user_type` via requests
-   - **Impact**: HIGH
-   - **Location**: `User.php`, line 29
-   - **Fix**: Use `$guarded` for sensitive fields or validate strictly
+    - **Issue**: User model has `$fillable` array including sensitive fields
+    - **Risk**: Attackers can modify fields like `balance`, `user_type` via requests
+    - **Impact**: HIGH
+    - **Location**: `User.php`, line 29
+    - **Fix**: Use `$guarded` for sensitive fields or validate strictly
 
 8. **Weak Email Verification**
-   - **Issue**: `verification_code` stored in plaintext in database
-   - **Risk**: Database leak exposes verification codes
-   - **Impact**: MEDIUM
-   - **Fix**: Hash verification codes before storing
+    - **Issue**: `verification_code` stored in plaintext in database
+    - **Risk**: Database leak exposes verification codes
+    - **Impact**: MEDIUM
+    - **Fix**: Hash verification codes before storing
 
 9. **No CSRF Protection on Social Login Callbacks**
-   - **Issue**: Social login callbacks might not verify state parameter
-   - **Risk**: CSRF attack during OAuth flow
-   - **Impact**: MEDIUM
-   - **Fix**: Implement state parameter validation
+    - **Issue**: Social login callbacks might not verify state parameter
+    - **Risk**: CSRF attack during OAuth flow
+    - **Impact**: MEDIUM
+    - **Fix**: Implement state parameter validation
 
 10. **Avatar Upload Without Validation**
     - **Issue**: No mention of file type/size validation for avatar uploads
@@ -807,6 +852,7 @@ CREATE TABLE `users` (
 ### 1. God Model Anti-Pattern 👑
 
 **Problem**: User model has 30+ relationships and handles:
+
 - Authentication
 - Profile data
 - Wallet balances
@@ -819,6 +865,7 @@ CREATE TABLE `users` (
 - etc.
 
 **Violations**:
+
 - Single Responsibility Principle (SRP)
 - Open/Closed Principle
 - High coupling
@@ -826,12 +873,14 @@ CREATE TABLE `users` (
 **Location**: `app/Models/User.php`
 
 **Impact**:
+
 - Hard to test
 - Hard to maintain
 - Changes ripple across system
 - Difficult to scale
 
 **Fix Strategy**:
+
 ```
 Extract to separate models/services:
 - UserProfile (name, address, avatar)
@@ -847,15 +896,18 @@ Extract to separate models/services:
 **Problem**: Controllers contain business logic instead of delegating to services
 
 **Examples**:
+
 - `RegisterController::create()` - 61 lines mixing validation, cart transfer, referral logic
 - `LoginController::authenticated()` - 48 lines of redirect logic
 - `HomeController::reset_password_with_code()` - 25 lines of password reset logic
 
 **Violations**:
+
 - Single Responsibility Principle
 - Controllers should be thin orchestrators
 
 **Fix**: Extract to services:
+
 ```php
 // Instead of:
 class RegisterController {
@@ -883,11 +935,13 @@ class RegisterController {
 **Problem**: Validation scattered across multiple methods and controllers
 
 **Examples**:
+
 - Email validation: `RegisterController::register()` + `HomeController::sendRegVerificationCode()`
 - Phone validation: Different patterns in different places
 - reCAPTCHA: Inline Rule::when() instead of custom request
 
 **Fix**: Use Form Request classes
+
 ```php
 php artisan make:request RegisterUserRequest
 php artisan make:request SendVerificationCodeRequest
@@ -900,6 +954,7 @@ php artisan make:request SendVerificationCodeRequest
 **Problem**: Hardcoded strings throughout codebase
 
 **Examples**:
+
 ```php
 // User types
 'customer', 'admin', 'seller', 'staff', 'delivery_boy'
@@ -912,6 +967,7 @@ php artisan make:request SendVerificationCodeRequest
 ```
 
 **Fix**: Use enums (PHP 8.1+) or constants
+
 ```php
 enum UserType: string {
     case ADMIN = 'admin';
@@ -936,6 +992,7 @@ enum SocialProvider: string {
 **Problem**: Complex if-else chains for user type checking
 
 **Example** (from LoginController@authenticated):
+
 ```php
 if (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff') {
     return redirect()->route('admin.dashboard');
@@ -947,6 +1004,7 @@ elseif (auth()->user()->user_type == 'seller') {
 ```
 
 **Fix**: Strategy pattern or polymorphism
+
 ```php
 interface UserDashboard {
     public function getDashboardRoute(): string;
@@ -969,6 +1027,7 @@ return redirect($user->getDashboardRoute());
 **Problem**: Middleware redirects with business logic
 
 **Example** (IsUser.php):
+
 ```php
 if (Auth::check() && (Auth::user()->user_type == 'customer' || ...)) {
     return $next($request);
@@ -986,12 +1045,14 @@ if (Auth::check() && (Auth::user()->user_type == 'customer' || ...)) {
 
 **Problem**: Zero test coverage mentioned
 
-**Impact**: 
+**Impact**:
+
 - Refactoring is risky
 - No regression detection
 - Unknown edge cases
 
 **Fix**: Write tests using TDD approach
+
 ```php
 tests/Feature/Auth/
 ├── RegistrationTest.php
@@ -1009,11 +1070,13 @@ tests/Feature/Auth/
 **Problem**: Controllers use Eloquent directly instead of repositories
 
 **Example**:
+
 ```php
 $user = User::where('email', $request->email)->first();
 ```
 
 **Fix**: Repository pattern
+
 ```php
 interface UserRepositoryInterface {
     public function findByEmail(string $email): ?User;
@@ -1034,6 +1097,7 @@ class EloquentUserRepository implements UserRepositoryInterface {
 **Problem**: Email sending scattered in controllers
 
 **Fix**: Use Jobs and Queues
+
 ```php
 // Instead of:
 EmailUtility::email_verification($user, 'customer');
@@ -1047,12 +1111,14 @@ dispatch(new SendVerificationEmail($user));
 ### 10. No Logging 📝
 
 **Problem**: No audit trail for:
+
 - Failed login attempts
 - Password reset requests
 - User registration
 - Email changes
 
 **Fix**: Add logging layer
+
 ```php
 Log::info('User login attempt', [
     'email' => $request->email,
@@ -1071,9 +1137,9 @@ Log::info('User login attempt', [
    ```sql
    ALTER TABLE users MODIFY COLUMN balance DECIMAL(15,2) NOT NULL DEFAULT 0.00;
    ```
-   - Risk: LOW
-   - Impact: HIGH
-   - Effort: 1 hour
+    - Risk: LOW
+    - Impact: HIGH
+    - Effort: 1 hour
 
 2. **Add Database Indexes**
    ```sql
@@ -1082,15 +1148,15 @@ Log::info('User login attempt', [
    ALTER TABLE users ADD INDEX idx_provider (provider, provider_id);
    ALTER TABLE users ADD UNIQUE INDEX idx_referral_code (referral_code);
    ```
-   - Risk: LOW
-   - Impact: MEDIUM (performance)
-   - Effort: 1 hour
+    - Risk: LOW
+    - Impact: MEDIUM (performance)
+    - Effort: 1 hour
 
 3. **Add Foreign Key Constraints**
-   - Currently missing FK definitions
-   - Risk: LOW
-   - Impact: MEDIUM (data integrity)
-   - Effort: 2 hours
+    - Currently missing FK definitions
+    - Risk: LOW
+    - Impact: MEDIUM (data integrity)
+    - Effort: 2 hours
 
 ### Phase 2: Security Hardening (Medium Risk)
 
@@ -1100,28 +1166,28 @@ Log::info('User login attempt', [
    Route::post('/login')->middleware('throttle:5,1'); // 5 attempts per minute
    Route::post('/password/email')->middleware('throttle:3,10'); // 3 per 10 min
    ```
-   - Risk: LOW
-   - Impact: HIGH
-   - Effort: 2 hours
+    - Risk: LOW
+    - Impact: HIGH
+    - Effort: 2 hours
 
 5. **Add CSRF Protection to Social Login**
-   - Implement state parameter validation
-   - Risk: MEDIUM
-   - Impact: HIGH
-   - Effort: 4 hours
+    - Implement state parameter validation
+    - Risk: MEDIUM
+    - Impact: HIGH
+    - Effort: 4 hours
 
 6. **Hash Verification Codes**
-   - Store hashed codes instead of plaintext
-   - Risk: MEDIUM (requires careful migration)
-   - Impact: MEDIUM
-   - Effort: 6 hours
+    - Store hashed codes instead of plaintext
+    - Risk: MEDIUM (requires careful migration)
+    - Impact: MEDIUM
+    - Effort: 6 hours
 
 7. **Implement UUIDs**
-   - Add `uuid` column to users table
-   - Use UUIDs in URLs instead of IDs
-   - Risk: HIGH (lots of code changes)
-   - Impact: HIGH
-   - Effort: 16 hours
+    - Add `uuid` column to users table
+    - Use UUIDs in URLs instead of IDs
+    - Risk: HIGH (lots of code changes)
+    - Impact: HIGH
+    - Effort: 16 hours
 
 ### Phase 3: Code Structure (High Risk)
 
@@ -1133,9 +1199,9 @@ Log::info('User login attempt', [
        public function logout(): void
    }
    ```
-   - Risk: MEDIUM
-   - Impact: HIGH (maintainability)
-   - Effort: 8 hours
+    - Risk: MEDIUM
+    - Impact: HIGH (maintainability)
+    - Effort: 8 hours
 
 9. **Extract Registration Service**
    ```php
@@ -1150,9 +1216,9 @@ Log::info('User login attempt', [
        public function registerSeller(array $data): User
    }
    ```
-   - Risk: MEDIUM
-   - Impact: HIGH
-   - Effort: 12 hours
+    - Risk: MEDIUM
+    - Impact: HIGH
+    - Effort: 12 hours
 
 10. **Extract Password Service**
     ```php
@@ -1257,12 +1323,14 @@ Log::info('User login attempt', [
 ## Priority Roadmap
 
 ### 🔥 Critical (Do First - Week 1)
+
 1. Fix `balance` column type (Data Integrity)
 2. Implement rate limiting on auth endpoints (Security)
 3. Add database indexes for performance
 4. Add audit logging for security events
 
 ### ⚠️ High Priority (Week 2-3)
+
 5. Extract Password Service (reduce controller bloat)
 6. Extract Verification Service
 7. Implement UUID for users (IDOR fix)
@@ -1271,13 +1339,15 @@ Log::info('User login attempt', [
 10. Write Feature Tests for critical flows
 
 ### 💡 Medium Priority (Week 4-6)
+
 11. Extract Authentication Service
-12. Extract Registration Service  
+12. Extract Registration Service
 13. Implement Repository Pattern
 14. Add CSRF protection to social login
 15. Write Unit Tests (80% coverage)
 
 ### 🎯 Long-term (Month 2-3)
+
 16. Decompose User Model (requires tests first!)
 17. Implement MFA for admin users
 18. Add security monitoring dashboard
@@ -1291,38 +1361,38 @@ Log::info('User login attempt', [
 ### What I Learned
 
 1. **Laravel Authentication Architecture**
-   - How Laravel's built-in auth works (traits, routes, controllers)
-   - How to extend default behavior
-   - Middleware for authorization
-   - Email verification mechanisms
+    - How Laravel's built-in auth works (traits, routes, controllers)
+    - How to extend default behavior
+    - Middleware for authorization
+    - Email verification mechanisms
 
 2. **Multi-Actor Systems**
-   - Challenges of having multiple user types in one table
-   - Role-based access control (RBAC)
-   - Polymorphic relationships
+    - Challenges of having multiple user types in one table
+    - Role-based access control (RBAC)
+    - Polymorphic relationships
 
 3. **OAuth/Social Login**
-   - OAuth 2.0 flow (redirect → callback → token exchange)
-   - Handling different providers
-   - Linking social accounts to existing users
+    - OAuth 2.0 flow (redirect → callback → token exchange)
+    - Handling different providers
+    - Linking social accounts to existing users
 
 4. **Security Concerns**
-   - IDOR vulnerabilities
-   - Rate limiting importance
-   - Password hashing
-   - CSRF in OAuth
-   - Audit logging
+    - IDOR vulnerabilities
+    - Rate limiting importance
+    - Password hashing
+    - CSRF in OAuth
+    - Audit logging
 
 5. **Code Quality Issues**
-   - God Model anti-pattern
-   - Fat Controllers
-   - Importance of separation of concerns
-   - Repository pattern benefits
+    - God Model anti-pattern
+    - Fat Controllers
+    - Importance of separation of concerns
+    - Repository pattern benefits
 
 6. **Database Design**
-   - Proper data types for financial fields
-   - Indexing strategy
-   - Foreign key constraints
+    - Proper data types for financial fields
+    - Indexing strategy
+    - Foreign key constraints
 
 ### Questions to Explore
 
@@ -1374,6 +1444,7 @@ Log::info('User login attempt', [
 ## File Checklist
 
 ### Controllers
+
 - ✅ `app/Http/Controllers/Auth/LoginController.php`
 - ✅ `app/Http/Controllers/Auth/RegisterController.php`
 - ✅ `app/Http/Controllers/Auth/VerificationController.php`
@@ -1384,6 +1455,7 @@ Log::info('User login attempt', [
 - ⏭️ `app/Http/Controllers/OTPVerificationController.php`
 
 ### Models
+
 - ✅ `app/Models/User.php`
 - ⏭️ `app/Models/Customer.php`
 - ⏭️ `app/Models/Seller.php`
@@ -1393,6 +1465,7 @@ Log::info('User login attempt', [
 - ⏭️ `app/Models/RegistrationVerificationCode.php`
 
 ### Middleware
+
 - ✅ `app/Http/Middleware/IsAdmin.php`
 - ✅ `app/Http/Middleware/IsUser.php`
 - ✅ `app/Http/Middleware/IsCustomer.php`
@@ -1402,16 +1475,19 @@ Log::info('User login attempt', [
 - ⏭️ `app/Http/Middleware/PreventBackHistory.php`
 
 ### Routes
+
 - ✅ `routes/web.php` (auth routes)
 - ⏭️ `routes/admin.php`
 - ⏭️ `routes/seller.php`
 - ⏭️ `routes/api.php`
 
 ### Utilities
+
 - ⏭️ `app/Utility/EmailUtility.php`
 - ⏭️ `app/Utility/SmsUtility.php`
 
 ### Views
+
 - ⏭️ `resources/views/auth/*/login.blade.php`
 - ⏭️ `resources/views/auth/*/register.blade.php`
 - ⏭️ `resources/views/auth/*/verify_email.blade.php`
@@ -1419,11 +1495,13 @@ Log::info('User login attempt', [
 - ⏭️ `resources/views/auth/*/passwords/reset.blade.php`
 
 ### Configuration
+
 - ✅ `config/services.php` (social login credentials)
 - ⏭️ `config/auth.php`
 - ⏭️ `config/session.php`
 
 ### Database
+
 - ✅ `shop.sql` (users table schema)
 - ⏭️ `database/migrations/*_create_users_table.php` (if exists)
 
@@ -1432,6 +1510,7 @@ Log::info('User login attempt', [
 ## References
 
 ### Laravel Documentation
+
 - [Authentication](https://laravel.com/docs/10.x/authentication)
 - [Authorization](https://laravel.com/docs/10.x/authorization)
 - [Email Verification](https://laravel.com/docs/10.x/verification)
@@ -1439,11 +1518,13 @@ Log::info('User login attempt', [
 - [Socialite](https://laravel.com/docs/10.x/socialite)
 
 ### Security Resources
+
 - [OWASP Authentication Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
 - [OWASP Session Management](https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html)
 - [OWASP Password Storage](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
 
 ### Design Patterns
+
 - [Repository Pattern](https://programmingpot.com/laravel/repository-pattern-in-laravel/)
 - [Service Layer Pattern](https://phpmath.com/service-layer-pattern-in-laravel/)
 - [God Object Anti-Pattern](https://sourcemaking.com/antipatterns/the-blob)
@@ -1452,4 +1533,5 @@ Log::info('User login attempt', [
 
 **End of Document**
 
-*This analysis was created as part of the Active eCommerce CMS refactoring project. It represents the current state of understanding as of 2026-01-28 and will be updated as the refactoring progresses.*
+*This analysis was created as part of the Active eCommerce CMS refactoring project. It represents the current state of
+understanding as of 2026-01-28 and will be updated as the refactoring progresses.*

@@ -41,8 +41,6 @@ class HomeController extends Controller
 {
     /**
      * Show the application frontend home.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function index()
     {
@@ -158,7 +156,11 @@ class HomeController extends Controller
 
     public function registration(Request $request)
     {
-        // todo: learn what does this do!
+        /**
+         * Toggles a "Verification First" registration flow for new customers.
+         *
+         * @see /.docs/business_settings/customer_registration_verify.md
+         */
         if (get_setting('customer_registration_verify') === '1') {
             abort(404);
         }

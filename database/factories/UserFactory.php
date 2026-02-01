@@ -2,14 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Enums\SocialProvider;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * User Factory - Laravel 10 Class-Based Style
- *
  * Provides flexible test data generation with states for different user types and verification statuses.
  *
  * @extends Factory<User>
@@ -32,7 +31,7 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => Hash::make('password'), // Test password: "password"
+            'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
             'user_type' => 'customer', // Default
             'banned' => 0,
@@ -129,10 +128,10 @@ class UserFactory extends Factory
     /**
      * Indicate that the user authenticated via social provider.
      */
-    public function socialAuth(string $provider = 'google', ?string $providerId = null): static
+    public function socialAuth(SocialProvider $provider = SocialProvider::GOOGLE, ?string $providerId = null): static
     {
         return $this->state(fn (array $attributes) => [
-            'provider' => $provider,
+            'provider' => $provider->value,
             'provider_id' => $providerId ?? fake()->uuid(),
             'email_verified_at' => now(), // Social auth users are auto-verified
         ]);

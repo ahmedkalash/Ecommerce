@@ -37,21 +37,21 @@ return [
     ],
 
     'google' => [
-        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect'      => env('APP_URL').'/social-login/google/callback',
+        'redirect' => env('APP_URL').'/social-login/google/callback',
     ],
 
     'facebook' => [
-        'client_id'     => env('FACEBOOK_CLIENT_ID'),
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect'      => env('APP_URL').'/social-login/facebook/callback',
+        'redirect' => env('APP_URL').'/social-login/facebook/callback',
     ],
 
     'twitter' => [
-        'client_id'     => env('TWITTER_CLIENT_ID'),
+        'client_id' => env('TWITTER_CLIENT_ID'),
         'client_secret' => env('TWITTER_CLIENT_SECRET'),
-        'redirect'      => env('APP_URL').'/social-login/twitter/callback',
+        'redirect' => env('APP_URL').'/social-login/twitter/callback',
     ],
 
     'paytm-wallet' => [
@@ -63,4 +63,9 @@ return [
         'industry_type' => env('PAYTM_INDUSTRY_TYPE'),
     ],
 
+    'recaptcha' => [
+        'secret' => env('RECAPTCHA_SECRET_KEY'),
+        'verify_url' => env('RECAPTCHA_VERIFY_URL'),
+        'score_threshold' => env('RECAPTCHA_SCORE_THRESHOLD', 0.5),
+    ],
 ];

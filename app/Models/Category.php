@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    use PreventDemoModeChanges;
+    use HasFactory, PreventDemoModeChanges;
+
     protected $fillable = [
         'discount',
         'discount_start_date',
@@ -21,6 +23,7 @@ class Category extends Model
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $category_translation = $this->category_translations->where('lang', $lang)->first();
+
         return $category_translation != null ? $category_translation->$field : $this->$field;
     }
 
@@ -84,7 +87,7 @@ class Category extends Model
         return $this->belongsTo(SizeChart::class, 'id', 'category_id');
     }
 
-   public function sellerDiscount()
+    public function sellerDiscount()
     {
         return $this->hasOne(SellerCategory::class)->where('seller_id', auth()->id());
     }
@@ -93,5 +96,4 @@ class Category extends Model
     {
         return $this->hasMany(SellerCategory::class);
     }
-
 }

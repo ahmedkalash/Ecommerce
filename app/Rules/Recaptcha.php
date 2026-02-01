@@ -4,52 +4,42 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class Recaptcha implements Rule
 {
-    /**
-     * Create a new rule instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
     /**
      * Determine if the validation rule passes.
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value): bool
     {
-        // return false;
-        $data = array(
-            'secret' => env('RECAPTCHA_SECRET_KEY'),
-            'response' => $value
-        );
+        $data = [
+            'secret' => config('services.recaptcha.secret'),
+            'response' => $value,
+        ];
 
         try {
-            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', $data);
+            $response = Http::asForm()->post(config('services.recaptcha.verify_url'), $data);
 
             $recaptchaData = $response->json();
-            //dd($recaptchaData);
-            return ($recaptchaData['success'] ?? false) && ($recaptchaData['score'] ?? 0) >= (float) env('RECAPTCHA_SCORE_THRESHOLD', 0.5);
+
+            return ($recaptchaData['success'] ?? false) &&
+                ($recaptchaData['score'] ?? 0) >= (float) config('services.recaptcha.score_threshold', 0.5);
         } catch (\Exception $e) {
+            Log::error('Recaptcha validation failed: '.$e->getMessage());
+
             return false;
         }
     }
 
     /**
      * Get the validation error message.
-     *
-     * @return string
      */
-    public function message()
+    public function message(): string
     {
-        return (translate('Verification failed. Please try again.'));
+        return translate('Verification failed. Please try again.');
     }
 }

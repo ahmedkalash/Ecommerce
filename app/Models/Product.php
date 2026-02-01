@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use App;
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use PreventDemoModeChanges;
-    
+    use HasFactory, PreventDemoModeChanges;
+
     protected $guarded = ['choice_attributes'];
 
     protected $with = ['product_translations', 'taxes', 'thumbnail'];
@@ -20,6 +20,7 @@ class Product extends Model
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $product_translations = $this->product_translations->where('lang', $lang)->first();
+
         return $product_translations != null ? $product_translations->$field : $this->$field;
     }
 
@@ -32,7 +33,7 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-    
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories');
@@ -117,7 +118,7 @@ class Product extends Model
     {
         return $this->hasMany(Cart::class);
     }
-    
+
     public function scopeIsApprovedPublished($query)
     {
         return $query->where('approved', '1')->where('published', 1);
@@ -145,7 +146,7 @@ class Product extends Model
 
     // add gallery image to thumb
 
-   public function thumbnailImg(): Attribute
+    public function thumbnailImg(): Attribute
     {
         return Attribute::get(function ($value, $attributes) {
             $photos = $attributes['photos'] ?? null;
@@ -161,19 +162,17 @@ class Product extends Model
         });
     }
 
-
     protected function videoLink(): Attribute
     {
         return Attribute::make(
-           
-            get: fn($value) => json_decode($value, true), 
 
-         
-             set: function ($value) {
+            get: fn($value) => json_decode($value, true),
+
+            set: function ($value) {
                 if (!is_array($value)) {
                     return null;
                 }
-            
+
                 $filtered = array_filter($value, function ($item) {
                     return trim($item) !== '';
                 });
@@ -182,6 +181,4 @@ class Product extends Model
             },
         );
     }
-
-
 }

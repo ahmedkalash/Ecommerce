@@ -92,7 +92,6 @@ class ImportBaseData extends Migration
         $isTestEnvironment = app()->runningUnitTests();
         if ($isTestEnvironment) {
             // TESTING ENVIRONMENT: Import minimal data only
-            // Total: ~18KB, ~0.5s import time
             return [
                 join_paths('for_testing_env', '0_init_db_config.sql'),             // DB initialization (required)
                 join_paths('for_testing_env', '2_business_settings_table.sql'),    // Critical app settings (required)
