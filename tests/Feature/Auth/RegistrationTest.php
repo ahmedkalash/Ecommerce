@@ -262,11 +262,6 @@ class RegistrationTest extends AuthTestCase
         $this->enableEmailVerification();
         $this->disableRegistrationVerify();
 
-        // Create an admin user for email utilities that need get_admin()
-        User::factory()->admin()->create([
-            'email' => 'admin@test.com',
-            'name' => 'Test Admin',
-        ]);
 
         // Act
         $response = $this->post('/register', [

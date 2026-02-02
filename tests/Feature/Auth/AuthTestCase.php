@@ -90,16 +90,19 @@ abstract class AuthTestCase extends TestCase
      */
     protected function seedEssentialData(): void
     {
-        // Create an admin user for email utilities that need get_admin()
-        //        \App\Models\User::firstOrCreate(
-        //            ['email' => 'admin@test.com'],
-        //            [
-        //                'name' => 'Test Admin',
-        //                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-        //                'user_type' => 'admin',
-        //                'email_verified_at' => now(),
-        //            ]
-        //        );
+        // The RefreshDatabase trait will automatically run migrations
+        // which includes our 0000_00_00_000001_import_base_data.php migration
+
+        // Create admin user for email utilities that need get_admin()
+        \App\Models\User::firstOrCreate(
+            ['email' => 'admin@test.com'],
+            [
+                'name' => 'Test Admin',
+                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+                'user_type' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Seed Email Template for password reset
         \App\Models\EmailTemplate::firstOrCreate(
@@ -107,6 +110,26 @@ abstract class AuthTestCase extends TestCase
             [
                 'subject' => 'Password Reset',
                 'default_text' => 'Your password reset code is [[code]].',
+                'status' => 1,
+            ]
+        );
+
+        // Seed Email Verification Template for customer
+        \App\Models\EmailTemplate::firstOrCreate(
+            ['identifier' => 'email_verification_customer'],
+            [
+                'subject' => 'Verify your email',
+                'default_text' => 'Please verify your email: [[verify_email_button]]',
+                'status' => 1,
+            ]
+        );
+
+        // Seed Registration Template for customer
+        \App\Models\EmailTemplate::firstOrCreate(
+            ['identifier' => 'registration_email_to_customer'],
+            [
+                'subject' => 'Welcome to our store',
+                'default_text' => 'Welcome [[customer_name]]!',
                 'status' => 1,
             ]
         );
