@@ -61,8 +61,11 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
             'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1,
-                    ['required', new Recaptcha], ['sometimes']),
+                Rule::when(
+                    get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1,
+                    ['required', new Recaptcha],
+                    ['sometimes']
+                ),
             ],
         ]);
     }
@@ -96,7 +99,6 @@ class RegisterController extends Controller
                     $otpController = new OTPVerificationController;
                     $otpController->send_code($user);
                 }
-
             }
         }
         // Todo: fix this mess
@@ -118,7 +120,6 @@ class RegisterController extends Controller
                 }
 
                 return back();
-
             }
         } elseif (User::where('phone', '+'.$request->country_code.$request->phone)->first() != null) {
             flash(translate('Phone already exists.'));
@@ -137,9 +138,11 @@ class RegisterController extends Controller
         $this->handelReferralCode($user);
 
         if ($user->email != null) {
-            if (BusinessSetting::where('type',
-                    'email_verification')->first()->value != 1 || get_setting('customer_registration_verify') === '1') {
-                $user->email_verified_at = date('Y-m-d H:m:s');
+            if (BusinessSetting::where(
+                    'type',
+                    'email_verification'
+                )->first()->value != 1 || get_setting('customer_registration_verify') === '1') {
+                $user->email_verified_at = date('Y-m-d H:i:s');
                 $user->save();
                 offerUserWelcomeCoupon();
                 flash(translate('Registration successful.'))->success();
@@ -148,7 +151,7 @@ class RegisterController extends Controller
                     EmailUtility::email_verification($user, 'customer');
                     flash(translate('Registration successful. Please verify your email.'))->success();
                 } catch (\Throwable $e) {
-                    dd($e);
+                    // dd($e);
                     $user->delete();
                     flash(translate('Registration failed. Please try again later.'))->error();
                 }

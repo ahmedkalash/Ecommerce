@@ -90,7 +90,26 @@ abstract class AuthTestCase extends TestCase
      */
     protected function seedEssentialData(): void
     {
-        //
+        // Create an admin user for email utilities that need get_admin()
+        //        \App\Models\User::firstOrCreate(
+        //            ['email' => 'admin@test.com'],
+        //            [
+        //                'name' => 'Test Admin',
+        //                'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+        //                'user_type' => 'admin',
+        //                'email_verified_at' => now(),
+        //            ]
+        //        );
+
+        // Seed Email Template for password reset
+        \App\Models\EmailTemplate::firstOrCreate(
+            ['identifier' => 'password_reset_email_to_all'],
+            [
+                'subject' => 'Password Reset',
+                'default_text' => 'Your password reset code is [[code]].',
+                'status' => 1,
+            ]
+        );
     }
 
     /**

@@ -27,13 +27,15 @@ class SocialLoginTest extends AuthTestCase
     public function google_oauth_creates_new_customer_user(): void
     {
         // Arrange - Mock Socialite
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('google-123456');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('newuser@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('John Doe');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn('https://example.com/avatar.jpg');
+        // Arrange - Mock Socialite
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'google-123456',
+            'email' => 'newuser@gmail.com',
+            'name' => 'John Doe',
+            'avatar' => 'https://example.com/avatar.jpg',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
@@ -67,13 +69,15 @@ class SocialLoginTest extends AuthTestCase
         ]);
 
         // Mock Socialite with same email
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('google-789');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('existing@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('John Doe');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn('https://example.com/avatar.jpg');
+        // Mock Socialite with same email
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'google-789',
+            'email' => 'existing@gmail.com',
+            'name' => 'John Doe',
+            'avatar' => 'https://example.com/avatar.jpg',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
@@ -93,13 +97,15 @@ class SocialLoginTest extends AuthTestCase
     public function facebook_login_creates_new_user(): void
     {
         // Arrange
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('fb-123456');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('user@facebook.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Jane Smith');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn('https://facebook.com/avatar.jpg');
+        // Arrange
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'fb-123456',
+            'email' => 'user@facebook.com',
+            'name' => 'Jane Smith',
+            'avatar' => 'https://facebook.com/avatar.jpg',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('facebook', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/facebook/callback');
@@ -123,14 +129,16 @@ class SocialLoginTest extends AuthTestCase
     public function twitter_login_creates_new_user(): void
     {
         // Arrange
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('twitter-123');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('user@twitter.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Twitter User');
-        $socialiteUser->shouldReceive('getNickname')->andReturn('twitteruser');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn('https://twitter.com/avatar.jpg');
+        // Arrange
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'twitter-123',
+            'email' => 'user@twitter.com',
+            'name' => 'Twitter User',
+            'nickname' => 'twitteruser',
+            'avatar' => 'https://twitter.com/avatar.jpg',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('twitter', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/twitter/callback');
@@ -151,16 +159,17 @@ class SocialLoginTest extends AuthTestCase
     public function apple_callback_creates_new_user(): void
     {
         // Arrange
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('apple-xyz');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('user@privaterelay.appleid.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Apple User');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn(null);
+        // Arrange
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'apple-xyz',
+            'email' => 'user@privaterelay.appleid.com',
+            'name' => 'Apple User',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('sign-in-with-apple', $socialiteUser);
 
         // Act - Apple uses POST callback
-        $response = $this->post('/social-login/apple/callback');
+        $response = $this->post('/apple-callback');
 
         // Assert
         $this->assertDatabaseHas('users', [
@@ -180,13 +189,13 @@ class SocialLoginTest extends AuthTestCase
         // Arrange
         $this->enableEmailVerification();
 
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('google-auto');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('auto@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Auto Verify');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn(null);
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'google-auto',
+            'email' => 'auto@gmail.com',
+            'name' => 'Auto Verify',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
@@ -207,13 +216,14 @@ class SocialLoginTest extends AuthTestCase
     public function social_login_without_email_uses_provider_id(): void
     {
         // Arrange - Some providers might not return email
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('no-email-123');
-        $socialiteUser->shouldReceive('getEmail')->andReturn(null);
-        $socialiteUser->shouldReceive('getName')->andReturn('No Email User');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn(null);
+        // Arrange - Some providers might not return email
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'no-email-123',
+            'email' => null,
+            'name' => 'No Email User',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
@@ -239,13 +249,14 @@ class SocialLoginTest extends AuthTestCase
         ]);
 
         // Mock Socialite returning same user
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('google-repeat');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('repeat@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Repeat User');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn(null);
+        // Mock Socialite returning same user
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'google-repeat',
+            'email' => 'repeat@gmail.com',
+            'name' => 'Repeat User',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
@@ -265,19 +276,51 @@ class SocialLoginTest extends AuthTestCase
     public function social_login_redirects_customer_to_home(): void
     {
         // Arrange
-        $socialiteUser = Mockery::mock(SocialiteUser::class);
-        $socialiteUser->shouldReceive('getId')->andReturn('redirect-test');
-        $socialiteUser->shouldReceive('getEmail')->andReturn('redirect@gmail.com');
-        $socialiteUser->shouldReceive('getName')->andReturn('Redirect Test');
-        $socialiteUser->shouldReceive('getAvatar')->andReturn(null);
+        // Arrange
+        $socialiteUser = $this->createSocialUser([
+            'id' => 'redirect-test',
+            'email' => 'redirect@gmail.com',
+            'name' => 'Redirect Test',
+        ]);
 
-        Socialite::shouldReceive('driver->user')->andReturn($socialiteUser);
+        $this->mockSocialite('google', $socialiteUser);
 
         // Act
         $response = $this->get('/social-login/google/callback');
 
-        // Assert - Customer should redirect to home
-        $response->assertRedirect('/');
+        // Assert - Customer should redirect to dashboard
+        $response->assertRedirect('/dashboard');
+    }
+
+    /**
+     * Helper to create a Socialite User object with properties
+     */
+    protected function createSocialUser(array $attributes)
+    {
+        $user = new SocialiteUser;
+        $user->id = $attributes['id'] ?? null;
+        $user->name = $attributes['name'] ?? null;
+        $user->email = $attributes['email'] ?? null;
+        $user->token = 'test-token';
+        $user->avatar = $attributes['avatar'] ?? null;
+        $user->nickname = $attributes['nickname'] ?? null;
+        return $user;
+    }
+
+    /**
+     * Helper to mock Socialite driver
+     */
+    protected function mockSocialite(string $driver, $userObject)
+    {
+        $abstractProvider = Mockery::mock('Laravel\Socialite\Two\AbstractProvider');
+        if ($driver === 'twitter' || $driver === 'sign-in-with-apple') {
+            // Twitter uses OAuth1 without stateless, Apple handled separately without stateless
+            $abstractProvider->shouldReceive('user')->andReturn($userObject);
+        } else {
+            $abstractProvider->shouldReceive('stateless')->andReturnSelf();
+            $abstractProvider->shouldReceive('user')->andReturn($userObject);
+        }
+        Socialite::shouldReceive('driver')->with($driver)->andReturn($abstractProvider);
     }
 
     /**
