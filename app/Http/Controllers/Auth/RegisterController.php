@@ -12,6 +12,7 @@ use App\Utility\EmailUtility;
 use Cookie;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -48,6 +49,45 @@ class RegisterController extends Controller
     public function __construct()
     {
         $this->middleware('guest');
+    }
+
+    public function showRegistrationForm()
+    {
+        /**
+         * Toggles a "Verification First" registration flow for new customers.
+         *
+         * @see /.docs/business_settings/customer_registration_verify.md
+         */
+        if (get_setting('customer_registration_verify') === '1') {
+            abort(404);
+        }
+
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        // // todo: install and handel affiliate_system addon
+        //        if ($request->has('referral_code') && addon_is_activated('affiliate_system')) {
+        //            try {
+        //                $affiliate_validation_time = AffiliateConfig::where('type', 'validation_time')->first();
+        //                $cookie_minute = 30 * 24;
+        //                if ($affiliate_validation_time) {
+        //                    $cookie_minute = $affiliate_validation_time->value * 60;
+        //                }
+        //
+        //                Cookie::queue('referral_code', $request->referral_code, $cookie_minute);
+        //                $referred_by_user = User::where('referral_code', $request->referral_code)->first();
+        //
+        //                $affiliateController = new AffiliateController;
+        //                $affiliateController->processAffiliateStats($referred_by_user->id, 1, 0, 0, 0);
+        //            } catch (\Exception $e) {
+        //            }
+        //        }
+        $email = null;
+        $phone = null;
+
+        return view('auth.'.get_setting('authentication_layout_select').'.user_registration',
+            compact('email', 'phone'));
     }
 
     /**

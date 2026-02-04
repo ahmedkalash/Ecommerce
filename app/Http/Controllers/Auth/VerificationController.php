@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\VerifiesEmails;
+use App\Http\Controllers\OTPVerificationController;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
-use App\Http\Controllers\OTPVerificationController;
 
 class VerificationController extends Controller
 {
@@ -38,7 +38,7 @@ class VerificationController extends Controller
      */
     public function __construct()
     {
-        //$this->middleware('auth');
+        // $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
@@ -46,7 +46,6 @@ class VerificationController extends Controller
     /**
      * Show the email verification notice.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
@@ -55,19 +54,17 @@ class VerificationController extends Controller
             return $request->user()->hasVerifiedEmail()
                             ? redirect($this->redirectPath())
                             : view('auth.'.get_setting('authentication_layout_select').'.verify_email');
-        }
-        else {
+        } else {
             $otpController = new OTPVerificationController;
             $otpController->send_code($request->user());
+
             return redirect()->route('verification');
         }
     }
 
-
     /**
      * Resend the email verification notification.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function resend(Request $request)
@@ -81,20 +78,20 @@ class VerificationController extends Controller
         return back()->with('resent', true);
     }
 
-    public function verification_confirmation($code){
+    public function verification_confirmation($code)
+    {
         $user = User::where('verification_code', $code)->first();
-        if($user != null){
+        if ($user != null) {
             $user->email_verified_at = Carbon::now();
             $user->save();
             auth()->login($user, true);
             offerUserWelcomeCoupon();
             flash(translate('Your email has been verified successfully'))->success();
-        }
-        else {
+        } else {
             flash(translate('Sorry, we could not verifiy you. Please try again'))->error();
         }
 
-        if($user->user_type == 'seller') {
+        if ($user->user_type == 'seller') {
             return redirect()->route('seller.dashboard');
         }
 
