@@ -45,15 +45,13 @@ class VerificationController extends Controller
 
     /**
      * Show the email verification notice.
-     *
-     * @return \Illuminate\Http\Response
-     */
+     **/
     public function show(Request $request)
     {
         if ($request->user()->email != null) {
             return $request->user()->hasVerifiedEmail()
-                            ? redirect($this->redirectPath())
-                            : view('auth.'.get_setting('authentication_layout_select').'.verify_email');
+                ? redirect($this->redirectPath())
+                : view('auth.'.get_setting('authentication_layout_select').'.verify_email');
         } else {
             $otpController = new OTPVerificationController;
             $otpController->send_code($request->user());
@@ -65,7 +63,6 @@ class VerificationController extends Controller
     /**
      * Resend the email verification notification.
      *
-     * @return \Illuminate\Http\Response
      */
     public function resend(Request $request)
     {
@@ -94,6 +91,34 @@ class VerificationController extends Controller
         if ($user->user_type == 'seller') {
             return redirect()->route('seller.dashboard');
         }
+
+        return redirect()->route('dashboard');
+    }
+
+    public function emailChangeCallback(Request $request)
+    {
+        if ($request->has('new_email_verificiation_code') && $request->has('email')) {
+            $verification_code_of_url_param = $request->input('new_email_verificiation_code');
+            $user = User::where('new_email_verificiation_code', $verification_code_of_url_param)->first();
+
+            if ($user != null) {
+
+                $user->email = $request->input('email');
+                $user->new_email_verificiation_code = null;
+                $user->save();
+
+                auth()->login($user, true);
+
+                flash(translate('Email Changed successfully'))->success();
+                if ($user->user_type == 'seller') {
+                    return redirect()->route('seller.dashboard');
+                }
+
+                return redirect()->route('dashboard');
+            }
+        }
+
+        flash(translate('Email was not verified. Please resend your mail!'))->error();
 
         return redirect()->route('dashboard');
     }

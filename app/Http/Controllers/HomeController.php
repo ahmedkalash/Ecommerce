@@ -26,7 +26,6 @@ use Carbon\Carbon;
 use Cookie;
 use DB;
 use Hash;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
@@ -125,50 +124,6 @@ class HomeController extends Controller
         );
     }
 
-    public function login()
-    {
-        if (Auth::check()) {
-            return redirect()->route('home');
-        }
-
-        if (Route::currentRouteName() == 'seller.login' && get_setting('vendor_system_activation') == 1) {
-            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
-        } elseif (Route::currentRouteName() == 'deliveryboy.login' && addon_is_activated('delivery_boy')) {
-            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
-        }
-
-        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
-    }
-
-    public function cart_login(Request $request)
-    {
-        $user = null;
-        if ($request->get('phone') != null) {
-            $user = User::whereIn('user_type', ['customer', 'seller'])->where(
-                'phone',
-                "+{$request['country_code']}{$request['phone']}"
-            )->first();
-        } elseif ($request->get('email') != null) {
-            $user = User::whereIn('user_type', ['customer', 'seller'])->where('email', $request->email)->first();
-        }
-
-        if ($user != null) {
-            if (Hash::check($request->password, $user->password)) {
-                if ($request->has('remember')) {
-                    auth()->login($user, true);
-                } else {
-                    auth()->login($user, false);
-                }
-            } else {
-                flash(translate('Invalid email or password!'))->warning();
-            }
-        } else {
-            flash(translate('Invalid email or password!'))->warning();
-        }
-
-        return back();
-    }
-
     /**
      * Create a new controller instance.
      *
@@ -181,8 +136,6 @@ class HomeController extends Controller
 
     /**
      * Show the customer/seller dashboard.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function dashboard()
     {
@@ -802,66 +755,6 @@ class HomeController extends Controller
         }
 
         return $response;
-    }
-
-    public function email_change_callback(Request $request)
-    {
-        if ($request->has('new_email_verificiation_code') && $request->has('email')) {
-            $verification_code_of_url_param = $request->input('new_email_verificiation_code');
-            $user = User::where('new_email_verificiation_code', $verification_code_of_url_param)->first();
-
-            if ($user != null) {
-
-                $user->email = $request->input('email');
-                $user->new_email_verificiation_code = null;
-                $user->save();
-
-                auth()->login($user, true);
-
-                flash(translate('Email Changed successfully'))->success();
-                if ($user->user_type == 'seller') {
-                    return redirect()->route('seller.dashboard');
-                }
-
-                return redirect()->route('dashboard');
-            }
-        }
-
-        flash(translate('Email was not verified. Please resend your mail!'))->error();
-
-        return redirect()->route('dashboard');
-    }
-
-    public function reset_password_with_code(Request $request)
-    {
-        if (($user = User::where('email', $request->email)->where(
-                'verification_code',
-                $request->code
-            )->first()) != null) {
-            if ($request->password == $request->password_confirmation) {
-                $user->password = Hash::make($request->password);
-                $user->email_verified_at = date('Y-m-d h:m:s');
-                $user->save();
-                event(new PasswordReset($user));
-                auth()->login($user, true);
-
-                flash(translate('Password updated successfully'))->success();
-
-                if (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff') {
-                    return redirect()->route('admin.dashboard');
-                }
-
-                return redirect()->route('home');
-            } else {
-                flash(translate("Password and confirm password didn't match"))->warning();
-
-                return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
-            }
-        } else {
-            flash(translate('Verification code mismatch'))->error();
-
-            return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
-        }
     }
 
     public function all_flash_deals()

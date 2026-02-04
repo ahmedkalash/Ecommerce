@@ -5,6 +5,7 @@ use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationFirstController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
@@ -103,6 +104,11 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Login
 Route::controller(LoginController::class)->group(function () {
+    Route::get('/users/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
+    Route::get('/seller/login', 'showSellerLoginForm')->name('seller.login')->middleware('handle-demo-login');
+    Route::get('/deliveryboy/login',
+        'showDeliveryBoyLoginForm')->name('deliveryboy.login')->middleware('handle-demo-login');
+    Route::post('/users/login/cart', 'cart_login')->name('cart.login.submit')->middleware('handle-demo-login');
     Route::get('/logout', 'logout');
     Route::get('/social-login/redirect/{provider}', 'redirectToProvider')->name('social.login');
     Route::get('/social-login/{provider}/callback', 'handleProviderCallback')->name('social.callback');
@@ -118,6 +124,11 @@ Route::controller(VerificationController::class)->group(function () {
         '/verification-confirmation/{code}',
         'verification_confirmation'
     )->name('email.verification.confirmation');
+    Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
+});
+
+Route::controller(ResetPasswordController::class)->group(function () {
+    Route::post('/password/reset/email/submit', 'resetWithCode')->name('password.update');
 });
 
 Route::resource('shops', ShopController::class)->middleware('handle-demo-login');
@@ -136,22 +147,18 @@ Route::controller(ShopController::class)->group(function () {
 
 Route::controller(VerificationFirstController::class)->group(function () {
     Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('registration.verification');
-    Route::post('/registration/verification-code-send',
-        'sendRegVerificationCode')->name('customer-reg.verification_code_send');
+    Route::post(
+        '/registration/verification-code-send',
+        'sendRegVerificationCode'
+    )->name('customer-reg.verification_code_send');
     Route::get('/registration/verify-code/{id}', 'regVerifyCode')->name('customer-reg.verify_code');
-    Route::post('/registration/verification-code-confirmation',
-        'regVerifyCodeConfirmation')->name('customer-reg.verify_code_confirmation');
+    Route::post(
+        '/registration/verification-code-confirmation',
+        'regVerifyCodeConfirmation'
+    )->name('customer-reg.verify_code_confirmation');
 });
 
 Route::controller(HomeController::class)->group(function () {
-    Route::get('/email-change/callback', 'email_change_callback')->name('email_change.callback');
-    Route::post('/password/reset/email/submit', 'reset_password_with_code')->name('password.update');
-
-    Route::get('/users/login', 'login')->name('user.login')->middleware('handle-demo-login');
-    Route::get('/seller/login', 'login')->name('seller.login')->middleware('handle-demo-login');
-    Route::get('/deliveryboy/login', 'login')->name('deliveryboy.login')->middleware('handle-demo-login');
-    Route::post('/users/login/cart', 'cart_login')->name('cart.login.submit')->middleware('handle-demo-login');
-
     Route::post('/import-data', 'import_data');
 
     // Home Page
@@ -584,6 +591,5 @@ Route::controller(ContactController::class)->group(function () {
 Route::get('/test', function () {
     return 'test';
 })->name('test');
-
 
 // --------------------------------- Redirects routes ---------------------------------

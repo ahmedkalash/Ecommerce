@@ -12,6 +12,8 @@ use App\Utility\EmailUtility;
 use CoreComponentRepository;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Session;
 use Socialite;
@@ -32,17 +34,72 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    /* protected $redirectTo = '/'; */
+    public function showLoginForm()
+    {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
+    }
+
+    public function showSellerLoginForm()
+    {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        if (get_setting('vendor_system_activation') == 1) {
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
+        }
+
+        return redirect()->route('home');
+    }
+
+    public function showDeliveryBoyLoginForm()
+    {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+
+        if (addon_is_activated('delivery_boy')) {
+            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
+        }
+
+        return redirect()->route('home');
+    }
+
+    public function cart_login(Request $request)
+    {
+        $user = null;
+        if ($request->get('phone') != null) {
+            $user = User::whereIn('user_type', ['customer', 'seller'])->where(
+                'phone',
+                "+{$request['country_code']}{$request['phone']}"
+            )->first();
+        } elseif ($request->get('email') != null) {
+            $user = User::whereIn('user_type', ['customer', 'seller'])->where('email', $request->email)->first();
+        }
+
+        if ($user != null) {
+            if (Hash::check($request->password, $user->password)) {
+                if ($request->has('remember')) {
+                    auth()->login($user, true);
+                } else {
+                    auth()->login($user, false);
+                }
+            } else {
+                flash(translate('Invalid email or password!'))->warning();
+            }
+        } else {
+            flash(translate('Invalid email or password!'))->warning();
+        }
+
+        return back();
+    }
 
     /**
      * Redirect the user to the Google authentication page.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function redirectToProvider($provider)
     {
@@ -102,8 +159,10 @@ class LoginController extends Controller
         }
 
         if (session('temp_user_id') != null) {
-            Cart::where('user_id',
-                auth()->user()->id)->delete(); // If previous data is available for this user, delete first
+            Cart::where(
+                'user_id',
+                auth()->user()->id
+            )->delete(); // If previous data is available for this user, delete first
             Cart::where('temp_user_id', session('temp_user_id'))
                 ->update([
                     'user_id' => auth()->user()->id,
@@ -244,8 +303,11 @@ class LoginController extends Controller
             'phone' => 'required_without:email',
             'password' => 'required|string',
             'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1 && get_setting($request['recaptcha_action']) == 1,
-                    ['required', new Recaptcha], ['sometimes']),
+                Rule::when(
+                    get_setting('google_recaptcha') == 1 && get_setting($request['recaptcha_action']) == 1,
+                    ['required', new Recaptcha],
+                    ['sometimes']
+                ),
             ],
         ]);
     }
@@ -259,7 +321,8 @@ class LoginController extends Controller
     {
         if ($request->get('phone') != null) {
             return [
-                'phone' => "+{$request['country_code']}{$request['phone']}", 'password' => $request->get('password')
+                'phone' => "+{$request['country_code']}{$request['phone']}",
+                'password' => $request->get('password'),
             ];
         } elseif ($request->get('email') != null) {
             return $request->only($this->username(), 'password');
