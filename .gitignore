@@ -49,3 +49,7 @@ _ide_helper.php
 /public/logs
 /.agent
 /.aiassistant
+/config/debugbar.php
+/config/ide-helper.php
+/config/ignition.php
+/config/tinker.php
