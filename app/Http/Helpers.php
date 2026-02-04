@@ -900,18 +900,18 @@ if (!function_exists('translation_tables')) {
             $addons = [];
             $addons['affiliate'] = [
                 'affiliate_options', 'affiliate_configs', 'affiliate_users', 'affiliate_payments',
-                'affiliate_withdraw_requests', 'affiliate_logs', 'affiliate_stats'
+                'affiliate_withdraw_requests', 'affiliate_logs', 'affiliate_stats',
             ];
             $addons['auction'] = ['auction_product_bids'];
             $addons['club_point'] = ['club_points', 'club_point_details'];
             $addons['delivery_boy'] = [
-                'delivery_boys', 'delivery_histories', 'delivery_boy_payments', 'delivery_boy_collections'
+                'delivery_boys', 'delivery_histories', 'delivery_boy_payments', 'delivery_boy_collections',
             ];
             $addons['offline_payment'] = ['manual_payment_methods'];
             $addons['otp_system'] = ['otp_configurations', 'sms_templates'];
             $addons['refund_request'] = ['refund_requests'];
             $addons['seller_subscription'] = [
-                'seller_packages', 'seller_package_translations', 'seller_package_payments'
+                'seller_packages', 'seller_package_translations', 'seller_package_payments',
             ];
             $addons['wholesale'] = ['wholesale_prices'];
 
@@ -2231,7 +2231,7 @@ if (!function_exists('get_order_details_by_review')) {
         return $order_detail_query->with([
             'order' => function ($q) use ($review) {
                 $q->where('user_id', $review->user_id);
-            }
+            },
         ])->where('product_id', $review->product_id)->where('delivery_status', 'delivered')->first();
     }
 }
@@ -2521,8 +2521,9 @@ if (!function_exists('get_Affiliate_onfig_value')) {
 
 // Welcome Coupon add for user
 if (!function_exists('offerUserWelcomeCoupon')) {
-    function offerUserWelcomeCoupon()
+    function offerUserWelcomeCoupon(): void
     {
+        // Todo: check this
         $coupon = Coupon::where('type', 'welcome_base')->where('status', 1)->first();
         if ($coupon) {
 

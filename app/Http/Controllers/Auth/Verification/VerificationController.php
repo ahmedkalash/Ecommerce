@@ -62,7 +62,6 @@ class VerificationController extends Controller
 
     /**
      * Resend the email verification notification.
-     *
      */
     public function resend(Request $request)
     {

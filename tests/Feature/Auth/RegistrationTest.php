@@ -33,12 +33,13 @@ class RegistrationTest extends AuthTestCase
         // Arrange
         $this->disableEmailVerification(); // Simplify for basic test Todo: add test for email verification
         $this->disableRegistrationVerify(); // Simplify for basic test Todo: add test for pre email verification
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -69,13 +70,14 @@ class RegistrationTest extends AuthTestCase
         $email = 'existing@example.com';
         User::factory()->create(['email' => $email]);
 
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'Jane Doe',
             'email' => $email,
             'phone' => null,
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -100,14 +102,15 @@ class RegistrationTest extends AuthTestCase
         $phone = '+11234567890';
         User::factory()->create(['phone' => $phone]);
 
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'Jane Doe',
             'country_code' => '1',
             'phone' => $phone,
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'email' => null, // needed for testing phone registration
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -128,12 +131,13 @@ class RegistrationTest extends AuthTestCase
     public function registration_requires_password_confirmation(): void
     {
         // Arrange
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'different_password',
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -156,12 +160,13 @@ class RegistrationTest extends AuthTestCase
     public function registration_requires_name(): void
     {
         // Arrange
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => null,
             'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -181,12 +186,13 @@ class RegistrationTest extends AuthTestCase
     public function registration_requires_minimum_password_length(): void
     {
         // Arrange
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => '12345', // Less than 6 chars
-            'password_confirmation' => '12345',
-        ]);
+            'password' => '12345', // Less than 8 chars
+            'password_confirmation' => '1234567',
+            'agree_to_terms' => 'on',
+        ];
 
         // Act
         $response = $this->post('/register', $use_data);
@@ -207,12 +213,13 @@ class RegistrationTest extends AuthTestCase
         $this->disableEmailVerification();
         $this->disableRegistrationVerify();
 
-        $use_data = User::factory()->raw([
+        $use_data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ]);
+            'agree_to_terms' => 'on',
+        ];
 
         // Create a guest cart with temp_user_id
         $cart = [
@@ -261,7 +268,6 @@ class RegistrationTest extends AuthTestCase
         // Arrange
         $this->enableEmailVerification();
         $this->disableRegistrationVerify();
-
 
         // Act
         $response = $this->post('/register', [

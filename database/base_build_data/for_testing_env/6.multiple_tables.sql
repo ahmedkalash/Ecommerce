@@ -1,9 +1,4 @@
 --
--- Truncate table before insert `colors`
---
-
-TRUNCATE TABLE `colors`;
---
 -- Dumping data for table `colors`
 --
 
@@ -152,12 +147,6 @@ VALUES (1, 'IndianRed', '#CD5C5C', '2018-11-05 02:12:26', '2018-11-05 02:12:26')
        (142, 'DarkSlateGray', '#2F4F4F', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
        (143, 'Black', '#000000', '2018-11-05 02:12:30', '2018-11-05 02:12:30');
 
-
---
--- Truncate table before insert `countries`
---
-
-TRUNCATE TABLE `countries`;
 --
 -- Dumping data for table `countries`
 --
@@ -410,12 +399,6 @@ VALUES (1, 'AF', 'Afghanistan', 0, 0, '2021-04-06 01:06:30', '2021-10-11 00:34:1
        (245, 'ZM', 'Zambia', 0, 0, '2021-04-06 01:06:30', NULL, NULL),
        (246, 'ZW', 'Zimbabwe', 0, 0, '2021-04-06 01:06:30', NULL, NULL);
 
-
---
--- Truncate table before insert `currencies`
---
-
-TRUNCATE TABLE `currencies`;
 --
 -- Dumping data for table `currencies`
 --
@@ -447,12 +430,6 @@ VALUES (1, 'U.S. Dollar', '$', 1.00000, 1, 'USD', '2018-10-09 11:35:08', '2018-1
        (27, 'Taka', '৳', 84.00000, 1, 'BDT', '2018-10-09 11:35:08', '2018-12-02 05:16:13'),
        (28, 'Indian Rupee', 'Rs', 68.45000, 1, 'INR', '2019-07-07 10:33:46', '2025-05-24 10:33:46');
 
-
---
--- Truncate table before insert `custom_alerts`
---
-
-TRUNCATE TABLE `custom_alerts`;
 --
 -- Dumping data for table `custom_alerts`
 --
@@ -463,11 +440,6 @@ VALUES (1, 1, 'small', NULL, '#',
         '<p>We use cookie for better user experience, check our policy <a href=\"https://demo.activeitzone.com/ecommerce/privacypolicy\">here</a>&nbsp;</p>',
         'dark', '#ffffff', '2024-03-26 20:02:20', '2024-03-27 17:21:29');
 
---
--- Truncate table before insert `dynamic_popups`
---
-
-TRUNCATE TABLE `dynamic_popups`;
 --
 -- Dumping data for table `dynamic_popups`
 --
@@ -483,22 +455,12 @@ VALUES (1, 1, 'Subscribe to Our Newsletter',
         NULL, '2025-03-27 16:32:51', '2025-03-27 22:33:24');
 
 --
--- Truncate table before insert `elements`
---
-
-TRUNCATE TABLE `elements`;
---
 -- Dumping data for table `elements`
 --
 
 INSERT INTO `elements` (`id`, `name`, `created_at`, `updated_at`)
 VALUES (1, 'Header', '2025-07-28 00:02:29', '2025-07-28 00:02:29');
 
---
--- Truncate table before insert `element_styles`
---
-
-TRUNCATE TABLE `element_styles`;
 --
 -- Dumping data for table `element_styles`
 --
@@ -533,12 +495,6 @@ VALUES (1, 1, 'top_header_bg_color', '#ffffff', '2025-07-28 04:46:27', '2025-07-
        (27, 5, 'top_header_text_color', '#ffffff', '2025-07-28 08:18:41', '2025-07-29 00:05:50'),
        (28, 5, 'middle_header_text_color', '#ffffff', '2025-07-28 08:18:41', '2025-07-29 01:15:43');
 
-
---
--- Truncate table before insert `element_types`
---
-
-TRUNCATE TABLE `element_types`;
 --
 -- Dumping data for table `element_types`
 --
@@ -550,11 +506,6 @@ VALUES (1, 1, 'Header 1', 0, '2025-07-28 01:54:52', '2025-07-29 05:13:41'),
        (4, 1, 'Header 4', 0, '2025-07-28 01:56:52', '2025-07-29 05:13:41'),
        (5, 1, 'Header 5', 0, '2025-07-28 02:41:11', '2025-07-29 05:13:41');
 
---
--- Truncate table before insert `email_templates`
---
-
-TRUNCATE TABLE `email_templates`;
 --
 -- Dumping data for table `email_templates`
 --
@@ -778,12 +729,6 @@ VALUES (50, 'seller', 'seller_payout_email_to_seller', 'Payout Received', 'Payme
         '<span id=\"docs-internal-guid-7441a6d7-7fff-62b9-67a0-909d5d4ae5dd\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\"><b>Dear [[seller_name]],</b></span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Congratulations! Your shop has been approved and is now part of the <span style=\"font-size: 14.6667px;\">[[store_name]]</span> seller network.</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">You can now log in, manage your store, and start listing your products.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Here are your account details:</span></p><ul style=\"margin-bottom: 0px; padding-inline-start: 48px;\"><li dir=\"ltr\" style=\"list-style-type: disc; font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:0pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Name:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" font-size:=\"\" 14.6667px;=\"\" text-wrap:=\"\" wrap;=\"\" background-color:=\"\" transparent;\"=\"\">[[seller_name]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Email:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" font-size:=\"\" 14.6667px;=\"\" text-wrap:=\"\" wrap;=\"\" background-color:=\"\" transparent;\"=\"\">[[seller_email]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;\" role=\"presentation\"><span style=\"font-size: 11pt;\" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Shop Name</span><span style=\"font-size: 11pt; font-weight: 700; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">: </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[seller_shop_name]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;\" role=\"presentation\"><span style=\"font-size: 11pt;\" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Address</span><span style=\"font-size: 11pt; font-weight: 700; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">: </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[seller_shop_address]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 12pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Registration Date:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[date]]</span></p></li></ul><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">To access your seller account, please log in </span><a href=\"[[login_url]]\" target=\"_blank\">here</a><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">If you need any assistance, our seller support team is available to help you with any questions or issues. Contact us at <span style=\"font-family: Roboto, sans-serif; font-size: 14.6667px;\">[[admin_email]]</span>.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">We are excited to see your products in our marketplace and look forward to your success!</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Best regards,</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\"><b>The <span style=\"font-size: 14.6667px;\">[[store_name]]</span> Team</b></span></p></span>',
         1, 1, 1, NULL, '2025-08-06 12:53:37', '2025-08-06 12:53:37');
 
-
---
--- Truncate table before insert `flash_deals`
---
-
-TRUNCATE TABLE `flash_deals`;
 --
 -- Dumping data for table `flash_deals`
 --
@@ -799,11 +744,6 @@ VALUES (1, 'Flash Sale', 1698796800, 1767743940, 1, 1, NULL, NULL, '153', 'flash
        (4, 'End of Season', 1612483200, 1748908740, 1, 0, NULL, NULL, '154', 'end-of-season-ehVld',
         '2024-01-09 12:34:25', '2024-01-09 12:35:54');
 
---
--- Truncate table before insert `flash_deal_products`
---
-
-TRUNCATE TABLE `flash_deal_products`;
 --
 -- Dumping data for table `flash_deal_products`
 --
@@ -831,11 +771,6 @@ VALUES (1, 3, 13, 0.00, NULL, '2024-01-09 12:26:58', '2024-01-09 12:26:58'),
        (19, 1, 20, 0.00, NULL, '2024-01-09 12:36:52', '2024-01-09 12:36:52');
 
 --
--- Truncate table before insert `flash_deal_translations`
---
-
-TRUNCATE TABLE `flash_deal_translations`;
---
 -- Dumping data for table `flash_deal_translations`
 --
 
@@ -845,12 +780,6 @@ VALUES (1, 1, 'Flash Sale', 'en', '2023-12-17 15:00:33', '2023-12-17 15:00:33'),
        (3, 3, 'Winter Sale', 'en', '2023-12-17 15:11:20', '2023-12-17 15:11:20'),
        (4, 4, 'End of Season', 'en', '2024-01-09 12:34:25', '2024-01-09 12:34:25');
 
-
---
--- Truncate table before insert `home_categories`
---
-
-TRUNCATE TABLE `home_categories`;
 --
 -- Dumping data for table `home_categories`
 --
@@ -859,11 +788,6 @@ INSERT INTO `home_categories` (`id`, `category_id`, `subsubcategories`, `status`
 VALUES (1, 1, '[\"1\"]', 1, '2019-03-12 06:38:23', '2019-03-12 06:38:23'),
        (2, 2, '[\"10\"]', 1, '2019-03-12 06:44:54', '2019-03-12 06:44:54');
 
---
--- Truncate table before insert `languages`
---
-
-TRUNCATE TABLE `languages`;
 --
 -- Dumping data for table `languages`
 --
@@ -874,22 +798,12 @@ VALUES (1, 'English', 'en', 'en', 0, 1, '2019-01-20 12:13:20', '2019-01-20 12:13
        (4, 'Arabic', 'sa', 'ar', 1, 1, '2019-04-28 18:34:12', '2019-04-28 18:34:12');
 
 --
--- Truncate table before insert `model_has_roles`
---
-
-TRUNCATE TABLE `model_has_roles`;
---
 -- Dumping data for table `model_has_roles`
 --
 
 INSERT INTO `model_has_roles` (`role_id`, `model_type`, `model_id`)
 VALUES (1, 'App\\Models\\User', 9);
 
---
--- Truncate table before insert `notification_types`
---
-
-TRUNCATE TABLE `notification_types`;
 --
 -- Dumping data for table `notification_types`
 --
@@ -957,11 +871,6 @@ VALUES (1, 'admin', 'order_placed_admin', 'Order Placed', NULL, 'Order: [[order_
         '2024-08-22 05:45:04', '2024-08-22 05:45:04');
 
 --
--- Truncate table before insert `pages`
---
-
-TRUNCATE TABLE `pages`;
---
 -- Dumping data for table `pages`
 --
 
@@ -983,11 +892,6 @@ VALUES (1, 'home_page', 'Home Page', 'home', NULL, NULL, NULL, NULL, NULL, '2020
         '{\"description\":null,\"address\":null,\"phone\":null,\"email\":null}', NULL, NULL, NULL, NULL,
         '2024-08-25 07:22:32', '2024-08-25 07:22:32');
 
---
--- Truncate table before insert `payment_methods`
---
-
-TRUNCATE TABLE `payment_methods`;
 --
 -- Dumping data for table `payment_methods`
 --
@@ -1019,11 +923,6 @@ VALUES (1, 'paypal', 0, NULL, '2024-05-18 23:31:18', '2024-05-18 23:31:18'),
        (24, 'payfast', 0, 'african_pg', '2024-05-18 23:36:10', '2024-05-18 23:36:10'),
        (25, 'tap', 0, NULL, '2024-07-14 06:16:47', '2024-07-14 06:16:47');
 
---
--- Truncate table before insert `permissions`
---
-
-TRUNCATE TABLE `permissions`;
 --
 -- Dumping data for table `permissions`
 --
@@ -1322,11 +1221,6 @@ VALUES (1, 'add_new_product', 'product', 'web', '2022-06-12 09:31:31', '2022-06-
        (278, 'select_header', 'website_setup', 'web', '2022-06-19 22:41:29', '2022-06-19 22:41:29');
 
 --
--- Truncate table before insert `products`
---
-
-TRUNCATE TABLE `products`;
---
 -- Dumping data for table `products`
 --
 
@@ -1490,11 +1384,6 @@ VALUES (1, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell G
         NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-17 14:21:19', '2024-01-08 10:20:40');
 
 --
--- Truncate table before insert `product_categories`
---
-
-TRUNCATE TABLE `product_categories`;
---
 -- Dumping data for table `product_categories`
 --
 
@@ -1588,12 +1477,6 @@ VALUES (2, 1),
        (22, 30),
        (22, 31);
 
-
---
--- Truncate table before insert `product_stocks`
---
-
-TRUNCATE TABLE `product_stocks`;
 --
 -- Dumping data for table `product_stocks`
 --
@@ -1622,11 +1505,6 @@ VALUES (1, 22, '', NULL, 5.32, 233, NULL, '2024-01-08 10:20:40', '2024-01-08 10:
        (21, 7, '', NULL, 12.00, 109, NULL, '2024-01-08 13:17:03', '2024-01-08 13:17:03');
 
 --
--- Truncate table before insert `product_taxes`
---
-
-TRUNCATE TABLE `product_taxes`;
---
 -- Dumping data for table `product_taxes`
 --
 
@@ -1653,11 +1531,6 @@ VALUES (1, 22, 3, 0.00, 'amount', '2024-01-08 10:20:40', '2024-01-08 10:20:40'),
        (20, 4, 3, 0.00, 'amount', '2024-01-08 13:14:45', '2024-01-08 13:14:45'),
        (21, 7, 3, 0.00, 'amount', '2024-01-08 13:17:03', '2024-01-08 13:17:03');
 
---
--- Truncate table before insert `product_translations`
---
-
-TRUNCATE TABLE `product_translations`;
 --
 -- Dumping data for table `product_translations`
 --
@@ -1723,22 +1596,12 @@ VALUES (1, 2, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshel
         '2023-12-17 14:21:19', '2023-12-17 14:21:19');
 
 --
--- Truncate table before insert `roles`
---
-
-TRUNCATE TABLE `roles`;
---
 -- Dumping data for table `roles`
 --
 
 INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`)
 VALUES (1, 'Super Admin', 'web', '2022-06-13 00:29:58', '2022-06-12 12:00:00');
 
---
--- Truncate table before insert `searches`
---
-
-TRUNCATE TABLE `searches`;
 --
 -- Dumping data for table `searches`
 --
@@ -1747,11 +1610,6 @@ INSERT INTO `searches` (`id`, `query`, `count`, `created_at`, `updated_at`)
 VALUES (2, 'dcs', 1, '2020-03-08 00:29:09', '2020-03-08 00:29:09'),
        (3, 'das', 3, '2020-03-08 00:29:15', '2020-03-08 00:29:50');
 
---
--- Truncate table before insert `sellers`
---
-
-TRUNCATE TABLE `sellers`;
 --
 -- Dumping data for table `sellers`
 --
@@ -1763,11 +1621,6 @@ VALUES (1, 3, 0.00, 0, 0, 1,
         '[{\"type\":\"text\",\"label\":\"Name\",\"value\":\"Mr. Seller\"},{\"type\":\"select\",\"label\":\"Marital Status\",\"value\":\"Married\"},{\"type\":\"multi_select\",\"label\":\"Company\",\"value\":\"[\\\"Company\\\"]\"},{\"type\":\"select\",\"label\":\"Gender\",\"value\":\"Male\"},{\"type\":\"file\",\"label\":\"Image\",\"value\":\"uploads\\/verification_form\\/CRWqFifcbKqibNzllBhEyUSkV6m1viknGXMEhtiW.png\"}]',
         1, 78.40, NULL, NULL, NULL, NULL, 0, '2018-10-07 04:42:57', '2020-01-26 04:21:11');
 
---
--- Truncate table before insert `shops`
---
-
-TRUNCATE TABLE `shops`;
 --
 -- Dumping data for table `shops`
 --
@@ -1805,12 +1658,6 @@ VALUES (1, 3, 'Demo Seller Shop', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Hou
         0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
         0, '2024-01-09 12:18:07', '2024-01-09 12:21:53');
 
-
---
--- Truncate table before insert `taxes`
---
-
-TRUNCATE TABLE `taxes`;
 --
 -- Dumping data for table `taxes`
 --

@@ -4,8 +4,8 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\VerificationFirstController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
@@ -98,8 +98,7 @@ Route::group(['middleware' => ['prevent-back-history', 'handle-demo-login']], fu
 
 // Register
 Route::controller(RegisterController::class)->group(function () {
-    Route::get('/users/registration', 'showRegistrationForm')->name('user.registration')
-        ->middleware('handle-demo-login');
+    Route::get('/users/registration', 'showRegistrationForm')->name('user.registration');
 });
 
 // Login
@@ -593,3 +592,5 @@ Route::get('/test', function () {
 })->name('test');
 
 // --------------------------------- Redirects routes ---------------------------------
+
+Route::redirect('/home', '/');

@@ -44,8 +44,7 @@ abstract class AuthTestCase extends TestCase
     protected function mockRecaptcha(): void
     {
         $this->app->bind(Recaptcha::class, function () {
-            return new class implements \Illuminate\Contracts\Validation\Rule
-            {
+            return new class implements \Illuminate\Contracts\Validation\Rule {
                 public function passes($attribute, $value): bool
                 {
                     return true; // Always pass in tests
@@ -91,7 +90,7 @@ abstract class AuthTestCase extends TestCase
     protected function seedEssentialData(): void
     {
         // The RefreshDatabase trait will automatically run migrations
-        // which includes our 0000_00_00_000001_import_base_data.php migration
+        // which includes our 9999_99_99_999999_import_base_data.php migration
 
         // Create admin user for email utilities that need get_admin()
         \App\Models\User::firstOrCreate(

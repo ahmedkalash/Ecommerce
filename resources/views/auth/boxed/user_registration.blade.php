@@ -215,7 +215,7 @@
                                             <!-- Terms and Conditions -->
                                             <div class="mb-3">
                                                 <label class="aiz-checkbox">
-                                                    <input type="checkbox" name="checkbox_example_1" required>
+                                                    <input type="checkbox" name="agree_to_terms" required>
                                                     <span class="">{{ translate('By signing up you agree to our ')}} <a
                                                                 href="{{ route('terms') }}"
                                                                 class="fw-500">{{ translate('terms and conditions.') }}</a></span>
