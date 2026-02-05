@@ -53,3 +53,4 @@ _ide_helper.php
 /config/ide-helper.php
 /config/ignition.php
 /config/tinker.php
+/.phpstorm.meta.php
