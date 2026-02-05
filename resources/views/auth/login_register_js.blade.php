@@ -47,10 +47,10 @@
 </script>
 <script>
     @foreach (session('flash_notification', collect())->toArray() as $message)
-        AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
+    AIZ.plugins.notify('{{ $message['level'] }}', '{{ $message['message'] }}');
     @endforeach
 
-    $('.password-toggle').click(function(){
+    $('.password-toggle').click(function () {
         var $this = $(this);
         if ($this.siblings('input').attr('type') == 'password') {
             $this.siblings('input').attr('type', 'text');
@@ -80,7 +80,7 @@
             separateDialCode: true,
             utilsScript: "{{ static_asset('assets/js/intlTelutils.js') }}?1590403638580",
             onlyCountries: @php echo get_active_countries()->pluck('code') @endphp,
-            customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                 if (selectedCountryData.iso2 == 'bd') {
                     return "01xxxxxxxxx";
                 }
@@ -91,7 +91,7 @@
         var country = iti.getSelectedCountryData();
         $('input[name=country_code]').val(country.dialCode);
 
-        input.addEventListener("countrychange", function(e) {
+        input.addEventListener("countrychange", function (e) {
             // var currentMask = e.currentTarget.placeholder;
             var country = iti.getSelectedCountryData();
             $('input[name=country_code]').val(country.dialCode);
@@ -108,6 +108,10 @@
 
                 $('.toggle-login-with-otp').addClass('d-none');
 
+                // Clear phone errors when switching to email
+                $('.phone-form-group .invalid-feedback').remove();
+                $('.phone-form-group input').removeClass('is-invalid');
+
             } else {
                 $('.phone-form-group').removeClass('d-none');
                 $('.email-form-group').addClass('d-none');
@@ -116,11 +120,15 @@
                 $(el).html('<i>*{{ translate('Use Email Instead') }}</i>');
 
                 $('.toggle-login-with-otp').removeClass('d-none');
+
+                // Clear email errors when switching to phone
+                $('.email-form-group .invalid-feedback').remove();
+                $('.email-form-group input').removeClass('is-invalid');
             }
-            
+
             $('.submit-button').html('{{ translate('Login') }}');
             $('.password-login-block').removeClass('d-none');
-            
+
             var url = '{{ route('login') }}';
             $('.loginForm').attr('action', url);
         }
@@ -132,5 +140,5 @@
             var url = '{{ route('send-otp') }}';
             $('.loginForm').attr('action', url);
         }
-    </script> 
+    </script>
 @endif

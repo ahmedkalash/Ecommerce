@@ -3,17 +3,19 @@
     'color' => 'primary',
     'align' => 'center',
 ])
-<table class="action" align="{{ $align }}" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<table class="action" width="100%" style="width: 100%; margin: 30px auto; padding: 0; text-align: {{ $align }};"
+       role="presentation">
     <tr>
-        <td align="{{ $align }}">
-            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation">
+        <td style="text-align: {{ $align }};">
+            <table width="100%" style="width: 100%;" role="presentation">
                 <tr>
-                    <td align="{{ $align }}">
-                        <table border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <td style="text-align: {{ $align }};">
+                        <table style="margin: 0 auto;" role="presentation">
                             <tr>
                                 <td>
                                     <a href="{{ $url }}" class="button button-{{ $color }}" target="_blank"
-                                       rel="noopener">{{ $slot }}</a>
+                                       rel="noopener"
+                                       style="-webkit-text-size-adjust: none; border-radius: 4px; color: #fff; display: inline-block; overflow: hidden; text-decoration: none;">{{ $slot }}</a>
                                 </td>
                             </tr>
                         </table>
