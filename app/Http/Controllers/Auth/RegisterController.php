@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Middleware\CheckRegistrationFirstFlow;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\UserRegistrationService;
 use Illuminate\Auth\Events\Registered;
@@ -24,11 +23,6 @@ class RegisterController extends Controller
     */
 
     /**
-     * Where to redirect users after registration.
-     */
-    protected string $redirectTo = '/';
-
-    /**
      * Create a new controller instance.
      *
      * @return void
@@ -38,16 +32,12 @@ class RegisterController extends Controller
     ) {
         $this->middleware('guest');
         $this->middleware('handle-demo-login');
-        $this->middleware(CheckRegistrationFirstFlow::class)->only([
-            'showRegistrationForm',
-            'register',
-        ]);
     }
 
     public function showRegistrationForm(Request $request)
     {
         // todo: install and handel affiliate_system addon
-        $this->registrationService->handelAffiliateSystem($request);
+        // $this->registrationService->handelAffiliateSystem($request);
         $email = null;
         $phone = null;
         $view = $this->registrationService->getRegistrationView();
@@ -63,14 +53,14 @@ class RegisterController extends Controller
         $user = null;
         DB::transaction(function () use ($request, &$user) {
             $user = $this->registrationService->create($request->all());
+            $user = $this->registrationService->handlePostRegistration($user);
             $this->registrationService->guard()->login($user);
             $this->registrationService->handelCart();
             $this->registrationService->handelReferralCode($user);
-            $this->registrationService->handlePostRegistration($user);
             event(new Registered($user));
         });
 
         return $this->registrationService->registrationResponse($request, $user) ?:
-            redirect($this->registrationService->redirectPath());
+            redirect($user->homePage());
     }
 }

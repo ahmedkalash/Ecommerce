@@ -10,42 +10,47 @@
                         <div class="row no-gutters">
                             <!-- Left Side Image-->
                             <div class="col-lg-6">
-                                <img src="{{ uploaded_asset(get_setting('password_reset_page_image')) }}" alt="{{ translate('Password Reset Page Image') }}" class="img-fit h-100">
+                                <img src="{{ uploaded_asset(get_setting('password_reset_page_image')) }}"
+                                     alt="{{ translate('Password Reset Page Image') }}" class="img-fit h-100">
                             </div>
 
-                            <div class="col-lg-6 p-4 p-lg-5 d-flex flex-column justify-content-center border right-content" style="height: auto;">
+                            <div class="col-lg-6 p-4 p-lg-5 d-flex flex-column justify-content-center border right-content"
+                                 style="height: auto;">
                                 <!-- Site Icon -->
                                 <div class="size-48px mb-3 mx-auto mx-lg-0">
-                                    <img src="{{ uploaded_asset(get_setting('site_icon')) }}" alt="{{ translate('Site Icon')}}" class="img-fit h-100">
+                                    <img src="{{ uploaded_asset(get_setting('site_icon')) }}"
+                                         alt="{{ translate('Site Icon')}}" class="img-fit h-100">
                                 </div>
 
                                 <!-- Titles -->
                                 <div class="text-center text-lg-left">
-                                    <h1 class="fs-20 fs-md-20 fw-700 text-primary" style="text-transform: uppercase;">{{ translate('Verify Your Email Address') }}</h1>
-                                    <h5 class="fs-14 fw-400 text-dark">
-                                        {{ translate('Before proceeding, please check your email for a verification link. If you did not receive the email.') }}
-                                    </h5>
+                                    <h1 class="fs-20 fs-md-24 fw-700 text-primary"
+                                        style="text-transform: uppercase;">{{ translate('Verify Your Email Address') }}</h1>
+                                    <p class="fs-14 fw-400 text-dark mt-2">
+                                        {{ translate('Before proceeding, please check your email for a verification link.') }}
+                                    </p>
+                                    <p class="fs-14 fw-400 text-dark">
+                                        {{ translate('If you did not receive the email, click the button below to request another.') }}
+                                    </p>
                                 </div>
 
-                                <!-- Reset password form -->
+                                <!-- Resend form -->
                                 <div class="pt-3">
-                                    <div class="">
-                                        <a href="{{ route('verification.resend') }}" class="btn btn-primary btn-block">{{ translate('Click here to request another') }}</a>
-                                        @if (session('resent'))
-                                            <div class="alert alert-success mt-2 mb-0" role="alert">
-                                                {{ translate('A fresh verification link has been sent to your email address.') }}
-                                            </div>
-                                        @endif
-                                    </div>
+                                    <form method="POST" action="{{ route('verification.resend') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary btn-block fw-700">
+                                            {{ translate('Resend Verification Email') }}
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Back to Login -->
+                                <div class="text-center mt-3">
+                                    <a href="{{ route('login') }}" class="fs-14 fw-400 text-primary">
+                                        {{ translate('Back to Login') }}
+                                    </a>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Go Back -->
-                        <div class="mt-3 mr-4 mr-md-0">
-                            <a href="{{ url()->previous() }}" class="ml-auto fs-14 fw-700 d-flex align-items-center text-primary" style="max-width: fit-content;">
-                                <i class="las la-arrow-left fs-20 mr-1"></i>
-                                {{ translate('Back to Previous Page')}}
-                            </a>
                         </div>
                     </div>
                 </div>

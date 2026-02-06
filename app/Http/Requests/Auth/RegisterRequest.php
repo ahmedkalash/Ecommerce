@@ -26,7 +26,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:190'],
-            'email' => ['required', 'email', 'unique:users,id', 'string', 'max:190'],
+            'email' => ['required', 'email', 'unique:users,email', 'string', 'max:190'],
             'password' => ['required', 'confirmed', Password::min(8)->max(190)],
             // 'phone' => ['nullable', 'string', 'min:6', 'max:190'], Todo: otp plugin
             'agree_to_terms' => ['required', 'string', 'accepted', 'max:10'],

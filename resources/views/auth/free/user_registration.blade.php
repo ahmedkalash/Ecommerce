@@ -122,6 +122,11 @@
                                                                class="form-control rounded-0{{ $errors->has('phone') ? ' is-invalid' : '' }}"
                                                                value="{{ old('phone') }}" placeholder="" name="phone"
                                                                autocomplete="off">
+                                                        @if ($errors->has('phone'))
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $errors->first('phone') }}</strong>
+                                                            </span>
+                                                        @endif
                                                     </div>
 
                                                     <input type="hidden" id="country_code" name="country_code"
@@ -310,6 +315,19 @@
                         e.target.submit();
                     });
                 });
+            });
+        </script>
+    @else
+        <script type="text/javascript">
+            // Add loading state to prevent double submission
+            document.getElementById('reg-form').addEventListener('submit', function (e) {
+                var submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn.disabled) {
+                    e.preventDefault();
+                    return false;
+                }
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>{{ translate("Creating Account...") }}';
             });
         </script>
     @endif

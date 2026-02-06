@@ -105,8 +105,10 @@ Route::controller(RegisterController::class)->group(function () {
 Route::controller(LoginController::class)->group(function () {
     Route::get('/users/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
     Route::get('/seller/login', 'showSellerLoginForm')->name('seller.login')->middleware('handle-demo-login');
-    Route::get('/deliveryboy/login',
-        'showDeliveryBoyLoginForm')->name('deliveryboy.login')->middleware('handle-demo-login');
+    Route::get(
+        '/deliveryboy/login',
+        'showDeliveryBoyLoginForm'
+    )->name('deliveryboy.login')->middleware('handle-demo-login');
     Route::post('/users/login/cart', 'cart_login')->name('cart.login.submit')->middleware('handle-demo-login');
     Route::get('/logout', 'logout');
     Route::get('/social-login/redirect/{provider}', 'redirectToProvider')->name('social.login');
@@ -118,11 +120,6 @@ Route::controller(LoginController::class)->group(function () {
 });
 
 Route::controller(VerificationController::class)->group(function () {
-    Route::get('/email/resend', 'resend')->name('verification.resend');
-    Route::get(
-        '/verification-confirmation/{code}',
-        'verification_confirmation'
-    )->name('email.verification.confirmation');
     Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
 });
 
@@ -413,7 +410,7 @@ Route::controller(AddressController::class)->group(function () {
     Route::post('/get-cities-by-country', 'getCitiesByCountry')->name('get-city-by-country');
 });
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::get('invoice/{order_id}', [InvoiceController::class, 'invoice_download'])->name('invoice.download');
     Route::get('/invoice-print/{order_id}', [InvoiceController::class, 'invoice_print'])->name('invoice.print');
@@ -588,6 +585,7 @@ Route::controller(ContactController::class)->group(function () {
 // --------------------------------- test routes ---------------------------------
 // TEST ROUTES - REMOVE AFTER TESTING
 Route::get('/test', function () {
+    dd(session()->all());
     return 'test';
 })->name('test');
 

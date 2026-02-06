@@ -51,17 +51,17 @@ class User extends Authenticatable implements MustVerifyEmail
         throw new \RuntimeException('Unknown user type');
     }
 
-    public function isAdmin(): string
+    public function isAdmin(): bool
     {
         return $this->user_type == 'admin';
     }
 
-    public function isSeller(): string
+    public function isSeller(): bool
     {
         return $this->user_type == 'seller';
     }
 
-    public function isCustomer(): string
+    public function isCustomer(): bool
     {
         return $this->user_type == 'customer';
     }
