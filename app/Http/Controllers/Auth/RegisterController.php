@@ -61,6 +61,6 @@ class RegisterController extends Controller
         });
 
         return $this->registrationService->registrationResponse($request, $user) ?:
-            redirect($user->homePage());
+            redirect()->intended($user->homePage());
     }
 }

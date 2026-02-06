@@ -38,7 +38,9 @@ class VerificationController extends Controller
 
     public function redirectTo()
     {
-        return \request()->user()->homePage();
+        // 1. 'pull' fetches the intended URL AND deletes it from the session immediately.
+        // 2. The second argument is the fallback (if no intended URL exists).
+        return session()->pull('url.intended', \request()->user()->homePage());
     }
 
     /**

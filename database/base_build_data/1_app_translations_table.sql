@@ -2594,7 +2594,7 @@ VALUES (2091, 'en', 'total_order_ucf', 'Total Order', '2026-01-18 16:33:46', '20
        (2233, 'en', 'main_item_purchase_code_ucf', 'Main item purchase code', '2026-01-25 02:10:59',
         '2026-01-25 02:10:59'),
        (2234, 'en', 'addon_purchase_code_ucf', 'Addon purchase code', '2026-01-25 02:10:59', '2026-01-25 02:10:59'),
-       (2235, 'en', 'password_must_contain_at_least_6_digits_ucf', 'Password must contain at least 6 digits',
+       (2235, 'en', 'password_must_contain_at_least_6_digits_ucf', 'Password must contain at least 8 digits',
         '2026-01-28 19:22:39', '2026-01-28 19:22:39'),
        (2236, 'en', 'by_signing_up_you_agree_to_our__ucf', 'By signing up you agree to our ', '2026-01-28 19:22:39',
         '2026-01-28 19:22:39');

@@ -27078,5 +27078,5 @@ INSERT INTO `translations` (`id`, `lang`, `lang_key`, `lang_value`, `created_at`
 (27485, 'en', 'max_900_character', 'Max 900 character', '2026-01-25 01:23:05', '2026-01-25 01:23:05'),
 (27486, 'en', 'main_item_purchase_code', 'Main item purchase code', '2026-01-25 02:10:59', '2026-01-25 02:10:59'),
 (27487, 'en', 'addon_purchase_code', 'Addon purchase code', '2026-01-25 02:10:59', '2026-01-25 02:10:59'),
-(27488, 'en', 'password_must_contain_at_least_6_digits', 'Password must contain at least 6 digits', '2026-01-28 19:22:39', '2026-01-28 19:22:39'),
+(27488, 'en', 'password_must_contain_at_least_6_digits', 'Password must contain at least 8 digits', '2026-01-28 19:22:39', '2026-01-28 19:22:39'),
 (27489, 'en', 'by_signing_up_you_agree_to_our_', 'By signing up you agree to our ', '2026-01-28 19:22:39', '2026-01-28 19:22:39');
