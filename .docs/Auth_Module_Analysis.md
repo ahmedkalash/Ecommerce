@@ -431,36 +431,36 @@ Permission.php      // Permissions (Spatie)
 CREATE TABLE `users`
 (
     `id`                           int(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `referred_by`                  int(11)                  DEFAULT NULL,       -- Referral system
-    `provider`                     varchar(255)             DEFAULT NULL,       -- 'google', 'facebook', 'twitter', 'apple'
-    `provider_id`                  varchar(50)              DEFAULT NULL,       -- OAuth user ID
-    `refresh_token`                text                     DEFAULT NULL,       -- OAuth refresh token
-    `access_token`                 longtext                 DEFAULT NULL,       -- OAuth access token
-    `user_type`                    varchar(20)     NOT NULL DEFAULT 'customer', -- 'admin', 'seller', 'customer', 'delivery_boy', 'staff'
-    `name`                         varchar(191)    NOT NULL,
-    `email`                        varchar(191)             DEFAULT NULL,       -- Can be NULL for phone-only registration
-    `email_verified_at`            timestamp       NULL     DEFAULT NULL,
-    `verification_code`            text                     DEFAULT NULL,       -- 6-digit code for email/password verification
-    `new_email_verificiation_code` text                     DEFAULT NULL,       -- For email change
-    `password`                     varchar(191)             DEFAULT NULL,       -- Bcrypt hash (NULL for social login initially)
-    `remember_token`               varchar(100)             DEFAULT NULL,       -- Laravel remember me
-    `device_token`                 varchar(255)             DEFAULT NULL,       -- For push notifications
-    `avatar`                       varchar(256)             DEFAULT NULL,       -- Avatar file ID
-    `avatar_original`              varchar(256)             DEFAULT NULL,       -- Original avatar path
-    `address`                      varchar(300)             DEFAULT NULL,
-    `country`                      varchar(30)              DEFAULT NULL,
-    `state`                        varchar(30)              DEFAULT NULL,
-    `city`                         varchar(30)              DEFAULT NULL,
-    `postal_code`                  varchar(20)              DEFAULT NULL,
-    `phone`                        varchar(20)              DEFAULT NULL,
-    `balance`                      double(20, 2)   NOT NULL DEFAULT 0.00,       -- ⚠️ PROBLEM: Should be decimal, not double!
-    `banned`                       tinyint(4)      NOT NULL DEFAULT 0,          -- Ban status
-    `is_suspicious`                tinyint(4)               DEFAULT 0,          -- Fraud detection flag
-    `referral_code`                varchar(255)             DEFAULT NULL,       -- User's unique referral code
-    `customer_package_id`          int(11)                  DEFAULT NULL,       -- Subscription package FK
-    `remaining_uploads`            int(11)                  DEFAULT 0,          -- Upload quota
-    `created_at`                   timestamp       NULL     DEFAULT NULL,
-    `updated_at`                   timestamp       NULL     DEFAULT NULL,
+    `referred_by`                  int(11)                  DEFAULT NULL,    -- Referral system
+    `provider`                     varchar(255)          DEFAULT NULL,       -- 'google', 'facebook', 'twitter', 'apple'
+    `provider_id`                  varchar(50)           DEFAULT NULL,       -- OAuth user ID
+    `refresh_token`                text                  DEFAULT NULL,       -- OAuth refresh token
+    `access_token`                 longtext              DEFAULT NULL,       -- OAuth access token
+    `user_type`                    varchar(20)  NOT NULL DEFAULT 'customer', -- 'admin', 'seller', 'customer', 'delivery_boy', 'staff'
+    `name`                         varchar(191) NOT NULL,
+    `email`                        varchar(191)          DEFAULT NULL,       -- Can be NULL for phone-only registration
+    `email_verified_at`            timestamp NULL     DEFAULT NULL,
+    `verification_code`            text                  DEFAULT NULL,       -- 6-digit code for email/password verification
+    `new_email_verificiation_code` text                  DEFAULT NULL,       -- For email change
+    `password`                     varchar(191)          DEFAULT NULL,       -- Bcrypt hash (NULL for social login initially)
+    `remember_token`               varchar(100)          DEFAULT NULL,       -- Laravel remember me
+    `device_token`                 varchar(255)          DEFAULT NULL,       -- For push notifications
+    `avatar`                       varchar(256)          DEFAULT NULL,       -- Avatar file ID
+    `avatar_original`              varchar(256)          DEFAULT NULL,       -- Original avatar path
+    `address`                      varchar(300)          DEFAULT NULL,
+    `country`                      varchar(30)           DEFAULT NULL,
+    `state`                        varchar(30)           DEFAULT NULL,
+    `city`                         varchar(30)           DEFAULT NULL,
+    `postal_code`                  varchar(20)           DEFAULT NULL,
+    `phone`                        varchar(20)           DEFAULT NULL,
+    `balance` double(20, 2)   NOT NULL DEFAULT 0.00,                         -- ⚠️ PROBLEM: Should be decimal, not double!
+    `banned`                       tinyint(4)      NOT NULL DEFAULT 0,       -- Ban status
+    `is_suspicious`                tinyint(4)               DEFAULT 0,       -- Fraud detection flag
+    `referral_code`                varchar(255)          DEFAULT NULL,       -- User's unique referral code
+    `customer_package_id`          int(11)                  DEFAULT NULL,    -- Subscription package FK
+    `remaining_uploads`            int(11)                  DEFAULT 0,       -- Upload quota
+    `created_at`                   timestamp NULL     DEFAULT NULL,
+    `updated_at`                   timestamp NULL     DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -783,32 +783,32 @@ CREATE TABLE `users`
 
 ### ⚠️ Medium Issues
 
-6. **SQL Injection Risk in User Search**
+1. **SQL Injection Risk in User Search**
     - **Issue**: If user search uses raw queries without parameter binding
     - **Risk**: Database breach
     - **Impact**: CRITICAL if exists
     - **Action**: Audit all User::where() calls for raw SQL
 
-7. **Mass Assignment Vulnerability**
+2. **Mass Assignment Vulnerability**
     - **Issue**: User model has `$fillable` array including sensitive fields
     - **Risk**: Attackers can modify fields like `balance`, `user_type` via requests
     - **Impact**: HIGH
     - **Location**: `User.php`, line 29
     - **Fix**: Use `$guarded` for sensitive fields or validate strictly
 
-8. **Weak Email Verification**
+3. **Weak Email Verification**
     - **Issue**: `verification_code` stored in plaintext in database
     - **Risk**: Database leak exposes verification codes
     - **Impact**: MEDIUM
     - **Fix**: Hash verification codes before storing
 
-9. **No CSRF Protection on Social Login Callbacks**
+4. **No CSRF Protection on Social Login Callbacks**
     - **Issue**: Social login callbacks might not verify state parameter
     - **Risk**: CSRF attack during OAuth flow
     - **Impact**: MEDIUM
     - **Fix**: Implement state parameter validation
 
-10. **Avatar Upload Without Validation**
+5. **Avatar Upload Without Validation**
     - **Issue**: No mention of file type/size validation for avatar uploads
     - **Risk**: Malicious file upload (XSS, RCE)
     - **Impact**: CRITICAL if exists
@@ -816,30 +816,30 @@ CREATE TABLE `users`
 
 ### 💡 Best Practice Violations
 
-11. **Passwords Stored with bcrypt Only**
+1. **Passwords Stored with bcrypt Only**
     - **Note**: Laravel's Hash::make() uses bcrypt by default
     - **Recommendation**: Consider Argon2id for better security
     - **Impact**: LOW (bcrypt is still acceptable)
 
-12. **No Multi-Factor Authentication (MFA)**
+2. **No Multi-Factor Authentication (MFA)**
     - **Issue**: Only username/password authentication
     - **Risk**: Single point of failure
     - **Impact**: MEDIUM
     - **Fix**: Implement 2FA for admin/seller accounts
 
-13. **Device Token Not Encrypted**
+3. **Device Token Not Encrypted**
     - **Issue**: `device_token` stored in plaintext
     - **Risk**: If database leaks, push notification hijacking
     - **Impact**: LOW
     - **Fix**: Encrypt device tokens
 
-14. **No Account Lockout After Failed Attempts**
+4. **No Account Lockout After Failed Attempts**
     - **Issue**: No automatic ban after X failed login attempts
     - **Risk**: Brute force attacks
     - **Impact**: MEDIUM
     - **Fix**: Implement account lockout logic
 
-15. **Referral Code Not Validated for Uniqueness**
+5. **Referral Code Not Validated for Uniqueness**
     - **Issue**: No unique constraint on `referral_code`
     - **Risk**: Duplicate referral codes = conflicts
     - **Impact**: LOW
@@ -1134,20 +1134,24 @@ Log::info('User login attempt', [
 ### Phase 1: Data Integrity (Low Risk)
 
 1. **Fix Financial Column Type**
+
    ```sql
    ALTER TABLE users MODIFY COLUMN balance DECIMAL(15,2) NOT NULL DEFAULT 0.00;
    ```
+
     - Risk: LOW
     - Impact: HIGH
     - Effort: 1 hour
 
 2. **Add Database Indexes**
+
    ```sql
    ALTER TABLE users ADD INDEX idx_email (email);
    ALTER TABLE users ADD INDEX idx_phone (phone);
    ALTER TABLE users ADD INDEX idx_provider (provider, provider_id);
    ALTER TABLE users ADD UNIQUE INDEX idx_referral_code (referral_code);
    ```
+
     - Risk: LOW
     - Impact: MEDIUM (performance)
     - Effort: 1 hour
@@ -1160,29 +1164,31 @@ Log::info('User login attempt', [
 
 ### Phase 2: Security Hardening (Medium Risk)
 
-4. **Implement Rate Limiting**
+1. **Implement Rate Limiting**
+
    ```php
    // routes/web.php
    Route::post('/login')->middleware('throttle:5,1'); // 5 attempts per minute
    Route::post('/password/email')->middleware('throttle:3,10'); // 3 per 10 min
    ```
+
     - Risk: LOW
     - Impact: HIGH
     - Effort: 2 hours
 
-5. **Add CSRF Protection to Social Login**
+2. **Add CSRF Protection to Social Login**
     - Implement state parameter validation
     - Risk: MEDIUM
     - Impact: HIGH
     - Effort: 4 hours
 
-6. **Hash Verification Codes**
+3. **Hash Verification Codes**
     - Store hashed codes instead of plaintext
     - Risk: MEDIUM (requires careful migration)
     - Impact: MEDIUM
     - Effort: 6 hours
 
-7. **Implement UUIDs**
+4. **Implement UUIDs**
     - Add `uuid` column to users table
     - Use UUIDs in URLs instead of IDs
     - Risk: HIGH (lots of code changes)
@@ -1191,7 +1197,8 @@ Log::info('User login attempt', [
 
 ### Phase 3: Code Structure (High Risk)
 
-8. **Extract Authentication Service**
+1. **Extract Authentication Service**
+
    ```php
    class AuthenticationService {
        public function attemptLogin(array $credentials): bool
@@ -1199,11 +1206,13 @@ Log::info('User login attempt', [
        public function logout(): void
    }
    ```
+
     - Risk: MEDIUM
     - Impact: HIGH (maintainability)
     - Effort: 8 hours
 
-9. **Extract Registration Service**
+2. **Extract Registration Service**
+
    ```php
    class UserRegistrationService {
        public function __construct(
@@ -1216,11 +1225,13 @@ Log::info('User login attempt', [
        public function registerSeller(array $data): User
    }
    ```
+
     - Risk: MEDIUM
     - Impact: HIGH
     - Effort: 12 hours
 
-10. **Extract Password Service**
+3. **Extract Password Service**
+
     ```php
     class PasswordService {
         public function sendResetCode(string $email): bool
@@ -1228,11 +1239,13 @@ Log::info('User login attempt', [
         public function resetPassword(string $email, string $password): bool
     }
     ```
+
     - Risk: LOW
     - Impact: MEDIUM
     - Effort: 6 hours
 
-11. **Extract Verification Service**
+4. **Extract Verification Service**
+
     ```php
     class UserVerificationService {
         public function sendEmailVerification(User $user): bool
@@ -1241,13 +1254,15 @@ Log::info('User login attempt', [
         public function verifyPhone(string $code): bool
     }
     ```
+
     - Risk: LOW
     - Impact: MEDIUM
     - Effort: 8 hours
 
 ### Phase 4: Domain Refactoring (HIGH Risk)
 
-12. **Decompose User Model**
+1. **Decompose User Model**
+
     ```php
     User (Core Auth)
       ├── UserProfile (name, avatar, address)
@@ -1256,12 +1271,13 @@ Log::info('User login attempt', [
       ├── SellerProfile (extends UserProfile)
       └── StaffProfile (extends UserProfile)
     ```
+
     - Risk: VERY HIGH (breaks existing code)
     - Impact: VERY HIGH (maintainability, scalability)
     - Effort: 40+ hours
     - **Prerequisite**: 100% test coverage!
 
-13. **Implement Repository Pattern**
+2. **Implement Repository Pattern**
     - UserRepository
     - CustomerRepository
     - SellerRepository
@@ -1269,7 +1285,7 @@ Log::info('User login attempt', [
     - Impact: HIGH
     - Effort: 24 hours
 
-14. **Migrate to Form Requests**
+3. **Migrate to Form Requests**
     - RegisterUserRequest
     - LoginRequest
     - SendVerificationRequest
@@ -1280,14 +1296,14 @@ Log::info('User login attempt', [
 
 ### Phase 5: Testing & Monitoring
 
-15. **Add Unit Tests**
+1. **Add Unit Tests**
     - Test all authentication services
     - Target: 80% code coverage
     - Risk: LOW (doesn't change code)
     - Impact: HIGH (confidence)
     - Effort: 32 hours
 
-16. **Add Feature Tests**
+2. **Add Feature Tests**
     - Test registration flow end-to-end
     - Test login flows
     - Test password reset
@@ -1296,7 +1312,8 @@ Log::info('User login attempt', [
     - Impact: HIGH
     - Effort: 24 hours
 
-17. **Add Audit Logging**
+3. **Add Audit Logging**
+
     ```php
     ActivityLog::create([
         'user_id' => $user->id,
@@ -1306,11 +1323,12 @@ Log::info('User login attempt', [
         'status' => 'success'
     ]);
     ```
+
     - Risk: LOW
     - Impact: MEDIUM
     - Effort: 8 hours
 
-18. **Add Security Monitoring**
+4. **Add Security Monitoring**
     - Failed login alerts
     - Suspicious activity detection
     - Rate limit breach notifications
@@ -1331,28 +1349,28 @@ Log::info('User login attempt', [
 
 ### ⚠️ High Priority (Week 2-3)
 
-5. Extract Password Service (reduce controller bloat)
-6. Extract Verification Service
-7. Implement UUID for users (IDOR fix)
-8. Add Form Request validation
-9. Hash verification codes
-10. Write Feature Tests for critical flows
+1. Extract Password Service (reduce controller bloat)
+2. Extract Verification Service
+3. Implement UUID for users (IDOR fix)
+4. Add Form Request validation
+5. Hash verification codes
+6. Write Feature Tests for critical flows
 
 ### 💡 Medium Priority (Week 4-6)
 
-11. Extract Authentication Service
-12. Extract Registration Service
-13. Implement Repository Pattern
-14. Add CSRF protection to social login
-15. Write Unit Tests (80% coverage)
+1. Extract Authentication Service
+2. Extract Registration Service
+3. Implement Repository Pattern
+4. Add CSRF protection to social login
+5. Write Unit Tests (80% coverage)
 
 ### 🎯 Long-term (Month 2-3)
 
-16. Decompose User Model (requires tests first!)
-17. Implement MFA for admin users
-18. Add security monitoring dashboard
-19. Performance optimization
-20. API documentation
+1. Decompose User Model (requires tests first!)
+2. Implement MFA for admin users
+3. Add security monitoring dashboard
+4. Performance optimization
+5. API documentation
 
 ---
 
@@ -1417,27 +1435,27 @@ Log::info('User login attempt', [
 
 ### Short-term Goals (Next 2 Weeks)
 
-6. 🔲 **Extract PasswordService** - Move all password logic
-7. 🔲 **Extract VerificationService** - Move all verification logic
-8. 🔲 **Write test suite** - Cover all auth flows
-9. 🔲 **Add audit logging** - Track auth events
-10. 🔲 **Security audit** - Check all identified vulnerabilities
+1. 🔲 **Extract PasswordService** - Move all password logic
+2. 🔲 **Extract VerificationService** - Move all verification logic
+3. 🔲 **Write test suite** - Cover all auth flows
+4. 🔲 **Add audit logging** - Track auth events
+5. 🔲 **Security audit** - Check all identified vulnerabilities
 
 ### Medium-term Goals (Next Month)
 
-11. 🔲 **Implement UUIDs** - Add uuid column + migration
-12. 🔲 **Refactor controllers** - Make them thin orchestrators
-13. 🔲 **Implement Repository Pattern** - Decouple data access
-14. 🔲 **Add Form Requests** - Centralize validation
-15. 🔲 **Documentation** - API docs + sequence diagrams
+1. 🔲 **Implement UUIDs** - Add uuid column + migration
+2. 🔲 **Refactor controllers** - Make them thin orchestrators
+3. 🔲 **Implement Repository Pattern** - Decouple data access
+4. 🔲 **Add Form Requests** - Centralize validation
+5. 🔲 **Documentation** - API docs + sequence diagrams
 
 ### Long-term Vision (Next 3 Months)
 
-16. 🔲 **Decompose User Model** - Split into focused models
-17. 🔲 **Implement MFA** - Two-factor authentication
-18. 🔲 **Performance optimization** - Query optimization, caching
-19. 🔲 **Security monitoring** - Real-time threat detection
-20. 🔲 **Clean architecture** - Full SOLID compliance
+1. 🔲 **Decompose User Model** - Split into focused models
+2. 🔲 **Implement MFA** - Two-factor authentication
+3. 🔲 **Performance optimization** - Query optimization, caching
+4. 🔲 **Security monitoring** - Real-time threat detection
+5. 🔲 **Clean architecture** - Full SOLID compliance
 
 ---
 
