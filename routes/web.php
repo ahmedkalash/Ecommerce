@@ -6,7 +6,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
-use App\Http\Controllers\Auth\VerificationFirstController;
+
+// VerificationFirstController removed - using standard register-then-verify flow
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -141,18 +142,7 @@ Route::controller(ShopController::class)->group(function () {
     )->name('shop-reg.verify_code_confirmation');
 });
 
-Route::controller(VerificationFirstController::class)->group(function () {
-    Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('registration.verification');
-    Route::post(
-        '/registration/verification-code-send',
-        'sendRegVerificationCode'
-    )->name('customer-reg.verification_code_send');
-    Route::get('/registration/verify-code/{id}', 'regVerifyCode')->name('customer-reg.verify_code');
-    Route::post(
-        '/registration/verification-code-confirmation',
-        'regVerifyCodeConfirmation'
-    )->name('customer-reg.verify_code_confirmation');
-});
+// Verification-first registration routes removed - using standard register-then-verify flow
 
 Route::controller(HomeController::class)->group(function () {
     Route::post('/import-data', 'import_data');

@@ -1,52 +1,36 @@
-## Overview
+## ⚠️ DEPRECATED
 
-The `customer_registration_verify` business setting in this project toggles a **"Verification First"** registration flow
-for new customers.
+**This setting and feature has been removed from the codebase.**
 
-Instead of the standard "register then verify" approach, this setting forces users to verify their identity (Email or
-Phone) **before** they are allowed to fill out the registration form.
+The `customer_registration_verify` business setting has been deprecated and removed in favor of the standard "
+register-then-verify" flow using Laravel's built-in email verification (with the new `EnsureEmailIsVerified`
+middleware).
 
-### **How it Works**
+### Removal Summary
 
-#### **1. When Disabled (Value = 0 or NULL - Default)**
+The following components related to this feature have been removed:
 
-* **Access:** Users go directly to the registration page (`/users/registration`).
-* **Process:** They fill in their Name, Email/Phone, and Password all at once.
-* **Verification:** If `email_verification` is enabled globally, the user is asked to verify their email **after** the
-  account is already created.
+1. **Routes:** All routes related to `/registration/verification` were removed from `routes/web.php`.
+2. **Controllers:** The `VerificationFirstController.php` file was deleted.
+3. **Admin Panel:** The admin toggle for `customer_registration_verify` was removed from the activation settings.
+4. **Database Seed:** The SQL insert statement for `customer_registration_verify` was removed from database seeders.
+5. **Frontend Views:** All conditional registration links that checked `customer_registration_verify` were simplified to
+   directly use `route('user.registration')`.
+6. **Test Cases:** Test setup related to `customer_registration_verify` was cleaned up.
 
-#### **2. When Enabled (Value = 1)**
+### Current Registration Flow
 
-* **Access:** The standard registration page (`/users/registration`) is **disabled** (returns a 404 error). All "
-  Register" links on the site are dynamically changed to point to `/registration/verification`.
-* **Step 1 (Pre-Verification):** The user is presented with a simple form asking for their **Email or Phone**.
-* **Step 2 (Code Delivery):** A verification code is sent via email or SMS (if the OTP addon is active).
-* **Step 3 (Verification):** The user must enter the correct code.
-* **Step 4 (Final Registration):** Only after successful verification is the user redirected to the full registration
-  form to enter their Name and Password.
-* **Auto-Verification:** Since the identity was verified upfront, the resulting user account is **automatically marked
-  as verified** (`email_verified_at` is set immediately).
+The application now uses the standard Laravel registration flow:
 
-### **Key Technical Implementation**
+1. User visits `/users/registration` and fills out the registration form.
+2. User account is created.
+3. If `email_verification` is enabled, the user is required to verify their email via the `EnsureEmailIsVerified`
+   middleware.
+4. Unverified users are automatically redirected to the email verification notice page until they verify.
 
-* **Admin Toggle:** You can find this setting in the Admin Panel under `Setup Configurations > Activation` labeled as *
-  *"Customer Registration Verification"**.
-* **`HomeController.php`**:
-    * `registration()`: Aborts with 404 if this setting is enabled.
-    * `verifyRegEmailorPhone()`: Displays the initial verification-first view.
-    * `sendRegVerificationCode()`: Handles sending the OTP/Email code.
-    * `regVerifyCodeConfirmation()`: Validates the code and finally unlocks the registration form.
-* **`RegisterController.php`**:
-    * In the `register()` and `create()` methods, it checks this setting to decide whether to skip the usual
-      post-registration verification logic, as the user is already "pre-verified".
-* **Frontend Views:** Files like `nav.blade.php`, `user_login.blade.php`, and various headers use a ternary check:
-  ```php
-  route(get_setting('customer_registration_verify') === '1' ? 'registration.verification' : 'user.registration')
-  ```
+This approach is simpler, follows Laravel conventions, and still prevents unverified users from accessing protected
+resources.
 
-### **Why use it?**
+---
 
-This setting is used to **prevent spam registrations** and ensure that every account in the database belongs to a
-reachable email or phone number from the very first second of its existence. It is a stricter, more secure onboarding
-flow.
-<br>
+*Document updated: February 2026*

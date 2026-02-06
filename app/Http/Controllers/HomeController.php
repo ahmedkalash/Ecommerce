@@ -39,8 +39,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // $route = route(get_setting('customer_registration_verify') === '1' ? 'registration.verification' : 'user.registration');
-        // dd( $route );
+
         $lang = get_system_language() ? get_system_language()->code : null;
         $featured_categories = Cache::rememberForever('featured_categories', function () {
             return Category::with('bannerImage')->where('featured', 1)->get();

@@ -188,27 +188,7 @@ abstract class AuthTestCase extends TestCase
         );
     }
 
-    /**
-     * Disable pre-registration verification.
-     */
-    protected function disableRegistrationVerify(): void
-    {
-        \DB::table('business_settings')->updateOrInsert(
-            ['type' => 'customer_registration_verify'],
-            ['value' => 0]
-        );
-    }
-
-    /**
-     * Enable pre-registration verification.
-     */
-    protected function enableRegistrationVerify(): void
-    {
-        \DB::table('business_settings')->updateOrInsert(
-            ['type' => 'customer_registration_verify'],
-            ['value' => 1]
-        );
-    }
+    // Pre-registration verification helpers removed - using standard email verification via middleware
 
     /**
      * Assert that a user exists in the database with given attributes.

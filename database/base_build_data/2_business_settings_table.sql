@@ -199,5 +199,4 @@ VALUES (1, 'home_default_currency', '1', NULL, '2018-10-16 01:35:52', '2019-01-2
        (207, 'bottom_header_bg_color', '#ff0000', NULL, '2025-07-28 04:46:27', '2025-07-29 01:04:22'),
        (208, 'top_header_text_color', '#857E7E', NULL, '2025-07-28 04:46:27', '2025-07-28 07:58:05'),
        (209, 'middle_header_text_color', '#857E7E', NULL, '2025-07-28 04:46:27', '2025-07-29 01:04:22'),
-       (210, 'bottom_header_text_color', '#ffffff', NULL, '2025-07-28 04:50:54', '2025-07-28 04:50:54'),
-       (211, 'customer_registration_verify', 0, NULL, '2026-01-31 04:50:54', '2025-07-28 04:50:54');
+       (210, 'bottom_header_text_color', '#ffffff', NULL, '2025-07-28 04:50:54', '2025-07-28 04:50:54');

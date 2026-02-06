@@ -90,16 +90,16 @@ class UserRegistrationService
     protected function notifyAdmin(User $user): void
     {
         // Todo: check this
-        //        if (! get_email_template_data('customer_reg_email_to_admin', 'status')) {
-        //            return;
-        //        }
-        //
-        //        try {
-        //            // Todo: check this
-        //            EmailUtility::customer_registration_email('customer_reg_email_to_admin', $user);
-        //        } catch (\Exception $e) {
-        //            \Log::warning('Admin notification failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
-        //        }
+        if (!get_email_template_data('customer_reg_email_to_admin', 'status')) {
+            return;
+        }
+
+        try {
+            // Todo: check this
+            EmailUtility::customer_registration_email('customer_reg_email_to_admin', $user);
+        } catch (\Exception $e) {
+            \Log::warning('Admin notification failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
+        }
     }
 
     /**
