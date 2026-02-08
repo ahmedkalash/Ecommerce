@@ -154,44 +154,6 @@ class HomeController extends Controller
         }
     }
 
-    public function profile(Request $request)
-    {
-        if (Auth::user()->user_type == 'seller') {
-            return redirect()->route('seller.profile.index');
-        } elseif (Auth::user()->user_type == 'delivery_boy') {
-            return view('delivery_boys.profile');
-        } else {
-            return view('frontend.user.profile');
-        }
-    }
-
-    public function userProfileUpdate(Request $request)
-    {
-        if (env('DEMO_MODE') == 'On') {
-            flash(translate('Sorry! the action is not permitted in demo '))->error();
-
-            return back();
-        }
-
-        $user = Auth::user();
-        $user->name = $request->name;
-        $user->address = $request->address;
-        $user->country = $request->country;
-        $user->city = $request->city;
-        $user->postal_code = $request->postal_code;
-        $user->phone = $request->phone;
-
-        if ($request->new_password != null && ($request->new_password == $request->confirm_password)) {
-            $user->password = Hash::make($request->new_password);
-        }
-
-        $user->avatar_original = $request->photo;
-        $user->save();
-
-        flash(translate('Your Profile has been updated successfully!'))->success();
-
-        return back();
-    }
 
     public function flash_deal_details($slug)
     {

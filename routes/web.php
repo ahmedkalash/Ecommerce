@@ -57,6 +57,7 @@ use App\Http\Controllers\SizeChartController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\WalletController;
+use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\WishlistController;
 
 /*
@@ -318,17 +319,23 @@ Route::resource('subscribers', SubscriberController::class);
 
 Route::group(['middleware' => ['user', 'verified', 'unbanned']], function () {
 
+
     Route::controller(HomeController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard')->middleware(['prevent-back-history']);
         Route::get(
             '/wallet_recharge_success',
             'wallet_recharge_success'
         )->name('wallet_recharge_success')->middleware(['prevent-back-history']);
-        Route::get('/profile', 'profile')->name('profile');
+        // Profile routes moved to ProfileController
         Route::post('/new-user-verification', 'new_verify')->name('user.new.verify');
         Route::post('/send-otp-update-email', 'sendEmailUpdateVerificationCode')->name('user.email.update.verify.code');
         Route::post('/new-user-email', 'update_email')->name('user.change.email');
-        Route::post('/user/update-profile', 'userProfileUpdate')->name('user.profile.update');
+    });
+
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile', 'show')->name('profile');
+        Route::post('/profile/update', 'update')->name('user.profile.update');
+        Route::post('/profile/update-password', 'updatePassword')->name('user.password.update');
     });
 
     Route::controller(NotificationController::class)->group(function () {
