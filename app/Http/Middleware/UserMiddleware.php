@@ -10,19 +10,13 @@ class UserMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @param  Closure  $next
-     * @return mixed
      */
     public function handle(Request $request, Closure $next): mixed
     {
         if (Auth::check() && (Auth::user()->isCustomer() || Auth::user()->isSeller()) && !Auth::user()->banned) {
             return $next($request);
         } else {
-            session(['link' => url()->current()]);
-
-            return redirect()->route('user.login');
+            return redirect()->guest(route('user.login'));
         }
     }
 }

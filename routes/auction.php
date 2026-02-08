@@ -61,7 +61,7 @@ Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user
     });
 });
 
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::resource('auction_product_bids', AuctionProductBidController::class);
 
     Route::post('/auction/cart/show-cart-modal', [CartController::class, 'showCartModalAuction'])->name('auction.cart.showCartModal');

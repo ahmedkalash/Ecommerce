@@ -372,8 +372,8 @@
                                             }
                                         @endphp
                                         <div class="form-group">
-                                            <textarea id="referral_code_url" class="form-control" readonly type="text"
-                                                      style="display:none">{{$referral_code_url}}</textarea>
+                                    <textarea id="referral_code_url" class="form-control" readonly type="text"
+                                              style="display:none">{{$referral_code_url}}</textarea>
                                         </div>
                                         <button type="button" id="ref-cpurl-btn"
                                                 class="btn btn-sm btn-secondary w-150px rounded-0"
@@ -888,8 +888,8 @@
                                    placeholder="{{ translate('Product Name') }}" required>
                         </div>
                         <div class="form-group">
-                            <textarea class="form-control" rows="8" name="message" required
-                                      placeholder="{{ translate('Your Question') }}">{{ route('product', $detailedProduct->slug) }}</textarea>
+                        <textarea class="form-control" rows="8" name="message" required
+                                  placeholder="{{ translate('Your Question') }}">{{ route('product', $detailedProduct->slug) }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -915,7 +915,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="p-3">
-                        <form class="form-default" role="form" action="{{ route('cart.login.submit') }}" method="POST">
+                        <form class="form-default" role="form" action="{{ route('login') }}" method="POST">
                             @csrf
                             <div class="form-group">
                                 @if (addon_is_activated('otp_system'))

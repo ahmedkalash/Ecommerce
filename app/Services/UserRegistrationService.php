@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Enums\UserType;
-use App\Models\Cart;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -89,13 +88,13 @@ class UserRegistrationService
 
     protected function notifyAdmin(User $user): void
     {
-        // Todo: check this
+        // Todo: check this with the emails task
         if (!get_email_template_data('customer_reg_email_to_admin', 'status')) {
             return;
         }
 
         try {
-            // Todo: check this
+            // Todo: check this with the emails task
             EmailUtility::customer_registration_email('customer_reg_email_to_admin', $user);
         } catch (\Exception $e) {
             \Log::warning('Admin notification failed', ['user_id' => $user->id, 'error' => $e->getMessage()]);
@@ -117,29 +116,9 @@ class UserRegistrationService
         return redirect()->route('verification.notice');
     }
 
-    public function handelCart(): void
-    {
-        // Todo: check this
-        if (session('temp_user_id') != null) {
-            if (auth()->user()?->user_type == 'customer') {
-
-                Cart::where('temp_user_id', session('temp_user_id'))
-                    ->update(
-                        [
-                            'user_id' => auth()->user()->id,
-                            'temp_user_id' => null,
-                        ]
-                    );
-            } else {
-                Cart::where('temp_user_id', session('temp_user_id'))->delete();
-            }
-            Session::forget('temp_user_id');
-        }
-    }
-
     public function handelReferralCode(User $user): void
     {
-        // Todo: check this
+        // Todo: check this with the affiliate_system addon task
         // if ($referral_code = Cookie::get('referral_code')) {
         //     $referred_by_user = User::where('referral_code', $referral_code)->first();
         //     if ($referred_by_user != null) {

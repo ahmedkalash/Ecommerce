@@ -41,7 +41,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function homePage(): string
     {
-        if ($this->isAdmin()) {
+        if ($this->isAdmin() || $this->isStaff()) {
             return route('admin.dashboard');
         } elseif ($this->isSeller()) {
             return route('seller.dashboard');
@@ -56,6 +56,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->user_type == 'admin';
     }
 
+    public function isStaff(): bool
+    {
+        return $this->user_type == 'staff';
+    }
+
     public function isSeller(): bool
     {
         return $this->user_type == 'seller';
@@ -64,5 +69,16 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isCustomer(): bool
     {
         return $this->user_type == 'customer';
+    }
+
+    public function isDeliveryBoy(): bool
+    {
+        return $this->user_type == 'delivery_boy';
+    }
+
+
+    public function IsShopApproved(): bool
+    {
+        return $this->shop->registration_approval == 1;
     }
 }

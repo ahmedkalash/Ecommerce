@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
+use App\Http\Controllers\Auth\CustomerAccountController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerificationController;
-
 // VerificationFirstController removed - using standard register-then-verify flow
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
@@ -104,20 +105,40 @@ Route::controller(RegisterController::class)->group(function () {
 
 // Login
 Route::controller(LoginController::class)->group(function () {
+    /**
+     * There are 2 routes for login, one of them exist in AuthRouteMethods file: get('login', 'Auth\LoginController@showLoginForm')->name('login');
+     * The '/login' route will be redirected to '/users/login'
+     *
+     * @see vendor/laravel/ui/src/AuthRouteMethods.php
+     */
     Route::get('/users/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
+
     Route::get('/seller/login', 'showSellerLoginForm')->name('seller.login')->middleware('handle-demo-login');
     Route::get(
         '/deliveryboy/login',
         'showDeliveryBoyLoginForm'
     )->name('deliveryboy.login')->middleware('handle-demo-login');
-    Route::post('/users/login/cart', 'cart_login')->name('cart.login.submit')->middleware('handle-demo-login');
     Route::get('/logout', 'logout');
+    // Route::get('/handle-demo-login', 'handle_demo_login')->name('handleDemoLogin');
+});
+
+// Customer Account Management
+Route::controller(CustomerAccountController::class)->group(function () {
+    Route::post('/account-deletion', 'destroy')->name('account_delete')->middleware(['auth', 'verified']);
+});
+
+// Social Login
+Route::controller(SocialLoginController::class)->group(function () {
+    /**
+     * There are 2 routes for login, one of them exist in AuthRouteMethods file: get('login', 'Auth\LoginController@showLoginForm')->name('login');
+     * The '/login' route will be redirected to '/users/login'
+     *
+     * @see vendor/laravel/ui/src/AuthRouteMethods.php
+     */
     Route::get('/social-login/redirect/{provider}', 'redirectToProvider')->name('social.login');
     Route::get('/social-login/{provider}/callback', 'handleProviderCallback')->name('social.callback');
     // Apple Callback
     Route::post('/apple-callback', 'handleAppleCallback');
-    Route::get('/account-deletion', 'account_deletion')->name('account_delete');
-    // Route::get('/handle-demo-login', 'handle_demo_login')->name('handleDemoLogin');
 });
 
 Route::controller(VerificationController::class)->group(function () {
@@ -576,9 +597,14 @@ Route::controller(ContactController::class)->group(function () {
 // TEST ROUTES - REMOVE AFTER TESTING
 Route::get('/test', function () {
     dd(session()->all());
+
     return 'test';
 })->name('test');
 
 // --------------------------------- Redirects routes ---------------------------------
 
 Route::redirect('/home', '/');
+
+// Note: do not use this "Route::redirect('/login', '/users/login')" to redirect as we only need to redirect
+// the 'get' route, not the 'post'. 'POST /login' remains handled by Auth::routes() for actual authentication
+Route::get('/login', fn() => redirect()->route('user.login'))->name('login');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Services\CartService;
 use App\Services\UserRegistrationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -28,7 +29,8 @@ class RegisterController extends Controller
      * @return void
      */
     public function __construct(
-        protected UserRegistrationService $registrationService
+        protected UserRegistrationService $registrationService,
+        protected CartService $cartService
     ) {
         $this->middleware('guest');
         $this->middleware('handle-demo-login');
@@ -55,7 +57,7 @@ class RegisterController extends Controller
             $user = $this->registrationService->create($request->all());
             $user = $this->registrationService->handlePostRegistration($user);
             $this->registrationService->guard()->login($user);
-            $this->registrationService->handelCart();
+            $this->cartService->handelCartAfterAuthentication();
             $this->registrationService->handelReferralCode($user);
             event(new Registered($user));
         });

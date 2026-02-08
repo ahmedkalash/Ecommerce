@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <div class="p-3">
-                    <form class="form-default" role="form" action="{{ route('cart.login.submit') }}" method="POST">
+                    <form class="form-default" role="form" action="{{ route('login') }}" method="POST">
                         @csrf
 
                         @if (addon_is_activated('otp_system'))

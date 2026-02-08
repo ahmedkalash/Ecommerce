@@ -18,15 +18,12 @@ class CheckoutMiddleware
     public function handle($request, Closure $next)
     {
         if (BusinessSetting::where('type', 'guest_checkout_active')->first()->value != 1) {
-            if(Auth::check()){
+            if (Auth::check()) {
                 return $next($request);
+            } else {
+                return redirect()->guest(route('user.login'));
             }
-            else {
-                session(['link' => url()->current()]);
-                return redirect()->route('user.login');
-            }
-        }
-        else{
+        } else {
             return $next($request);
         }
     }
