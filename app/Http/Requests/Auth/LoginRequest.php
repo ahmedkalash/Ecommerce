@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\RecaptchaAction;
 use App\Rules\Recaptcha;
+use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,13 +29,7 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'email', 'string', 'max:190'],
             'password' => ['required', 'string'],
             'remember' => ['boolean'],
-            'g-recaptcha-response' => [
-                Rule::when(
-                    get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1,
-                    ['required', new Recaptcha],
-                    ['sometimes']
-                ),
-            ],
+            'g-recaptcha-response' => RecaptchaService::validationRules(RecaptchaAction::CUSTOMER_LOGIN),
         ];
     }
 }

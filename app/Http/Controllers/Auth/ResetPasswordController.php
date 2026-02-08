@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Auth\Events\PasswordReset;
+use App\Services\UserService;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
 
 class ResetPasswordController extends Controller
 {
@@ -22,7 +24,9 @@ class ResetPasswordController extends Controller
     |
     */
 
-    use ResetsPasswords;
+    use ResetsPasswords {
+        reset as baseReset;
+    }
 
     /**
      * Create a new controller instance.
@@ -35,50 +39,40 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * Get the response for a successful password reset.
+     * Reset the given user's password.
      *
-     * @param  string  $response
+     * @return RedirectResponse|JsonResponse
      */
-    protected function sendResetResponse(Request $request, $response)
+    public function reset(Request $request)
     {
-        if (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff') {
-            return redirect()->route('admin.dashboard')
-                ->with('status', trans($response));
+        $request->validate($this->rules(), $this->validationErrorMessages());
+
+        if (UserService::isBanned($request->email)) {
+            flash(translate('Your account has been banned.'))->error();
+
+            return back()->withInput($request->only('email'));
         }
 
-        return redirect()->route('home')
-            ->with('status', trans($response));
+        return $this->baseReset($request);
     }
 
-    public function resetWithCode(Request $request)
+    /**
+     * Display the password reset view for the given token.
+     *
+     * @return Factory|View
+     */
+    public function showResetForm(Request $request, ?string $token = null)
     {
-        if (($user = User::where('email', $request->email)->where(
-                'verification_code',
-                $request->code
-            )->first()) != null) {
-            if ($request->password == $request->password_confirmation) {
-                $user->password = Hash::make($request->password);
-                $user->email_verified_at = date('Y-m-d h:m:s');
-                $user->save();
-                event(new PasswordReset($user));
-                auth()->login($user, true);
+        return view('auth.'.get_setting('authentication_layout_select').'.reset_password')->with(
+            ['token' => $token, 'email' => $request->email]
+        );
+    }
 
-                flash(translate('Password updated successfully'))->success();
-
-                if (auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff') {
-                    return redirect()->route('admin.dashboard');
-                }
-
-                return redirect()->route('home');
-            } else {
-                flash(translate("Password and confirm password didn't match"))->warning();
-
-                return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
-            }
-        } else {
-            flash(translate('Verification code mismatch'))->error();
-
-            return view('auth.'.get_setting('authentication_layout_select').'.reset_password');
-        }
+    /**
+     * Get the Post-Reset Redirect Path
+     */
+    public function redirectPath()
+    {
+        return auth()->user()->homePage();
     }
 }

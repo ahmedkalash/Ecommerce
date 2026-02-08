@@ -1,6 +1,6 @@
 # Authentication and User Management Module - Complete Analysis
 
-**Date**: 2026-01-28  
+**Date**: 2026-02-08  
 **Author**: Ahmed Kalash (with AI Assistant)  
 **Purpose**: Comprehensive understanding of the authentication system for refactoring project
 
@@ -15,8 +15,9 @@
 5. [Security Concerns](#security-concerns)
 6. [Code Smells & Anti-Patterns](#code-smells--anti-patterns)
 7. [Refactoring Opportunities](#refactoring-opportunities)
-8. [Learning Points](#learning-points)
-9. [References](#references)
+8. [Refactoring Progress](#refactoring-progress)
+9. [Learning Points](#learning-points)
+10. [References](#references)
 
 ---
 
@@ -256,51 +257,53 @@ app/Http/Controllers/Auth/LoginController.php
 
 **Step 1: Request Reset**
 
-- `GET /password/reset` → Shows email/phone input form
-- `POST /password/email` → ForgotPasswordController@sendResetLinkEmail
-- Validates with reCAPTCHA (if enabled)
-- Checks if email/phone exists
-- Generates 6-digit `verification_code`
-- Stores in `users.verification_code`
-- Sends email with code OR SMS (if phone)
+- `GET /password/reset` → `ForgotPasswordController@showLinkRequestForm`
+- `POST /password/email` → `ForgotPasswordController@sendResetLinkEmail`
+- **Validation**:
+    - Uses `RecaptchaService` with `RecaptchaAction::FORGOT_PASSWORD`
+    - Checks `UserService::isBanned($email)` to prevent banned users from requesting reset
+- **Process**:
+    - Uses standard Laravel `PasswordBroker`
+    - Sends email with **Signed Link** (secure token)
+    - Notification: `App\Notifications\ResetPasswordNotification` (Queueable)
 
-**Step 2: Enter Code & New Password**
+**Step 2: Authenticate Request**
 
-- User receives email/SMS with code
-- `GET /password/reset` (from email link) → Shows form
-- User enters:
-    - Email/Phone
-    - Verification code
-    - New password
-    - Confirm password
+- User clicks link: `GET /password/reset/{token}`
+- Controller: `ResetPasswordController@showResetForm`
+- Validates token format automatically
 
 **Step 3: Reset Password**
 
-- `POST /password/reset/email/submit` → HomeController@reset_password_with_code
-- Validates verification code matches email
-- Updates password with bcrypt hash
-- Sets `email_verified_at` = now
-- Fires `PasswordReset` event
-- Auto-login user
-- Redirects based on user type
-
-#### Email Template
-
-- Uses `password_reset_email_to_all` template
-- Stored in `email_templates` table
-- Supports variables: `[[user_email]]`, `[[code]]`, `[[store_name]]`
+- `POST /password/reset` → `ResetPasswordController@reset`
+- **Validation**:
+    - Checks `UserService::isBanned($email)` again
+    - Validates token, email, password (`min:6`, `confirmed`)
+- **Process**:
+    - Resets password using `ResetsPasswords` trait
+    - **Auto-login**: Logs user in automatically upon success
+    - **Redirect**: To `auth()->user()->homePage()` (Admin dashboard or Home)
 
 #### Key Files
 
 ```php
 app/Http/Controllers/Auth/ForgotPasswordController.php
-  - sendResetLinkEmail() // Send reset code
+  - Uses standard SendsPasswordResetEmails trait
+  - Validates Recaptcha & Banned status via services
 
 app/Http/Controllers/Auth/ResetPasswordController.php
-  - sendResetResponse() // Post-reset redirect
+  - Uses standard ResetsPasswords trait
+  - Overrides reset() to enforce banned check
+  - Overrides showResetForm() for theme support
 
-app/Http/Controllers/HomeController.php
-  - reset_password_with_code() // Process reset
+app/Services/UserService.php
+  - isBanned($userOrEmail) // Centralized banned check
+
+app/Services/RecaptchaService.php
+  - validationRules(RecaptchaAction::FORGOT_PASSWORD) // Type-safe captcha rules
+
+app/Notifications/ResetPasswordNotification.php
+  - Queueable notification extending Laravel default
 ```
 
 ---
@@ -1108,6 +1111,23 @@ Log::info('User login attempt', [
     - Risk: LOW
     - Impact: HIGH
     - Effort: 16 hours
+
+---
+
+## Refactoring Progress (Feb 2026)
+
+### ✅ Improved Password Reset Flow
+
+- **Security**: Replaced custom OTP logic with **Laravel Standard Signed URLs** (Token-based).
+- **Access Control**: Enforced **Banned User Checks** (`UserService::isBanned`) during strictly reset request and
+  completion.
+- **Performance**: Made password reset emails **Queueable** via `ResetPasswordNotification`.
+
+### ✅ Code Quality Improvements
+
+- **UserService**: Centralized user logic (e.g., `isBanned`).
+- **RecaptchaService**: Replaced magic strings with Type-Safe `RecaptchaAction` Enum.
+- **Controller Cleanup**: Refactored `ResetPasswordController` and `ForgotPasswordController` to use standard traits.
 
 ---
 

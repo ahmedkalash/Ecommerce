@@ -3,11 +3,13 @@
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Auth\CustomerAccountController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerificationController;
+
 // VerificationFirstController removed - using standard register-then-verify flow
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
@@ -145,8 +147,15 @@ Route::controller(VerificationController::class)->group(function () {
     Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
 });
 
+// Standard Password Reset Routes
+Route::controller(ForgotPasswordController::class)->group(function () {
+    Route::get('password/reset', 'showLinkRequestForm')->name('password.request');
+    Route::post('password/email', 'sendResetLinkEmail')->name('password.email');
+});
+
 Route::controller(ResetPasswordController::class)->group(function () {
-    Route::post('/password/reset/email/submit', 'resetWithCode')->name('password.update');
+    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset');
+    Route::post('password/reset', 'reset')->name('password.update');
 });
 
 Route::resource('shops', ShopController::class)->middleware('handle-demo-login');

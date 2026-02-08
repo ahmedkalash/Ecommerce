@@ -43,9 +43,7 @@ class AuthController extends Controller
                 Rule::when($request->register_by === 'email', ['email', 'unique:users,email']),
                 Rule::when($request->register_by === 'phone', ['numeric', 'unique:users,phone']),
             ],
-            'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1, ['required', new Recaptcha()], ['sometimes'])
-            ]
+            'g-recaptcha-response' => RecaptchaService::validationRules()
         ], $messages);
 
         if ($validator->fails()) {
@@ -200,18 +198,24 @@ class AuthController extends Controller
         if ($user != null) {
             if (!$user->banned) {
                 if (Hash::check($request->password, $user->password)) {
-                    if($user->user_type=='seller' && $user->shop->registration_approval  == 0){
-                        return response()->json(['result' => false, 'message' => translate('Your seller account is under review. We will notify you once approved.'), 'user' => null], 401);
-                    }else{
+                    if ($user->user_type == 'seller' && $user->shop->registration_approval == 0) {
+                        return response()->json([
+                            'result' => false,
+                            'message' => translate('Your seller account is under review. We will notify you once approved.'),
+                            'user' => null
+                        ], 401);
+                    } else {
                         $tempUserId = $request->has('temp_user_id') ? $request->temp_user_id : null;
-                        return $this->loginSuccess($user,'', $tempUserId);
+                        return $this->loginSuccess($user, '', $tempUserId);
                     }
 
                 } else {
-                    return response()->json(['result' => false, 'message' => translate('Unauthorized'), 'user' => null], 401);
+                    return response()->json(['result' => false, 'message' => translate('Unauthorized'), 'user' => null],
+                        401);
                 }
             } else {
-                return response()->json(['result' => false, 'message' => translate('User is banned'), 'user' => null], 401);
+                return response()->json(['result' => false, 'message' => translate('User is banned'), 'user' => null],
+                    401);
             }
         } else {
             return response()->json(['result' => false, 'message' => translate('User not found'), 'user' => null], 401);
@@ -269,7 +273,9 @@ class AuthController extends Controller
                 $social_user = null;
         }
         if ($social_user == null) {
-            return response()->json(['result' => false, 'message' => translate('No social provider matches'), 'user' => null]);
+            return response()->json([
+                'result' => false, 'message' => translate('No social provider matches'), 'user' => null
+            ]);
         }
 
         if ($request->social_provider == 'twitter') {
@@ -279,7 +285,9 @@ class AuthController extends Controller
         }
 
         if ($social_user_details == null) {
-            return response()->json(['result' => false, 'message' => translate('No social account matches'), 'user' => null]);
+            return response()->json([
+                'result' => false, 'message' => translate('No social account matches'), 'user' => null
+            ]);
         }
 
         $existingUserByProviderId = User::where('provider_id', $request->provider)->first();
@@ -346,28 +354,28 @@ class AuthController extends Controller
             $user->delete();
         }
 
-        if($success == 0){
+        if ($success == 0) {
             return response()->json([
                 'result' => false,
                 'message' => translate('Something went wrong!')
             ]);
         }
 
-        if($isEmailVerificationEnabled == 1){
+        if ($isEmailVerificationEnabled == 1) {
             $user->notify(new AppEmailVerificationNotification());
         }
-        
+
         // User Address Create
         $address = new Address();
-        $address->user_id       = $user->id;
-        $address->address       = $request->address;
-        $address->country_id    = $request->country_id;
-        $address->state_id      = $request->state_id;
-        $address->city_id       = $request->city_id;
-        $address->postal_code   = $request->postal_code;
-        $address->phone         = $request->phone;
-        $address->longitude     = $request->longitude;
-        $address->latitude      = $request->latitude;
+        $address->user_id = $user->id;
+        $address->address = $request->address;
+        $address->country_id = $request->country_id;
+        $address->state_id = $request->state_id;
+        $address->city_id = $request->city_id;
+        $address->postal_code = $request->postal_code;
+        $address->phone = $request->phone;
+        $address->longitude = $request->longitude;
+        $address->latitude = $request->latitude;
         $address->save();
 
         Cart::where('temp_user_id', $request->temp_user_id)
@@ -390,7 +398,7 @@ class AuthController extends Controller
             $token = $user->createToken('API Token')->plainTextToken;
         }
 
-        if($tempUserId != null){
+        if ($tempUserId != null) {
             Cart::where('temp_user_id', $tempUserId)
                 ->update([
                     'user_id' => $user->id,
@@ -398,7 +406,7 @@ class AuthController extends Controller
                 ]);
         }
 
-         if($user->user_type == 'seller'){
+        if ($user->user_type == 'seller') {
             \Log::channel('seller_login')->info('Seller Logged In', [
                 'user_id' => $user->id,
                 'email' => $user->email,

@@ -80,7 +80,7 @@ class LoginController extends Controller
 
         if (auth()->user()->isSeller()) {
             // Block unapproved sellers
-            if (!auth()->user()->IsShopApproved()) {
+            if (!auth()->user()->isShopApproved()) {
                 auth()->logout();
                 flash(translate('Your seller account is under review. We will notify you once approved.'));
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\User\UserRelationships;
 use App\Notifications\EmailVerificationNotification;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,14 +21,29 @@ class User extends Authenticatable implements MustVerifyEmail
         $this->notify(new EmailVerificationNotification);
     }
 
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
     /**
      * The attributes that are mass-assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'user_type', 'email', 'password', 'address', 'city', 'postal_code', 'phone', 'country', 'provider_id',
-        'email_verified_at', 'verification_code',
+        'name',
+        'user_type',
+        'email',
+        'password',
+        'address',
+        'city',
+        'postal_code',
+        'phone',
+        'country',
+        'provider_id',
+        'email_verified_at',
+        'verification_code',
     ];
 
     /**
@@ -36,7 +52,8 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     public function homePage(): string
@@ -76,9 +93,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->user_type == 'delivery_boy';
     }
 
-
-    public function IsShopApproved(): bool
+    public function isShopApproved(): bool
     {
         return $this->shop->registration_approval == 1;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->banned == 1;
     }
 }

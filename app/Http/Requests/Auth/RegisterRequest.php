@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\RecaptchaAction;
 use App\Rules\Recaptcha;
+use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -27,16 +29,10 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:190'],
             'email' => ['required', 'email', 'unique:users,email', 'string', 'max:190'],
-            'password' => ['required', 'confirmed', Password::min(8)->max(190)],
+            'password' => ['required', 'confirmed', Password::defaults()],
             // 'phone' => ['nullable', 'string', 'min:6', 'max:190'], Todo: otp plugin
             'agree_to_terms' => ['required', 'string', 'accepted', 'max:10'],
-            'g-recaptcha-response' => [
-                Rule::when(
-                    get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_register') == 1,
-                    ['required', new Recaptcha],
-                    ['sometimes']
-                ),
-            ],
+            'g-recaptcha-response' => RecaptchaService::validationRules(RecaptchaAction::CUSTOMER_REGISTER),
         ];
     }
 
