@@ -695,4 +695,177 @@ class PasswordResetTest extends AuthTestCase
         // Assert - Should redirect to home (guest middleware)
         $response->assertRedirect('/');
     }
+
+    // ==========================================
+    // CASE-INSENSITIVE EMAIL
+    // ==========================================
+
+    /**
+     * Test: Password reset request works with different email casing
+     *
+     * Registration stores emails in lowercase. The password broker
+     * should still find the user when the email casing differs.
+     *
+     * @test
+     */
+    public function password_reset_request_works_with_different_email_casing(): void
+    {
+        // Arrange
+        Notification::fake();
+        $user = User::factory()->create([
+            'email' => 'user@example.com', // stored lowercase
+        ]);
+
+        // Act - Request with uppercase email
+        $response = $this->post(route('password.email'), [
+            'email' => 'User@Example.COM',
+        ]);
+
+        // Assert - Should still find the user (DB collation dependent)
+        $response->assertSessionHas('status');
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
+    }
+
+    /**
+     * Test: Password reset submit works with different email casing
+     *
+     * @test
+     */
+    public function password_reset_submit_works_with_different_email_casing(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'user@example.com',
+            'password' => Hash::make('old_password'),
+        ]);
+        $token = Password::createToken($user);
+
+        // Act - Submit with mixed case email
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'USER@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
+        // Assert
+        $response->assertRedirect($user->homePage());
+        $this->assertAuthenticatedAs($user);
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('new_password123', $user->password));
+    }
+
+    // ==========================================
+    // THEMED RESET FORM VIEW
+    // ==========================================
+
+    /**
+     * Test: Reset form uses themed layout from settings
+     *
+     * The showResetForm() method renders the view based on
+     * the `authentication_layout_select` business setting.
+     *
+     * @test
+     */
+    public function reset_form_uses_themed_layout(): void
+    {
+        // Arrange
+        $user = User::factory()->create([
+            'email' => 'user@example.com',
+        ]);
+        $token = Password::createToken($user);
+
+        $layout = get_setting('authentication_layout_select');
+
+        // Act
+        $response = $this->get(route('password.reset', [
+            'token' => $token,
+            'email' => $user->email,
+        ]));
+
+        // Assert - View should match the configured theme layout
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.'.$layout.'.reset_password');
+        $response->assertViewHas('token', $token);
+        $response->assertViewHas('email', $user->email);
+    }
+
+    // ==========================================
+    // CONCURRENT RESET TOKENS
+    // ==========================================
+
+    /**
+     * Test: Requesting a new reset token invalidates the previous one
+     *
+     * When a user requests a second reset link, the old token should
+     * no longer work (Laravel's broker replaces the token row).
+     *
+     * @test
+     */
+    public function new_reset_token_invalidates_previous_token(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'user@example.com',
+            'password' => Hash::make('original_password'),
+        ]);
+
+        // Create first token
+        $firstToken = Password::createToken($user);
+
+        // Create second token (should invalidate the first)
+        $secondToken = Password::createToken($user);
+
+        // Act - Try to reset with the first (old) token
+        $response = $this->post(route('password.update'), [
+            'token' => $firstToken,
+            'email' => 'user@example.com',
+            'password' => 'hacked_password',
+            'password_confirmation' => 'hacked_password',
+        ]);
+
+        // Assert - First token should be invalid
+        $response->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        // Verify password was NOT changed
+        $user->refresh();
+        $this->assertTrue(Hash::check('original_password', $user->password));
+    }
+
+    /**
+     * Test: Second (latest) token still works after requesting multiple tokens
+     *
+     * @test
+     */
+    public function latest_reset_token_still_works(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'user@example.com',
+            'password' => Hash::make('original_password'),
+        ]);
+
+        // Create first token (will be invalidated)
+        Password::createToken($user);
+
+        // Create second token (should be the valid one)
+        $secondToken = Password::createToken($user);
+
+        // Act - Reset with the latest token
+        $response = $this->post(route('password.update'), [
+            'token' => $secondToken,
+            'email' => 'user@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
+        // Assert - Latest token should work
+        $response->assertRedirect($user->homePage());
+        $this->assertAuthenticatedAs($user);
+
+        $user->refresh();
+        $this->assertTrue(Hash::check('new_password123', $user->password));
+    }
 }
