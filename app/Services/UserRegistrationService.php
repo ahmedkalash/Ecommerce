@@ -24,7 +24,7 @@ class UserRegistrationService
     {
         $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'email' => strtolower($data['email']), // Store email in lowercase for case-insensitive login
             'user_type' => UserType::CUSTOMER->value,
             'password' => Hash::make($data['password']),
         ]);
@@ -111,8 +111,9 @@ class UserRegistrationService
 
     public function registrationResponse(Request $request, User $user): Response
     {
-        // TODO: Store user's intended destination if they were trying to access something
-
+        if ($this->shouldAutoVerify()) {
+            return redirect()->intended($user->homePage());
+        }
         return redirect()->route('verification.notice');
     }
 

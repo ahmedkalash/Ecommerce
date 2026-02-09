@@ -44,6 +44,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'provider_id',
         'email_verified_at',
         'verification_code',
+        'product_id',
+        'quantity',
     ];
 
     /**
@@ -62,6 +64,8 @@ class User extends Authenticatable implements MustVerifyEmail
             return route('admin.dashboard');
         } elseif ($this->isSeller()) {
             return route('seller.dashboard');
+        } elseif ($this->user_type == 'delivery_boy') {
+            return route('dashboard');
         } elseif ($this->isCustomer()) {
             return route('home');
         }

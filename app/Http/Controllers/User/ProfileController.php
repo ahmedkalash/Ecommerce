@@ -72,4 +72,12 @@ class ProfileController extends Controller
 
         return back();
     }
+
+    public function verifyEmailCode(\Illuminate\Http\Request $request)
+    {
+        return response()->json(json_encode([
+            'status' => 1,
+            'message' => 'Verification code sent successfully',
+        ]));
+    }
 }
