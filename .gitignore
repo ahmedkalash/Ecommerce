@@ -54,3 +54,10 @@ _ide_helper.php
 /config/ignition.php
 /config/tinker.php
 /.phpstorm.meta.php
+/.mcp.json
+/boost.json
+/CLAUDE.md
+/.junie/guidelines.md
+/.ai/mcp/mcp.json
+/.junie/mcp/mcp.json
+/.gemini/settings.json
