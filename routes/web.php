@@ -56,8 +56,8 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SizeChartController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SupportTicketController;
-use App\Http\Controllers\WalletController;
 use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
 
 /*
@@ -96,7 +96,7 @@ Route::controller(AizUploadController::class)->group(function () {
     Route::get('/aiz-uploader/download/{id}', 'attachment_download')->name('download_attachment');
 });
 
-Route::group(['middleware' => ['prevent-back-history', 'handle-demo-login']], function () {
+Route::group(['middleware' => ['prevent-back-history']], function () {
     /**@see vendor/laravel/ui/src/AuthRouteMethods.php */
     Auth::routes(['verify' => true]);
 });
@@ -145,6 +145,9 @@ Route::controller(SocialLoginController::class)->group(function () {
 });
 
 Route::controller(VerificationController::class)->group(function () {
+    Route::get('/email/verify', 'show')->name('verification.notice');
+    Route::get('/email/verify/{code}', 'verify')->name('email.verification.confirmation');
+    Route::get('/email/resend', 'resend')->name('verification.resend');
     Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
 });
 
@@ -318,7 +321,6 @@ Route::controller(CompareController::class)->group(function () {
 Route::resource('subscribers', SubscriberController::class);
 
 Route::group(['middleware' => ['user', 'verified', 'unbanned']], function () {
-
 
     Route::controller(HomeController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard')->middleware(['prevent-back-history']);
@@ -624,3 +626,6 @@ Route::redirect('/home', '/');
 // Note: do not use this "Route::redirect('/login', '/users/login')" to redirect as we only need to redirect
 // the 'get' route, not the 'post'. 'POST /login' remains handled by Auth::routes() for actual authentication
 Route::get('/login', fn() => redirect()->route('user.login'))->name('login');
+
+Route::middleware(['user', 'verified', 'unbanned'])->post('/profile/email-verify',
+    [App\Http\Controllers\User\ProfileController::class, 'verifyEmailCode'])->name('user.email.update.verify.code');

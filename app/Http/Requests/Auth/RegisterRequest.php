@@ -28,9 +28,9 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:190'],
-            'email' => ['required', 'email', 'unique:users,email', 'string', 'max:190'],
+            'email' => ['required_without:phone', 'nullable', 'email', 'unique:users,email', 'string', 'max:190'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            // 'phone' => ['nullable', 'string', 'min:6', 'max:190'], Todo: otp plugin
+            'phone' => ['required_without:email', 'nullable', 'string', 'min:6', 'max:190', 'unique:users,phone'], // Todo: otp plugin
             'agree_to_terms' => ['required', 'string', 'accepted', 'max:10'],
             'g-recaptcha-response' => RecaptchaService::validationRules(RecaptchaAction::CUSTOMER_REGISTER),
         ];

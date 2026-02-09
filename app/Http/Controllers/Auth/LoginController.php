@@ -35,13 +35,13 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
+        return view('auth.' . get_setting('authentication_layout_select') . '.user_login');
     }
 
     public function showSellerLoginForm()
     {
         if (get_setting('vendor_system_activation') == 1) {
-            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
+            return view('auth.' . get_setting('authentication_layout_select') . '.seller_login');
         }
 
         return redirect()->route('home');
@@ -50,7 +50,7 @@ class LoginController extends Controller
     public function showDeliveryBoyLoginForm()
     {
         if (addon_is_activated('delivery_boy')) {
-            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
+            return view('auth.' . get_setting('authentication_layout_select') . '.deliveryboy_login');
         }
 
         return redirect()->route('home');
@@ -68,6 +68,24 @@ class LoginController extends Controller
     {
         // Logic moved to LoginRequest, and we keep it empty to override parent trait method validation logic,
         // so it does not make a conflict
+    }
+
+    /**
+     * Get the login credentials from the request.
+     * Handles both email and phone authentication.
+     */
+    protected function credentials(Request $request): array
+    {
+        // Phone login: combine country_code + phone
+        if ($request->filled('phone') && $request->filled('country_code')) {
+            return [
+                'phone' => '+' . $request->input('country_code') . $request->input('phone'),
+                'password' => $request->input('password'),
+            ];
+        }
+
+        // Email login (default)
+        return $request->only($this->username(), 'password');
     }
 
     /**
@@ -97,6 +115,10 @@ class LoginController extends Controller
 
         if (!auth()->user()->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
+        }
+
+        if (session()->has('link')) {
+            return redirect(session()->pull('link'));
         }
 
         return redirect()->intended(auth()->user()->homePage());
