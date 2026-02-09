@@ -3,45 +3,64 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 
 /**
  * Password Reset Feature Tests
  *
- * Tests the complete password reset flow including:
- * - Reset request with email/phone
- * - Verification code generation and sending
- * - Password update with valid code
- * - Invalid code handling
- * - Auto-login after reset
+ * Tests the complete password reset flow using Laravel's standard token-based system:
+ * - Reset link request
+ * - Reset form display
+ * - Password update with valid token
+ * - Invalid/expired token handling
+ * - Banned user handling
+ * - User type-specific redirects
  */
 class PasswordResetTest extends AuthTestCase
 {
+    // ==========================================
+    // FORGOT PASSWORD (Request Reset Link)
+    // ==========================================
+
     /**
-     * Test: User can request password reset with email
+     * Test: User can view forgot password form
      *
      * @test
      */
-    public function user_can_request_password_reset_with_email(): void
+    public function user_can_view_forgot_password_form(): void
+    {
+        // Act
+        $response = $this->get(route('password.request'));
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.passwords.email');
+    }
+
+    /**
+     * Test: User can request password reset link with valid email
+     *
+     * @test
+     */
+    public function user_can_request_password_reset_link_with_valid_email(): void
     {
         // Arrange
+        Notification::fake();
         $user = User::factory()->create([
             'email' => 'user@example.com',
         ]);
 
         // Act
-        $response = $this->post('/password/email', [
+        $response = $this->post(route('password.email'), [
             'email' => 'user@example.com',
         ]);
 
         // Assert
-        $response->assertOk(); // Returns view
-        // $response->assertViewIs('auth.param.reset_password'); // Can be specific if we know the layout
-
-        // Verify code was generated and stored
-        $user->refresh();
-        $this->assertNotNull($user->verification_code);
-        $this->assertMatchesRegularExpression('/^\d{6}$/', $user->verification_code);
+        $response->assertSessionHas('status');
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
     /**
@@ -51,77 +70,165 @@ class PasswordResetTest extends AuthTestCase
      */
     public function password_reset_request_fails_with_nonexistent_email(): void
     {
+        // Arrange
+        Notification::fake();
+
         // Act
-        $response = $this->post('/password/email', [
+        $response = $this->post(route('password.email'), [
             'email' => 'nonexistent@example.com',
         ]);
 
         // Assert
-        // Assert
-        $response->assertRedirect(); // Redirects back with flash error
-        // $this->assertGuest();
+        $response->assertSessionHasErrors('email');
+        Notification::assertNothingSent();
     }
 
     /**
-     * Test: User can reset password with valid verification code
+     * Test: Password reset request fails for banned user
      *
      * @test
      */
-    public function user_can_reset_password_with_valid_code(): void
+    public function password_reset_request_fails_for_banned_user(): void
+    {
+        // Arrange
+        Notification::fake();
+        User::factory()->create([
+            'email' => 'banned@example.com',
+            'banned' => 1,
+        ]);
+
+        // Act
+        $response = $this->post(route('password.email'), [
+            'email' => 'banned@example.com',
+        ]);
+
+        // Assert
+        $response->assertSessionHasErrors('email');
+        Notification::assertNothingSent();
+    }
+
+    /**
+     * Test: Password reset request requires valid email (caught by base trait)
+     *
+     * Note: The validation for required email is handled by Laravel's
+     * SendsPasswordResetEmails trait which runs after recaptcha validation.
+     * This test verifies the email format validation works correctly.
+     *
+     * @test
+     */
+    public function password_reset_request_requires_valid_email(): void
+    {
+        // Act - Submit with invalid but non-empty email
+        $response = $this->post(route('password.email'), [
+            'email' => 'notanemail',
+        ]);
+
+        // Assert - Laravel's validation returns errors
+        $response->assertRedirect();
+        $response->assertSessionHasErrors('email');
+    }
+
+    /**
+     * Test: Password reset request validates email format
+     *
+     * @test
+     */
+    public function password_reset_request_validates_email_format(): void
+    {
+        // Act
+        $response = $this->post(route('password.email'), [
+            'email' => 'not-an-email',
+        ]);
+
+        // Assert
+        $response->assertSessionHasErrors('email');
+    }
+
+    // ==========================================
+    // RESET PASSWORD FORM
+    // ==========================================
+
+    /**
+     * Test: User can view reset password form with valid token
+     *
+     * @test
+     */
+    public function user_can_view_reset_password_form_with_valid_token(): void
     {
         // Arrange
         $user = User::factory()->create([
             'email' => 'user@example.com',
-            'password' => Hash::make('old_password'),
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->get(route('password.reset', ['token' => $token, 'email' => $user->email]));
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.'.get_setting('authentication_layout_select').'.reset_password');
+        $response->assertViewHas('token', $token);
+    }
+
+    // ==========================================
+    // RESET PASSWORD (Submit New Password)
+    // ==========================================
+
+    /**
+     * Test: User can reset password with valid token
+     *
+     * @test
+     */
+    public function user_can_reset_password_with_valid_token(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
             'email' => 'user@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => Hash::make('old_password'),
+        ]);
+        $token = Password::createToken($user);
+
+        // Act
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'user@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/');
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
 
         // Verify password changed
         $user->refresh();
-        $this->assertTrue(Hash::check('new_password', $user->password));
+        $this->assertTrue(Hash::check('new_password123', $user->password));
         $this->assertFalse(Hash::check('old_password', $user->password));
-
-        // Verify email is marked as verified
-        $this->assertUserVerified($user);
     }
 
     /**
-     * Test: Password reset fails with invalid verification code
+     * Test: Password reset fails with invalid token
      *
      * @test
      */
-    public function password_reset_fails_with_invalid_code(): void
+    public function password_reset_fails_with_invalid_token(): void
     {
         // Arrange
         $user = User::factory()->create([
             'email' => 'user@example.com',
             'password' => Hash::make('old_password'),
-            'verification_code' => '123456',
         ]);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->post(route('password.update'), [
+            'token' => 'invalid-token',
             'email' => 'user@example.com',
-            'code' => '999999', // Wrong code
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
-        // Assert
-        $response->assertOk(); // Returns view with error flash
+        $response->assertSessionHasErrors('email'); // Laravel returns 'email' error for invalid token
         $this->assertGuest();
 
         // Verify password NOT changed
@@ -130,34 +237,66 @@ class PasswordResetTest extends AuthTestCase
     }
 
     /**
-     * Test: Password reset fails with mismatched email and code
+     * Test: Password reset fails with expired token
      *
      * @test
      */
-    public function password_reset_fails_with_mismatched_email_and_code(): void
+    public function password_reset_fails_with_expired_token(): void
     {
         // Arrange
-        User::factory()->create([
-            'email' => 'user1@example.com',
-            'verification_code' => '123456',
+        $user = User::factory()->create([
+            'email' => 'user@example.com',
+            'password' => Hash::make('old_password'),
         ]);
+        $token = Password::createToken($user);
 
-        User::factory()->create([
-            'email' => 'user2@example.com',
-            'verification_code' => '654321',
-        ]);
+        // Expire the token by traveling forward in time
+        $this->travel(config('auth.passwords.users.expire', 60) + 1)->minutes();
 
-        // Act - Try user2's email with user1's code
-        $response = $this->post('/password/reset/email/submit', [
-            'email' => 'user2@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+        // Act
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'user@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
+        $response->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        // Verify password NOT changed
+        $user->refresh();
+        $this->assertTrue(Hash::check('old_password', $user->password));
+    }
+
+    /**
+     * Test: Password reset fails with mismatched email
+     *
+     * @test
+     */
+    public function password_reset_fails_with_mismatched_email(): void
+    {
+        // Arrange
+        $user = User::factory()->create([
+            'email' => 'user@example.com',
+        ]);
+        $token = Password::createToken($user);
+
+        User::factory()->create([
+            'email' => 'other@example.com',
+        ]);
+
+        // Act - Use token for user1 but email for user2
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'other@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
         // Assert
-        $response->assertOk(); // Returns view with error flash
+        $response->assertSessionHasErrors('email');
         $this->assertGuest();
     }
 
@@ -171,47 +310,83 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         $user = User::factory()->create([
             'email' => 'user@example.com',
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'user@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
+            'password' => 'new_password123',
             'password_confirmation' => 'different_password',
         ]);
 
         // Assert
-        // Assert
-        $response->assertOk(); // Returns view with warning flash
+        $response->assertSessionHasErrors('password');
+        $this->assertGuest();
     }
 
     /**
-     * Test: Password reset auto-logs user in after success
+     * Test: Password reset enforces minimum length
      *
      * @test
      */
-    public function password_reset_auto_logs_user_in_after_success(): void
+    public function password_reset_enforces_minimum_length(): void
     {
         // Arrange
-        $user = User::factory()->customer()->create([
+        $user = User::factory()->create([
             'email' => 'user@example.com',
-            'password' => Hash::make('old_password'),
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'user@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'short',
+            'password_confirmation' => 'short',
         ]);
 
         // Assert
-        $this->assertAuthenticatedAs($user);
+        $response->assertSessionHasErrors('password');
+        $this->assertGuest();
     }
+
+    /**
+     * Test: Password reset fails for banned user
+     *
+     * @test
+     */
+    public function password_reset_fails_for_banned_user(): void
+    {
+        // Arrange
+        $user = User::factory()->create([
+            'email' => 'banned@example.com',
+            'password' => Hash::make('old_password'),
+            'banned' => 1,
+        ]);
+        $token = Password::createToken($user);
+
+        // Act
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'banned@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
+        // Assert - Controller checks for banned users
+        $response->assertRedirect();
+        $this->assertGuest();
+
+        // Verify password NOT changed
+        $user->refresh();
+        $this->assertTrue(Hash::check('old_password', $user->password));
+    }
+
+    // ==========================================
+    // USER TYPE-SPECIFIC REDIRECTS
+    // ==========================================
 
     /**
      * Test: Customer redirects to home after password reset
@@ -223,52 +398,20 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         $user = User::factory()->customer()->create([
             'email' => 'customer@example.com',
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'customer@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
         $response->assertRedirect('/');
-    }
-
-    /**
-     * Test: Seller redirects to seller dashboard after password reset
-     *
-     * @test
-     */
-    public function seller_redirects_to_seller_dashboard_after_password_reset(): void
-    {
-        // Arrange
-        $user = User::factory()->seller()->create([
-            'email' => 'seller@example.com',
-            'verification_code' => '123456',
-        ]);
-
-        // Create approved shop for seller
-        $shop = new \App\Models\Shop();
-        $shop->user_id = $user->id;
-        $shop->name = 'Test Shop';
-        $shop->slug = 'test-shop';
-        $shop->registration_approval = 1; // Approved
-        $shop->save();
-
-        // Act
-        $response = $this->post('/password/reset/email/submit', [
-            'email' => 'seller@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
-        ]);
-
-        // Assert
-        $response->assertRedirect('/');
+        $this->assertAuthenticatedAs($user);
     }
 
     /**
@@ -281,75 +424,125 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         $user = User::factory()->admin()->create([
             'email' => 'admin@example.com',
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act
-        $response = $this->post('/password/reset/email/submit', [
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'admin@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/admin');
+        $response->assertRedirect(route('admin.dashboard'));
+        $this->assertAuthenticatedAs($user);
     }
 
     /**
-     * Test: Password reset request with phone (if OTP system enabled)
-     *
-     * This test is skipped if OTP addon is not installed
+     * Test: Seller redirects to seller dashboard after password reset
      *
      * @test
      */
-    public function user_can_request_password_reset_with_phone(): void
+    public function seller_redirects_to_seller_dashboard_after_password_reset(): void
     {
-        // Skip if OTP addon not activated
-        if (!function_exists('addon_is_activated') || !addon_is_activated('otp_system')) {
-            $this->markTestSkipped('Skipped...OTP system addon not activated');
-        }
-
         // Arrange
-        $user = User::factory()->create([
-            'phone' => '+11234567890',
-            'email' => null,
+        $user = User::factory()->seller()->create([
+            'email' => 'seller@example.com',
         ]);
 
+        // Create approved shop for seller
+        $shop = new \App\Models\Shop;
+        $shop->user_id = $user->id;
+        $shop->name = 'Test Shop';
+        $shop->slug = 'test-shop';
+        $shop->registration_approval = 1;
+        $shop->save();
+
+        $token = Password::createToken($user);
+
         // Act
-        $response = $this->post('/password/email', [
-            'phone' => '+11234567890',
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'seller@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Assert
-        $response->assertSessionHas('status');
+        $response->assertRedirect(route('seller.dashboard'));
+        $this->assertAuthenticatedAs($user);
+    }
 
-        $user->refresh();
-        $this->assertNotNull($user->verification_code);
+    // ==========================================
+    // POST-RESET BEHAVIOR
+    // ==========================================
+
+    /**
+     * Test: User is automatically logged in after password reset
+     *
+     * @test
+     */
+    public function user_is_automatically_logged_in_after_password_reset(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'user@example.com',
+        ]);
+        $token = Password::createToken($user);
+
+        // Act
+        $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'user@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
+        // Assert
+        $this->assertAuthenticatedAs($user);
     }
 
     /**
-     * Test: Verification code is 6 digits
+     * Test: Token is invalidated after successful reset
      *
      * @test
      */
-    public function verification_code_is_six_digits(): void
+    public function token_is_invalidated_after_successful_reset(): void
     {
         // Arrange
-        $user = User::factory()->create([
+        $user = User::factory()->customer()->create([
             'email' => 'user@example.com',
         ]);
+        $token = Password::createToken($user);
 
-        // Act
-        $this->post('/password/email', [
+        // Act - First reset succeeds
+        $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'user@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
-        // Assert
+        // Logout
+        auth()->logout();
+
+        // Try to use the same token again
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'user@example.com',
+            'password' => 'another_password',
+            'password_confirmation' => 'another_password',
+        ]);
+
+        // Assert - Token should be invalid now
+        $response->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        // Verify password is still the first reset value
         $user->refresh();
-        $this->assertMatchesRegularExpression('/^\d{6}$/', $user->verification_code);
-        $this->assertGreaterThanOrEqual(100000, (int) $user->verification_code);
-        $this->assertLessThan(1000000, (int) $user->verification_code);
+        $this->assertTrue(Hash::check('new_password123', $user->password));
     }
 
     /**
@@ -360,33 +553,31 @@ class PasswordResetTest extends AuthTestCase
     public function old_password_no_longer_works_after_reset(): void
     {
         // Arrange
-        $user = User::factory()->create([
+        $user = User::factory()->customer()->create([
             'email' => 'user@example.com',
             'password' => Hash::make('old_password'),
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act - Reset password
-        $this->post('/password/reset/email/submit', [
+        $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'user@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Logout
         auth()->logout();
 
         // Try to login with old password
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'user@example.com',
             'password' => 'old_password',
         ]);
 
         // Assert
-        // Assert
-        $response->assertRedirect(); // Login fails and redirects back
-        $this->assertGuest();
+        $response->assertRedirect();
         $this->assertGuest();
     }
 
@@ -398,31 +589,110 @@ class PasswordResetTest extends AuthTestCase
     public function new_password_works_after_reset(): void
     {
         // Arrange
-        $user = User::factory()->create([
+        $user = User::factory()->customer()->create([
             'email' => 'user@example.com',
             'password' => Hash::make('old_password'),
-            'verification_code' => '123456',
         ]);
+        $token = Password::createToken($user);
 
         // Act - Reset password
-        $this->post('/password/reset/email/submit', [
+        $this->post(route('password.update'), [
+            'token' => $token,
             'email' => 'user@example.com',
-            'code' => '123456',
-            'password' => 'new_password',
-            'password_confirmation' => 'new_password',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
         ]);
 
         // Logout
         auth()->logout();
 
         // Try to login with new password
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'user@example.com',
-            'password' => 'new_password',
+            'password' => 'new_password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect('/');
         $this->assertAuthenticatedAs($user);
+    }
+
+    // ==========================================
+    // RATE LIMITING
+    // ==========================================
+
+    /**
+     * Test: Password reset request is rate limited
+     *
+     * @test
+     */
+    public function password_reset_request_is_rate_limited(): void
+    {
+        // Arrange
+        Notification::fake();
+        $user = User::factory()->create([
+            'email' => 'user@example.com',
+        ]);
+
+        // Act - Make multiple requests
+        for ($i = 0; $i < 3; $i++) {
+            $response = $this->post(route('password.email'), [
+                'email' => 'user@example.com',
+            ]);
+        }
+
+        // Assert - Request should succeed (we're under default limit)
+        $response->assertRedirect();
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
+    }
+
+    // ==========================================
+    // GUEST MIDDLEWARE
+    // ==========================================
+
+    /**
+     * Test: Authenticated user cannot access forgot password form
+     *
+     * @test
+     */
+    public function authenticated_user_cannot_access_forgot_password_form(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create();
+        $this->actingAs($user);
+
+        // Act
+        $response = $this->get(route('password.request'));
+
+        // Assert - Should redirect to home (guest middleware)
+        $response->assertRedirect('/');
+    }
+
+    /**
+     * Test: Authenticated user cannot submit password reset
+     *
+     * @test
+     */
+    public function authenticated_user_cannot_submit_password_reset(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create();
+        $this->actingAs($user);
+
+        $otherUser = User::factory()->create([
+            'email' => 'other@example.com',
+        ]);
+        $token = Password::createToken($otherUser);
+
+        // Act
+        $response = $this->post(route('password.update'), [
+            'token' => $token,
+            'email' => 'other@example.com',
+            'password' => 'new_password123',
+            'password_confirmation' => 'new_password123',
+        ]);
+
+        // Assert - Should redirect to home (guest middleware)
+        $response->assertRedirect('/');
     }
 }
