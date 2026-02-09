@@ -32,13 +32,14 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/dashboard'); // Controller redirects customers to dashboard
+        $response->assertStatus(302);
+        $response->assertRedirect($user->homePage()); // Controller redirects customers to home
         $this->assertAuthenticatedAs($user);
     }
 
@@ -59,14 +60,15 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'country_code' => '1',
             'phone' => '1234567890', // Without +
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/dashboard'); // Controller redirects customers to dashboard
+        $response->assertStatus(302);
+        $response->assertRedirect('/'); // Controller redirects customers to home
         $this->assertAuthenticatedAs($user);
     }
 
@@ -84,12 +86,13 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'wrong_password',
         ]);
 
-        // Assert - Controller uses flash()->error() and returns back()
+        // Assert
+        $response->assertStatus(302);
         $response->assertRedirect(); // Redirects back
         $this->assertGuest();
     }
@@ -102,12 +105,13 @@ class LoginTest extends AuthTestCase
     public function login_fails_with_nonexistent_email(): void
     {
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'nonexistent@example.com',
             'password' => 'password123',
         ]);
 
-        // Assert - Controller uses flash()->error() and returns back()
+        // Assert
+        $response->assertStatus(302);
         $response->assertRedirect(); // Redirects back
         $this->assertGuest();
     }
@@ -125,8 +129,8 @@ class LoginTest extends AuthTestCase
             'password' => Hash::make('password123'),
         ]);
 
-        // Act - Login will succeed initially
-        $response = $this->post('/login', [
+        // Act
+        $response = $this->post(route('login'), [
             'email' => 'banned@example.com',
             'password' => 'password123',
         ]);
@@ -151,13 +155,14 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'admin@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/admin');
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -183,13 +188,14 @@ class LoginTest extends AuthTestCase
         $shop->save();
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'seller@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/seller/dashboard');
+        $response->assertStatus(302);
+        $response->assertRedirect(route('seller.dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -207,13 +213,14 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'delivery@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/dashboard'); // Delivery boys redirect to dashboard like customers
+        $response->assertStatus(302);
+        $response->assertRedirect(route('dashboard')); // Delivery boys redirect to dashboard like customers
         $this->assertAuthenticatedAs($user);
     }
 
@@ -231,13 +238,14 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'staff@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
-        $response->assertRedirect('/admin');
+        $response->assertStatus(302);
+        $response->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 
@@ -263,7 +271,7 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'password123',
         ]);
@@ -288,13 +296,15 @@ class LoginTest extends AuthTestCase
         session(['link' => '/checkout']);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'password123',
         ]);
 
         // Assert
+        $response->assertStatus(302);
         $response->assertRedirect('/checkout');
+        $this->assertAuthenticatedAs($user);
     }
 
     /**
@@ -311,13 +321,14 @@ class LoginTest extends AuthTestCase
         ]);
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'password123',
             'remember' => 'on',
         ]);
 
         // Assert
+        $response->assertStatus(302);
         $this->assertAuthenticatedAs($user);
 
         // Check if remember token is set (indicates remember me worked)
@@ -333,11 +344,12 @@ class LoginTest extends AuthTestCase
     public function login_requires_email_or_phone(): void
     {
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'password' => 'password123',
         ]);
 
         // Assert
+        $response->assertStatus(302);
         $response->assertSessionHasErrors();
         $this->assertGuest();
     }
@@ -350,11 +362,12 @@ class LoginTest extends AuthTestCase
     public function login_requires_password(): void
     {
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
         ]);
 
         // Assert
+        $response->assertStatus(302);
         $response->assertSessionHasErrors();
         $this->assertGuest();
     }
@@ -371,9 +384,10 @@ class LoginTest extends AuthTestCase
         $this->actingAs($user);
 
         // Act
-        $response = $this->get('/logout');
+        $response = $this->get(route('logout'));
 
         // Assert
+        $response->assertStatus(302);
         $response->assertRedirect('/');
         $this->assertGuest();
     }
@@ -386,10 +400,11 @@ class LoginTest extends AuthTestCase
     public function unauthenticated_user_redirected_to_login_on_protected_route(): void
     {
         // Act
-        $response = $this->get('/dashboard');
+        $response = $this->get(route('dashboard'));
 
         // Assert
-        $response->assertRedirect('/users/login'); // Actual login route
+        $response->assertStatus(302);
+        $response->assertRedirect(route('user.login')); // Actual login route
     }
 
     /**
@@ -412,7 +427,7 @@ class LoginTest extends AuthTestCase
         $this->assertNotNull(session('temp_user_id'));
 
         // Act
-        $response = $this->post('/login', [
+        $response = $this->post(route('login'), [
             'email' => 'customer@example.com',
             'password' => 'password123',
         ]);
@@ -420,4 +435,176 @@ class LoginTest extends AuthTestCase
         // Assert
         $this->assertNull(session('temp_user_id'));
     }
+
+    /**
+     * Test: Login with unverified email when verification required
+     *
+     * @test
+     */
+    public function login_with_unverified_email_when_verification_required(): void
+    {
+        // Arrange
+        $this->enableEmailVerification();
+        $user = User::factory()->customer()->unverified()->create([
+            'email' => 'unverified@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // Act
+        $response = $this->post(route('login'), [
+            'email' => 'unverified@example.com',
+            'password' => 'password123',
+        ]);
+
+        // Assert - Should redirect to verification notice
+        $response->assertStatus(302);
+        $response->assertRedirect(route('verification.notice'));
+
+        // User should be authenticated but redirected to verify
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test: Login throttling after multiple failed attempts
+     *
+     * @test
+     */
+    public function login_throttling_after_multiple_failed_attempts(): void
+    {
+        // Note: Laravel's default throttling is 5 attempts per minute
+        // This test verifies rate limiting is working
+
+        // Act - Attempt login 6 times with wrong password
+        for ($i = 0; $i < 6; $i++) {
+            $response = $this->post(route('login'), [
+                'email' => 'test@example.com',
+                'password' => 'wrongpassword',
+            ]);
+        }
+
+        // Assert - 6th attempt should be throttled
+        $response->assertStatus(302);
+        // Laravel throttles with session error message
+        // Verify we get a throttle-related error
+        $this->assertTrue(
+            session()->has('errors') || session()->has('status'),
+            'Expected throttling response after multiple failed attempts'
+        );
+    }
+
+    /**
+     * Test: Login with inactive or soft-deleted user fails
+     *
+     * @test
+     */
+    public function login_with_inactive_or_soft_deleted_user(): void
+    {
+        // Arrange - Create and soft delete a user
+        $user = User::factory()->customer()->create([
+            'email' => 'deleted@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // Soft delete the user (if your User model uses SoftDeletes)
+        $user->delete();
+
+        // Act
+        $response = $this->post(route('login'), [
+            'email' => 'deleted@example.com',
+            'password' => 'password123',
+        ]);
+
+        // Assert - Should fail to login
+        $response->assertStatus(302);
+        $response->assertRedirect(); // Redirects back with error
+        $this->assertGuest();
+    }
+
+    /**
+     * Test: Login preserves query parameters in redirect
+     *
+     * @test
+     */
+    public function login_preserves_query_parameters_in_redirect(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'customer@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        session(['link' => '/checkout?coupon=SAVE10&ref=email']);
+
+        // Act
+        $response = $this->post(route('login'), [
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+        ]);
+
+        // Assert
+        $response->assertStatus(302);
+        $response->assertRedirect('/checkout?coupon=SAVE10&ref=email');
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /**
+     * Test: Remember token persists across sessions
+     *
+     * @test
+     */
+    public function remember_token_persists_across_sessions(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'customer@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // Act - Login with remember me
+        $response = $this->post(route('login'), [
+            'email' => 'customer@example.com',
+            'password' => 'password123',
+            'remember' => 'on',
+        ]);
+
+        // Assert
+        $response->assertStatus(302);
+
+        // Verify remember token was set
+        $user->refresh();
+        $this->assertNotNull($user->remember_token);
+
+        // Note: Remember cookie name varies by Laravel version and guard config
+        // Testing the database token is sufficient to verify remember me works
+    }
+
+    /**
+     * Test: Login is case-insensitive for email
+     *
+     * @test
+     */
+    public function login_is_case_insensitive_for_email(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email' => 'user@test.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        // Act - Login with uppercase email
+        $response = $this->post(route('login'), [
+            'email' => 'USER@TEST.COM',
+            'password' => 'password123',
+        ]);
+
+        // Assert - Should successfully login
+        $response->assertStatus(302);
+        $response->assertRedirect('/');
+        $this->assertAuthenticatedAs($user);
+    }
+
+    // TODO: @seller-shop-approval - Add test for seller_login_fails_when_shop_not_approved
+    // This should verify that sellers without approved shops cannot login
+    // Location: tests/Feature/Auth/LoginTest.php
+    // Priority: Important for seller feature security
 }

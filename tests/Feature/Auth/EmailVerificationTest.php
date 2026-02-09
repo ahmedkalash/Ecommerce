@@ -3,140 +3,135 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Mail\MailManager;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\EmailVerificationNotification;
 
 /**
  * Email Verification Feature Tests
- *
- * Tests the email verification flow including:
- * - Verification code submission
- * - Signed URL verification
- * - Resending verification emails
- * - Invalid code handling
- * - Already verified user handling
+ * 
+ * Tests the security and logic of the email verification flow.
  */
 class EmailVerificationTest extends AuthTestCase
 {
     /**
-     * Test: User can verify email with valid verification code
+     * Test: User can verify email with a valid signed verification link
      *
      * @test
      */
-    public function user_can_verify_email_with_valid_code(): void
+    public function user_can_verify_email_with_valid_signed_link(): void
     {
         // Arrange
         $user = User::factory()->customer()->unverified()->create([
             'email' => 'user@example.com',
-            'verification_code' => '123456',
         ]);
 
-        // Act - Verification happens via GET request with code in URL
-        $response = $this->get(route('email.verification.confirmation', '123456'));
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
 
-        // Assert - Controller redirects to dashboard  
-        $response->assertRedirect('/dashboard');
+        // Act
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        // Assert - Controller redirects to intended or home
+        $response->assertRedirect($user->homePage());
 
         $user->refresh();
         $this->assertUserVerified($user);
     }
 
     /**
-     * Test: Email verification fails with invalid code
+     * Test: Email verification fails with invalid hash
      *
      * @test
      */
-    public function email_verification_fails_with_invalid_code(): void
+    public function email_verification_fails_with_invalid_hash(): void
     {
         // Arrange
         $user = User::factory()->customer()->unverified()->create([
             'email' => 'user@example.com',
-            'verification_code' => '123456',
         ]);
 
-        // Act - Try with wrong code
-        $response = $this->get(route('email.verification.confirmation', '999999'));
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1('wrong-hash')]
+        );
 
-        // Assert - Controller has a bug: tries to access $user->user_type when $user is null
-        // This causes 500 error. Test just verifies user stays unverified.
-        // Note: This is a controller bug that should be fixed
-        $this->assertTrue($response->status() === 500 || $response->isRedirect());
+        // Act
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        // Assert - Should fail signature/hash check
+        $response->assertStatus(403);
 
         $user->refresh();
         $this->assertUserNotVerified($user);
     }
 
     /**
-     * Test: User can verify email via signed URL
+     * Test: Already verified user is redirected when clicking verification link
      *
      * @test
      */
-    public function user_can_verify_email_with_signed_url(): void
+    public function already_verified_user_redirected_from_verification_link(): void
     {
         // Arrange
-        $user = User::factory()->customer()->unverified()->create([
-            'email' => 'user@example.com',
-        ]);
-
-        // Create verification code (encrypted user id)
-        $verificationCode = encrypt($user->id);
-        $user->verification_code = $verificationCode;
-        $user->save();
-
-        // Act
-        $response = $this->get(route('email.verification.confirmation', $verificationCode));
-
-        // Assert
-        $response->assertRedirect('/dashboard');
-
-        $user->refresh();
-        $this->assertUserVerified($user);
-    }
-
-    /**
-     * Test: Invalid signed URL shows error
-     *
-     * @test
-     */
-    public function invalid_signed_url_shows_error(): void
-    {
-        // Act
-        $response = $this->get(route('email.verification.confirmation', 'invalid-code'));
-
-        // Assert - Controller has bug with null $user, results in 500 error
-        $this->assertTrue(
-            $response->status() === 500 || $response->isRedirect() || $response->status() === 404,
-            'Expected 500, redirect, or 404 for invalid verification code'
-        );
-    }
-
-    /**
-     * Test: Already verified user shows appropriate message
-     *
-     * @test
-     */
-    public function already_verified_user_shows_message(): void
-    {
-        // Arrange - Create already verified user
         $user = User::factory()->customer()->create([
-            'email' => 'verified@example.com',
             'email_verified_at' => now(),
         ]);
 
-        $this->actingAs($user);
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
 
-        // Create a verification code anyway
-        $verificationCode = encrypt($user->id);
-        $user->verification_code = $verificationCode;
-        $user->save();
+        // Act
+        $response = $this->actingAs($user)->get($verificationUrl);
 
-        // Act - Controller doesn't check if already verified
-        $response = $this->get(route('email.verification.confirmation', $verificationCode));
+        // Assert
+        $response->assertRedirect($user->homePage());
+    }
 
-        // Assert - Redirects to dashboard
-        $response->assertRedirect('/dashboard');
+    /**
+     * Test: User can access verification notice page when unverified
+     *
+     * @test
+     */
+    public function unverified_user_can_access_verification_notice(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->unverified()->create();
 
-        $user->refresh();
-        $this->assertUserVerified($user);
+        // Act
+        $response = $this->actingAs($user)->get(route('verification.notice'));
+
+        // Assert
+        $response->assertStatus(200);
+        $response->assertViewIs('auth.' . get_setting('authentication_layout_select') . '.verify_email');
+    }
+
+    /**
+     * Test: Verified user is redirected from verification notice page
+     *
+     * @test
+     */
+    public function verified_user_redirected_from_verification_notice(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        // Act
+        $response = $this->actingAs($user)->get(route('verification.notice'));
+
+        // Assert
+        $response->assertRedirect($user->homePage());
     }
 
     /**
@@ -147,122 +142,198 @@ class EmailVerificationTest extends AuthTestCase
     public function user_can_resend_verification_email(): void
     {
         // Arrange
-        $user = User::factory()->customer()->unverified()->create([
-            'email' => 'user@example.com',
-        ]);
-
-        $this->actingAs($user);
+        Notification::fake();
+        $user = User::factory()->customer()->unverified()->create();
 
         // Act
-        $response = $this->get(route('verification.resend'));
+        $response = $this->actingAs($user)->get(route('verification.resend'));
 
         // Assert
         $response->assertRedirect();
-
-        // Verify new code was generated
-        $user->refresh();
-        $this->assertNotNull($user->verification_code);
+        Notification::assertSentTo($user, EmailVerificationNotification::class);
     }
 
     /**
-     * Test: Verification code format is correct
+     * Test: Unverified user redirected from protected routes
      *
      * @test
      */
-    public function verification_code_is_encrypted_user_id(): void
-    {
-        // Arrange
-        $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
-        ]);
-
-        // Trigger email verification
-        $this->enableEmailVerification();
-
-        // The controller should set verification_code
-        // We'll test that the verification code can decrypt to user ID
-        $verificationCode = encrypt($user->id);
-
-        // Act - Verify we can decrypt it
-        $decryptedId = decrypt($verificationCode);
-
-        // Assert
-        $this->assertEquals($user->id, $decryptedId);
-    }
-
-    /**
-     * Test: Unverified user cannot access verified-only routes
-     *
-     * @test
-     */
-    public function unverified_user_redirected_from_verified_routes(): void
+    public function unverified_user_redirected_from_protected_routes(): void
     {
         // Arrange
         $user = User::factory()->customer()->unverified()->create();
-        $this->actingAs($user);
-
         $this->enableEmailVerification();
 
-        // Act - Try to access a route that requires verification
-        $response = $this->get('/dashboard');
+        // Act
+        $response = $this->actingAs($user)->get(route('dashboard'));
 
-        // Assert - Should be redirected to email verification page
-        // The exact behavior depends on middleware, this is a general test
-        $this->assertTrue(
-            $response->isRedirect() || $response->isOk(),
-            'User should be redirected or allowed (depending on verification requirement)'
-        );
+        // Assert
+        $response->assertRedirect(route('verification.notice'));
     }
 
     /**
-     * Test: Verified user can access all routes
+     * Test: Guests cannot access verification routes
      *
      * @test
      */
-    public function verified_user_can_access_dashboard(): void
+    public function guests_cannot_access_verification_routes(): void
+    {
+        $this->get(route('verification.notice'))->assertRedirect(route('login'));
+        $this->get(route('verification.resend'))->assertRedirect(route('login'));
+    }
+
+    /**
+     * Test: Verification link requires valid signature
+     *
+     * @test
+     */
+    public function verification_link_requires_valid_signature(): void
     {
         // Arrange
+        $user = User::factory()->customer()->unverified()->create();
+
+        $url = route('verification.verify', [
+            'id' => $user->id,
+            'hash' => sha1($user->getEmailForVerification())
+        ]);
+
+        // Act - No signature in URL
+        $response = $this->actingAs($user)->get($url);
+
+        // Assert
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Test: Expired verification link returns 403
+     *
+     * @test
+     */
+    public function expired_verification_link_fails(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->unverified()->create();
+
+        // Create a link that expired 1 minute ago
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->subMinute(),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+
+        // Act
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        // Assert - Expired signature should fail
+        $response->assertStatus(403);
+
+        $user->refresh();
+        $this->assertUserNotVerified($user);
+    }
+
+    /**
+     * Test: User cannot verify another user's email
+     *
+     * @test
+     */
+    public function user_cannot_verify_another_users_email(): void
+    {
+        // Arrange
+        $userA = User::factory()->customer()->unverified()->create();
+        $userB = User::factory()->customer()->unverified()->create();
+
+        // Create verification URL for User B
+        $verificationUrlForB = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $userB->id, 'hash' => sha1($userB->getEmailForVerification())]
+        );
+
+        // Act - User A tries to use User B's verification link
+        $response = $this->actingAs($userA)->get($verificationUrlForB);
+
+        // Assert - Should fail (Laravel checks user ID match)
+        $response->assertStatus(403);
+
+        // Neither user should be verified
+        $userA->refresh();
+        $userB->refresh();
+        $this->assertUserNotVerified($userA);
+        $this->assertUserNotVerified($userB);
+    }
+
+    /**
+     * Test: Already verified user cannot resend verification email
+     *
+     * @test
+     */
+    public function verified_user_cannot_resend_verification_email(): void
+    {
+        // Arrange
+        Notification::fake();
         $user = User::factory()->customer()->create([
             'email_verified_at' => now(),
         ]);
 
-        $this->actingAs($user);
-
         // Act
-        $response = $this->get('/dashboard');
+        $response = $this->actingAs($user)->get(route('verification.resend'));
 
-        // Assert - Just verify user is verified
-        $this->assertUserVerified($user);
+        // Assert - Should redirect (HasNotVerifiedEmail middleware)
+        $response->assertRedirect($user->homePage());
+
+        // No notification should be sent
+        Notification::assertNotSentTo($user, EmailVerificationNotification::class);
     }
 
     /**
-     * Test: Verification email contains correct verification code
+     * Test: Resend verification is rate limited
      *
      * @test
      */
-    public function verification_email_contains_code(): void
+    public function resend_verification_is_rate_limited(): void
     {
-        // This test verifies that when email verification is triggered,
-        // the user's verification_code is set properly
-
         // Arrange
-        $this->enableEmailVerification();
-        $this->disableRegistrationVerify();
+        $user = User::factory()->customer()->unverified()->create();
 
-        // Act - Register a new user (triggers verification email)
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'newuser@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
+        // Act - Make 7 requests (limit is 6 per minute)
+        for ($i = 0; $i < 6; $i++) {
+            $this->actingAs($user)->get(route('verification.resend'));
+        }
 
-        // Assert
-        $user = User::where('email', 'newuser@example.com')->first();
-        $this->assertNotNull($user);
-        $this->assertUserNotVerified($user);
+        // 7th request should be throttled
+        $response = $this->actingAs($user)->get(route('verification.resend'));
 
-        // Verify code was generated
-        $this->assertNotNull($user->verification_code);
+        // Assert - Should be rate limited (429 Too Many Requests)
+        $response->assertStatus(429);
+    }
+
+    /**
+     * Test: User is redirected to intended URL after verification
+     *
+     * @test
+     */
+    public function user_redirected_to_intended_url_after_verification(): void
+    {
+        // Arrange
+        $user = User::factory()->customer()->unverified()->create();
+        $intendedUrl = route('dashboard');
+
+        // Set an intended URL in the session
+        $this->actingAs($user)->session(['url.intended' => $intendedUrl]);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())]
+        );
+
+        // Act
+        $response = $this->actingAs($user)->get($verificationUrl);
+
+        // Assert - Should redirect to the intended URL
+        $response->assertRedirect($intendedUrl);
+
+        $user->refresh();
+        $this->assertUserVerified($user);
     }
 }

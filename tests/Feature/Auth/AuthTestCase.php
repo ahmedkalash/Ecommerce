@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use App\Rules\Recaptcha;
+use Closure;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
@@ -44,15 +47,10 @@ abstract class AuthTestCase extends TestCase
     protected function mockRecaptcha(): void
     {
         $this->app->bind(Recaptcha::class, function () {
-            return new class implements \Illuminate\Contracts\Validation\Rule {
-                public function passes($attribute, $value): bool
+            return new class implements ValidationRule {
+                public function validate(string $attribute, mixed $value, Closure $fail): void
                 {
-                    return true; // Always pass in tests
-                }
-
-                public function message(): string
-                {
-                    return 'The reCAPTCHA verification failed.';
+                    // The reCAPTCHA verification will always pass in the unit test;
                 }
             };
         });
@@ -93,43 +91,13 @@ abstract class AuthTestCase extends TestCase
         // which includes our 9999_99_99_999999_import_base_data.php migration
 
         // Create admin user for email utilities that need get_admin()
-        \App\Models\User::firstOrCreate(
+        User::firstOrCreate(
             ['email' => 'admin@test.com'],
             [
                 'name' => 'Test Admin',
                 'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
                 'user_type' => 'admin',
                 'email_verified_at' => now(),
-            ]
-        );
-
-        // Seed Email Template for password reset
-        \App\Models\EmailTemplate::firstOrCreate(
-            ['identifier' => 'password_reset_email_to_all'],
-            [
-                'subject' => 'Password Reset',
-                'default_text' => 'Your password reset code is [[code]].',
-                'status' => 1,
-            ]
-        );
-
-        // Seed Email Verification Template for customer
-        \App\Models\EmailTemplate::firstOrCreate(
-            ['identifier' => 'email_verification_customer'],
-            [
-                'subject' => 'Verify your email',
-                'default_text' => 'Please verify your email: [[verify_email_button]]',
-                'status' => 1,
-            ]
-        );
-
-        // Seed Registration Template for customer
-        \App\Models\EmailTemplate::firstOrCreate(
-            ['identifier' => 'registration_email_to_customer'],
-            [
-                'subject' => 'Welcome to our store',
-                'default_text' => 'Welcome [[customer_name]]!',
-                'status' => 1,
             ]
         );
     }
@@ -193,9 +161,9 @@ abstract class AuthTestCase extends TestCase
     /**
      * Assert that a user exists in the database with given attributes.
      */
-    protected function assertUserExists(string $email): \App\Models\User
+    protected function assertUserExists(string $email): User
     {
-        $user = \App\Models\User::where('email', $email)->first();
+        $user = User::where('email', $email)->first();
         $this->assertNotNull($user, "User with email {$email} not found");
 
         return $user;
@@ -204,7 +172,7 @@ abstract class AuthTestCase extends TestCase
     /**
      * Assert that a user's email is verified.
      */
-    protected function assertUserVerified(\App\Models\User $user): void
+    protected function assertUserVerified(User $user): void
     {
         $user->refresh();
         $this->assertNotNull($user->email_verified_at, 'User email not verified');
@@ -213,7 +181,7 @@ abstract class AuthTestCase extends TestCase
     /**
      * Assert that a user's email is not verified.
      */
-    protected function assertUserNotVerified(\App\Models\User $user): void
+    protected function assertUserNotVerified(User $user): void
     {
         $user->refresh();
         $this->assertNull($user->email_verified_at, 'User email should not be verified');
