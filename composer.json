@@ -9,10 +9,12 @@
     "type": "project",
     "require": {
         "php": "^8.2",
+        "ext-zip": "*",
         "aiz-packages/color-code-converter": "dev-main",
         "aiz-packages/combination-generate": "dev-main",
         "anandsiddharth/laravel-paytm-wallet": "^2.0",
         "authorizenet/authorizenet": "^2.0",
+        "doctrine/dbal": "^3.10",
         "enshrined/svg-sanitize": "^0.15.4",
         "genealabs/laravel-sign-in-with-apple": "*",
         "genealabs/laravel-socialiter": "*",
@@ -49,8 +51,7 @@
         "stichoza/google-translate-php": "^5.2",
         "stripe/stripe-php": "^10.5",
         "twilio/sdk": "^6.44",
-        "unicodeveloper/laravel-paystack": "^1.0",
-        "ext-zip": "*"
+        "unicodeveloper/laravel-paystack": "^1.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
