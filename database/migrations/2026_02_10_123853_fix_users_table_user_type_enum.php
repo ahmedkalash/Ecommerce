@@ -11,11 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('user_type', ['admin', 'staff', 'customer', 'seller', 'delivery_boy'])
-                ->default('customer')
-                ->change();
-        });
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE users MODIFY user_type ENUM('admin', 'staff', 'customer', 'seller', 'delivery_boy') DEFAULT 'customer'");
     }
 
     /**
@@ -23,8 +19,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('user_type')->change();
-        });
+        \Illuminate\Support\Facades\DB::statement("ALTER TABLE users MODIFY user_type VARCHAR(50) DEFAULT 'customer'");
     }
 };

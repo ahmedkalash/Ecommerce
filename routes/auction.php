@@ -21,7 +21,7 @@ use App\Http\Controllers\HomeController;
 // use App\Http\Controllers\AuctionProductController;
 
 // Admin
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin']], function () {
     // Auction product lists
     Route::controller(AuctionProductController::class)->group(function () {
         Route::get('auction/all-products', 'all_auction_product_list')->name('auction.all_products');

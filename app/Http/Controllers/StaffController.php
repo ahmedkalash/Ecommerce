@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Staff;
 use App\Models\Role;
+use App\Models\Staff;
 use App\Models\User;
 use Hash;
 
 class StaffController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_staffs'])->only('index');
         $this->middleware(['permission:add_staff'])->only('create');
@@ -26,6 +26,7 @@ class StaffController extends Controller
     public function index()
     {
         $staffs = Staff::paginate(10);
+
         return view('backend.staff.staffs.index', compact('staffs'));
     }
 
@@ -36,39 +37,55 @@ class StaffController extends Controller
      */
     public function create()
     {
-        $roles = Role::where('id','!=',1)->orderBy('id', 'desc')->get();
+        $roles = Role::where('id', '!=', 1)->orderBy('id', 'desc')->get();
+
         return view('backend.staff.staffs.create', compact('roles'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\StoreStaffRequest $request)
     {
-        if(User::where('email', $request->email)->first() == null){
-            $user = new User;
+        try {
+            \DB::beginTransaction();
+
+            $user = new \App\Models\Admin; // Use Admin model so roles are assigned to App\Models\Admin
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
-            $user->user_type = "staff";
+            $user->user_type = 'staff';
             $user->password = Hash::make($request->password);
-            if($user->save()){
+
+            if ($user->save()) {
                 $staff = new Staff;
                 $staff->user_id = $user->id;
-                $staff->role_id = $request->role_id;
-                $user->assignRole(Role::findOrFail($request->role_id)->name);
-                if($staff->save()){
+                // role_id column is removed from staff table
+
+                // Assign role via Spatie Permission
+                $role = Role::findOrFail($request->role_id);
+                $user->assignRole($role->name);
+
+                if ($staff->save()) {
+                    \DB::commit();
                     flash(translate('Staff has been inserted successfully'))->success();
+
                     return redirect()->route('staffs.index');
                 }
             }
-        }
 
-        flash(translate('Email already used'))->error();
-        return back();
+            \DB::rollback();
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        } catch (\Exception $e) {
+            \DB::rollback();
+            flash(translate('Something went wrong: ').$e->getMessage())->error();
+
+            return back();
+        }
     }
 
     /**
@@ -91,38 +108,59 @@ class StaffController extends Controller
     public function edit($id)
     {
         $staff = Staff::findOrFail(decrypt($id));
-        $roles = $roles = Role::where('id','!=',1)->orderBy('id', 'desc')->get();
+        $roles = $roles = Role::where('id', '!=', 1)->orderBy('id', 'desc')->get();
+
         return view('backend.staff.staffs.edit', compact('staff', 'roles'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(\App\Http\Requests\UpdateStaffRequest $request, $id)
     {
-        $staff = Staff::findOrFail($id);
-        $user = $staff->user;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->mobile;
-        if(strlen($request->password) > 0){
-            $user->password = Hash::make($request->password);
-        }
-        if($user->save()){
-            $staff->role_id = $request->role_id;
-            if($staff->save()){
-                $user->syncRoles(Role::findOrFail($request->role_id)->name);
-                flash(translate('Staff has been updated successfully'))->success();
-                return redirect()->route('staffs.index');
-            }
-        }
+        try {
+            \DB::beginTransaction();
 
-        flash(translate('Something went wrong'))->error();
-        return back();
+            $staff = Staff::findOrFail($id);
+            // We need to retrieve the user as an Admin model instance to ensure role syncing works for App\Models\Admin
+            $user = \App\Models\Admin::find($staff->user->id);
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->mobile;
+
+            if (strlen($request->password) > 0) {
+                $user->password = Hash::make($request->password);
+            }
+
+            if ($user->save()) {
+                // role_id column is removed from staff table
+                // $staff->role_id = $request->role_id;
+
+                if ($staff->save()) {
+                    $role = Role::findOrFail($request->role_id);
+                    $user->syncRoles($role->name);
+
+                    \DB::commit();
+                    flash(translate('Staff has been updated successfully'))->success();
+
+                    return redirect()->route('staffs.index');
+                }
+            }
+
+            \DB::rollback();
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        } catch (\Exception $e) {
+            \DB::rollback();
+            flash(translate('Something went wrong: ').$e->getMessage())->error();
+
+            return back();
+        }
     }
 
     /**
@@ -133,13 +171,16 @@ class StaffController extends Controller
      */
     public function destroy($id)
     {
-        User::destroy(Staff::findOrFail($id)->user->id);
-        if(Staff::destroy($id)){
+        // Use Admin model to destroy to be consistent, though for deletion User::destroy works the same on the DB level
+        \App\Models\Admin::destroy(Staff::findOrFail($id)->user->id);
+        if (Staff::destroy($id)) {
             flash(translate('Staff has been deleted successfully'))->success();
+
             return redirect()->route('staffs.index');
         }
 
         flash(translate('Something went wrong'))->error();
+
         return back();
     }
 }

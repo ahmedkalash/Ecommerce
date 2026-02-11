@@ -34,14 +34,17 @@ use App\Http\Controllers\Preorder\seller\PreorderProductReviewController as Sell
 Route::group(['middleware' => ['isPreorder']], function () {
 
     // Admin Routes
-    Route::group(['prefix' => 'admin/preorder', 'middleware' => ['auth', 'admin', 'prevent-back-history']],
+    Route::group(
+        ['prefix' => 'admin/preorder', 'middleware' => ['auth:admin', 'admin', 'prevent-back-history']],
         function () {
 
             // Admin Dashboard
             Route::controller(DashboardController::class)->group(function () {
                 Route::get('/dashboard', 'index')->name('preorder.dashboard');
-                Route::post('/dashboard/preorder-by-products-section',
-                    'preorderByProductsSection')->name('dashboard.preorder-by-products-section');
+                Route::post(
+                    '/dashboard/preorder-by-products-section',
+                    'preorderByProductsSection'
+                )->name('dashboard.preorder-by-products-section');
             });
 
             // Preorder Products
@@ -49,15 +52,23 @@ Route::group(['middleware' => ['isPreorder']], function () {
             Route::controller(PreorderProductController::class)->group(function () {
                 Route::get('/preorder-product/edit/{id}', 'edit')->name('preorder-product.edit');
                 Route::get('/preorder-product/destroy/{id}', 'destroy')->name('preorder-product.destroy');
-                Route::post('/preorder-product/bulk-destroy',
-                    'bulkProductDestroy')->name('preorder-product.bulk-destroy');
-                Route::post('/preorder-product/published',
-                    'preorder_product_published')->name('preorder-product.published');
+                Route::post(
+                    '/preorder-product/bulk-destroy',
+                    'bulkProductDestroy'
+                )->name('preorder-product.bulk-destroy');
+                Route::post(
+                    '/preorder-product/published',
+                    'preorder_product_published'
+                )->name('preorder-product.published');
                 Route::post('/preorder-product/approval', 'preorderProductApproval')->name('preorder-product.approval');
-                Route::post('/preorder-product/featured',
-                    'preorder_product_featured')->name('preorder-product.featured');
-                Route::post('/preorder-product/show-on-homepage',
-                    'preorder_product_show_on_homepage')->name('preorder-product.show_on_homepage');
+                Route::post(
+                    '/preorder-product/featured',
+                    'preorder_product_featured'
+                )->name('preorder-product.featured');
+                Route::post(
+                    '/preorder-product/show-on-homepage',
+                    'preorder_product_show_on_homepage'
+                )->name('preorder-product.show_on_homepage');
             });
 
             // Preorders
@@ -65,16 +76,20 @@ Route::group(['middleware' => ['isPreorder']], function () {
                 Route::get('/all-order-list', 'order_list')->name('all_preorder.list');
                 Route::get('/inhouse-order-list', 'order_list')->name('inhouse_preorder.list');
                 Route::get('/seller-order-list', 'order_list')->name('seller_preorder.list');
-                Route::get('/delayed-prepayment-preorders-list',
-                    'order_list')->name('delayed_prepayment_preorders.list');
+                Route::get(
+                    '/delayed-prepayment-preorders-list',
+                    'order_list'
+                )->name('delayed_prepayment_preorders.list');
                 Route::get('/delayed-final-orders-list', 'order_list')->name('delayed_final_orders.list');
 
                 Route::get('/order/{id}', 'show')->name('preorder-order.show');
                 Route::get('/order/destroy/{id}', 'destroy')->name('preorder-order.destroy');
                 Route::post('/bulk-preorder-delete', 'bulkPreorderDelete')->name('bulk-preorder-delete');
                 Route::put('/order/update/{id}', 'order_status_update')->name('preorder-order.status_update');
-                Route::post('prepayment-final-preorder-reminder',
-                    'prepaymentFinalPreorderReminder')->name('prepayment_final_preorder_reminder');
+                Route::post(
+                    'prepayment-final-preorder-reminder',
+                    'prepaymentFinalPreorderReminder'
+                )->name('prepayment_final_preorder_reminder');
             });
 
             Route::controller(PreorderController::class)->group(function () {
@@ -112,10 +127,14 @@ Route::group(['middleware' => ['isPreorder']], function () {
             // Product Reviews
             Route::controller(PreorderProductReviewController::class)->group(function () {
                 Route::get('/preorder-product-reviews', 'adminIndex')->name('preorder.product_reviews.index');
-                Route::post('/preorder-product/reviews/update-status',
-                    'updateStatus')->name('preorder.product_reviews.update_status');
-                Route::get('/preorder-product/reviews/detail-reviews/{id}',
-                    'detailReviews')->name('preorder.product_detail_reviews');
+                Route::post(
+                    '/preorder-product/reviews/update-status',
+                    'updateStatus'
+                )->name('preorder.product_reviews.update_status');
+                Route::get(
+                    '/preorder-product/reviews/detail-reviews/{id}',
+                    'detailReviews'
+                )->name('preorder.product_detail_reviews');
             });
 
             // Notification Types
@@ -123,10 +142,12 @@ Route::group(['middleware' => ['isPreorder']], function () {
             Route::controller(NotificationTypeController::class)->group(function () {
                 Route::get('/preorder-notification/edit/{id}', 'edit')->name('preorder.notification-type.edit');
             });
-        });
+        }
+    );
 
     // Seller Routes
-    Route::group(['prefix' => 'seller/preorder', 'middleware' => ['seller', 'verified', 'user'], 'as' => 'seller.'],
+    Route::group(
+        ['prefix' => 'seller/preorder', 'middleware' => ['seller', 'verified', 'user'], 'as' => 'seller.'],
         function () {
 
             Route::controller(SellerDashboardController::class)->group(function () {
@@ -135,20 +156,28 @@ Route::group(['middleware' => ['isPreorder']], function () {
 
             Route::controller(SellerPreorderController::class)->group(function () {
                 Route::get('/preorder-settings', 'preorderSettings')->name('preorder-settings');
-                Route::post('/preorder-instruction-update',
-                    'updatePreorderInstruction')->name('preorder-instruction-update');
+                Route::post(
+                    '/preorder-instruction-update',
+                    'updatePreorderInstruction'
+                )->name('preorder-instruction-update');
             });
 
             Route::resource('preorder-product', SellerPreorderProductController::class);
             Route::controller(SellerPreorderProductController::class)->group(function () {
                 Route::get('/preorder-product/edit/{id}', 'edit')->name('preorder-product.edit');
                 Route::get('/preorder-product/destroy/{id}', 'destroy')->name('preorder-product.destroy');
-                Route::post('/preorder-product/bulk-destroy',
-                    'bulkProductDestroy')->name('preorder-product.bulk-destroy');
-                Route::post('/preorder-product/published',
-                    'preorder_product_published')->name('preorder-product.published');
-                Route::post('/preorder-product/featured',
-                    'preorder_product_featured')->name('preorder-product.featured');
+                Route::post(
+                    '/preorder-product/bulk-destroy',
+                    'bulkProductDestroy'
+                )->name('preorder-product.bulk-destroy');
+                Route::post(
+                    '/preorder-product/published',
+                    'preorder_product_published'
+                )->name('preorder-product.published');
+                Route::post(
+                    '/preorder-product/featured',
+                    'preorder_product_featured'
+                )->name('preorder-product.featured');
             });
 
             Route::controller(SellerOrderController::class)->group(function () {
@@ -187,7 +216,8 @@ Route::group(['middleware' => ['isPreorder']], function () {
                 Route::post('conversations/message-reply', 'messageReply')->name('preorder-conversations.reply');
                 Route::get('conversations/destroy', 'messageReply')->name('preorder-conversations.destroy');
             });
-        });
+        }
+    );
 
     // frontend
     Route::group(['prefix' => 'preorder'], function () {
@@ -207,7 +237,8 @@ Route::group(['middleware' => ['isPreorder']], function () {
             // Product Review
             Route::resource('/preorder-product-reviews', PreorderProductReviewController::class);
             Route::post('/product-review-modal', [
-                PreorderProductReviewController::class, 'product_review_modal'
+                PreorderProductReviewController::class,
+                'product_review_modal',
             ])->name('preorder.product_review_modal');
 
             // Conversation
@@ -217,8 +248,10 @@ Route::group(['middleware' => ['isPreorder']], function () {
                 Route::get('/conversations', 'customerIndex')->name('preorder-conversations.customer-index');
                 Route::get('/conversation/{id}/show', 'customerShow')->name('preorder-conversations.customer-show');
                 Route::post('/conversation/refresh', 'refresh')->name('preorder.conversations.refresh');
-                Route::post('/conversations/message-reply',
-                    'messageReplyCustomer')->name('preorder-conversations.customer_reply');
+                Route::post(
+                    '/conversations/message-reply',
+                    'messageReplyCustomer'
+                )->name('preorder-conversations.customer_reply');
             });
         });
     });
@@ -227,22 +260,32 @@ Route::group(['middleware' => ['isPreorder']], function () {
     Route::group(['prefix' => 'preorder', 'middleware' => ['auth', 'verified']], function () {
         Route::controller(PreorderProductController::class)->group(function () {
             Route::post('/preordr-product/search', 'product_search')->name('preorder_product.search');
-            Route::post('/get-selected-preorder-products',
-                'get_selected_products')->name('get-selected-preorder-products');
+            Route::post(
+                '/get-selected-preorder-products',
+                'get_selected_products'
+            )->name('get-selected-preorder-products');
         });
 
         // Product Query
         Route::resource('preorder-product-queries', PreorderProductQueryController::class);
-        Route::get('/invoice-download/{id}',
-            [OrderController::class, 'invoice_download'])->name('preorder.invoice_download');
-        Route::get('/invoice-preview/{id}',
-            [OrderController::class, 'invoice_preview'])->name('preorder.invoice_preview');
+        Route::get(
+            '/invoice-download/{id}',
+            [OrderController::class, 'invoice_download']
+        )->name('preorder.invoice_download');
+        Route::get(
+            '/invoice-preview/{id}',
+            [OrderController::class, 'invoice_preview']
+        )->name('preorder.invoice_preview');
     });
 
     // guest routes for preorder
-    Route::get('/all-preorder-products',
-        [PreorderProductController::class, 'all_preorder_products'])->name('all_preorder_products');
-    Route::get('/preorder/category/{category_slug}',
-        [PreorderProductController::class, 'listingByCategory'])->name('preorder.category');
+    Route::get(
+        '/all-preorder-products',
+        [PreorderProductController::class, 'all_preorder_products']
+    )->name('all_preorder_products');
+    Route::get(
+        '/preorder/category/{category_slug}',
+        [PreorderProductController::class, 'listingByCategory']
+    )->name('preorder.category');
     Route::get('/how-to-preorder', [PreorderProductController::class, 'how_to_preorder'])->name('how_to_preorder');
 });

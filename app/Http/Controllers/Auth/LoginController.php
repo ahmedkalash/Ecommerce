@@ -35,13 +35,13 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        return view('auth.' . get_setting('authentication_layout_select') . '.user_login');
+        return view('auth.'.get_setting('authentication_layout_select').'.user_login');
     }
 
     public function showSellerLoginForm()
     {
         if (get_setting('vendor_system_activation') == 1) {
-            return view('auth.' . get_setting('authentication_layout_select') . '.seller_login');
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_login');
         }
 
         return redirect()->route('home');
@@ -50,7 +50,7 @@ class LoginController extends Controller
     public function showDeliveryBoyLoginForm()
     {
         if (addon_is_activated('delivery_boy')) {
-            return view('auth.' . get_setting('authentication_layout_select') . '.deliveryboy_login');
+            return view('auth.'.get_setting('authentication_layout_select').'.deliveryboy_login');
         }
 
         return redirect()->route('home');
@@ -79,7 +79,7 @@ class LoginController extends Controller
         // Phone login: combine country_code + phone
         if ($request->filled('phone') && $request->filled('country_code')) {
             return [
-                'phone' => '+' . $request->input('country_code') . $request->input('phone'),
+                'phone' => '+'.$request->input('country_code').$request->input('phone'),
                 'password' => $request->input('password'),
             ];
         }
@@ -105,27 +105,23 @@ class LoginController extends Controller
                 return redirect()->route('home');
             }
 
-            // Log seller login
-            Log::channel('seller_login')->info('Seller Logged In', [
-                'user_id' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'time' => now()->toDateTimeString(),
-            ]);
+            $this->logSellerLogin();
+
         }
 
         if (!auth()->user()->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
         }
 
-        if (session()->has('link')) {
-            return redirect(session()->pull('link'));
-        }
-
         return redirect()->intended(auth()->user()->homePage());
     }
 
-    public function handle_demo_login()
+    protected function logSellerLogin()
     {
-        return view('frontend.handle_demo_login');
+        Log::channel('seller_login')->info('Seller Logged In', [
+            'user_id' => auth()->user()->id,
+            'email' => auth()->user()->email,
+            'time' => now()->toDateTimeString(),
+        ]);
     }
 }
