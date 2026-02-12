@@ -3,12 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateStaffRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -19,23 +17,32 @@ class UpdateStaffRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        // Get the user ID associated with the staff member being updated
-        // route parameter is 'staff' which is the staff ID
-        // we need to find the user_id from staff table or assume staff ID is passed
-
-        $userId = $this->route('staff');
-
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$userId,
-            'mobile' => 'required|string|max:20',
-            'password' => 'nullable|string|min:6',
-            'role_id' => 'required|exists:roles,id',
+            'id' => ['required', 'integer', Rule::exists('users', 'id')],
+            'name' => ['required', 'string', 'max:190'],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:190',
+                Rule::unique('users', 'email')->ignore($this->route('staff')),
+            ],
+            'mobile' => ['required', 'string', 'max:20'],
+            'password' => ['nullable', 'string', 'min:6'],
+            'role_id' => ['required', 'exists:roles,id'],
         ];
+    }
+
+    /**
+     * Get data to be validated from the request.
+     */
+    public function validationData(): array
+    {
+        return array_merge($this->all(), [
+            'id' => $this->route('staff'),
+        ]);
     }
 }

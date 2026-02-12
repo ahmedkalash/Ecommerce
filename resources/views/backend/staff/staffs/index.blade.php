@@ -48,7 +48,7 @@
                         <td class="text-right">
                             @can('edit_staff')
                                 <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
-                                   href="{{route('staffs.edit', encrypt($staff->id))}}" title="{{ translate('Edit') }}">
+                                   href="{{route('staffs.edit', $staff->id)}}" title="{{ translate('Edit') }}">
                                     <i class="las la-edit"></i>
                                 </a>
                             @endcan

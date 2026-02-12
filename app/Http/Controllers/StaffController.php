@@ -6,9 +6,13 @@ use App\Enums\UserType;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Models\Admin;
-use Spatie\Permission\Models\Role;
-use Hash;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\View\View;
 
 class StaffController extends Controller
 {
@@ -24,7 +28,7 @@ class StaffController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): View
     {
         $staffs = Admin::where('user_type', UserType::STAFF->value)->paginate(10);
 
@@ -34,7 +38,7 @@ class StaffController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
         $roles = Role::orderBy('id', 'desc')->get();
 
@@ -44,12 +48,12 @@ class StaffController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreStaffRequest $request)
+    public function store(StoreStaffRequest $request): RedirectResponse
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
-            $user = new Admin;
+            $user = new Admin();
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
@@ -61,18 +65,18 @@ class StaffController extends Controller
                 $role = Role::findOrFail($request->role_id);
                 $user->assignRole($role->name);
 
-                \DB::commit();
+                DB::commit();
                 flash(translate('Staff has been inserted successfully'))->success();
 
                 return redirect()->route('staffs.index');
             }
 
-            \DB::rollback();
+            DB::rollBack();
             flash(translate('Something went wrong'))->error();
 
             return back();
         } catch (\Exception $e) {
-            \DB::rollback();
+            DB::rollBack();
             Log::error('Staff storage failed: '.$e->getMessage(), $e->getTrace());
             flash(translate('Something went wrong'))->error();
 
@@ -82,22 +86,18 @@ class StaffController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
      */
-    public function show($id)
+    public function show(int $id): never
     {
-        //
+        throw new NotFoundHttpException();
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  string  $id  Encrypted String
      */
-    public function edit($id)
+    public function edit(int $id): View
     {
-        $staff = Admin::findOrFail(decrypt($id));
+        $staff = Admin::findOrFail($id);
         $roles = Role::orderBy('id', 'desc')->get();
 
         return view('backend.staff.staffs.edit', compact('staff', 'roles'));
@@ -105,21 +105,18 @@ class StaffController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  int  $id
      */
-    public function update(UpdateStaffRequest $request, $id)
+    public function update(UpdateStaffRequest $request, int $id): RedirectResponse
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             $user = Admin::findOrFail($id);
-
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
 
-            if (strlen($request->password) > 0) {
+            if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
             }
 
@@ -127,19 +124,19 @@ class StaffController extends Controller
                 $role = Role::findOrFail($request->role_id);
                 $user->syncRoles($role->name);
 
-                \DB::commit();
+                DB::commit();
                 flash(translate('Staff has been updated successfully'))->success();
 
                 return redirect()->route('staffs.index');
             }
 
-            \DB::rollback();
+            DB::rollBack();
             flash(translate('Something went wrong'))->error();
 
             return back();
         } catch (\Exception $e) {
-            \DB::rollback();
-            Log::error('Staff update failed: '.$e->getMessage());
+            DB::rollBack();
+            Log::error('Staff update failed: '.$e->getMessage(), $e->getTrace());
             flash(translate('Something went wrong'))->error();
 
             return back();
@@ -148,19 +145,21 @@ class StaffController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-        if (Admin::destroy($id)) {
+        try {
+            $user = Admin::findOrFail($id);
+            $user->delete();
+
             flash(translate('Staff has been deleted successfully'))->success();
 
-            return redirect()->route('staffs.index');
+            return back();
+        } catch (\Exception $e) {
+            Log::error('Staff deletion failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
         }
-
-        flash(translate('Something went wrong'))->error();
-
-        return back();
     }
 }
