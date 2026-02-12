@@ -1,13 +1,4 @@
 --
--- Dumping data for table `roles`
---
-
-INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`)
-VALUES (1, 'Super Admin', 'admin', '2022-06-13 00:29:58', '2022-06-12 12:00:00');
-
-
-
---
 -- Dumping data for table `permissions`
 --
 

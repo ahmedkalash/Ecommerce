@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -23,10 +24,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Implicitly grant "Super Admin" role all permissions
-        // This works in conjunction with Spatie Laravel-Permission
-        Gate::before(function ($user, $ability) {
-            return $user->hasRole('Super Admin') ? true : null;
+        // Implicitly grant "admin" users all permissions
+        Gate::before(function (User $user, $ability) {
+            return $user->isSuperAdmin() ? true : null;
         });
 
         // Define the gate for accessing the admin panel

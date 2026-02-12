@@ -28,9 +28,7 @@ class UpdateStaffRequest extends FormRequest
         // route parameter is 'staff' which is the staff ID
         // we need to find the user_id from staff table or assume staff ID is passed
 
-        $staffId = $this->route('staff');
-        $staff = \App\Models\Staff::findOrFail($staffId);
-        $userId = $staff->user_id;
+        $userId = $this->route('staff');
 
         return [
             'name' => 'required|string|max:255',

@@ -15,6 +15,7 @@ use App\Models\CustomerPackagePayment;
 use App\Models\CustomerProduct;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\PickupPoint;
 use App\Models\Preorder;
 use App\Models\PreorderProduct;
 use App\Models\Product;
@@ -23,7 +24,6 @@ use App\Models\Review;
 use App\Models\Seller;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
-use App\Models\Staff;
 use App\Models\Upload;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
@@ -66,9 +66,9 @@ trait UserRelationships
         return $this->hasOne(Seller::class);
     }
 
-    public function staff()
+    public function pickup_point()
     {
-        return $this->hasOne(Staff::class);
+        return $this->hasOne(PickupPoint::class, 'user_id');
     }
 
     public function orders()

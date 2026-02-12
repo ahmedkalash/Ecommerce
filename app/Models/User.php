@@ -60,11 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function homePage(): string
     {
-        if ($this->isAdmin() || $this->isStaff()) {
+        if ($this->isSuperAdmin() || $this->isStaff()) {
             return route('admin.dashboard');
         } elseif ($this->isSeller()) {
             return route('seller.dashboard');
-        } elseif ($this->user_type == 'delivery_boy') {
+        } elseif ($this->isDeliveryBoy()) {
             return route('dashboard');
         } elseif ($this->isCustomer()) {
             return route('home');
@@ -72,7 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
         throw new \RuntimeException('Unknown user type');
     }
 
-    public function isAdmin(): bool
+    public function isSuperAdmin(): bool
     {
         return $this->user_type == 'admin';
     }
