@@ -45,7 +45,7 @@ class SocialLoginTest extends AuthTestCase
             'email' => 'newuser@gmail.com',
             'provider' => 'google',
             'provider_id' => 'google-123456',
-            'user_type' => 'customer',
+            'user_type' => \App\Enums\UserType::CUSTOMER->value,
         ]);
 
         $user = User::where('email', 'newuser@gmail.com')->first();
@@ -68,7 +68,6 @@ class SocialLoginTest extends AuthTestCase
             'provider_id' => null,
         ]);
 
-        // Mock Socialite with same email
         // Mock Socialite with same email
         $socialiteUser = $this->createSocialUser([
             'id' => 'google-789',
@@ -96,7 +95,6 @@ class SocialLoginTest extends AuthTestCase
      */
     public function facebook_login_creates_new_user(): void
     {
-        // Arrange
         // Arrange
         $socialiteUser = $this->createSocialUser([
             'id' => 'fb-123456',
@@ -129,7 +127,6 @@ class SocialLoginTest extends AuthTestCase
     public function twitter_login_creates_new_user(): void
     {
         // Arrange
-        // Arrange
         $socialiteUser = $this->createSocialUser([
             'id' => 'twitter-123',
             'email' => 'user@twitter.com',
@@ -158,7 +155,6 @@ class SocialLoginTest extends AuthTestCase
      */
     public function apple_callback_creates_new_user(): void
     {
-        // Arrange
         // Arrange
         $socialiteUser = $this->createSocialUser([
             'id' => 'apple-xyz',
@@ -216,7 +212,6 @@ class SocialLoginTest extends AuthTestCase
     public function social_login_without_email_uses_provider_id(): void
     {
         // Arrange - Some providers might not return email
-        // Arrange - Some providers might not return email
         $socialiteUser = $this->createSocialUser([
             'id' => 'no-email-123',
             'email' => null,
@@ -248,7 +243,6 @@ class SocialLoginTest extends AuthTestCase
             'email' => 'repeat@gmail.com',
         ]);
 
-        // Mock Socialite returning same user
         // Mock Socialite returning same user
         $socialiteUser = $this->createSocialUser([
             'id' => 'google-repeat',
@@ -289,7 +283,8 @@ class SocialLoginTest extends AuthTestCase
         $response = $this->get('/social-login/google/callback');
 
         // Assert - Customer should redirect to home page
-        $response->assertRedirect('/');
+        $user = User::where('email', 'redirect@gmail.com')->first();
+        $response->assertRedirect($user->homePage());
     }
 
     /**
@@ -304,6 +299,7 @@ class SocialLoginTest extends AuthTestCase
         $user->token = 'test-token';
         $user->avatar = $attributes['avatar'] ?? null;
         $user->nickname = $attributes['nickname'] ?? null;
+
         return $user;
     }
 

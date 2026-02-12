@@ -4,13 +4,11 @@ namespace Tests\Feature\Auth;
 
 use App\Enums\UserType;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Mail\MailManager;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\EmailVerificationNotification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 /**
@@ -26,8 +24,6 @@ use Illuminate\Support\Facades\Notification;
 class RegistrationTest extends AuthTestCase
 {
     protected bool $stopOnFirstFailure = true;
-
-    // Todo: test response status code and error messages
 
     protected function setUp(): void
     {
@@ -45,7 +41,7 @@ class RegistrationTest extends AuthTestCase
         // Act
         $response = $this->post(route('register'), []);
 
-        //Assert
+        // Assert
         // prevent the test from failing if the rules order was changed.
         $error_name = Arr::first(array_keys((new RegisterRequest)->rules()));
         // Assert - With stopOnFirstFailure, only a 'name' error will appear.
@@ -73,14 +69,14 @@ class RegistrationTest extends AuthTestCase
         $response = $this->post(route('register'), $use_data);
 
         // Assert
-        $response->assertRedirect('/');
+        $user = User::where('email', $use_data['email'])->first();
+        $response->assertRedirect($user->homePage());
+
         $this->assertDatabaseHas('users', [
             'email' => $use_data['email'],
             'name' => $use_data['name'],
             'user_type' => UserType::CUSTOMER,
         ]);
-
-        $user = User::where('email', $use_data['email'])->first();
         Hash::check('password123', $user->password);
 
         // Assert User Authenticated
@@ -369,9 +365,8 @@ class RegistrationTest extends AuthTestCase
             ]);
 
         // Assert
-        $response->assertRedirect('/');
-
         $user = User::where('email', 'test_john@example.com')->first();
+        $response->assertRedirect($user->homePage());
         $this->assertNotNull($user);
         $this->assertAuthenticatedAs($user);
 
@@ -399,7 +394,8 @@ class RegistrationTest extends AuthTestCase
         ]);
 
         // Assert
-        $response->assertRedirect('/');
+        $user = User::where('email', 'test_john@example.com')->first();
+        $response->assertRedirect($user->homePage());
     }
 
     /**
@@ -472,8 +468,8 @@ class RegistrationTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect('/');
         $user = User::where('email', 'test_john@example.com')->first();
+        $response->assertRedirect($user->homePage());
         $this->assertNotNull($user);
         $this->assertEquals(UserType::CUSTOMER->value, $user->user_type);
     }
@@ -532,7 +528,7 @@ class RegistrationTest extends AuthTestCase
 
         // Assert - Should redirect to home, not create new account
         $response->assertStatus(302);
-        $response->assertRedirect('/');
+        $response->assertRedirect($existingUser->homePage());
 
         // Verify no new user was created
         $this->assertNull(User::where('email', 'newuser@example.com')->first());

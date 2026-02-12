@@ -9180,40 +9180,7 @@ parameters:
 			count: 1
 			path: app/Http/Controllers/ReviewController.php
 
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:create\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\View\\\\View\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
 
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:destroy\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\Http\\\\RedirectResponse\\.$#"
-			count: 2
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:edit\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\View\\\\View\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:index\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\View\\\\View\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:show\\(\\) should return Illuminate\\\\Http\\\\Response but return statement is missing\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:store\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\Http\\\\RedirectResponse\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\RoleController\\:\\:update\\(\\) should return Illuminate\\\\Http\\\\Response but returns Illuminate\\\\Http\\\\RedirectResponse\\.$#"
-			count: 1
-			path: app/Http/Controllers/RoleController.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\BusinessSetting\\:\\:\\$value\\.$#"

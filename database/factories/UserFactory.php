@@ -33,7 +33,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'remember_token' => Str::random(10),
-            'user_type' => 'customer', // Default
+            'user_type' => \App\Enums\UserType::CUSTOMER->value, // Default
             'banned' => 0,
             'is_suspicious' => 0,
             'phone' => '+'.fake()->unique()->numerify('1##########'), // US format
@@ -50,7 +50,7 @@ class UserFactory extends Factory
     public function customer(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_type' => 'customer',
+            'user_type' => \App\Enums\UserType::CUSTOMER->value,
         ]);
     }
 
@@ -60,7 +60,7 @@ class UserFactory extends Factory
     public function seller(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_type' => 'seller',
+            'user_type' => \App\Enums\UserType::SELLER->value,
         ]);
     }
 
@@ -70,7 +70,7 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_type' => 'admin',
+            'user_type' => \App\Enums\UserType::ADMIN->value,
         ]);
     }
 
@@ -80,7 +80,7 @@ class UserFactory extends Factory
     public function staff(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_type' => 'staff',
+            'user_type' => \App\Enums\UserType::STAFF->value,
         ]);
     }
 
@@ -90,7 +90,7 @@ class UserFactory extends Factory
     public function deliveryBoy(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_type' => 'delivery_boy',
+            'user_type' => \App\Enums\UserType::DELIVERY_BOY->value,
         ]);
     }
 

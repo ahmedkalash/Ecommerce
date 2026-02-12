@@ -3,15 +3,13 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use App\Mail\MailManager;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\EmailVerificationNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 
 /**
  * Email Verification Feature Tests
- * 
+ *
  * Tests the security and logic of the email verification flow.
  */
 class EmailVerificationTest extends AuthTestCase
@@ -112,7 +110,7 @@ class EmailVerificationTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(200);
-        $response->assertViewIs('auth.' . get_setting('authentication_layout_select') . '.verify_email');
+        $response->assertViewIs('auth.'.get_setting('authentication_layout_select').'.verify_email');
     }
 
     /**
@@ -194,7 +192,7 @@ class EmailVerificationTest extends AuthTestCase
 
         $url = route('verification.verify', [
             'id' => $user->id,
-            'hash' => sha1($user->getEmailForVerification())
+            'hash' => sha1($user->getEmailForVerification()),
         ]);
 
         // Act - No signature in URL

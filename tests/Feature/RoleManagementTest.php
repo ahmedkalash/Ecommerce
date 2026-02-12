@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\UserType;
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -22,12 +21,12 @@ class RoleManagementTest extends TestCase
         parent::setUp();
 
         // Create a super admin to run tests
-        $this->admin = Admin::create([
+        $user = \App\Models\User::factory()->admin()->create([
             'name' => 'Super Admin',
             'email' => 'admin_'.uniqid().'@example.com',
-            'user_type' => UserType::ADMIN->value,
             'password' => bcrypt('password'),
         ]);
+        $this->admin = Admin::find($user->id);
 
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin', 'guard_name' => 'admin']);
         $permissions = [

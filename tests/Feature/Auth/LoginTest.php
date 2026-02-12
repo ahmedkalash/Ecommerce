@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 /**
  * Login Feature Tests
  *
- * Tests the complete login flow including:
+ * Tests the complete login flow including
  * - Email/phone login
  * - Password validation
  * - Banned user blocking
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Hash;
 class LoginTest extends AuthTestCase
 {
     /**
-     * Test: Customer can login with email and password
+     * Test: Customer can log in with email and password
      *
      * @test
      */
@@ -67,7 +67,7 @@ class LoginTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect('/'); // Controller redirects customers to home
+        $response->assertRedirect($user->homePage()); // Controller redirects customers to home
         $this->assertAuthenticatedAs($user);
     }
 
@@ -158,7 +158,7 @@ class LoginTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
     }
 
@@ -190,7 +190,7 @@ class LoginTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect(route('seller.dashboard'));
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
     }
 
@@ -214,7 +214,7 @@ class LoginTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect(route('dashboard')); // Delivery boys redirect to dashboard like customers
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
     }
 
@@ -238,7 +238,7 @@ class LoginTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $response->assertRedirect(route('admin.dashboard'));
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
     }
 
@@ -586,7 +586,7 @@ class LoginTest extends AuthTestCase
 
         // Assert - Should successfully login
         $response->assertStatus(302);
-        $response->assertRedirect('/');
+        $response->assertRedirect($user->homePage());
         $this->assertAuthenticatedAs($user);
     }
 
