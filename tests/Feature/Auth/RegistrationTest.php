@@ -63,7 +63,7 @@ class RegistrationTest extends AuthTestCase
         $this->disableEmailVerification();
         $use_data = [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -95,7 +95,7 @@ class RegistrationTest extends AuthTestCase
     public function registration_fails_with_duplicate_email(): void
     {
         // Arrange
-        $email = 'existing@example.com';
+        $email = 'test_existing@example.com';
         User::factory()->create(['email' => $email]);
 
         $use_data = [
@@ -161,7 +161,7 @@ class RegistrationTest extends AuthTestCase
         // Arrange
         $use_data = [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'different_password',
             'agree_to_terms' => 'on',
@@ -188,7 +188,7 @@ class RegistrationTest extends AuthTestCase
         // Arrange
         $use_data = [
             'name' => null,
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -212,7 +212,7 @@ class RegistrationTest extends AuthTestCase
         // Arrange
         $use_data = [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => '12345', // Less than 8 chars
             'password_confirmation' => '1234567',
             'agree_to_terms' => 'on',
@@ -239,7 +239,7 @@ class RegistrationTest extends AuthTestCase
 
         $use_data = [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -262,7 +262,7 @@ class RegistrationTest extends AuthTestCase
         $response = $this->post(route('register'), $use_data);
 
         // Assert
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertAuthenticatedAs($user);
 
@@ -296,14 +296,14 @@ class RegistrationTest extends AuthTestCase
         // Act
         $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
         ]);
 
         // Assert
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
         // Email should NOT be verified yet
         $this->assertUserNotVerified($user);
@@ -329,14 +329,14 @@ class RegistrationTest extends AuthTestCase
         // Act
         $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
         ]);
 
         // Assert
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertAuthenticatedAs($user);
 
@@ -362,7 +362,7 @@ class RegistrationTest extends AuthTestCase
         $response = $this->withUnencryptedCookie('referral_code', 'REFER123')
             ->post(route('register'), [
                 'name' => 'John Doe',
-                'email' => 'john@example.com',
+                'email' => 'test_john@example.com',
                 'password' => 'password123',
                 'password_confirmation' => 'password123',
                 'agree_to_terms' => 'on',
@@ -371,7 +371,7 @@ class RegistrationTest extends AuthTestCase
         // Assert
         $response->assertRedirect('/');
 
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertAuthenticatedAs($user);
 
@@ -392,7 +392,7 @@ class RegistrationTest extends AuthTestCase
         // Act
         $response = $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -416,7 +416,7 @@ class RegistrationTest extends AuthTestCase
         // Act
         $response = $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -464,7 +464,7 @@ class RegistrationTest extends AuthTestCase
         // Act
         $response = $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -473,7 +473,7 @@ class RegistrationTest extends AuthTestCase
         // Assert
         $response->assertStatus(302);
         $response->assertRedirect('/');
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
         $this->assertEquals(UserType::CUSTOMER->value, $user->user_type);
     }
@@ -492,7 +492,7 @@ class RegistrationTest extends AuthTestCase
         // Act
         $response = $this->post(route('register'), [
             'name' => $xssPayload,
-            'email' => 'test@example.com',
+            'email' => 'test_unique@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -500,7 +500,7 @@ class RegistrationTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $user = User::where('email', 'test@example.com')->first();
+        $user = User::where('email', 'test_unique@example.com')->first();
         $this->assertNotNull($user);
 
         // Verify name is stored (Laravel escapes on output, not input)
@@ -551,7 +551,7 @@ class RegistrationTest extends AuthTestCase
         // Act - Name exceeds max:190
         $response = $this->post(route('register'), [
             'name' => str_repeat('A', 191),
-            'email' => 'test@example.com',
+            'email' => 'test_unique@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -576,7 +576,7 @@ class RegistrationTest extends AuthTestCase
         // Act - Email with leading/trailing whitespace
         $response = $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => '  john@example.com  ',
+            'email' => '  test_john@example.com  ',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -586,9 +586,9 @@ class RegistrationTest extends AuthTestCase
         $response->assertStatus(302);
 
         // Laravel validation trims by default for email rule
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
-        $this->assertEquals('john@example.com', $user->email);
+        $this->assertEquals('test_john@example.com', $user->email);
     }
 
     /**
@@ -603,7 +603,7 @@ class RegistrationTest extends AuthTestCase
 
         // Create existing user with cart item (quantity: 3)
         $user = User::factory()->customer()->create([
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => Hash::make('password123'),
         ]);
 
@@ -626,7 +626,7 @@ class RegistrationTest extends AuthTestCase
 
         // Act - Login (not register) to trigger cart merge
         $response = $this->post(route('login'), [
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
         ]);
 
@@ -654,7 +654,7 @@ class RegistrationTest extends AuthTestCase
         // Act - Missing agree_to_terms
         $response = $this->post(route('register'), [
             'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ]);
@@ -663,7 +663,7 @@ class RegistrationTest extends AuthTestCase
         $response->assertStatus(302);
         $response->assertSessionHasErrors('agree_to_terms');
         $this->assertGuest();
-        $this->assertDatabaseMissing('users', ['email' => 'john@example.com']);
+        $this->assertDatabaseMissing('users', ['email' => 'test_john@example.com']);
     }
 
     /**
@@ -701,7 +701,7 @@ class RegistrationTest extends AuthTestCase
         // Act - Name with leading/trailing spaces
         $response = $this->post(route('register'), [
             'name' => '  John Doe  ',
-            'email' => 'john@example.com',
+            'email' => 'test_john@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
             'agree_to_terms' => 'on',
@@ -709,7 +709,7 @@ class RegistrationTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(302);
-        $user = User::where('email', 'john@example.com')->first();
+        $user = User::where('email', 'test_john@example.com')->first();
         $this->assertNotNull($user);
 
         // Verify name is trimmed (if your controller/request does this)

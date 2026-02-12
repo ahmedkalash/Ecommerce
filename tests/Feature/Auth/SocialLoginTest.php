@@ -258,6 +258,7 @@ class SocialLoginTest extends AuthTestCase
 
         $this->mockSocialite('google', $socialiteUser);
 
+        $initialCount = User::count();
         // Act
         $response = $this->get('/social-login/google/callback');
 
@@ -265,7 +266,7 @@ class SocialLoginTest extends AuthTestCase
         $this->assertAuthenticatedAs($existingUser);
 
         // Should not create duplicate user
-        $this->assertDatabaseCount('users', 2); // 1 existing + 1 admin from setUp
+        $this->assertDatabaseCount('users', $initialCount);
     }
 
     /**
@@ -275,7 +276,6 @@ class SocialLoginTest extends AuthTestCase
      */
     public function social_login_redirects_customer_to_home(): void
     {
-        // Arrange
         // Arrange
         $socialiteUser = $this->createSocialUser([
             'id' => 'redirect-test',
@@ -288,8 +288,8 @@ class SocialLoginTest extends AuthTestCase
         // Act
         $response = $this->get('/social-login/google/callback');
 
-        // Assert - Customer should redirect to dashboard
-        $response->assertRedirect('/dashboard');
+        // Assert - Customer should redirect to home page
+        $response->assertRedirect('/');
     }
 
     /**

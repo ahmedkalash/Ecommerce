@@ -18,6 +18,13 @@ use Illuminate\Database\Eloquent\Builder;
 class Admin extends User
 {
     /**
+     * The guard used by the model.
+     *
+     * @var string
+     */
+    public $guard_name = 'admin';
+
+    /**
      * The table associated with the model.
      *
      * @var string

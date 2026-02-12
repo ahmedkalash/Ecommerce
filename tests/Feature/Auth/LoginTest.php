@@ -27,13 +27,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -80,14 +79,13 @@ class LoginTest extends AuthTestCase
     public function login_fails_with_wrong_password(): void
     {
         // Arrange
-        User::factory()->customer()->create([
-            'email' => 'customer@example.com',
+        $user = User::factory()->customer()->create([
             'password' => Hash::make('correct_password'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'wrong_password',
         ]);
 
@@ -125,13 +123,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->banned()->create([
-            'email' => 'banned@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'banned@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -150,13 +147,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->admin()->create([
-            'email' => 'admin@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'admin@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -175,7 +171,6 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->seller()->create([
-            'email' => 'seller@example.com',
             'password' => Hash::make('password123'),
         ]);
 
@@ -183,13 +178,13 @@ class LoginTest extends AuthTestCase
         $shop = new \App\Models\Shop;
         $shop->user_id = $user->id;
         $shop->name = 'Test Shop';
-        $shop->slug = 'test-shop';
+        $shop->slug = 'test-shop-'.time();
         $shop->registration_approval = 1; // Approved
         $shop->save();
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'seller@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -208,13 +203,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->deliveryBoy()->create([
-            'email' => 'delivery@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'delivery@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -233,13 +227,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->staff()->create([
-            'email' => 'staff@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'staff@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -258,7 +251,6 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
@@ -272,7 +264,7 @@ class LoginTest extends AuthTestCase
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -289,15 +281,14 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
-        session(['link' => '/checkout']);
+        session(['url.intended' => '/checkout']);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -316,13 +307,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
             'remember' => 'on',
         ]);
@@ -416,7 +406,6 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
@@ -428,7 +417,7 @@ class LoginTest extends AuthTestCase
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -446,13 +435,12 @@ class LoginTest extends AuthTestCase
         // Arrange
         $this->enableEmailVerification();
         $user = User::factory()->customer()->unverified()->create([
-            'email' => 'unverified@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'unverified@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -501,16 +489,17 @@ class LoginTest extends AuthTestCase
     {
         // Arrange - Create and soft delete a user
         $user = User::factory()->customer()->create([
-            'email' => 'deleted@example.com',
             'password' => Hash::make('password123'),
         ]);
+
+        $email = $user->email;
 
         // Soft delete the user (if your User model uses SoftDeletes)
         $user->delete();
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'deleted@example.com',
+            'email' => $email,
             'password' => 'password123',
         ]);
 
@@ -529,15 +518,14 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
-        session(['link' => '/checkout?coupon=SAVE10&ref=email']);
+        session(['url.intended' => '/checkout?coupon=SAVE10&ref=email']);
 
         // Act
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
         ]);
 
@@ -556,13 +544,12 @@ class LoginTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
             'password' => Hash::make('password123'),
         ]);
 
         // Act - Login with remember me
         $response = $this->post(route('login'), [
-            'email' => 'customer@example.com',
+            'email' => $user->email,
             'password' => 'password123',
             'remember' => 'on',
         ]);

@@ -50,12 +50,12 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         Notification::fake();
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
 
         // Act
         $response = $this->post(route('password.email'), [
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
 
         // Assert
@@ -93,13 +93,13 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         Notification::fake();
         User::factory()->create([
-            'email' => 'banned@example.com',
+            'email' => 'test_banned@example.com',
             'banned' => 1,
         ]);
 
         // Act
         $response = $this->post(route('password.email'), [
-            'email' => 'banned@example.com',
+            'email' => 'test_banned@example.com',
         ]);
 
         // Assert
@@ -157,7 +157,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
@@ -183,7 +183,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => Hash::make('old_password'),
         ]);
         $token = Password::createToken($user);
@@ -191,7 +191,7 @@ class PasswordResetTest extends AuthTestCase
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -215,14 +215,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => Hash::make('old_password'),
         ]);
 
         // Act
         $response = $this->post(route('password.update'), [
             'token' => 'invalid-token',
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -245,7 +245,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => Hash::make('old_password'),
         ]);
         $token = Password::createToken($user);
@@ -256,7 +256,7 @@ class PasswordResetTest extends AuthTestCase
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -279,7 +279,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
@@ -309,14 +309,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'different_password',
         ]);
@@ -335,14 +335,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'short',
             'password_confirmation' => 'short',
         ]);
@@ -361,7 +361,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'banned@example.com',
+            'email' => 'test_banned@example.com',
             'password' => Hash::make('old_password'),
             'banned' => 1,
         ]);
@@ -370,7 +370,7 @@ class PasswordResetTest extends AuthTestCase
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'banned@example.com',
+            'email' => 'test_banned@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -397,14 +397,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'customer@example.com',
+            'email' => 'test_customer@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'customer@example.com',
+            'email' => 'test_customer@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -423,14 +423,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->admin()->create([
-            'email' => 'admin@example.com',
+            'email' => 'test_admin@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'admin@example.com',
+            'email' => 'test_admin@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -449,7 +449,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->seller()->create([
-            'email' => 'seller@example.com',
+            'email' => 'test_seller@example.com',
         ]);
 
         // Create approved shop for seller
@@ -465,7 +465,7 @@ class PasswordResetTest extends AuthTestCase
         // Act
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'seller@example.com',
+            'email' => 'test_seller@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -488,14 +488,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act
         $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -513,14 +513,14 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
         $token = Password::createToken($user);
 
         // Act - First reset succeeds
         $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -531,7 +531,7 @@ class PasswordResetTest extends AuthTestCase
         // Try to use the same token again
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'another_password',
             'password_confirmation' => 'another_password',
         ]);
@@ -554,7 +554,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => Hash::make('old_password'),
         ]);
         $token = Password::createToken($user);
@@ -562,7 +562,7 @@ class PasswordResetTest extends AuthTestCase
         // Act - Reset password
         $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -572,7 +572,7 @@ class PasswordResetTest extends AuthTestCase
 
         // Try to login with old password
         $response = $this->post(route('login'), [
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'old_password',
         ]);
 
@@ -590,7 +590,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => Hash::make('old_password'),
         ]);
         $token = Password::createToken($user);
@@ -598,7 +598,7 @@ class PasswordResetTest extends AuthTestCase
         // Act - Reset password
         $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -608,7 +608,7 @@ class PasswordResetTest extends AuthTestCase
 
         // Try to login with new password
         $response = $this->post(route('login'), [
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
             'password' => 'new_password123',
         ]);
 
@@ -631,13 +631,13 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         Notification::fake();
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_user@example.com',
         ]);
 
         // Act - Make multiple requests
         for ($i = 0; $i < 3; $i++) {
             $response = $this->post(route('password.email'), [
-                'email' => 'user@example.com',
+                'email' => 'test_user@example.com',
             ]);
         }
 
@@ -713,12 +713,12 @@ class PasswordResetTest extends AuthTestCase
         // Arrange
         Notification::fake();
         $user = User::factory()->create([
-            'email' => 'user@example.com', // stored lowercase
+            'email' => 'test_diff_case_'.time().'@example.com', // stored lowercase
         ]);
 
         // Act - Request with uppercase email
         $response = $this->post(route('password.email'), [
-            'email' => 'User@Example.COM',
+            'email' => strtoupper($user->email),
         ]);
 
         // Assert - Should still find the user (DB collation dependent)
@@ -735,7 +735,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
+            'email' => 'test_diff_case_submit_'.time().'@example.com',
             'password' => Hash::make('old_password'),
         ]);
         $token = Password::createToken($user);
@@ -743,7 +743,7 @@ class PasswordResetTest extends AuthTestCase
         // Act - Submit with mixed case email
         $response = $this->post(route('password.update'), [
             'token' => $token,
-            'email' => 'USER@example.com',
+            'email' => strtoupper($user->email),
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);
@@ -772,7 +772,7 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->create([
-            'email' => 'user@example.com',
+            'password' => Hash::make('password123'),
         ]);
         $token = Password::createToken($user);
 
@@ -807,7 +807,6 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
             'password' => Hash::make('original_password'),
         ]);
 
@@ -820,7 +819,7 @@ class PasswordResetTest extends AuthTestCase
         // Act - Try to reset with the first (old) token
         $response = $this->post(route('password.update'), [
             'token' => $firstToken,
-            'email' => 'user@example.com',
+            'email' => $user->email,
             'password' => 'hacked_password',
             'password_confirmation' => 'hacked_password',
         ]);
@@ -843,7 +842,6 @@ class PasswordResetTest extends AuthTestCase
     {
         // Arrange
         $user = User::factory()->customer()->create([
-            'email' => 'user@example.com',
             'password' => Hash::make('original_password'),
         ]);
 
@@ -856,7 +854,7 @@ class PasswordResetTest extends AuthTestCase
         // Act - Reset with the latest token
         $response = $this->post(route('password.update'), [
             'token' => $secondToken,
-            'email' => 'user@example.com',
+            'email' => $user->email,
             'password' => 'new_password123',
             'password_confirmation' => 'new_password123',
         ]);

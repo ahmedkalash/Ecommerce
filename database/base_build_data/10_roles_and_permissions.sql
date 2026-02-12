@@ -2,7 +2,7 @@
 -- Dumping data for table `permissions`
 --
 
-INSERT INTO `permissions` (`id`, `name`, `section`, `guard_name`, `created_at`, `updated_at`)
+INSERT INTO `permissions` (`id`, `name`, `group`, `guard_name`, `created_at`, `updated_at`)
 VALUES (1, 'add_new_product', 'product', 'admin', '2022-06-12 09:31:31', '2022-06-12 09:31:31'),
        (2, 'show_all_products', 'product', 'admin', '2022-06-12 09:32:34', '2022-06-12 09:32:34'),
        (3, 'show_in_house_products', 'product', 'admin', '2022-06-12 09:33:08', '2022-06-12 09:33:08'),

@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Rules\Recaptcha;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -20,7 +20,7 @@ use Tests\TestCase;
  */
 abstract class AuthTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Set up the test environment before each test.

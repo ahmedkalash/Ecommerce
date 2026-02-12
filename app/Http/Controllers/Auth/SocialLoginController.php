@@ -65,6 +65,7 @@ class SocialLoginController extends Controller
                     $existing_or_new_user->name = $user->name;
                 }
                 $existing_or_new_user->email = $user->email;
+                $existing_or_new_user->user_type = 'customer';
                 $existing_or_new_user->email_verified_at = date('Y-m-d H:m:s');
             }
             $existing_or_new_user->save();
@@ -138,6 +139,7 @@ class SocialLoginController extends Controller
                 $newUser = new User;
                 $newUser->name = $user->name;
                 $newUser->email = $user->email;
+                $newUser->user_type = 'customer';
                 $newUser->email_verified_at = date('Y-m-d H:i:s');
                 $newUser->provider_id = $user->id;
                 $newUser->provider = $provider;
