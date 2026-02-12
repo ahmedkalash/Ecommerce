@@ -138,7 +138,7 @@ class RoleController extends Controller
         try {
             Permission::create([
                 'name' => $request->name,
-                'section' => $request->parent,
+                'group' => $request->group,
                 'guard_name' => 'admin'
             ]);
 

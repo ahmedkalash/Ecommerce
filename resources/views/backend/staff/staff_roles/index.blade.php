@@ -16,7 +16,7 @@
             @endcan
         </div>
     </div>
-    {{-- <div class="row">
+    <div class="row">
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
@@ -27,11 +27,13 @@
                         @csrf
                         <div class="form-group mb-3">
                             <label for="name">{{translate('Name')}}</label>
-                            <input type="text" id="name" name="name" placeholder="{{ translate('Permission') }}" class="form-control" required>
+                            <input type="text" id="name" name="name" placeholder="{{ translate('Permission') }}"
+                                   class="form-control" required>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="name">{{translate('Parent')}}</label>
-                            <input type="text" id="parent" name="parent" placeholder="{{ translate('Parent') }}" class="form-control" required>
+                            <label for="group">{{translate('Group')}}</label>
+                            <input type="text" id="group" name="group" placeholder="{{ translate('Group') }}"
+                                   class="form-control" required>
                         </div>
                         <div class="form-group mb-3 text-right">
                             <button type="submit" class="btn btn-primary">{{translate('Save')}}</button>
@@ -40,7 +42,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <div class="card">
         <div class="card-header">
@@ -67,7 +69,7 @@
                                     <i class="las la-edit"></i>
                                 </a>
                             @endcan
-                            @if($role->id != 1 && auth()->user()->can('delete_staff_role'))
+                            @can('delete_staff_role')
                                 <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
                                    data-href="{{route('roles.destroy', $role->id)}}" title="{{ translate('Delete') }}">
                                     <i class="las la-trash"></i>

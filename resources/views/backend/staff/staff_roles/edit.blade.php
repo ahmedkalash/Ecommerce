@@ -23,16 +23,16 @@
                     </div>
                     <br>
                     @php
-                        $permission_groups =  \App\Models\Permission::all()->groupBy('section');
+                        $permission_groups =  \App\Models\Permission::all()->groupBy('group');
                         $addons = array("offline_payment", "club_point", "pos_system", "paytm", "seller_subscription", "otp_system", "refund_request", "affiliate_system", "african_pg", "delivery_boy", "auction", "wholesale");
                     @endphp
                     @foreach ($permission_groups as $key => $permission_group)
                         @php
                             $show_permission_group = true;
 
-                            if(in_array($permission_group[0]['section'], $addons)){
+                            if(in_array($permission_group[0]['group'], $addons)){
 
-                                if (addon_is_activated($permission_group[0]['section']) == false) {
+                                if (addon_is_activated($permission_group[0]['group']) == false) {
                                     $show_permission_group = false;
                                 }
                             }
@@ -40,7 +40,7 @@
                         @if($show_permission_group)
                             <ul class="list-group mb-4">
                                 <li class="list-group-item bg-light"
-                                    aria-current="true">{{ translate(Str::headline($permission_group[0]['section'])) }}</li>
+                                    aria-current="true">{{ translate(Str::headline($permission_group[0]['group'])) }}</li>
                                 <li class="list-group-item">
                                     <div class="row">
                                         @foreach ($permission_group as $key => $permission)

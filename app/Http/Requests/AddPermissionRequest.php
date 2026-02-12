@@ -21,7 +21,7 @@ class AddPermissionRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:190', 'unique:permissions,name'],
-            'parent' => ['required', 'string', 'max:190'],
+            'group' => ['required', 'string', 'max:190'],
         ];
     }
 }
