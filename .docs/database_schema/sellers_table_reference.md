@@ -10,19 +10,23 @@
 
 ## Overview
 
-The `sellers` table stores vendor-specific data for users who sell products on the multi-vendor e-commerce platform. It extends the `users` table with seller-specific metrics and verification status.
+The `sellers` table stores vendor-specific data for users who sell products on the multi-vendor e-commerce platform. It
+extends the `users` table with seller-specific metrics and verification status.
 
 **Architecture Pattern**: **Single Table Inheritance (STI) Extension**
-- Main user data → `users` table (`user_type = 'Seller'`)
+
+- Main user data → `users` table (`user_type = 'seller'`)
 - Seller-specific data → `sellers` table (this table)
 - Shop data → `shops` table (one seller can have one shop)
 
 **Key Features**:
+
 - Seller verification workflow
 - Performance metrics (reviews, ratings, sales)
 - Admin approval process
 
 **Related Tables**:
+
 - `users`: Authentication and basic profile
 - `shops`: Seller's storefront (1:1 relationship)
 - `products`: Products listed by the seller
@@ -36,9 +40,11 @@ The `sellers` table stores vendor-specific data for users who sell products on t
 ### **Primary Key**
 
 #### `id` - Seller Profile ID
+
 ```sql
 int(11) NOT NULL auto_increment primary key
 ```
+
 - **Purpose**: Unique identifier for the seller profile
 - **Type**: Auto-incrementing integer
 - **Usage**: Referenced in `products`, `orders`, `commission_histories`, etc.
@@ -50,14 +56,17 @@ int(11) NOT NULL auto_increment primary key
 ### **Foreign Keys**
 
 #### `user_id` - Link to Users Table
+
 ```sql
 int(11) NOT NULL
 ```
+
 - **Purpose**: Foreign key to `users.id`
-- **Constraint**: Must reference a user where `user_type = 'Seller'` (note the capital S)
+- **Constraint**: Must reference a user where `user_type = 'seller'`
 - **Uniqueness**: One user can have only ONE seller profile (1:1 relationship)
 
 **Usage**:
+
 ```php
 $seller = Seller::find(1);
 $seller->user->name; // Get seller's name
@@ -65,11 +74,13 @@ $seller->user->email; // Get seller's email
 ```
 
 **⚠️ Critical Issues**:
+
 1. No database foreign key constraint
 2. No unique constraint (could allow duplicate sellers for one user)
-3. `user_type` ENUM has inconsistent casing (`'Seller'` with capital S)
+3. `user_type` ENUM in `users` table uses lowercase `'seller'`.
 
 **Recommended Fix**:
+
 ```sql
 ALTER TABLE sellers 
 ADD CONSTRAINT fk_seller_user 
@@ -84,9 +95,11 @@ ADD UNIQUE KEY unique_seller_user (user_id);
 ### **Performance Metrics**
 
 #### `rating` - Average Seller Rating
+
 ```sql
 double(3,2) NOT NULL DEFAULT 0.00
 ```
+
 - **Purpose**: Calculated average rating from customer reviews
 - **Range**: 0.00 to 5.00 (assuming 5-star system)
 - **Precision**: 2 decimal places (e.g., 4.73)
@@ -95,6 +108,7 @@ double(3,2) NOT NULL DEFAULT 0.00
 **🔴 CRITICAL ISSUE**: Using `DOUBLE` for ratings can cause precision errors
 
 **Example Calculation**:
+
 ```php
 // When new review is added
 $totalReviews = $seller->num_of_reviews + 1;
@@ -106,11 +120,13 @@ $seller->save();
 ```
 
 **Recommended Fix**:
+
 ```sql
 ALTER TABLE sellers MODIFY rating DECIMAL(3,2) NOT NULL DEFAULT 0.00;
 ```
 
 **Usage in Frontend**:
+
 ```blade
 {{-- Display star rating --}}
 <div class="rating">
@@ -129,15 +145,18 @@ ALTER TABLE sellers MODIFY rating DECIMAL(3,2) NOT NULL DEFAULT 0.00;
 
 ---
 
-####  `num_of_reviews` - Total Review Count
+#### `num_of_reviews` - Total Review Count
+
 ```sql
 int(11) NOT NULL DEFAULT 0
 ```
+
 - **Purpose**: Total number of reviews the seller has received
 - **Type**: Integer counter
 - **Usage**: Display credibility (e.g., "4.5 stars from 234 reviews")
 
 **Increment Logic**:
+
 ```php
 // When a new review is created
 $seller = $product->seller;
@@ -154,6 +173,7 @@ $seller->save();
 ```
 
 **Display Example**:
+
 ```blade
 {{ number_format($seller->num_of_reviews) }} reviews
 ```
@@ -161,14 +181,17 @@ $seller->save();
 ---
 
 #### `num_of_sale` - Total Sales Count
+
 ```sql
 int(11) NOT NULL DEFAULT 0
 ```
+
 - **Purpose**: Total number of completed orders/sales
 - **Type**: Integer counter
 - **Business Logic**: Incremented when order is marked as "delivered"
 
 **Increment Logic**:
+
 ```php
 // When order is marked as delivered
 $orderDetails = OrderDetail::where('order_id', $order->id)
@@ -183,6 +206,7 @@ if ($orderDetails->count() > 0) {
 ```
 
 **Usage**:
+
 ```blade
 {{-- Seller credibility badge --}}
 @if($seller->num_of_sale > 1000)
@@ -195,6 +219,7 @@ if ($orderDetails->count() > 0) {
 **⚠️ Data Integrity Issue**: Counter can drift from actual completed orders if not recalculated periodically.
 
 **Audit Query**:
+
 ```sql
 SELECT s.id, s.user_id, s.num_of_sale as recorded_sales, 
        COUNT(DISTINCT od.order_id) as actual_sales
@@ -209,17 +234,21 @@ HAVING recorded_sales != actual_sales;
 ### **Verification System**
 
 #### `verification_status` - Seller Approval Status
+
 ```sql
 int(1) NOT NULL DEFAULT 0
 ```
+
 - **Purpose**: Admin verification/approval status for the seller
 - **Type**: Boolean-like integer (0 or 1)
 
 **Values**:
+
 - `0`: **Pending** - Seller registered but not yet verified by admin
 - `1`: **Verified** - Seller approved by admin, can list products
 
 **Business Flow**:
+
 ```
 1. User registers as seller → verification_status = 0
 2. Admin reviews verification_info
@@ -228,6 +257,7 @@ int(1) NOT NULL DEFAULT 0
 ```
 
 **Usage**:
+
 ```php
 // Check if seller is verified
 if ($seller->verification_status == 0) {
@@ -243,6 +273,7 @@ event(new SellerVerified($seller));
 ```
 
 **Middleware Example**:
+
 ```php
 // app/Http/Middleware/VerifiedSeller.php
 public function handle($request, Closure $next)
@@ -256,6 +287,7 @@ public function handle($request, Closure $next)
 ```
 
 **⚠️ Issue**: No "rejected" status (only pending or approved). Consider using ENUM:
+
 ```sql
 ALTER TABLE sellers MODIFY verification_status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending';
 ```
@@ -263,14 +295,17 @@ ALTER TABLE sellers MODIFY verification_status ENUM('pending', 'approved', 'reje
 ---
 
 #### `verification_info` - Verification Documents/Data
+
 ```sql
 longtext DEFAULT NULL
 ```
+
 - **Purpose**: Stores seller verification documents or serialized data
 - **Type**: LONGTEXT (can store large amounts of text/JSON)
 - **Nullable**: Yes (sellers might not submit verification info)
 
 **Common Uses**:
+
 1. **File paths to verification documents**:
    ```json
    {
@@ -300,6 +335,7 @@ longtext DEFAULT NULL
    ```
 
 **Storage Recommendation**: Use JSON for structured data
+
 ```php
 // Storing
 $seller->verification_info = json_encode([
@@ -317,6 +353,7 @@ $licensePath = $info['business_license'];
 **Security Concern**: Sensitive data (tax IDs, banking info) stored as plaintext
 
 **Recommended Fix**: Encrypt sensitive fields
+
 ```php
 use Illuminate\Support\Facades\Crypt;
 
@@ -331,15 +368,18 @@ $data = json_decode(Crypt::decryptString($seller->verification_info), true);
 ### **Timestamps**
 
 #### `updated_at` - Last Update Timestamp
+
 ```sql
 timestamp NOT NULL DEFAULT current_timestamp()
 ```
+
 - **Purpose**: Tracks when seller profile was last modified
 - **Auto-Updated**: Yes, on any save/update
 
 **⚠️ Missing Column**: No `created_at` timestamp
 
 **Recommended Fix**:
+
 ```sql
 ALTER TABLE sellers 
 ADD COLUMN created_at TIMESTAMP NULL DEFAULT current_timestamp() AFTER verification_info;
@@ -350,6 +390,7 @@ ADD COLUMN created_at TIMESTAMP NULL DEFAULT current_timestamp() AFTER verificat
 ## Relationships
 
 ### Belongs To User
+
 ```php
 // In Seller model
 public function user()
@@ -359,6 +400,7 @@ public function user()
 ```
 
 **Usage**:
+
 ```php
 $seller = Seller::find(1);
 $seller->user->name;
@@ -369,6 +411,7 @@ $seller->user->banned; // Check if seller account is banned
 ---
 
 ### Has One Shop
+
 ```php
 // In Seller model
 public function shop()
@@ -378,6 +421,7 @@ public function shop()
 ```
 
 **Usage**:
+
 ```php
 $seller = Seller::find(1);
 $seller->shop->name; // Shop name
@@ -388,6 +432,7 @@ $seller->shop->logo; // Shop logo
 ---
 
 ### Has Many Products
+
 ```php
 // In Seller model
 public function products()
@@ -397,6 +442,7 @@ public function products()
 ```
 
 **Usage**:
+
 ```php
 $seller = Seller::find(1);
 $seller->products; // All products listed by this seller
@@ -406,6 +452,7 @@ $seller->products()->where('published', 1)->count(); // Published products
 ---
 
 ### Has Many Orders (via OrderDetails)
+
 ```php
 // In Seller model
 public function orders()
@@ -422,6 +469,7 @@ public function orders()
 ```
 
 **Usage**:
+
 ```php
 $seller = Seller::find(1);
 $seller->orders; // All orders containing this seller's products
@@ -432,13 +480,14 @@ $seller->orders; // All orders containing this seller's products
 ## Business Logic
 
 ### Seller Registration Flow
+
 ```php
 // 1. Create User
 $user = User::create([
     'name' => $request->name,
     'email' => $request->email,
     'password' => Hash::make($request->password),
-    'user_type' => 'Seller', // Capital S - matches ENUM
+    'user_type' => 'seller',
 ]);
 
 // 2. Create Seller Profile
@@ -463,6 +512,7 @@ return $seller;
 ---
 
 ### Seller Verification Process
+
 ```php
 // Seller submits verification
 public function submitVerification(Request $request)
@@ -498,6 +548,7 @@ public function approve(Seller $seller)
 ---
 
 ### Update Seller Metrics
+
 ```php
 // When new review is added
 public function updateRating(Seller $seller, Review $review)
@@ -523,6 +574,7 @@ public function incrementSales(Seller $seller, OrderDetail $orderDetail)
 ## Common Queries
 
 ### Get Top Rated Sellers
+
 ```php
 $topSellers = Seller::where('verification_status', 1)
     ->where('num_of_reviews', '>', 10) // Minimum reviews for credibility
@@ -533,6 +585,7 @@ $topSellers = Seller::where('verification_status', 1)
 ```
 
 ### Get Pending Verification Sellers
+
 ```php
 $pendingSellers = Seller::where('verification_status', 0)
     ->whereNotNull('verification_info')
@@ -541,6 +594,7 @@ $pendingSellers = Seller::where('verification_status', 0)
 ```
 
 ### Get Sellers by Sales Volume
+
 ```php
 $topSellingVendors = Seller::where('verification_status', 1)
     ->orderBy('num_of_sale', 'desc')
@@ -549,6 +603,7 @@ $topSellingVendors = Seller::where('verification_status', 1)
 ```
 
 ### Recalculate Seller Metrics (Audit/Fix)
+
 ```php
 // Fix rating and review count
 $seller = Seller::find($sellerId);
@@ -567,9 +622,11 @@ $seller->save();
 ## Security Considerations
 
 ### 1. Verification Document Access
+
 **Risk**: Verification documents contain sensitive PII
 
 **Protection**:
+
 ```php
 // Only admins and the seller themselves can view
 public function downloadVerificationDoc($sellerId, $documentType)
@@ -585,9 +642,11 @@ public function downloadVerificationDoc($sellerId, $documentType)
 ```
 
 ### 2. Prevent Seller Impersonation
+
 **Risk**: User could create multiple seller accounts
 
 **Detection**:
+
 ```sql
 -- Find users with multiple seller profiles (should be impossible with unique constraint)
 SELECT user_id, COUNT(*) as seller_count
@@ -597,9 +656,11 @@ HAVING seller_count > 1;
 ```
 
 ### 3. Metric Manipulation Prevention
+
 **Risk**: Sellers might try to inflate ratings/sales
 
 **Audit**:
+
 ```php
 // Daily cron job to verify metrics
 public function auditSellerMetrics()
@@ -625,6 +686,7 @@ public function auditSellerMetrics()
 ## Refactoring Opportunities
 
 ### 1. Add Missing Constraints
+
 ```sql
 -- Foreign key
 ALTER TABLE sellers ADD CONSTRAINT fk_seller_user 
@@ -638,6 +700,7 @@ ALTER TABLE sellers ADD COLUMN created_at TIMESTAMP NULL DEFAULT current_timesta
 ```
 
 ### 2. Fix Data Types
+
 ```sql
 -- Use DECIMAL for rating
 ALTER TABLE sellers MODIFY rating DECIMAL(3,2) NOT NULL DEFAULT 0.00;
@@ -647,9 +710,11 @@ ALTER TABLE sellers MODIFY verification_status ENUM('pending', 'approved', 'reje
 ```
 
 ### 3. Separate Verification Data
+
 **Current**: verification_info is a blob of JSON
 
 **Proposed**: Create `seller_verifications` table
+
 ```sql
 CREATE TABLE seller_verifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -668,6 +733,7 @@ CREATE TABLE seller_verifications (
 ```
 
 ### 4. Add Performance Indexes
+
 ```sql
 CREATE INDEX idx_verification_status ON sellers(verification_status);
 CREATE INDEX idx_rating ON sellers(rating) WHERE verification_status = 1;
