@@ -35,7 +35,6 @@ class ProductFactory extends Factory
             'added_by' => 'admin',
             'user_id' => User::factory(),
             'category_id' => Category::factory(),
-            'category_id' => Category::factory(),
             'brand_id' => Brand::factory(),
             'video_provider' => 'youtube',
             'video_link' => null,
@@ -71,9 +70,8 @@ class ProductFactory extends Factory
             'num_of_sale' => 0,
             'meta_title' => $name,
             'meta_description' => $name,
-            'meta_img' => null,
-            'pdf' => null,
             'slug' => Str::slug($name).'-'.Str::random(5),
+
             'rating' => 0,
             'barcode' => null,
             'digital' => 0,

@@ -20,21 +20,15 @@ class ProductMediaTest extends TestCase
      */
     public function test_customer_product_media_collections_registration()
     {
-        $this->withoutExceptionHandling();
         Storage::fake('public');
 
-        try {
-            // Create a dummy CustomerProduct manually since we don't have a factory
-            $user = \App\Models\User::factory()->create();
-            $customerProduct = new CustomerProduct;
-            $customerProduct->name = 'Test Customer Product';
-            $customerProduct->slug = 'test-customer-product';
-            $customerProduct->user_id = $user->id;
-            $customerProduct->save();
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Test Exception: '.$e->getMessage());
-            throw $e;
-        }
+        // Create a dummy CustomerProduct manually since we don't have a factory
+        $user = \App\Models\User::factory()->create();
+        $customerProduct = new CustomerProduct;
+        $customerProduct->name = 'Test Customer Product';
+        $customerProduct->slug = 'test-customer-product';
+        $customerProduct->user_id = $user->id;
+        $customerProduct->save();
 
         // 1. Test Thumbnail Collection
         $thumbnail = UploadedFile::fake()->image('thumbnail.jpg');
@@ -50,6 +44,8 @@ class ProductMediaTest extends TestCase
         $customerProduct->addMedia($gallery1)->toMediaCollection('gallery');
         $customerProduct->addMedia($gallery2)->toMediaCollection('gallery');
 
+        $customerProduct->refresh();
+
         $this->assertCount(2, $customerProduct->galleryMedia());
         $this->assertEquals(2, $customerProduct->getMedia('gallery')->count());
 
@@ -60,7 +56,8 @@ class ProductMediaTest extends TestCase
         $this->assertEquals($customerProduct->getFirstMediaUrl('meta'), $customerProduct->metaImg);
 
         // 4. Test PDF
-        $pdf = UploadedFile::fake()->create('document.pdf', 100, 'application/pdf');
+        $pdfContent = "%PDF-1.4\n1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n3 0 obj\n<<\n/Type /Page\n/MediaBox [0 0 595 842]\n>>\nendobj\ntrailer\n<<\n/Root 1 0 R\n>>\n%%EOF";
+        $pdf = UploadedFile::fake()->createWithContent('document.pdf', $pdfContent);
         $customerProduct->addMedia($pdf)->toMediaCollection('pdf');
 
         $this->assertEquals($customerProduct->getFirstMediaUrl('pdf'), $customerProduct->pdfUrl);
