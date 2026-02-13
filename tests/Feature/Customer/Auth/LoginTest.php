@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Customer\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;

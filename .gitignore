@@ -65,3 +65,6 @@ _ide_helper.php
 /boost.json
 /CLAUDE.md
 /storage/logs/laravel-2026-02-12.log
+/storage/logs/browser.log
+/storage/logs/seller_login.log
+/test_results.txt

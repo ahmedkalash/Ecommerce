@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Customer\Auth;
 
 use App\Enums\SocialProvider;
 use App\Models\User;

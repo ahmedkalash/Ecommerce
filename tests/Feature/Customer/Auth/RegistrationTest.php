@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Auth;
+namespace Tests\Feature\Customer\Auth;
 
 use App\Enums\UserType;
 use App\Http\Requests\Auth\RegisterRequest;
