@@ -15,7 +15,7 @@
                 <div class="d-flex justify-content-center">
                     <span class="avatar avatar-md mb-2 mt-2">
                         @if (Auth::check() && Auth::user()->avatar_original != null)
-                            <img src="{{ uploaded_asset(Auth::user()->avatar_original) }}" class="m-auto"
+                            <img src="{{ get_file_by_id(Auth::user()->avatar_original) }}" class="m-auto"
                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';"
                                  alt="{{ translate('avatar') }}">
                         @else

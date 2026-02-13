@@ -8,7 +8,7 @@
                 <!-- Left Side Image-->
                 <div class="col-xxl-9 col-lg-8">
                     <div class="h-100" style="max-height: 100vh">
-                        <img src="{{ uploaded_asset(get_setting('customer_register_page_image')) }}" alt=""
+                        <img src="{{ get_file_by_id(get_setting('customer_register_page_image')) }}" alt=""
                              class="img-fit h-100">
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                         <div class="py-3 py-lg-4 px-3 px-xl-5 flex-grow-1">
                             <!-- Site Icon -->
                             <div class="size-48px mb-3 mx-auto mx-lg-0">
-                                <img src="{{ uploaded_asset(get_setting('site_icon')) }}"
+                                <img src="{{ get_file_by_id(get_setting('site_icon')) }}"
                                      alt="{{ translate('Site Icon')}}" class="img-fit h-100">
                             </div>
                             <!-- Titles -->
@@ -189,7 +189,8 @@
                                                 <i class="password-toggle las la-2x la-eye"></i>
                                             </div>
                                             <div class="text-right mt-1">
-                                                <span class="fs-12 fw-400 text-gray-dark">{{ translate('Password must contain at least 8 digits') }}</span>
+                                                <span
+                                                    class="fs-12 fw-400 text-gray-dark">{{ translate('Password must contain at least 8 digits') }}</span>
                                             </div>
                                             @error('password')
                                             <span class="invalid-feedback d-block" role="alert">
@@ -226,8 +227,8 @@
                                             <label class="aiz-checkbox">
                                                 <input type="checkbox" name="agree_to_terms" required>
                                                 <span class="">{{ translate('By signing up you agree to our ')}} <a
-                                                            href="{{ route('terms') }}"
-                                                            class="fw-500">{{ translate('terms and conditions.') }}</a></span>
+                                                        href="{{ route('terms') }}"
+                                                        class="fw-500">{{ translate('terms and conditions.') }}</a></span>
                                                 <span class="aiz-square-check"></span>
                                             </label>
                                         </div>

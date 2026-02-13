@@ -15,7 +15,7 @@ class ProductCollection extends ResourceCollection
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'photos' => explode(',', $data->photos),
-                    'thumbnail_image' => uploaded_asset($data->thumbnail_img),
+                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
                     'base_price' => (float) home_base_price($data, false),
                     'base_discounted_price' => (float) home_discounted_base_price($data, false),
                     'todays_deal' => (int) $data->todays_deal,
@@ -29,10 +29,10 @@ class ProductCollection extends ResourceCollection
                         'details' => route('products.show', $data->id),
                         'reviews' => route('api.reviews.index', $data->id),
                         'related' => route('products.related', $data->id),
-                        'top_from_seller' => route('products.topFromSeller', $data->id)
-                    ]
+                        'top_from_seller' => route('products.topFromSeller', $data->id),
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -40,7 +40,7 @@ class ProductCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

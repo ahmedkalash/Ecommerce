@@ -16,7 +16,7 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="{{ $detailedProduct->meta_title }}">
     <meta itemprop="description" content="{{ $detailedProduct->meta_description }}">
-    <meta itemprop="image" content="{{ uploaded_asset($detailedProduct->meta_img) }}">
+    <meta itemprop="image" content="{{ get_file_by_id($detailedProduct->meta_img) }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="product">
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="{{ $detailedProduct->meta_title }}">
     <meta name="twitter:description" content="{{ $detailedProduct->meta_description }}">
     <meta name="twitter:creator" content="@author_handle">
-    <meta name="twitter:image" content="{{ uploaded_asset($detailedProduct->meta_img) }}">
+    <meta name="twitter:image" content="{{ get_file_by_id($detailedProduct->meta_img) }}">
     <meta name="twitter:data1" content="{{ single_price($detailedProduct->unit_price) }}">
     <meta name="twitter:label1" content="Price">
 
@@ -32,7 +32,7 @@
     <meta property="og:title" content="{{ $detailedProduct->meta_title }}"/>
     <meta property="og:type" content="product"/>
     <meta property="og:url" content="{{ route('product', $detailedProduct->slug) }}"/>
-    <meta property="og:image" content="{{ uploaded_asset($detailedProduct->meta_img) }}"/>
+    <meta property="og:image" content="{{ get_file_by_id($detailedProduct->meta_img) }}"/>
     <meta property="og:description" content="{{ $detailedProduct->meta_description }}"/>
     <meta property="og:site_name" content="{{ get_setting('meta_title') }}"/>
     <meta property="og:price:amount" content="{{ single_price($detailedProduct->unit_price) }}"/>
@@ -57,7 +57,7 @@
                                             <div class="carousel-box img-zoom rounded">
                                                 <img class="img-fluid lazyload"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ uploaded_asset($photo) }}"
+                                                     data-src="{{ get_file_by_id($photo) }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -70,7 +70,7 @@
                                             <div class="carousel-box c-pointer border rounded-0">
                                                 <img class="lazyload mw-100 size-60px mx-auto"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ uploaded_asset($photo) }}"
+                                                     data-src="{{ get_file_by_id($photo) }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -107,7 +107,8 @@
                                         </div>
                                         <!-- In stock -->
                                         <div class="col-12 mt-1">
-                                            <span class="badge badge-md badge-inline badge-pill badge-success">{{ translate('In stock')}}</span>
+                                            <span
+                                                class="badge badge-md badge-inline badge-pill badge-success">{{ translate('In stock')}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -146,7 +147,7 @@
                                                class="size-40px rounded-content mr-2 overflow-hidden border">
                                                 <img class="lazyload img-fit h-100 mx-auto"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ uploaded_asset($detailedProduct->user->shop->logo) }}"
+                                                     data-src="{{ get_file_by_id($detailedProduct->user->shop->logo) }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </a>
                                         @endif
@@ -165,8 +166,9 @@
                                 <!-- Messase to seller -->
                                 @if (get_setting('conversation_system') == 1)
                                     <div class="col-md-4 text-md-right mb-3">
-                                        <button class="btn btn-sm btn-soft-secondary-base rounded-0 hov-svg-white hov-text-white"
-                                                onclick="show_chat_modal()">
+                                        <button
+                                            class="btn btn-sm btn-soft-secondary-base rounded-0 hov-svg-white hov-text-white"
+                                            onclick="show_chat_modal()">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                  viewBox="0 0 16 16" class="mr-2 has-transition">
                                                 <g id="Group_23918" data-name="Group 23918"
@@ -198,7 +200,7 @@
                                                class="size-40px rounded-content mr-2 overflow-hidden border p-1">
                                                 <img class="lazyload img-fit h-100 mx-auto"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ uploaded_asset($detailedProduct->brand->logo) }}"
+                                                     data-src="{{ get_file_by_id($detailedProduct->brand->logo) }}"
                                                      alt="{{ $detailedProduct->brand->getTranslation('name') }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </a>
@@ -232,17 +234,20 @@
                                             </del>
                                             <!-- Unit -->
                                             @if($detailedProduct->unit != null)
-                                                <span class="opacity-70 ml-1">/{{ $detailedProduct->getTranslation('unit') }}</span>
+                                                <span
+                                                    class="opacity-70 ml-1">/{{ $detailedProduct->getTranslation('unit') }}</span>
                                             @endif
                                             <!-- Discount percentage -->
                                             @if(discount_in_percentage($detailedProduct) > 0)
-                                                <span class="bg-primary ml-2 fs-11 fw-700 text-white w-35px text-center p-1"
-                                                      style="padding-top:2px;padding-bottom:2px;">-{{discount_in_percentage($detailedProduct)}}%</span>
+                                                <span
+                                                    class="bg-primary ml-2 fs-11 fw-700 text-white w-35px text-center p-1"
+                                                    style="padding-top:2px;padding-bottom:2px;">-{{discount_in_percentage($detailedProduct)}}%</span>
                                             @endif
                                             <!-- Club Point -->
                                             @if (addon_is_activated('club_point') && $detailedProduct->earn_point > 0)
-                                                <div class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
-                                                     style="width: fit-content;">
+                                                <div
+                                                    class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
+                                                    style="width: fit-content;">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                                          viewBox="0 0 12 12">
                                                         <g id="Group_23922" data-name="Group 23922"
@@ -264,7 +269,8 @@
                                                             </g>
                                                         </g>
                                                     </svg>
-                                                    <small class="fs-11 fw-500 text-white ml-2">{{ translate('Club Point') }}
+                                                    <small
+                                                        class="fs-11 fw-500 text-white ml-2">{{ translate('Club Point') }}
                                                         : {{ $detailedProduct->earn_point }}</small>
                                                 </div>
                                             @endif
@@ -285,12 +291,13 @@
                                             <!-- Unit -->
                                             @if ($detailedProduct->unit != null)
                                                 <span
-                                                        class="opacity-70">/{{ $detailedProduct->getTranslation('unit') }}</span>
+                                                    class="opacity-70">/{{ $detailedProduct->getTranslation('unit') }}</span>
                                             @endif
                                             <!-- Club Point -->
                                             @if (addon_is_activated('club_point') && $detailedProduct->earn_point > 0)
-                                                <div class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
-                                                     style="width: fit-content;">
+                                                <div
+                                                    class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
+                                                    style="width: fit-content;">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
                                                          viewBox="0 0 12 12">
                                                         <g id="Group_23922" data-name="Group 23922"
@@ -312,7 +319,8 @@
                                                             </g>
                                                         </g>
                                                     </svg>
-                                                    <small class="fs-11 fw-500 text-white ml-2">{{ translate('Club Point') }}
+                                                    <small
+                                                        class="fs-11 fw-500 text-white ml-2">{{ translate('Club Point') }}
                                                         : {{ $detailedProduct->earn_point }}</small>
                                                 </div>
                                             @endif
@@ -328,7 +336,8 @@
                                 <!-- Total Price -->
                                 <div class="row no-gutters pb-3 d-none" id="chosen_price_div">
                                     <div class="col-sm-2">
-                                        <div class="text-secondary fs-14 fw-400 mt-1">{{ translate('Total Price') }}</div>
+                                        <div
+                                            class="text-secondary fs-14 fw-400 mt-1">{{ translate('Total Price') }}</div>
                                     </div>
                                     <div class="col-sm-10">
                                         <div class="product-price">
@@ -395,7 +404,7 @@
                                     <div class="col-sm-10">
                                         <a href="{{ route('returnpolicy') }}" target="_blank">
                                             @if ($refund_sticker != null)
-                                                <img src="{{ uploaded_asset($refund_sticker) }}" height="36">
+                                                <img src="{{ get_file_by_id($refund_sticker) }}" height="36">
                                             @else
                                                 <img src="{{ static_asset('assets/img/refund-sticker.jpg') }}"
                                                      height="36">
@@ -412,13 +421,16 @@
                             @if ($detailedProduct->added_by == 'seller')
                                 <div class="row no-gutters mt-3">
                                     <div class="col-2">
-                                        <div class="text-secondary fs-14 fw-400">{{ translate('Seller Guarantees')}}</div>
+                                        <div
+                                            class="text-secondary fs-14 fw-400">{{ translate('Seller Guarantees')}}</div>
                                     </div>
                                     <div class="col-10">
                                         @if ($detailedProduct->user->shop->verification_status == 1)
-                                            <span class="text-success fs-14 fw-700">{{ translate('Verified seller')}}</span>
+                                            <span
+                                                class="text-success fs-14 fw-700">{{ translate('Verified seller')}}</span>
                                         @else
-                                            <span class="text-danger fs-14 fw-700">{{ translate('Non verified seller')}}</span>
+                                            <span
+                                                class="text-danger fs-14 fw-700">{{ translate('Non verified seller')}}</span>
                                         @endif
                                     </div>
                                 </div>
@@ -476,7 +488,7 @@
                                            class="h-60px w-70px rounded-content mr-2 overflow-hidden border">
                                             <img class="lazyload img-fit h-100 mx-auto"
                                                  src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                 data-src="{{ uploaded_asset($detailedProduct->user->shop->logo) }}"
+                                                 data-src="{{ get_file_by_id($detailedProduct->user->shop->logo) }}"
                                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                         </a>
                                     @endif
@@ -492,7 +504,8 @@
                                                 <span class="ml-2"><i class="fa fa-times-circle" style="color:red"></i></span>
                                             @endif
                                         </a>
-                                        <div class="location opacity-70">{{ $detailedProduct->user->shop->address }}</div>
+                                        <div
+                                            class="location opacity-70">{{ $detailedProduct->user->shop->address }}</div>
                                     </div>
                                 </div>
                                 <!-- Ratting -->
@@ -555,14 +568,15 @@
                             <ul class="list-group list-group-flush">
                                 @foreach (get_best_selling_products(6, $detailedProduct->user_id) as $key => $top_product)
                                     <li class="py-3 px-0 list-group-item border-0">
-                                        <div class="row gutters-10 align-items-center hov-scale-img hov-shadow-md overflow-hidden has-transition">
+                                        <div
+                                            class="row gutters-10 align-items-center hov-scale-img hov-shadow-md overflow-hidden has-transition">
                                             <div class="col-4">
                                                 <!-- Image -->
                                                 <a href="{{ route('product', $top_product->slug) }}"
                                                    class="d-block text-reset">
                                                     <img class="img-fit lazyload h-xl-80px h-120px has-transition"
                                                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                         data-src="{{ uploaded_asset($top_product->thumbnail_img) }}"
+                                                         data-src="{{ get_file_by_id($top_product->thumbnail_img) }}"
                                                          alt="{{ $top_product->getTranslation('name') }}"
                                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>
@@ -575,7 +589,8 @@
                                                 </h4>
                                                 <div class="mt-2 ">
                                                     <!-- Price -->
-                                                    <span class="fs-14 fw-700 text-primary">{{ home_discounted_base_price($top_product) }}</span>
+                                                    <span
+                                                        class="fs-14 fw-700 text-primary">{{ home_discounted_base_price($top_product) }}</span>
                                                     <!-- Home Price -->
                                                     @if(home_price($top_product) != home_discounted_price($top_product))
                                                         <del class="fs-14 fw-700 opacity-60 ml-1">
@@ -637,9 +652,9 @@
                                                     src="https://www.dailymotion.com/embed/video/{{ explode('video/', $detailedProduct->video_link)[1] }}"></iframe>
                                         @elseif ($detailedProduct->video_provider == 'vimeo' && isset(explode('vimeo.com/', $detailedProduct->video_link)[1]))
                                             <iframe
-                                                    src="https://player.vimeo.com/video/{{ explode('vimeo.com/', $detailedProduct->video_link)[1] }}"
-                                                    width="500" height="281" frameborder="0" webkitallowfullscreen
-                                                    mozallowfullscreen allowfullscreen></iframe>
+                                                src="https://player.vimeo.com/video/{{ explode('vimeo.com/', $detailedProduct->video_link)[1] }}"
+                                                width="500" height="281" frameborder="0" webkitallowfullscreen
+                                                mozallowfullscreen allowfullscreen></iframe>
                                         @endif
                                     </div>
                                 </div>
@@ -648,7 +663,7 @@
                             <!-- Download -->
                             <div class="tab-pane fade" id="tab_default_3">
                                 <div class="py-5 text-center ">
-                                    <a href="{{ uploaded_asset($detailedProduct->pdf) }}"
+                                    <a href="{{ get_file_by_id($detailedProduct->pdf) }}"
                                        class="btn btn-primary">{{ translate('Download') }}</a>
                                 </div>
                             </div>
@@ -664,7 +679,7 @@
                                             <img class="lazyload"
                                                  src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
-                                                 @if ($review->user->avatar_original != null) data-src="{{ uploaded_asset($review->user->avatar_original) }}"
+                                                 @if ($review->user->avatar_original != null) data-src="{{ get_file_by_id($review->user->avatar_original) }}"
                                                  @else
                                                      data-src="{{ static_asset('assets/img/placeholder.jpg') }}" @endif>
                                         </span>
@@ -720,11 +735,12 @@
                                             <div class="">
                                                 <a href="{{ route('product', $related_product->slug) }}"
                                                    class="d-block">
-                                                    <img class="img-fit lazyload mx-auto h-140px h-md-190px has-transition"
-                                                         src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                         data-src="{{ uploaded_asset($related_product->thumbnail_img) }}"
-                                                         alt="{{ $related_product->getTranslation('name') }}"
-                                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                    <img
+                                                        class="img-fit lazyload mx-auto h-140px h-md-190px has-transition"
+                                                        src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                                        data-src="{{ get_file_by_id($related_product->thumbnail_img) }}"
+                                                        alt="{{ $related_product->getTranslation('name') }}"
+                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>
                                             </div>
                                             <div class="p-md-3 p-2 text-center">
@@ -733,10 +749,11 @@
                                                        class="d-block text-reset hov-text-primary">{{ $related_product->getTranslation('name') }}</a>
                                                 </h3>
                                                 <div class="fs-14 mt-3">
-                                                    <span class="fw-700 text-primary">{{ home_discounted_base_price($related_product) }}</span>
+                                                    <span
+                                                        class="fw-700 text-primary">{{ home_discounted_base_price($related_product) }}</span>
                                                     @if (home_base_price($related_product) != home_discounted_base_price($related_product))
                                                         <del
-                                                                class="fw-700 opacity-60 ml-1">{{ home_base_price($related_product) }}</del>
+                                                            class="fw-700 opacity-60 ml-1">{{ home_base_price($related_product) }}</del>
                                                     @endif
                                                 </div>
                                             </div>
@@ -759,9 +776,9 @@
                             <!-- Login & Register -->
                             @guest
                                 <p class="fs-14 fw-400 mb-0 px-4 mt-3"><a
-                                            href="{{ route('user.login') }}">{{ translate('Login') }}</a> or <a
-                                            class="mr-1"
-                                            href="{{ route('user.registration') }}">{{ translate('Register ') }}</a>{{ translate(' to submit your questions to seller') }}
+                                        href="{{ route('user.login') }}">{{ translate('Login') }}</a> or <a
+                                        class="mr-1"
+                                        href="{{ route('user.registration') }}">{{ translate('Register ') }}</a>{{ translate(' to submit your questions to seller') }}
                                     {{-- href="{{ route('user.registration') }}">{{ translate('Register ') }}</a>{{ translate(' to submit your questions to seller') }} --}}
                                 </p>
                             @endguest
@@ -821,8 +838,10 @@
                                 </svg></span>
 
                                                     <div class="ml-3">
-                                                        <div class="fs-14">{{ strip_tags($product_query->question) }}</div>
-                                                        <span class="text-secondary">{{ $product_query->user->name }} </span>
+                                                        <div
+                                                            class="fs-14">{{ strip_tags($product_query->question) }}</div>
+                                                        <span
+                                                            class="text-secondary">{{ $product_query->user->name }} </span>
                                                     </div>
                                                 </div>
                                                 <div class="answer d-flex my-2">

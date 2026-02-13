@@ -34,7 +34,8 @@
                                         <!-- Quantity -->
                                         <div class="col-md-1 col order-1 order-md-0">
                                             @if ($cartItem['digital'] != 1 && $product->auction_product == 0)
-                                                <div class="d-flex flex-column align-items-start aiz-plus-minus mr-2 ml-0">
+                                                <div
+                                                    class="d-flex flex-column align-items-start aiz-plus-minus mr-2 ml-0">
                                                     <button
                                                         class="btn col-auto btn-icon btn-sm btn-circle btn-light"
                                                         type="button" data-type="plus"
@@ -42,11 +43,12 @@
                                                         <i class="las la-plus"></i>
                                                     </button>
                                                     <input type="number" name="quantity[{{ $cartItem['id'] }}]"
-                                                        class="col border-0 text-left px-0 flex-grow-1 fs-14 input-number"
-                                                        placeholder="1" value="{{ $cartItem['quantity'] }}"
-                                                        min="{{ $product->min_qty }}"
-                                                        max="{{ $product_stock->qty }}"
-                                                        onchange="updateQuantity({{ $cartItem['id'] }}, this)" style="padding-left:0.75rem !important;">
+                                                           class="col border-0 text-left px-0 flex-grow-1 fs-14 input-number"
+                                                           placeholder="1" value="{{ $cartItem['quantity'] }}"
+                                                           min="{{ $product->min_qty }}"
+                                                           max="{{ $product_stock->qty }}"
+                                                           onchange="updateQuantity({{ $cartItem['id'] }}, this)"
+                                                           style="padding-left:0.75rem !important;">
                                                     <button
                                                         class="btn col-auto btn-icon btn-sm btn-circle btn-light"
                                                         type="button" data-type="minus"
@@ -61,31 +63,39 @@
                                         <!-- Product Image & name -->
                                         <div class="col-md-5 d-flex align-items-center mb-2 mb-md-0">
                                             <span class="mr-2 ml-0">
-                                                <img src="{{ uploaded_asset($product->thumbnail_img) }}"
-                                                    class="img-fit size-70px"
-                                                    alt="{{ $product->getTranslation('name')  }}"
-                                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                <img src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                                     class="img-fit size-70px"
+                                                     alt="{{ $product->getTranslation('name')  }}"
+                                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </span>
                                             <span class="fs-14">{{ $product_name_with_choice }}</span>
                                         </div>
                                         <!-- Price -->
                                         <div class="col-md col-4 order-2 order-md-0 my-3 my-md-0">
-                                            <span class="opacity-60 fs-12 d-block d-md-none">{{ translate('Price')}}</span>
-                                            <span class="fw-700 fs-14">{{ cart_product_price($cartItem, $product, true, false) }}</span>
+                                            <span
+                                                class="opacity-60 fs-12 d-block d-md-none">{{ translate('Price')}}</span>
+                                            <span
+                                                class="fw-700 fs-14">{{ cart_product_price($cartItem, $product, true, false) }}</span>
                                         </div>
                                         <!-- Tax -->
                                         <div class="col-md col-4 order-3 order-md-0 my-3 my-md-0">
-                                            <span class="opacity-60 fs-12 d-block d-md-none">{{ translate('Tax')}}</span>
-                                            <span class="fw-700 fs-14">{{ cart_product_tax($cartItem, $product) }}</span>
+                                            <span
+                                                class="opacity-60 fs-12 d-block d-md-none">{{ translate('Tax')}}</span>
+                                            <span
+                                                class="fw-700 fs-14">{{ cart_product_tax($cartItem, $product) }}</span>
                                         </div>
                                         <!-- Total -->
                                         <div class="col-md col-5 order-4 order-md-0 my-3 my-md-0">
-                                            <span class="opacity-60 fs-12 d-block d-md-none">{{ translate('Total')}}</span>
-                                            <span class="fw-700 fs-16 text-primary">{{ single_price(cart_product_price($cartItem, $product, false) * $cartItem['quantity']) }}</span>
+                                            <span
+                                                class="opacity-60 fs-12 d-block d-md-none">{{ translate('Total')}}</span>
+                                            <span
+                                                class="fw-700 fs-16 text-primary">{{ single_price(cart_product_price($cartItem, $product, false) * $cartItem['quantity']) }}</span>
                                         </div>
                                         <!-- Remove From Cart -->
                                         <div class="col-md-auto col-6 order-5 order-md-0 text-right">
-                                            <a href="javascript:void(0)" onclick="removeFromCartView(event, {{ $cartItem['id'] }})" class="btn btn-icon btn-sm btn-soft-primary bg-soft-secondary-base hov-bg-primary btn-circle">
+                                            <a href="javascript:void(0)"
+                                               onclick="removeFromCartView(event, {{ $cartItem['id'] }})"
+                                               class="btn btn-icon btn-sm btn-soft-primary bg-soft-secondary-base hov-bg-primary btn-circle">
                                                 <i class="las la-trash fs-16"></i>
                                             </a>
                                         </div>
@@ -112,11 +122,13 @@
                         <div class="col-md-6 text-center text-md-right">
 
                             @if(get_setting('guest_checkout_activation') == 1 || Auth::check())
-                                <a href="{{ route('checkout.shipping_info') }}" class="btn btn-primary fs-14 fw-700 rounded-0 px-4">
+                                <a href="{{ route('checkout.shipping_info') }}"
+                                   class="btn btn-primary fs-14 fw-700 rounded-0 px-4">
                                     {{ translate('Continue to Shipping')}}
                                 </a>
                             @else
-                                <button class="btn btn-primary fs-14 fw-700 rounded-0 px-4" onclick="showLoginModal()">{{ translate('Continue to Shipping')}}</button>
+                                <button class="btn btn-primary fs-14 fw-700 rounded-0 px-4"
+                                        onclick="showLoginModal()">{{ translate('Continue to Shipping')}}</button>
                             @endif
                         </div>
                     </div>

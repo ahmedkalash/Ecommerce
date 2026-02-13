@@ -15,12 +15,12 @@ class CustomerPackageResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'                    =>(int) $this->id,
-            'name'                  => $this->getTranslation('name'),
-            'logo'                  => uploaded_asset($this->logo),
-            'product_upload_limit'  =>(int) $this->product_upload,
-            'amount'                => ($this->amount > 0) ? single_price($this->amount) : translate('Free'),
-            'price'                 => (double) $this->amount,
+            'id' => (int) $this->id,
+            'name' => $this->getTranslation('name'),
+            'logo' => get_file_by_id($this->logo),
+            'product_upload_limit' => (int) $this->product_upload,
+            'amount' => ($this->amount > 0) ? single_price($this->amount) : translate('Free'),
+            'price' => (float) $this->amount,
         ];
     }
 }

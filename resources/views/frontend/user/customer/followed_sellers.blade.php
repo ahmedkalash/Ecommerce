@@ -14,19 +14,25 @@
             <div class="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 border-top border-left">
                 @foreach ($followed_sellers as $key => $followed_seller)
                     @if($followed_seller->shop !=null)
-                        <div class="col border-right border-bottom p-4 has-transition hov-shadow-out z-1" id="followed_seller_{{ $followed_seller->shop->id }}">
+                        <div class="col border-right border-bottom p-4 has-transition hov-shadow-out z-1"
+                             id="followed_seller_{{ $followed_seller->shop->id }}">
                             <!-- Shop logo -->
-                            <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}" class="d-flex mx-auto justify-content-center align-item-center h-130px w-130px  overflow-hidden hov-scale" tabindex="0" style="border: 1px solid #e5e5e5; border-radius: 50%; box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">
+                            <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}"
+                               class="d-flex mx-auto justify-content-center align-item-center h-130px w-130px  overflow-hidden hov-scale"
+                               tabindex="0"
+                               style="border: 1px solid #e5e5e5; border-radius: 50%; box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.06);">
                                 <img src="{{ static_asset('assets/img/placeholder-rect.jpg') }}"
-                                    data-src="{{ uploaded_asset($followed_seller->shop->logo) }}"
-                                    alt="{{ $followed_seller->shop->name }}"
-                                    class="img-fit lazyload"
-                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
+                                     data-src="{{ get_file_by_id($followed_seller->shop->logo) }}"
+                                     alt="{{ $followed_seller->shop->name }}"
+                                     class="img-fit lazyload"
+                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                             </a>
                             <div class="text-center">
                                 <!-- Shop name -->
                                 <h2 class="fs-14 fw-700 text-dark text-truncate-2 h-40px mt-3">
-                                    <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}" class="text-reset hov-text-primary" tabindex="0">{{ $followed_seller->shop->name }}</a>
+                                    <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}"
+                                       class="text-reset hov-text-primary"
+                                       tabindex="0">{{ $followed_seller->shop->name }}</a>
                                 </h2>
                                 <!-- Shop Rating -->
                                 <div class="rating rating-md rating-space mt-2 mb-3">
@@ -35,10 +41,13 @@
                                         {{ translate('reviews') }})</span>
                                 </div>
                                 <div class="mb-3">
-                                    <a href="{{ route("followed_seller.remove", ['id'=>$followed_seller->shop->id]) }}" class="fs-12 fw-700 hov-text-secondary-base">{{ translate('Unfollow This Seller') }}</a>
+                                    <a href="{{ route("followed_seller.remove", ['id'=>$followed_seller->shop->id]) }}"
+                                       class="fs-12 fw-700 hov-text-secondary-base">{{ translate('Unfollow This Seller') }}</a>
                                 </div>
                                 <!-- Visit Button -->
-                                <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}" class="btn btn-light text-gray-dark btn-block btn-sm rounded-0 border fw-700" tabindex="0" style="padding: 0.75rem">
+                                <a href="{{ route('shop.visit', $followed_seller->shop->slug) }}"
+                                   class="btn btn-light text-gray-dark btn-block btn-sm rounded-0 border fw-700"
+                                   tabindex="0" style="padding: 0.75rem">
                                     {{ translate('Visit Store') }}
                                 </a>
                             </div>

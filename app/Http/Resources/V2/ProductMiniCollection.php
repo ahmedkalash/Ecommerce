@@ -12,14 +12,15 @@ class ProductMiniCollection extends ResourceCollection
             'data' => $this->collection->map(function ($data) {
                 $wholesale_product =
                     ($data->wholesale_product == 1) ? true : false;
+
                 return [
                     'id' => $data->id,
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'slug' => $data->slug,
-                    'thumbnail_image' => uploaded_asset($data->thumbnail_img),
+                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
                     'has_discount' => home_base_price($data, false) != home_discounted_base_price($data, false),
-                    'discount' => "-" . discount_in_percentage($data) . "%",
+                    'discount' => '-'.discount_in_percentage($data).'%',
                     'stroked_price' => home_base_price($data),
                     'main_price' => home_discounted_base_price($data),
                     'rating' => (float) $data->rating,
@@ -27,9 +28,9 @@ class ProductMiniCollection extends ResourceCollection
                     'is_wholesale' => $wholesale_product,
                     'links' => [
                         'details' => route('products.show', $data->id),
-                    ]
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -37,7 +38,7 @@ class ProductMiniCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -53,7 +53,8 @@
                                         </span>
                                         </a>
                                         @auth
-                                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg py-0 rounded-0">
+                                            <div
+                                                class="dropdown-menu dropdown-menu-right dropdown-menu-lg py-0 rounded-0">
                                                 <div class="p-3 bg-light border-bottom"
                                                      style="color: {{ get_setting('top_header_text_color') }}">
                                                     <h6 class="mb-0">{{ translate('Notifications') }}</h6>
@@ -112,9 +113,10 @@
                                                                                     'rounded-circle';
                                                                                     }
                                                                                 @endphp
-                                                                                <img src="{{ uploaded_asset($notificationType->image) }}"
-                                                                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
-                                                                                     class="img-fit h-100 {{ $notifyImageDesign }}">
+                                                                                <img
+                                                                                    src="{{ get_file_by_id($notificationType->image) }}"
+                                                                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
+                                                                                    class="img-fit h-100 {{ $notifyImageDesign }}">
                                                                             </div>
                                                                         @endif
                                                                         <div>
@@ -170,10 +172,10 @@
 
                                                                             @if ($isLinkable = true)
                                                                                 <a
-                                                                                        href="{{ route('notification.read-and-redirect', encrypt($notification->id)) }}">
+                                                                                    href="{{ route('notification.read-and-redirect', encrypt($notification->id)) }}">
                                                                                     @endif
                                                                                     <span
-                                                                                            class="fs-12 text-dark text-truncate-2">{!! $notifyContent !!}</span>
+                                                                                        class="fs-12 text-dark text-truncate-2">{!! $notifyContent !!}</span>
                                                                                     @if ($isLinkable = true)
                                                                                 </a>
                                                                             @endif
@@ -220,19 +222,23 @@
                                 <div class="dropdown-menu dropdown-menu-right py-0" style="min-width: 200px;">
                                     <!-- Language Switcher -->
                                     @if (get_setting('show_language_switcher') == 'on')
-                                        <div class="dropdown-submenu px-2 py-2 mt-1 ml-1 border-bottom border-soft-light hover-bg-light"
-                                             style="min-height: 40px;">
-                                            <div class="form-control form-control-sm border-0 bg-transparent p-0 w-100 cursor-pointer hover-text-primary h-100 d-flex align-items-center justify-content-between"
-                                                 onclick="toggleChildDropdown(this, event)">
+                                        <div
+                                            class="dropdown-submenu px-2 py-2 mt-1 ml-1 border-bottom border-soft-light hover-bg-light"
+                                            style="min-height: 40px;">
+                                            <div
+                                                class="form-control form-control-sm border-0 bg-transparent p-0 w-100 cursor-pointer hover-text-primary h-100 d-flex align-items-center justify-content-between"
+                                                onclick="toggleChildDropdown(this, event)">
                                                 <span>{{ $system_language->name }}</span>
                                                 <i class="la la-angle-right"></i>
                                             </div>
 
                                             <!-- Language Child Dropdown -->
-                                            <div class="dropdown-menu dropdown-menu-right py-0 header-drop child-dropdown"
-                                                 style="min-width: 200px; left: 100%; top: 1px!important; margin-top: -1px;">
+                                            <div
+                                                class="dropdown-menu dropdown-menu-right py-0 header-drop child-dropdown"
+                                                style="min-width: 200px; left: 100%; top: 1px!important; margin-top: -1px;">
                                                 @foreach (get_all_active_language() as $language)
-                                                    <div class="px-2 py-1 border-bottom border-soft-light hover-bg-light">
+                                                    <div
+                                                        class="px-2 py-1 border-bottom border-soft-light hover-bg-light">
                                                         <a href="javascript:void(0)" class="d-block text-dark"
                                                            data-flag="{{ $language->code }}"
                                                            onclick="changeLanguage('{{ $language->code }}')">
@@ -255,20 +261,24 @@
                                         @php
                                             $system_currency = get_system_currency();
                                         @endphp
-                                        <div class="dropdown-submenu px-2 py-2 mt-1 ml-1 border-bottom border-soft-light hover-bg-light"
-                                             style="min-height: 40px;">
-                                            <div class="form-control form-control-sm border-0 bg-transparent p-0 w-100 cursor-pointer hover-text-primary h-100 d-flex align-items-center justify-content-between"
-                                                 onclick="toggleChildDropdown(this, event)">
+                                        <div
+                                            class="dropdown-submenu px-2 py-2 mt-1 ml-1 border-bottom border-soft-light hover-bg-light"
+                                            style="min-height: 40px;">
+                                            <div
+                                                class="form-control form-control-sm border-0 bg-transparent p-0 w-100 cursor-pointer hover-text-primary h-100 d-flex align-items-center justify-content-between"
+                                                onclick="toggleChildDropdown(this, event)">
                                             <span>{{ $system_currency->name ?? ''}}
                                                 ({{ $system_currency->symbol ?? ''}})</span>
                                                 <i class="la la-angle-right"></i>
                                             </div>
 
                                             <!-- Currency Child Dropdown -->
-                                            <div class="dropdown-menu dropdown-menu-right py-0 header-drop child-dropdown"
-                                                 style="min-width: 200px; left: 100%; top: 1px!important; margin-top: -1px;">
+                                            <div
+                                                class="dropdown-menu dropdown-menu-right py-0 header-drop child-dropdown"
+                                                style="min-width: 200px; left: 100%; top: 1px!important; margin-top: -1px;">
                                                 @foreach (get_all_active_currency() as $currency)
-                                                    <div class="px-2 py-1 border-bottom border-soft-light hover-bg-light">
+                                                    <div
+                                                        class="px-2 py-1 border-bottom border-soft-light hover-bg-light">
                                                         <a href="javascript:void(0)" class="d-block text-dark"
                                                            data-currency="{{ $currency->code }}"
                                                            onclick="changeCurrency('{{ $currency->code }}')">
@@ -309,8 +319,9 @@
 </div>
 
 
-<header class="@if (get_setting('header_stikcy') == 'on') sticky-top @endif z-1020 middle-background-color-visibility stikcy-header-visibility pb-2 pt-0 mt-n1"
-        style="background-color: {{ get_setting('middle_header_bg_color') }}">
+<header
+    class="@if (get_setting('header_stikcy') == 'on') sticky-top @endif z-1020 middle-background-color-visibility stikcy-header-visibility pb-2 pt-0 mt-n1"
+    style="background-color: {{ get_setting('middle_header_bg_color') }}">
     <!-- Search Bar -->
     <div class="position-relative logo-bar-area border-md-nonea z-1025">
         <div class="container">
@@ -336,7 +347,7 @@
                             $header_logo = get_setting('header_logo');
                         @endphp
                         @if ($header_logo != null)
-                            <img id="header-logo-preview" src="{{ uploaded_asset($header_logo) }}"
+                            <img id="header-logo-preview" src="{{ get_file_by_id($header_logo) }}"
                                  alt="{{ env('APP_NAME') }}"
                                  class="mw-100 h-30px h-md-40px" height="40">
                         @else
@@ -453,7 +464,7 @@
                     <div class="container h-100">
                         <div class="d-flex align-items-center h-100 justify-content-end">
                             <div
-                                    class="position-relative flex-grow-1 h-100 d-flex align-items-center justify-content-end">
+                                class="position-relative flex-grow-1 h-100 d-flex align-items-center justify-content-end">
                                 <form action="{{ route('search') }}" method="GET" class="stop-propagation w-100">
                                     <div class="d-flex position-relative align-items-center">
                                         <div class="search-input-box flex-grow-1">
@@ -484,8 +495,9 @@
                                     </div>
                                 </form>
 
-                                <div class="typed-search-box stop-propagation document-click-d-none d-none bg-white rounded shadow-lg position-absolute left-0 top-100 w-100"
-                                     style="min-height: 200px">
+                                <div
+                                    class="typed-search-box stop-propagation document-click-d-none d-none bg-white rounded shadow-lg position-absolute left-0 top-100 w-100"
+                                    style="min-height: 200px">
                                     <div class="search-preloader absolute-top-center">
                                         <div class="dot-loader">
                                             <div></div>
@@ -528,13 +540,13 @@
                     <div>
                         @auth
                             <span
-                                    class="d-flex align-items-center nav-user-info py-20px @if (isAdmin()) ml-3 @else ml-2 @endif"
-                                    id="nav-user-info">
+                                class="d-flex align-items-center nav-user-info py-20px @if (isAdmin()) ml-3 @else ml-2 @endif"
+                                id="nav-user-info">
                             <!-- Image -->
                             <span
-                                    class="size-40px rounded-circle overflow-hidden border border-transparent nav-user-img">
+                                class="size-40px rounded-circle overflow-hidden border border-transparent nav-user-img">
                                 @if ($user->avatar_original != null)
-                                    <img src="{{ uploaded_asset(Auth::user()->avatar_original) }}" class="img-fit h-100"
+                                    <img src="{{ get_file_by_id(Auth::user()->avatar_original) }}" class="img-fit h-100"
                                          alt="{{ translate('avatar') }}"
                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                 @else
@@ -552,7 +564,7 @@
                             <span class="d-flex align-items-center nav-user-info ml-2">
                             <!-- Image -->
                             <span
-                                    class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
+                                class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="19.902" height="20.012"
                                      viewBox="0 0 19.902 20.012">
                                     <path id="fe2df171891038b33e9624c27e96e367"
@@ -595,7 +607,7 @@
                                                   fill="#b5b5c0"/>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
                                     </a>
                                 </li>
                             @else
@@ -609,7 +621,7 @@
                                                   fill="#b5b5c0"/>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
                                     </a>
                                 </li>
                             @endif
@@ -649,7 +661,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Purchase History') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Purchase History') }}</span>
                                     </a>
                                 </li>
 
@@ -664,7 +676,7 @@
                                                       transform="translate(-14072 -885.998)" fill="#b5b5bf"/>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('Preorder List') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('Preorder List') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -685,7 +697,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
                                     </a>
                                 </li>
                                 @if (get_setting('conversation_system') == 1)
@@ -711,7 +723,7 @@
                                                 </g>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('Conversations') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('Conversations') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -736,7 +748,7 @@
                                                 </g>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('My Wallet') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('My Wallet') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -756,7 +768,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Support Ticket') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Support Ticket') }}</span>
                                     </a>
                                 </li>
                             @endif
@@ -777,7 +789,7 @@
                                         </g>
                                     </svg>
                                     <span
-                                            class="user-top-menu-name text-primary has-transition ml-3">{{ translate('Logout') }}</span>
+                                        class="user-top-menu-name text-primary has-transition ml-3">{{ translate('Logout') }}</span>
                                 </a>
                             </li>
                         </ul>

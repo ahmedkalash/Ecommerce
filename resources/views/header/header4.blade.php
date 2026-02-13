@@ -115,8 +115,8 @@
 </div>
 
 <header
-        class="@if (get_setting('header_stikcy') == 'on') sticky-top @endif z-1020 violet-cart middle-background-color-visibility stikcy-header-visibility"
-        style="background-color: {{ get_setting('middle_header_bg_color') }}">
+    class="@if (get_setting('header_stikcy') == 'on') sticky-top @endif z-1020 violet-cart middle-background-color-visibility stikcy-header-visibility"
+    style="background-color: {{ get_setting('middle_header_bg_color') }}">
     <!-- Search Bar -->
     <div class="position-relative logo-bar-area border-md-nonea z-1025">
         <div class="container">
@@ -141,7 +141,7 @@
                             $header_logo = get_setting('header_logo');
                         @endphp
                         @if ($header_logo != null)
-                            <img id="header-logo-preview" src="{{ uploaded_asset($header_logo) }}"
+                            <img id="header-logo-preview" src="{{ get_file_by_id($header_logo) }}"
                                  alt="{{ env('APP_NAME') }}"
                                  class="mw-100 h-30px h-md-40px" height="40">
                         @else
@@ -160,13 +160,13 @@
                 </div>
                 <!-- Search field -->
                 <div
-                        class="front-header-search flex-grow-1 rounded-corner-8px d-flex align-items-center bg-white mx-xl-5">
+                    class="front-header-search flex-grow-1 rounded-corner-8px d-flex align-items-center bg-white mx-xl-5">
                     <div class="position-relative flex-grow-1 px-3 px-lg-0">
                         <form action="{{ route('search') }}" method="GET" class="stop-propagation">
                             <div class="d-flex position-relative align-items-center">
                                 <div class="d-lg-none" data-toggle="class-toggle" data-target=".front-header-search">
                                     <button class="btn px-2" type="button"><i
-                                                class="la la-2x la-long-arrow-left"></i></button>
+                                            class="la la-2x la-long-arrow-left"></i></button>
                                 </div>
                                 <div class="search-input-box">
                                     <input type="text"
@@ -186,8 +186,9 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="typed-search-box stop-propagation document-click-d-none d-none bg-white rounded shadow-lg position-absolute left-0 top-100 w-100"
-                             style="min-height: 200px">
+                        <div
+                            class="typed-search-box stop-propagation document-click-d-none d-none bg-white rounded shadow-lg position-absolute left-0 top-100 w-100"
+                            style="min-height: 200px">
                             <div class="search-preloader absolute-top-center">
                                 <div class="dot-loader">
                                     <div></div>
@@ -241,7 +242,7 @@
                                 </svg>
                                 @if (Auth::check() && count($user->unreadNotifications) > 0)
                                     <span
-                                            class="badge badge-primary badge-inline badge-pill absolute-top-right--10px unread-notification-count">{{ count($user->unreadNotifications) }}</span>
+                                        class="badge badge-primary badge-inline badge-pill absolute-top-right--10px unread-notification-count">{{ count($user->unreadNotifications) }}</span>
                                 @endif
                             </span>
                             </a>
@@ -298,9 +299,10 @@
                                                                         $notifyImageDesign = 'rounded-circle';
                                                                         }
                                                                     @endphp
-                                                                    <img src="{{ uploaded_asset($notificationType->image) }}"
-                                                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
-                                                                         class="img-fit h-100 {{ $notifyImageDesign }}">
+                                                                    <img
+                                                                        src="{{ get_file_by_id($notificationType->image) }}"
+                                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
+                                                                        class="img-fit h-100 {{ $notifyImageDesign }}">
                                                                 </div>
                                                             @endif
                                                             <div>
@@ -348,10 +350,10 @@
 
                                                                 @if ($isLinkable = true)
                                                                     <a
-                                                                            href="{{ route('notification.read-and-redirect', encrypt($notification->id)) }}">
+                                                                        href="{{ route('notification.read-and-redirect', encrypt($notification->id)) }}">
                                                                         @endif
                                                                         <span
-                                                                                class="fs-12 text-dark text-truncate-2">{!! $notifyContent !!}</span>
+                                                                            class="fs-12 text-dark text-truncate-2">{!! $notifyContent !!}</span>
                                                                         @if ($isLinkable = true)
                                                                     </a>
                                                                 @endif
@@ -387,7 +389,7 @@
                         <!-- Image -->
                         <span class="size-40px rounded-circle overflow-hidden border border-transparent nav-user-img">
                             @if ($user->avatar_original != null)
-                                <img src="{{ uploaded_asset(Auth::user()->avatar_original) }}" class="img-fit h-100"
+                                <img src="{{ get_file_by_id(Auth::user()->avatar_original) }}" class="img-fit h-100"
                                      alt="{{ translate('avatar') }}"
                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                             @else
@@ -405,7 +407,7 @@
                         <span class="d-flex align-items-center nav-user-info ml-3">
                         <!-- Image -->
                         <span
-                                class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
+                            class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19.902" height="20.012"
                                  viewBox="0 0 19.902 20.012">
                                 <path id="fe2df171891038b33e9624c27e96e367"
@@ -441,7 +443,7 @@
                                                   fill="#b5b5c0"/>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
                                     </a>
                                 </li>
                             @else
@@ -455,7 +457,7 @@
                                                   fill="#b5b5c0"/>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Dashboard') }}</span>
                                     </a>
                                 </li>
                             @endif
@@ -495,7 +497,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Purchase History') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Purchase History') }}</span>
                                     </a>
                                 </li>
 
@@ -510,7 +512,7 @@
                                                       transform="translate(-14072 -885.998)" fill="#b5b5bf"/>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('Preorder List') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('Preorder List') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -531,7 +533,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Downloads') }}</span>
                                     </a>
                                 </li>
                                 @if (get_setting('conversation_system') == 1)
@@ -557,7 +559,7 @@
                                                 </g>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('Conversations') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('Conversations') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -582,7 +584,7 @@
                                                 </g>
                                             </svg>
                                             <span
-                                                    class="user-top-menu-name has-transition ml-3">{{ translate('My Wallet') }}</span>
+                                                class="user-top-menu-name has-transition ml-3">{{ translate('My Wallet') }}</span>
                                         </a>
                                     </li>
                                 @endif
@@ -602,7 +604,7 @@
                                             </g>
                                         </svg>
                                         <span
-                                                class="user-top-menu-name has-transition ml-3">{{ translate('Support Ticket') }}</span>
+                                            class="user-top-menu-name has-transition ml-3">{{ translate('Support Ticket') }}</span>
                                     </a>
                                 </li>
                             @endif
@@ -623,7 +625,7 @@
                                         </g>
                                     </svg>
                                     <span
-                                            class="user-top-menu-name text-primary has-transition ml-3">{{ translate('Logout') }}</span>
+                                        class="user-top-menu-name text-primary has-transition ml-3">{{ translate('Logout') }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -648,7 +650,7 @@
                                 <span class="fw-700 fs-16 mr-3">{{ translate('Categories') }}</span>
                                 <a href="{{ route('categories.all') }}" class="text-reset categoriesAll">
                                     <span
-                                            class="d-none d-lg-inline-block animate-underline-white">({{ translate('See All') }})</span>
+                                        class="d-none d-lg-inline-block animate-underline-white">({{ translate('See All') }})</span>
                                 </a>
                             </div>
                             <i class="las la-angle-down has-transition" id="category-menu-bar-icon"

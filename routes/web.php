@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerificationController;
-
 // VerificationFirstController removed - using standard register-then-verify flow
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
@@ -88,12 +87,14 @@ Route::get('/refresh-csrf', function () {
 });
 
 // AIZ Uploader
-Route::controller(AizUploadController::class)->group(function () {
-    Route::post('/aiz-uploader', 'show_uploader');
-    Route::post('/aiz-uploader/upload', 'upload');
-    Route::get('/aiz-uploader/get-uploaded-files', 'get_uploaded_files');
-    Route::post('/aiz-uploader/get_file_by_ids', 'get_preview_files');
-    Route::get('/aiz-uploader/download/{id}', 'attachment_download')->name('download_attachment');
+Route::group(['middleware' => ['auth:admin,web']], function () {
+    Route::controller(AizUploadController::class)->group(function () {
+        Route::post('/aiz-uploader', 'show_uploader');
+        Route::post('/aiz-uploader/upload', 'upload');
+        Route::get('/aiz-uploader/get-uploaded-files', 'get_uploaded_files');
+        Route::post('/aiz-uploader/get_file_by_ids', 'get_preview_files');
+        Route::get('/aiz-uploader/download/{id}', 'attachment_download')->name('download_attachment');
+    });
 });
 
 Route::group(['middleware' => ['prevent-back-history']], function () {
@@ -625,7 +626,7 @@ Route::redirect('/home', '/');
 
 // Note: do not use this "Route::redirect('/login', '/users/login')" to redirect as we only need to redirect
 // the 'get' route, not the 'post'. 'POST /login' remains handled by Auth::routes() for actual authentication
-Route::get('/login', fn() => redirect()->route('user.login'))->name('login');
+Route::get('/login', fn () => redirect()->route('user.login'))->name('login');
 
 Route::middleware(['user', 'verified', 'unbanned'])->post('/profile/email-verify',
     [App\Http\Controllers\User\ProfileController::class, 'verifyEmailCode'])->name('user.email.update.verify.code');

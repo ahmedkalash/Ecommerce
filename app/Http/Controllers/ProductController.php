@@ -4,51 +4,38 @@ namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
 use App\Http\Requests\ProductRequest;
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\ProductTranslation;
-use App\Models\Category;
 use App\Models\AttributeValue;
 use App\Models\Cart;
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductCategory;
-use App\Models\Review;
-use App\Models\Wishlist;
+use App\Models\ProductTranslation;
 use App\Models\User;
+use App\Models\Wishlist;
 use App\Notifications\ShopProductNotification;
-use Carbon\Carbon;
-use CoreComponentRepository;
+use App\Services\FrequentlyBoughtProductService;
+use App\Services\ProductFlashDealService;
+use App\Services\ProductService;
+use App\Services\ProductStockService;
+use App\Services\ProductTaxService;
 use Artisan;
 use Cache;
-use App\Services\ProductService;
-use App\Services\ProductTaxService;
-use App\Services\ProductFlashDealService;
-use App\Services\ProductStockService;
-use App\Services\FrequentlyBoughtProductService;
+use Carbon\Carbon;
+use CoreComponentRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
 
 class ProductController extends Controller
 {
-    protected $productService;
-    protected $productTaxService;
-    protected $productFlashDealService;
-    protected $productStockService;
-    protected $frequentlyBoughtProductService;
-
     public function __construct(
-        ProductService $productService,
-        ProductTaxService $productTaxService,
-        ProductFlashDealService $productFlashDealService,
-        ProductStockService $productStockService,
-        FrequentlyBoughtProductService $frequentlyBoughtProductService
+        protected ProductService $productService,
+        protected ProductTaxService $productTaxService,
+        protected ProductFlashDealService $productFlashDealService,
+        protected ProductStockService $productStockService,
+        protected FrequentlyBoughtProductService $frequentlyBoughtProductService
     ) {
-        $this->productService = $productService;
-        $this->productTaxService = $productTaxService;
-        $this->productFlashDealService = $productFlashDealService;
-        $this->productStockService = $productStockService;
-        $this->frequentlyBoughtProductService = $frequentlyBoughtProductService;
-
         // Staff Permission Check
         $this->middleware(['permission:add_new_product'])->only('create');
         $this->middleware(['permission:show_all_products'])->only('all_products');
@@ -59,6 +46,7 @@ class ProductController extends Controller
         $this->middleware(['permission:product_delete'])->only('destroy');
         $this->middleware(['permission:set_category_wise_discount'])->only('categoriesWiseProductDiscount');
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -76,7 +64,7 @@ class ProductController extends Controller
         $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0);
 
         if ($request->type != null) {
-            $var = explode(",", $request->type);
+            $var = explode(',', $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
@@ -85,9 +73,9 @@ class ProductController extends Controller
         if ($request->search != null) {
             $sort_search = $request->search;
             $products = $products
-                ->where('name', 'like', '%' . $sort_search . '%')
+                ->where('name', 'like', '%'.$sort_search.'%')
                 ->orWhereHas('stocks', function ($q) use ($sort_search) {
-                    $q->where('sku', 'like', '%' . $sort_search . '%');
+                    $q->where('sku', 'like', '%'.$sort_search.'%');
                 });
         }
 
@@ -114,11 +102,11 @@ class ProductController extends Controller
         }
         if ($request->search != null) {
             $products = $products
-                ->where('name', 'like', '%' . $request->search . '%');
+                ->where('name', 'like', '%'.$request->search.'%');
             $sort_search = $request->search;
         }
         if ($request->type != null) {
-            $var = explode(",", $request->type);
+            $var = explode(',', $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
@@ -131,7 +119,9 @@ class ProductController extends Controller
         if ($product_type == 'digital') {
             return view('backend.product.digital_products.index', compact('products', 'sort_search', 'type'));
         }
-        return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+
+        return view('backend.product.products.index',
+            compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
 
     public function all_products(Request $request)
@@ -151,13 +141,13 @@ class ProductController extends Controller
         if ($request->search != null) {
             $sort_search = $request->search;
             $products = $products
-                ->where('name', 'like', '%' . $sort_search . '%')
+                ->where('name', 'like', '%'.$sort_search.'%')
                 ->orWhereHas('stocks', function ($q) use ($sort_search) {
-                    $q->where('sku', 'like', '%' . $sort_search . '%');
+                    $q->where('sku', 'like', '%'.$sort_search.'%');
                 });
         }
         if ($request->type != null) {
-            $var = explode(",", $request->type);
+            $var = explode(',', $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
@@ -167,19 +157,15 @@ class ProductController extends Controller
         $products = $products->orderBy('created_at', 'desc')->paginate(15);
         $type = 'All';
 
-        return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
+        return view('backend.product.products.index',
+            compact('products', 'type', 'col_name', 'query', 'seller_id', 'sort_search'));
     }
-
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        CoreComponentRepository::initializeCache();
-
         $categories = Category::where('parent_id', 0)
             ->where('digital', 0)
             ->with('childrenCategories')
@@ -195,7 +181,7 @@ class ProductController extends Controller
         $html = '';
 
         foreach ($all_attribute_values as $row) {
-            $html .= '<option value="' . $row->value . '">' . $row->value . '</option>';
+            $html .= '<option value="'.$row->value.'">'.$row->value.'</option>';
         }
 
         echo json_encode($html);
@@ -210,41 +196,42 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $product = $this->productService->store($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount',
+            'flash_discount_type',
         ]));
         $request->merge(['product_id' => $product->id]);
 
-        //Product categories
+        // Product categories
         $product->categories()->attach($request->category_ids);
 
-        //VAT & Tax
+        // VAT & Tax
         if ($request->tax_id) {
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id', 'tax', 'tax_type', 'product_id',
             ]));
         }
 
-        //Flash Deal
+        // Flash Deal
         $this->productFlashDealService->store($request->only([
-            'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            'flash_deal_id', 'flash_discount', 'flash_discount_type',
         ]), $product);
 
-        //Product Stock
+        // Product Stock
         $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
+            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
         ]), $product);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
         ]));
-       
+
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id'
+            'lang', 'name', 'unit', 'description', 'product_id',
         ]));
-        
+
         flash(translate('Product has been inserted successfully'))->success();
 
         Artisan::call('view:clear');
@@ -276,7 +263,7 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
         if ($product->digital == 1) {
-            return redirect('admin/digitalproducts/' . $id . '/edit');
+            return redirect('admin/digitalproducts/'.$id.'/edit');
         }
 
         $lang = $request->lang;
@@ -285,6 +272,7 @@ class ProductController extends Controller
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
+
         return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang'));
     }
 
@@ -298,7 +286,7 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         if ($product->digital == 1) {
-            return redirect('digitalproducts/' . $id . '/edit');
+            return redirect('digitalproducts/'.$id.'/edit');
         }
         $lang = $request->lang;
         $tags = json_decode($product->tags);
@@ -321,49 +309,49 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
 
-        //Product
+        // Product
         $product = $this->productService->update($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount',
+            'flash_discount_type',
         ]), $product);
 
         $request->merge(['product_id' => $product->id]);
 
-        //Product categories
+        // Product categories
         $product->categories()->sync($request->category_ids);
 
-
-        //Product Stock
+        // Product Stock
         $product->stocks()->delete();
         $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id'
+            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
         ]), $product);
 
-        //Flash Deal
+        // Flash Deal
         $this->productFlashDealService->store($request->only([
-            'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            'flash_deal_id', 'flash_discount', 'flash_discount_type',
         ]), $product);
 
-        //VAT & Tax
+        // VAT & Tax
         if ($request->tax_id) {
             $product->taxes()->delete();
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id', 'tax', 'tax_type', 'product_id',
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
         ]));
 
         // Product Translations
         ProductTranslation::updateOrCreate(
             $request->only([
-                'lang', 'product_id'
+                'lang', 'product_id',
             ]),
             $request->only([
-                'name', 'unit', 'description'
+                'name', 'unit', 'description',
             ])
         );
 
@@ -371,9 +359,10 @@ class ProductController extends Controller
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
-        if($request->has('tab') && $request->tab != null){
-            return Redirect::to(URL::previous() . "#" . $request->tab);
+        if ($request->has('tab') && $request->tab != null) {
+            return Redirect::to(URL::previous().'#'.$request->tab);
         }
+
         return back();
     }
 
@@ -385,13 +374,13 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-       $result=  $this->single_product_delete($id);
+        $result = $this->single_product_delete($id);
         if ($result) {
             flash(translate('Product has been deleted successfully'))->success();
-        }
-        else {
+        } else {
             flash(translate('Something went wrong'))->error();
         }
+
         return back();
     }
 
@@ -440,17 +429,17 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        //Product
+        // Product
         $product_new = $this->productService->product_duplicate_store($product);
 
-        //Product Stock
+        // Product Stock
         $this->productStockService->product_duplicate_store($product->stocks, $product_new);
 
-        //VAT & Tax
+        // VAT & Tax
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
-        
+
         // Product Categories
-        foreach($product->product_categories as $product_category){
+        foreach ($product->product_categories as $product_category) {
             ProductCategory::insert([
                 'product_id' => $product_new->id,
                 'category_id' => $product_category->category_id,
@@ -458,22 +447,25 @@ class ProductController extends Controller
         }
 
         // Frequently Bought Products
-        $this->frequentlyBoughtProductService->product_duplicate_store($product->frequently_bought_products, $product_new);
+        $this->frequentlyBoughtProductService->product_duplicate_store($product->frequently_bought_products,
+            $product_new);
 
         flash(translate('Product has been duplicated successfully'))->success();
-        if ($request->type == 'In House')
+        if ($request->type == 'In House') {
             return redirect()->route('products.admin');
-        elseif ($request->type == 'Seller')
+        } elseif ($request->type == 'Seller') {
             return redirect()->route('products.seller');
-        elseif ($request->type == 'All')
+        } elseif ($request->type == 'All') {
             return redirect()->route('products.all');
-        elseif ($request->type == 'SellerProfile')
-             return back();
+        } elseif ($request->type == 'SellerProfile') {
+            return back();
+        }
     }
 
     public function get_products_by_brand(Request $request)
     {
         $products = Product::where('brand_id', $request->brand_id)->get();
+
         return view('partials.product_select', compact('products'));
     }
 
@@ -483,6 +475,7 @@ class ProductController extends Controller
         $product->todays_deal = $request->status;
         $product->save();
         Cache::forget('todays_deal_products');
+
         return 1;
     }
 
@@ -506,6 +499,7 @@ class ProductController extends Controller
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
+
         return 1;
     }
 
@@ -527,16 +521,17 @@ class ProductController extends Controller
 
         $product->save();
 
-        $users                  = User::findMany($product->user_id);
-        $data = array();
-        $data['product_type']   = $product->digital ==  0 ? 'physical' : 'digital';
-        $data['status']         = $request->approved == 1 ? 'approved' : 'rejected';
-        $data['product']        = $product;
+        $users = User::findMany($product->user_id);
+        $data = [];
+        $data['product_type'] = $product->digital == 0 ? 'physical' : 'digital';
+        $data['status'] = $request->approved == 1 ? 'approved' : 'rejected';
+        $data['product'] = $product;
         $data['notification_type_id'] = get_notification_type('seller_product_approved', 'type')->id;
         Notification::send($users, new ShopProductNotification($data));
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
+
         return 1;
     }
 
@@ -547,14 +542,16 @@ class ProductController extends Controller
         if ($product->save()) {
             Artisan::call('view:clear');
             Artisan::call('cache:clear');
+
             return 1;
         }
+
         return 0;
     }
 
     public function sku_combination(Request $request)
     {
-        $options = array();
+        $options = [];
         if ($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0) {
             $colors_active = 1;
             array_push($options, $request->colors);
@@ -567,10 +564,10 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 // foreach (json_decode($request[$name][0]) as $key => $item) {
                 if (isset($request[$name])) {
-                    $data = array();
+                    $data = [];
                     foreach ($request[$name] as $key => $item) {
                         // array_push($data, $item->value);
                         array_push($data, $item);
@@ -580,15 +577,17 @@ class ProductController extends Controller
             }
         }
 
-        $combinations = (new CombinationService())->generate_combination($options);
-        return view('backend.product.products.sku_combinations', compact('combinations', 'unit_price', 'colors_active', 'product_name'));
+        $combinations = (new CombinationService)->generate_combination($options);
+
+        return view('backend.product.products.sku_combinations',
+            compact('combinations', 'unit_price', 'colors_active', 'product_name'));
     }
 
     public function sku_combination_edit(Request $request)
     {
         $product = Product::findOrFail($request->id);
 
-        $options = array();
+        $options = [];
         if ($request->has('colors_active') && $request->has('colors') && count($request->colors) > 0) {
             $colors_active = 1;
             array_push($options, $request->colors);
@@ -601,10 +600,10 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 // foreach (json_decode($request[$name][0]) as $key => $item) {
                 if (isset($request[$name])) {
-                    $data = array();
+                    $data = [];
                     foreach ($request[$name] as $key => $item) {
                         // array_push($data, $item->value);
                         array_push($data, $item);
@@ -614,19 +613,24 @@ class ProductController extends Controller
             }
         }
 
-        $combinations = (new CombinationService())->generate_combination($options);
-        return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product'));
+        $combinations = (new CombinationService)->generate_combination($options);
+
+        return view('backend.product.products.sku_combinations_edit',
+            compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product'));
     }
 
     public function product_search(Request $request)
     {
         $products = $this->productService->product_search($request->except(['_token']));
+
         return view('partials.product.product_search', compact('products'));
     }
 
-    public function get_selected_products(Request $request){
+    public function get_selected_products(Request $request)
+    {
         $products = product::whereIn('id', $request->product_ids)->get();
-        return  view('partials.product.frequently_bought_selected_product', compact('products'));
+
+        return view('partials.product.frequently_bought_selected_product', compact('products'));
     }
 
     public function setProductDiscount(Request $request)

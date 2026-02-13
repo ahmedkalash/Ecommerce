@@ -3,7 +3,7 @@
         {{ translate('Any additional info?') }}
     </h3>
     <textarea name="additional_info" rows="5" class="form-control rounded-0"
-        placeholder="{{ translate('Type your text...') }}"></textarea>
+              placeholder="{{ translate('Type your text...') }}"></textarea>
 </div>
 <div>
     <h3 class="fs-16 fw-700 text-dark">
@@ -14,12 +14,12 @@
             <div class="col-xl-4 col-md-6">
                 <label class="aiz-megabox d-block mb-3">
                     <input value="{{ $payment_method->name }}" class="online_payment" type="radio"
-                        name="payment_option" checked>
+                           name="payment_option" checked>
                     <span class="d-flex align-items-center justify-content-between aiz-megabox-elem rounded-0 p-3">
                         <span class="d-block fw-400 fs-14">{{ ucfirst(translate($payment_method->name)) }}</span>
                         <span class="rounded-1 h-40px overflow-hidden">
                             <img src="{{ static_asset('assets/img/cards/'.$payment_method->name.'.png') }}"
-                            class="img-fit h-100">
+                                 class="img-fit h-100">
                         </span>
                     </span>
                 </label>
@@ -45,12 +45,12 @@
                 <div class="col-xl-4 col-md-6">
                     <label class="aiz-megabox d-block mb-3">
                         <input value="cash_on_delivery" class="online_payment" type="radio"
-                            name="payment_option" checked>
+                               name="payment_option" checked>
                         <span class="d-flex align-items-center justify-content-between aiz-megabox-elem rounded-0 p-3">
                             <span class="d-block fw-400 fs-14">{{ translate('Cash on Delivery') }}</span>
                             <span class="rounded-1 h-40px w-70px overflow-hidden">
                                 <img src="{{ static_asset('assets/img/cards/cod.png') }}"
-                                class="img-fit h-100">
+                                     class="img-fit h-100">
                             </span>
                         </span>
                     </label>
@@ -65,14 +65,15 @@
                     <div class="col-xl-4 col-md-6">
                         <label class="aiz-megabox d-block mb-3">
                             <input value="{{ $method->heading }}" type="radio"
-                                name="payment_option" class="offline_payment_option"
-                                onchange="toggleManualPaymentData({{ $method->id }})"
-                                data-id="{{ $method->id }}" checked>
-                            <span class="d-flex align-items-center justify-content-between aiz-megabox-elem rounded-0 p-3">
+                                   name="payment_option" class="offline_payment_option"
+                                   onchange="toggleManualPaymentData({{ $method->id }})"
+                                   data-id="{{ $method->id }}" checked>
+                            <span
+                                class="d-flex align-items-center justify-content-between aiz-megabox-elem rounded-0 p-3">
                                 <span class="d-block fw-400 fs-14">{{ $method->heading }}</span>
                                 <span class="rounded-1 h-40px w-70px overflow-hidden">
-                                    <img src="{{ uploaded_asset($method->photo) }}"
-                                    class="img-fit h-100">
+                                    <img src="{{ get_file_by_id($method->photo) }}"
+                                         class="img-fit h-100">
                                 </span>
                             </span>
                         </label>
@@ -116,8 +117,8 @@
                 </div>
                 <div class="col-md-9">
                     <input type="text" class="form-control mb-3" name="trx_id" onchange="stepCompletionPaymentInfo()"
-                        id="trx_id" placeholder="{{ translate('Transaction ID') }}"
-                        required>
+                           id="trx_id" placeholder="{{ translate('Transaction ID') }}"
+                           required>
                 </div>
             </div>
             <div class="form-group row">
@@ -152,7 +153,7 @@
                 </button>
             @else
                 <button type="button" onclick="use_wallet()"
-                    class="btn btn-primary fs-14 fw-700 px-5 rounded-0">
+                        class="btn btn-primary fs-14 fw-700 px-5 rounded-0">
                     {{ translate('Pay with wallet') }}
                 </button>
             @endif

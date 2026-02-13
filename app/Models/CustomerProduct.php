@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CustomerProduct extends Model
 {
@@ -16,6 +17,7 @@ class CustomerProduct extends Model
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $customer_product_translations = $this->customer_product_translations->where('lang', $lang)->first();
+
         return $customer_product_translations != null ? $customer_product_translations->$field : $this->$field;
     }
 
@@ -67,6 +69,6 @@ class CustomerProduct extends Model
 
     public function thumbnail()
     {
-        return $this->belongsTo(Upload::class, 'thumbnail_img');
+        return $this->belongsTo(Media::class, 'thumbnail_img');
     }
 }

@@ -68,3 +68,5 @@ _ide_helper.php
 /storage/logs/browser.log
 /storage/logs/seller_login.log
 /test_results.txt
+/database/seeders/media_source/*
+

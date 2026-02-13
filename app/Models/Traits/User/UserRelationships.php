@@ -24,7 +24,7 @@ use App\Models\Review;
 use App\Models\Seller;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
-use App\Models\Upload;
+// use App\Models\Upload;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
 use App\Models\Wishlist;
@@ -144,11 +144,6 @@ trait UserRelationships
     public function product_queries()
     {
         return $this->hasMany(ProductQuery::class, 'customer_id');
-    }
-
-    public function uploads()
-    {
-        return $this->hasMany(Upload::class);
     }
 
     public function userCoupon()

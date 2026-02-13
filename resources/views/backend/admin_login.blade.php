@@ -8,7 +8,7 @@
     <title>{{ translate('Admin Login') }} - {{ env('APP_NAME') }}</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ uploaded_asset(get_setting('site_icon')) }}">
+    <link rel="icon" href="{{ get_file_by_id(get_setting('site_icon')) }}">
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap"
@@ -44,7 +44,7 @@
                     <div class="row no-gutters">
                         <!-- Left Side Image-->
                         <div class="col-lg-6">
-                            <img src="{{ uploaded_asset(get_setting('admin_login_page_image')) }}"
+                            <img src="{{ get_file_by_id(get_setting('admin_login_page_image')) }}"
                                  alt="{{ translate('Admin Login Page Image') }}" class="img-fit h-100">
                         </div>
 
@@ -52,7 +52,7 @@
                              style="height: auto;">
                             <!-- Site Icon -->
                             <div class="size-48px mb-3 mx-auto mx-lg-0">
-                                <img src="{{ uploaded_asset(get_setting('site_icon')) }}"
+                                <img src="{{ get_file_by_id(get_setting('site_icon')) }}"
                                      alt="{{ translate('Site Icon')}}" class="img-fit h-100">
                             </div>
 

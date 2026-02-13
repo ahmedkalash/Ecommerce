@@ -6,11 +6,11 @@
                     <!-- Review User Image -->
                     <span class="avatar avatar-md mr-3">
                         <img class="lazyload"
-                            src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
-                            @if ($review->user->avatar_original != null) data-src="{{ uploaded_asset($review->user->avatar_original) }}"
-                        @else
-                            data-src="{{ static_asset('assets/img/placeholder.jpg') }}" @endif>
+                             src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
+                             @if ($review->user->avatar_original != null) data-src="{{ get_file_by_id($review->user->avatar_original) }}"
+                             @else
+                                 data-src="{{ static_asset('assets/img/placeholder.jpg') }}" @endif>
                     </span>
                     <div class="media-body text-left">
                         <h3 class="fs-15 fw-600 mb-0">{{ $review->user->name }}
@@ -35,12 +35,13 @@
                         <div class="spotlight-group d-flex flex-wrap">
                             @if($review->photos != null)
                                 @foreach (explode(',', $review->photos) as $photo)
-                                <a class="spotlight mr-2 mr-md-3 mb-2 mb-md-3 size-60px size-md-90px border overflow-hidden has-transition hov-scale-img hov-border-primary" href="{{ uploaded_asset($photo) }}">
-                                    <img class="img-fit h-100 lazyload has-transition"
-                                            src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                            data-src="{{ uploaded_asset($photo) }}"
-                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                </a>
+                                    <a class="spotlight mr-2 mr-md-3 mb-2 mb-md-3 size-60px size-md-90px border overflow-hidden has-transition hov-scale-img hov-border-primary"
+                                       href="{{ get_file_by_id($photo) }}">
+                                        <img class="img-fit h-100 lazyload has-transition"
+                                             src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                             data-src="{{ get_file_by_id($photo) }}"
+                                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                    </a>
                                 @endforeach
                             @endif
                         </div>
@@ -49,7 +50,8 @@
                             $OrderDetail = get_order_details_by_review($review);
                         @endphp
                         @if ($OrderDetail && $OrderDetail->variation)
-                            <small class="text-secondary fs-12">{{ translate('Variation :') }} {{ $OrderDetail->variation }}</small>
+                            <small
+                                class="text-secondary fs-12">{{ translate('Variation :') }} {{ $OrderDetail->variation }}</small>
                         @endif
                     </div>
                 </li>

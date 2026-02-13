@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use DB;
-use Str;
-use Schema;
-use Artisan;
-use ZipArchive;
-use App\Models\Tax;
-use App\Models\Shop;
-use App\Models\User;
-use App\Models\Seller;
-use App\Models\Upload;
-use App\Models\Product;
-use App\Models\ProductTax;
-use Illuminate\Http\Request;
-use App\Models\SellerPackage;
 use App\Models\BusinessSetting;
+use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductTax;
+use App\Models\Seller;
+use App\Models\SellerPackage;
 use App\Models\SellerWithdrawRequest;
+use App\Models\Shop;
+use App\Models\Tax;
+use App\Models\User;
+use Artisan;
+use DB;
+use Illuminate\Http\Request;
+use Schema;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Str;
+use ZipArchive;
 
 class UpdateController extends Controller
 {
@@ -26,36 +26,42 @@ class UpdateController extends Controller
     {
         if (env('DEMO_MODE') == 'On') {
             flash(translate('This action is disabled in demo mode'))->error();
+
             return back();
         }
-        $current_version= get_setting('current_version');
+        $current_version = get_setting('current_version');
         if (version_compare($current_version, '9.8.1', '<')) {
             flash(translate('Could not update. Please check the compatible version'))->error();
+
             return redirect('/');
         }
         if ($request->has('update_zip')) {
             if (class_exists('ZipArchive')) {
                 // Create update directory.
                 $dir = 'updates';
-                if (!is_dir($dir))
+                if (! is_dir($dir)) {
                     mkdir($dir, 0777, true);
+                }
 
-                $path = Upload::findOrFail($request->update_zip)->file_name;
+                $upload = Media::findOrFail($request->update_zip);
+                $path = $upload->file_name; // Spatie Media has a file_name attribute
 
-                //Unzip uploaded update file and remove zip file.
+                // Unzip uploaded update file and remove zip file.
                 $zip = new ZipArchive;
-                $res = $zip->open(base_path('public/' . $path));
+                $res = $zip->open(base_path('public/'.$path));
 
                 if ($res === true) {
                     $res = $zip->extractTo(base_path());
                     $zip->close();
                 } else {
                     flash(translate('Could not open the updates zip file.'))->error();
+
                     return back();
                 }
                 if ($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0.1') {
                     return redirect()->route('update.step2');
                 }
+
                 return redirect()->route('update.step1');
             } else {
                 flash(translate('Please enable ZipArchive extension.'))->error();
@@ -73,11 +79,13 @@ class UpdateController extends Controller
     public function purchase_code(Request $request)
     {
         if (\App\Utility\CategoryUtility::create_initial_category($request->purchase_code) == false) {
-            flash("Sorry! The purchase code you have provided is not valid.")->error();
+            flash('Sorry! The purchase code you have provided is not valid.')->error();
+
             return back();
         }
         if ($request->system_key == null) {
-            flash("Sorry! The System Key required")->error();
+            flash('Sorry! The System Key required')->error();
+
             return back();
         }
 
@@ -99,25 +107,30 @@ class UpdateController extends Controller
 
     public function step2()
     {
-        $versions = ['9.8.1'=>'v981.sql' ,'9.9'=>'v990.sql','9.9.1'=>'v991.sql', '9.9.2'=>'v992.sql', '9.9.3'=>'v993.sql', '9.9.4'=>'v994.sql', '9.9.5'=>'v995.sql', '9.9.6'=>'v996.sql','9.9.7'=>'v997.sql','9.9.8'=>'v998.sql','9.9.9'=>'v999.sql'];
+        $versions = [
+            '9.8.1' => 'v981.sql', '9.9' => 'v990.sql', '9.9.1' => 'v991.sql', '9.9.2' => 'v992.sql',
+            '9.9.3' => 'v993.sql', '9.9.4' => 'v994.sql', '9.9.5' => 'v995.sql', '9.9.6' => 'v996.sql',
+            '9.9.7' => 'v997.sql', '9.9.8' => 'v998.sql', '9.9.9' => 'v999.sql',
+        ];
 
         $keys = array_keys($versions);
         $current_version = (get_setting('current_version') != null) ? get_setting('current_version') : '9.8.1';
 
-        if(array_search($current_version, $keys) == false){
+        if (array_search($current_version, $keys) == false) {
             Artisan::call('view:clear');
             Artisan::call('cache:clear');
             $previousRouteServiceProvier = base_path('app/Providers/RouteServiceProvider.php');
-            $newRouteServiceProvier      = base_path('app/Providers/RouteServiceProvider.txt');
+            $newRouteServiceProvier = base_path('app/Providers/RouteServiceProvider.txt');
             copy($newRouteServiceProvier, $previousRouteServiceProvier);
 
             flash(translate('Could not update. Please check the compatible version'))->error();
+
             return redirect('/');
         }
 
-        $initial_index = (array_search($current_version, $keys)+1);
+        $initial_index = (array_search($current_version, $keys) + 1);
 
-        for ($i=$initial_index; $i < count($keys); $i++) {
+        for ($i = $initial_index; $i < count($keys); $i++) {
             $sql_path = base_path('sqlupdates/'.$versions[$keys[$i]]);
             DB::unprepared(file_get_contents($sql_path));
         }
@@ -140,46 +153,43 @@ class UpdateController extends Controller
         // $this->convertColorsName();
 
         $previousRouteServiceProvier = base_path('app/Providers/RouteServiceProvider.php');
-        $newRouteServiceProvier      = base_path('app/Providers/RouteServiceProvider.txt');
+        $newRouteServiceProvier = base_path('app/Providers/RouteServiceProvider.txt');
         copy($newRouteServiceProvier, $previousRouteServiceProvier);
 
         return view('update.done');
     }
 
-    public function addNotificationType(){
-        $notifications = DB::table('notifications')->where('notification_type_id',0)->get();
-        foreach($notifications as $notification){
+    public function addNotificationType()
+    {
+        $notifications = DB::table('notifications')->where('notification_type_id', 0)->get();
+        foreach ($notifications as $notification) {
             $status = json_decode($notification->data, true)['status'];
             $notificationTypeId = null;
-            if($notification->type == 'App\Notifications\OrderNotification'){
-                if($status == 'pending'){
+            if ($notification->type == 'App\Notifications\OrderNotification') {
+                if ($status == 'pending') {
                     $status = 'placed';
                 }
                 $user = User::where('id', $notification->notifiable_id)->first();
-                if($user == null || $status == 'unpaid'){
+                if ($user == null || $status == 'unpaid') {
                     DB::table('notifications')->where('id', $notification->id)->delete();
+
                     continue;
                 }
                 $user_type = $user->user_type;
                 $type = 'order_'.$status.'_'.$user_type;
                 $notificationTypeId = get_notification_type($type, 'type')->id;
-            }
-            elseif($notification->type == 'App\Notifications\ShopProductNotification'){
-                $type = $status == "pending" ? 'seller_product_upload' : "seller_product_approved";
-                $notificationTypeId = get_notification_type($type , 'type')->id;
-            }
-            elseif($notification->type == 'App\Notifications\PayoutNotification'){
-                $type = $status == "pending" ? 'seller_payout_request' : "seller_payout";
+            } elseif ($notification->type == 'App\Notifications\ShopProductNotification') {
+                $type = $status == 'pending' ? 'seller_product_upload' : 'seller_product_approved';
                 $notificationTypeId = get_notification_type($type, 'type')->id;
-            }
-            elseif($notification->type == 'App\Notifications\ShopVerificationNotification'){
-                if($status == "submitted"){
+            } elseif ($notification->type == 'App\Notifications\PayoutNotification') {
+                $type = $status == 'pending' ? 'seller_payout_request' : 'seller_payout';
+                $notificationTypeId = get_notification_type($type, 'type')->id;
+            } elseif ($notification->type == 'App\Notifications\ShopVerificationNotification') {
+                if ($status == 'submitted') {
                     $type = 'shop_verify_request_submitted';
-                }
-                elseif($status == "approved"){
+                } elseif ($status == 'approved') {
                     $type = 'shop_verify_request_approved';
-                }
-                elseif($status == "rejected"){
+                } elseif ($status == 'rejected') {
                     $type = 'shop_verify_request_rejected';
                 }
                 $notificationTypeId = get_notification_type($type, 'type')->id;
@@ -199,8 +209,8 @@ class UpdateController extends Controller
             $new_product_array = [];
             foreach ($products as $product) {
                 $new_product_array[] = [
-                    "product_id" => $product->id,
-                    "category_id" => $product->category_id
+                    'product_id' => $product->id,
+                    'category_id' => $product->category_id,
                 ];
             }
             $collection = collect($new_product_array);
@@ -228,14 +238,14 @@ class UpdateController extends Controller
         foreach ($sellers as $seller) {
             $shop = Shop::where('user_id', $seller->user_id)->first();
             if ($shop) {
-                if (!$shop->rating) {
+                if (! $shop->rating) {
                     $shop->rating = $seller->rating;
                     $shop->num_of_reviews = $seller->num_of_reviews;
                 }
-                if (!$shop->num_of_sale) {
+                if (! $shop->num_of_sale) {
                     $shop->num_of_sale = $seller->num_of_sale;
                 }
-                if (!$shop->seller_package_id) {
+                if (! $shop->seller_package_id) {
                     $shop->seller_package_id = $seller->seller_package_id;
                     $shop->product_upload_limit = $seller->product_upload_limit;
                     $shop->package_invalid_at = $seller->invalid_at;
@@ -243,17 +253,17 @@ class UpdateController extends Controller
                 if ($shop->admin_to_pay == 0) {
                     $shop->admin_to_pay = $seller->admin_to_pay;
                 }
-                if (!$shop->verification_status) {
+                if (! $shop->verification_status) {
                     $shop->verification_status = $seller->verification_status;
                 }
-                if (!$shop->verification_info) {
+                if (! $shop->verification_info) {
                     $shop->verification_info = $seller->verification_info;
                 }
-                if (!$shop->cash_on_delivery_status) {
+                if (! $shop->cash_on_delivery_status) {
                     $shop->cash_on_delivery_status = $seller->cash_on_delivery_status;
                 }
 
-                if (!$shop->bank_name) {
+                if (! $shop->bank_name) {
                     $shop->bank_name = $seller->bank_name;
                     $shop->bank_acc_name = $seller->bank_acc_name;
                     $shop->bank_acc_no = $seller->bank_acc_no;
@@ -349,16 +359,16 @@ class UpdateController extends Controller
         }
     }
 
-    public function writeEnvironmentFile($type, $val) {
+    public function writeEnvironmentFile($type, $val)
+    {
         $path = base_path('.env');
         if (file_exists($path)) {
             $val = '"'.trim($val).'"';
-            if(is_numeric(strpos(file_get_contents($path), $type)) && strpos(file_get_contents($path), $type) >= 0){
+            if (is_numeric(strpos(file_get_contents($path), $type)) && strpos(file_get_contents($path), $type) >= 0) {
                 file_put_contents($path, str_replace(
                     $type.'="'.env($type).'"', $type.'='.$val, file_get_contents($path)
                 ));
-            }
-            else{
+            } else {
                 file_put_contents($path, file_get_contents($path)."\r\n".$type.'='.$val);
             }
         }

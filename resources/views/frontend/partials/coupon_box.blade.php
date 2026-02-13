@@ -34,7 +34,8 @@
     }
 @endphp
 
-<div style="min-height: 232px; border-radius: 24px; background: {{ $bg }};" class="d-flex align-items-center position-relative">
+<div style="min-height: 232px; border-radius: 24px; background: {{ $bg }};"
+     class="d-flex align-items-center position-relative">
 
     <!-- Shop Name & discount -->
     <div class="position-absolute" style="top:2rem; left:2rem;">
@@ -74,14 +75,16 @@
             @if($coupon->type == 'product_base')
                 <!-- Coupon Products -->
                 @php $products = get_multiple_products($coupon_products); @endphp
-                <div class="aiz-carousel slick-left gutters-16" data-items="6" data-lg-items="6"  data-md-items="4" data-sm-items="4" data-xs-items="4" data-arrows='false' data-infinite='true' data-autoplay="true">
+                <div class="aiz-carousel slick-left gutters-16" data-items="6" data-lg-items="6" data-md-items="4"
+                     data-sm-items="4" data-xs-items="4" data-arrows='false' data-infinite='true' data-autoplay="true">
                     @foreach($products as $key => $product)
-                        <a href="{{ route('product', $product->slug) }}" title="{{ $product->name }}" class='p-1 border border-transparent hov-border' target="_blank">
+                        <a href="{{ route('product', $product->slug) }}" title="{{ $product->name }}"
+                           class='p-1 border border-transparent hov-border' target="_blank">
                             <img class="img-fit mx-auto h-48px w-48px"
-                                src="{{ uploaded_asset($product->thumbnail_img) }}"
-                                data-src="{{ uploaded_asset($product->thumbnail_img) }}"
-                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
-                                alt="">
+                                 src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                 data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
+                                 alt="">
                         </a>
                     @endforeach
                 </div>
@@ -89,9 +92,15 @@
                 <!-- Coupon Discount range -->
                 <span class="fs-12 text-white pb-lg-3 d-block m-auto ">
                     @if($coupon->discount_type == 'amount')
-                        {{ translate('Min Spend ') }} <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ single_price($coupon->discount) }}</strong> {{ translate('OFF on total orders') }}
+                        {{ translate('Min Spend ') }}
+                        <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }}
+                        <strong>{{ $name }}</strong> {{ translate('to get') }}
+                        <strong>{{ single_price($coupon->discount) }}</strong> {{ translate('OFF on total orders') }}
                     @else
-                        {{ translate('Min Spend ') }} <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }} <strong>{{ $name }}</strong> {{ translate('to get') }} <strong>{{ $coupon->discount }}%</strong> {{ translate('OFF on total orders') }}
+                        {{ translate('Min Spend ') }}
+                        <strong>{{ single_price($coupon_discount->min_buy) }}</strong> {{ translate('from') }}
+                        <strong>{{ $name }}</strong> {{ translate('to get') }}
+                        <strong>{{ $coupon->discount }}%</strong> {{ translate('OFF on total orders') }}
                     @endif
                 </span>
             @else
@@ -110,7 +119,10 @@
             <span class="fs-13 d-block mb-0 text-white">
                 {{ translate('Code') }}:
                 <span class="fw-600">{{ $coupon->code }}</span>
-                <span class="ml-2 text-white fs-16" style="cursor:pointer;" onclick="copyCouponCode('{{ $coupon->code }}')" data-toggle="tooltip" data-title="{{ translate('Copy the Code') }}" data-placement="top"><i class="las la-copy"></i></span>
+                <span class="ml-2 text-white fs-16" style="cursor:pointer;"
+                      onclick="copyCouponCode('{{ $coupon->code }}')" data-toggle="tooltip"
+                      data-title="{{ translate('Copy the Code') }}" data-placement="top"><i
+                        class="las la-copy"></i></span>
             </span>
         </div>
     </div>

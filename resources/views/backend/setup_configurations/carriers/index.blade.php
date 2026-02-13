@@ -26,42 +26,48 @@
                 <div class="card-body">
                     <table class="table aiz-table mb-0">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{{ translate('Logo') }}</th>
-                                <th>{{ translate('Name') }}</th>
-                                <th>{{ translate('Transit Time') }}</th>
-                                <th>{{ translate('Status') }}</th>
-                                <th style="text-align: right;">{{ translate('Options') }}</th>
-                            </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ translate('Logo') }}</th>
+                            <th>{{ translate('Name') }}</th>
+                            <th>{{ translate('Transit Time') }}</th>
+                            <th>{{ translate('Status') }}</th>
+                            <th style="text-align: right;">{{ translate('Options') }}</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach ($carriers as $key => $carrier)
-                                <tr>
-                                    <td>
-                                        {{ $carriers->firstItem() + $key }}
-                                    </td>
-                                    <td>
-                                        <img src="{{ uploaded_asset($carrier->logo) }}" alt="{{translate('Carrier')}}" class="h-50px">
-                                    </td>
-                                    <td>{{ $carrier->name }}</td>
-                                    <td>{{ $carrier->transit_time }}</td>
-                                    <td>
-                                        <label class="aiz-switch aiz-switch-success mb-0">
-                                            <input onchange="update_status(this)" value="{{ $carrier->id }}" type="checkbox" <?php if($carrier->status == 1) echo "checked";?> >
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <a class="btn btn-soft-primary btn-icon btn-circle btn-sm" href="{{ route('carriers.edit', $carrier->id) }}" title="{{ translate('Edit') }}">
-                                            <i class="las la-edit"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete" data-href="{{route('carriers.destroy', $carrier->id)}}" title="{{ translate('Delete') }}">
-                                            <i class="las la-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @endforeach
+                        @foreach ($carriers as $key => $carrier)
+                            <tr>
+                                <td>
+                                    {{ $carriers->firstItem() + $key }}
+                                </td>
+                                <td>
+                                    <img src="{{ get_file_by_id($carrier->logo) }}" alt="{{translate('Carrier')}}"
+                                         class="h-50px">
+                                </td>
+                                <td>{{ $carrier->name }}</td>
+                                <td>{{ $carrier->transit_time }}</td>
+                                <td>
+                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                        <input onchange="update_status(this)" value="{{ $carrier->id }}"
+                                               type="checkbox" <?php if ($carrier->status == 1) echo "checked"; ?> >
+                                        <span class="slider round"></span>
+                                    </label>
+                                </td>
+                                <td style="text-align: right;">
+                                    <a class="btn btn-soft-primary btn-icon btn-circle btn-sm"
+                                       href="{{ route('carriers.edit', $carrier->id) }}"
+                                       title="{{ translate('Edit') }}">
+                                        <i class="las la-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-soft-danger btn-icon btn-circle btn-sm confirm-delete"
+                                       data-href="{{route('carriers.destroy', $carrier->id)}}"
+                                       title="{{ translate('Delete') }}">
+                                        <i class="las la-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                     <div class="aiz-pagination">
@@ -80,24 +86,26 @@
 @section('script')
     <script type="text/javascript">
 
-        function update_status(el){
+        function update_status(el) {
 
-            if('{{env('DEMO_MODE')}}' == 'On'){
+            if ('{{env('DEMO_MODE')}}' == 'On') {
                 AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
                 return;
             }
 
-            if(el.checked){
+            if (el.checked) {
                 var status = 1;
-            }
-            else{
+            } else {
                 var status = 0;
             }
-            $.post('{{ route('carriers.update_status') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
-                if(data == 1){
+            $.post('{{ route('carriers.update_status') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function (data) {
+                if (data == 1) {
                     AIZ.plugins.notify('success', '{{ translate('Carrier Status updated successfully') }}');
-                }
-                else{
+                } else {
                     AIZ.plugins.notify('danger', '{{ translate('Carrier Status went wrong') }}');
                 }
             });

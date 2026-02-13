@@ -16,20 +16,21 @@ class ConversationMessageCollection extends ResourceCollection
     {
         $image = null;
         $is_seller_message = false;
-        
-        if($this->user != null){
-            $image = uploaded_asset($this->user->avatar_original);
+
+        if ($this->user != null) {
+            $image = get_file_by_id($this->user->avatar_original);
         }
-        if($this->user->id == auth()->user->id) {
+        if ($this->user->id == auth()->user->id) {
             $is_seller_message = true;
         }
+
         return [
-            'image'             =>  $image,
-            'id'                =>  $this->user->id,
-            'name'              =>  $this->user->name,
-            'message'           =>  $this->message,
-            'is_seller_message' =>  $is_seller_message,
-            'created_at'        =>  $this->created_at,
+            'image' => $image,
+            'id' => $this->user->id,
+            'name' => $this->user->name,
+            'message' => $this->message,
+            'is_seller_message' => $is_seller_message,
+            'created_at' => $this->created_at,
         ];
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V2;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class BlogCollection extends ResourceCollection
@@ -22,13 +21,13 @@ class BlogCollection extends ResourceCollection
                     'slug' => $data->slug,
                     'short_description' => $data->short_description,
                     'description' => $data->description,
-                    'banner' => uploaded_asset($data->banner),
+                    'banner' => get_file_by_id($data->banner),
                     'meta_title' => $data->meta_title,
                     'meta_description' => $data->meta_description,
                     'status' => $data->status,
                     'category' => $data->category->category_name,
                 ];
-            })
+            }),
         ];
     }
 
@@ -36,7 +35,7 @@ class BlogCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

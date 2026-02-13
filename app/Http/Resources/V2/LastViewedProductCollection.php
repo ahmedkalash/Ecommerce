@@ -12,13 +12,14 @@ class LastViewedProductCollection extends ResourceCollection
             'data' => $this->collection->map(function ($data) {
                 $product = $data->product;
                 $wholesale_product = ($product->wholesale_product == 1) ? true : false;
+
                 return [
                     'id' => $product->id,
                     'slug' => $product->slug,
                     'name' => $product->getTranslation('name'),
-                    'thumbnail_image' => $product->thumbnail_img == null ? "" : uploaded_asset($product->thumbnail_img),
+                    'thumbnail_image' => $product->thumbnail_img == null ? '' : get_file_by_id($product->thumbnail_img),
                     'has_discount' => home_base_price($product, false) != home_discounted_base_price($product, false),
-                    'discount' => "-" . discount_in_percentage($product) . "%",
+                    'discount' => '-'.discount_in_percentage($product).'%',
                     'stroked_price' => home_base_price($product),
                     'main_price' => home_discounted_base_price($product),
                     'rating' => (float) $product->rating,
@@ -26,9 +27,9 @@ class LastViewedProductCollection extends ResourceCollection
                     'is_wholesale' => $wholesale_product,
                     'links' => [
                         'details' => route('products.show', $product->id),
-                    ]
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -36,7 +37,7 @@ class LastViewedProductCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

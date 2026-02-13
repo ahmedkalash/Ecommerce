@@ -24,20 +24,21 @@ class ConversationCollection extends ResourceCollection
                     $seen_status = true;
                 }
                 if (auth()->user()->id == $data->sender_id) {
-                    $image = uploaded_asset($data->receiver->avatar_original);
+                    $image = get_file_by_id($data->receiver->avatar_original);
                     $name = $data->receiver->name;
                 } else {
-                    $image = uploaded_asset($data->sender->avatar_original);
+                    $image = get_file_by_id($data->sender->avatar_original);
                     $name = $data->sender->name;
                 }
+
                 return [
-                    'id'    => $data->id,
+                    'id' => $data->id,
                     'image' => $image,
-                    'name'  => $name,
+                    'name' => $name,
                     'title' => $data->title,
                     'is_seen' => $seen_status,
                 ];
-            })
+            }),
         ];
     }
 }

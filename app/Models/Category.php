@@ -6,6 +6,7 @@ use App;
 use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Category extends Model
 {
@@ -34,12 +35,12 @@ class Category extends Model
 
     public function coverImage()
     {
-        return $this->belongsTo(Upload::class, 'cover_image');
+        return $this->belongsTo(Media::class, 'cover_image');
     }
 
     public function catIcon()
     {
-        return $this->belongsTo(Upload::class, 'icon');
+        return $this->belongsTo(Media::class, 'icon');
     }
 
     public function products()
@@ -54,7 +55,7 @@ class Category extends Model
 
     public function bannerImage()
     {
-        return $this->belongsTo(Upload::class, 'banner');
+        return $this->belongsTo(Media::class, 'banner');
     }
 
     public function classified_products()

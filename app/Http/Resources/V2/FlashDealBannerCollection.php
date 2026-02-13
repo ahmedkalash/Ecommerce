@@ -3,6 +3,7 @@
 namespace App\Http\Resources\V2;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+
 class FlashDealBannerCollection extends ResourceCollection
 {
     /**
@@ -16,10 +17,10 @@ class FlashDealBannerCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
                 return [
-                    'photo' => uploaded_asset($data->banner),
-                    'url' => url('flash-deal/'.$data->slug)
+                    'photo' => get_file_by_id($data->banner),
+                    'url' => url('flash-deal/'.$data->slug),
                 ];
-            })
+            }),
         ];
     }
 
@@ -27,7 +28,7 @@ class FlashDealBannerCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

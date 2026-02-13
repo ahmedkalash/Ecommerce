@@ -2,37 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\ProductStock;
-use Illuminate\Http\Request;
-use DB;
-use Schema;
-use ZipArchive;
-use File;
-use Artisan;
-use App\Models\Upload;
-use App\Models\Banner;
-use App\Models\Brand;
-use App\Models\User;
+use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\CategoryTranslation;
+use App\Models\CustomerProduct;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductCategory;
+use App\Models\ProductStock;
+use App\Models\ProductTax;
 use App\Models\SubCategory;
 use App\Models\SubCategoryTranslation;
 use App\Models\SubSubCategory;
 use App\Models\SubSubCategoryTranslation;
-use App\Models\CustomerPackage;
-use App\Models\CustomerProduct;
-use App\Models\FlashDeal;
-use App\Models\Product;
-use App\Models\ProductTax;
 use App\Models\Tax;
-use App\Models\Shop;
-use App\Models\Slider;
-use App\HomeCategory;
-use App\Models\BusinessSetting;
-use App\Models\Translation;
-use App\Models\AttributeValue;
-use App\Models\ProductCategory;
+use Artisan;
+use DB;
+use File;
+use Illuminate\Http\Request;
+use Schema;
+use ZipArchive;
 
 class DemoController extends Controller
 {
@@ -60,7 +49,6 @@ class DemoController extends Controller
         // $this->remove_folder();
         // $this->extract_uploads();
     }
-
 
     public function drop_all_tables()
     {
@@ -91,7 +79,8 @@ class DemoController extends Controller
         File::deleteDirectory(base_path('public/uploads'));
     }
 
-    public function migrate_attribute_values(Request $request){
+    public function migrate_attribute_values(Request $request)
+    {
         foreach (Product::all() as $product) {
             if ($product->variant_product) {
                 try {
@@ -131,314 +120,9 @@ class DemoController extends Controller
 
     public function convert_assets(Request $request)
     {
-        $type = array(
-            "jpg" => "image",
-            "jpeg" => "image",
-            "png" => "image",
-            "svg" => "image",
-            "webp" => "image",
-            "gif" => "image",
-            "mp4" => "video",
-            "mpg" => "video",
-            "mpeg" => "video",
-            "webm" => "video",
-            "ogg" => "video",
-            "avi" => "video",
-            "mov" => "video",
-            "flv" => "video",
-            "swf" => "video",
-            "mkv" => "video",
-            "wmv" => "video",
-            "wma" => "audio",
-            "aac" => "audio",
-            "wav" => "audio",
-            "mp3" => "audio",
-            "zip" => "archive",
-            "rar" => "archive",
-            "7z" => "archive",
-            "doc" => "document",
-            "txt" => "document",
-            "docx" => "document",
-            "pdf" => "document",
-            "csv" => "document",
-            "xml" => "document",
-            "ods" => "document",
-            "xlr" => "document",
-            "xls" => "document",
-            "xlsx" => "document"
-        );
-        foreach (Banner::all() as $key => $banner) {
-            if ($banner->photo != null) {
-                $arr = explode('.', $banner->photo);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $banner->photo, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $banner->photo = $upload->id;
-                $banner->save();
-            }
-        }
-
-        foreach (Brand::all() as $key => $brand) {
-            if ($brand->logo != null) {
-                $arr = explode('.', $brand->logo);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $brand->logo, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $brand->logo = $upload->id;
-                $brand->save();
-            }
-        }
-
-        foreach (Category::all() as $key => $category) {
-            if ($category->banner != null) {
-                $arr = explode('.', $category->banner);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $category->banner, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $category->banner = $upload->id;
-                $category->save();
-            }
-            if ($category->icon != null) {
-                $arr = explode('.', $category->icon);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $category->icon, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $category->icon = $upload->id;
-                $category->save();
-            }
-        }
-
-        foreach (CustomerPackage::all() as $key => $package) {
-            if ($package->logo != null) {
-                $arr = explode('.', $package->logo);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $package->logo, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $package->logo = $upload->id;
-                $package->save();
-            }
-        }
-
-        foreach (CustomerProduct::all() as $key => $product) {
-            if ($product->photos != null) {
-                $files = array();
-                foreach (json_decode($product->photos) as $key => $photo) {
-                    $arr = explode('.', $photo);
-                    $upload = Upload::create([
-                        'file_original_name' => null, 'file_name' => $photo, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                        'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                    ]);
-                    array_push($files, $upload->id);
-                }
-
-                $product->photos = implode(',', $files);
-                $product->save();
-            }
-            if ($product->thumbnail_img != null) {
-                $arr = explode('.', $product->thumbnail_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->thumbnail_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->thumbnail_img = $upload->id;
-                $product->save();
-            }
-            if ($product->meta_img != null) {
-                $arr = explode('.', $product->meta_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->meta_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->meta_img = $upload->id;
-                $product->save();
-            }
-        }
-
-        foreach (FlashDeal::all() as $key => $flash_deal) {
-            if ($flash_deal->banner != null) {
-                $arr = explode('.', $flash_deal->banner);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $flash_deal->banner, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $flash_deal->banner = $upload->id;
-                $flash_deal->save();
-            }
-        }
-
-        foreach (Product::all() as $key => $product) {
-            if ($product->photos != null) {
-                $files = array();
-                foreach (json_decode($product->photos) as $key => $photo) {
-                    $arr = explode('.', $photo);
-                    $upload = Upload::create([
-                        'file_original_name' => null, 'file_name' => $photo, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                        'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                    ]);
-                    array_push($files, $upload->id);
-                }
-
-                $product->photos = implode(',', $files);
-                $product->save();
-            }
-            if ($product->thumbnail_img != null) {
-                $arr = explode('.', $product->thumbnail_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->thumbnail_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->thumbnail_img = $upload->id;
-                $product->save();
-            }
-            if ($product->featured_img != null) {
-                $arr = explode('.', $product->featured_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->featured_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->featured_img = $upload->id;
-                $product->save();
-            }
-            if ($product->flash_deal_img != null) {
-                $arr = explode('.', $product->flash_deal_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->flash_deal_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->flash_deal_img = $upload->id;
-                $product->save();
-            }
-            if ($product->meta_img != null) {
-                $arr = explode('.', $product->meta_img);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $product->meta_img, 'user_id' => $product->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $product->meta_img = $upload->id;
-                $product->save();
-            }
-        }
-
-        foreach (Shop::all() as $key => $shop) {
-            if ($shop->sliders != null) {
-                $files = array();
-                foreach (json_decode($shop->sliders) as $key => $photo) {
-                    $arr = explode('.', $photo);
-                    $upload = Upload::create([
-                        'file_original_name' => null, 'file_name' => $photo, 'user_id' => $shop->user_id, 'extension' => $arr[1],
-                        'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                    ]);
-                    array_push($files, $upload->id);
-                }
-
-                $shop->sliders = implode(',', $files);
-                $shop->save();
-            }
-            if ($shop->logo != null) {
-                $arr = explode('.', $shop->logo);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $shop->logo, 'user_id' => $shop->user_id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $shop->logo = $upload->id;
-                $shop->save();
-            }
-        }
-
-        foreach (Slider::all() as $key => $slider) {
-            if ($slider->photo != null) {
-                $arr = explode('.', $slider->photo);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $slider->photo, 'user_id' => User::where('user_type', 'admin')->first()->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $slider->photo = $upload->id;
-                $slider->save();
-            }
-        }
-
-        foreach (User::all() as $key => $user) {
-            if ($user->avatar_original != null) {
-                $arr = explode('.', $user->avatar_original);
-                $upload = Upload::create([
-                    'file_original_name' => null, 'file_name' => $user->avatar_original, 'user_id' => $user->id, 'extension' => $arr[1],
-                    'type' => isset($type[$arr[1]]) ?  $type[$arr[1]] : "others", 'file_size' => 0
-                ]);
-
-                $user->avatar_original = $upload->id;
-                $user->save();
-            }
-        }
-
-        $business_setting = BusinessSetting::where('type', 'home_slider_images')->first();
-        $business_setting->value = json_encode(Slider::pluck('photo')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_slider_links')->first();
-        $business_setting->value = json_encode(Slider::pluck('link')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_banner1_images')->first();
-        $business_setting->value = json_encode(Banner::where('position', 1)->pluck('photo')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_banner1_links')->first();
-        $business_setting->value = json_encode(Banner::where('position', 1)->pluck('url')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_banner2_images')->first();
-        $business_setting->value = json_encode(Banner::where('position', 2)->pluck('photo')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_banner2_links')->first();
-        $business_setting->value = json_encode(Banner::where('position', 2)->pluck('url')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'home_categories')->first();
-        $business_setting->value = json_encode(HomeCategory::pluck('category_id')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'top10_categories')->first();
-        $business_setting->value = json_encode(Category::where('top', 1)->pluck('id')->toArray());
-        $business_setting->save();
-
-        $business_setting = BusinessSetting::where('type', 'top10_brands')->first();
-        $business_setting->value = json_encode(Brand::where('top', 1)->pluck('id')->toArray());
-        $business_setting->save();
-
-        $code = 'en';
-        $jsonString = [];
-        if(File::exists(base_path('resources/lang/'.$code.'.json'))){
-            $jsonString = file_get_contents(base_path('resources/lang/'.$code.'.json'));
-            $jsonString = json_decode($jsonString, true);
-        }
-
-        foreach($jsonString as $key => $string){
-            $translation_def = new Translation;
-            $translation_def->lang = $code;
-            $translation_def->lang_key = $key;
-            $translation_def->lang_value = $string;
-            $translation_def->save();
-        }
+        // This method relies on the legacy Upload model which has been removed.
+        // It should be refactored to use Spatie Media Library if asset conversion is still required.
+        return back();
     }
 
     public function convert_category()
@@ -564,8 +248,8 @@ class DemoController extends Controller
 
     public function update_seller_id_in_order($order)
     {
-        if($order->seller_id == 0){
-            //dd($order->orderDetails[0]->seller_id);
+        if ($order->seller_id == 0) {
+            // dd($order->orderDetails[0]->seller_id);
             $order->seller_id = $order->orderDetails[0]->seller_id;
             $order->save();
         }
@@ -577,8 +261,8 @@ class DemoController extends Controller
         $new_product_array = [];
         foreach ($products as $product) {
             $new_product_array[] = [
-                "product_id" => $product->id,
-                "category_id" => $product->category_id
+                'product_id' => $product->id,
+                'category_id' => $product->category_id,
             ];
         }
         $collection = collect($new_product_array);

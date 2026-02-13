@@ -19,18 +19,18 @@ class AuctionProductCollection extends ResourceCollection
                 return [
                     'id' => $data->id,
                     'name' => $data->getTranslation('name'),
-                    'thumbnail_image' => uploaded_asset($data->thumbnail_img),
+                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
                     'main_price' => single_price($data->starting_bid),
                     'start_date' => date('Y-m-d H:i:s', $data->auction_start_date),
                     'end_date' => date('Y-m-d H:i:s', $data->auction_end_date),
                     'total_bids' => (int) $data->bids->count(),
-                    'can_edit' => $data->auction_start_date > strtotime("now"),
+                    'can_edit' => $data->auction_start_date > strtotime('now'),
 
                     'links' => [
                         'details' => route('products.show', $data->id),
-                    ]
+                    ],
                 ];
-            })
+            }),
         ];
     }
 }

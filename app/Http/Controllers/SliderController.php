@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Slider;
+use Illuminate\Http\Request;
 
 class SliderController extends Controller
 {
@@ -15,6 +15,7 @@ class SliderController extends Controller
     public function index()
     {
         $sliders = Slider::all();
+
         return view('sliders.index', compact('sliders'));
     }
 
@@ -31,7 +32,6 @@ class SliderController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -40,11 +40,13 @@ class SliderController extends Controller
             foreach ($request->photos as $key => $photo) {
                 $slider = new Slider;
                 $slider->link = $request->url;
-                $slider->photo = $photo->store('uploads/sliders');
-                $slider->save();
+                $slider->save(); // Save the slider first to get an ID
+
+                $slider->addMedia($photo)->toMediaCollection('sliders');
             }
             flash(translate('Slider has been inserted successfully'))->success();
         }
+
         return redirect()->route('home_settings.index');
     }
 
@@ -73,11 +75,9 @@ class SliderController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function update(Request $request, $id)
     {
         $slider = Slider::find($id);
@@ -99,11 +99,12 @@ class SliderController extends Controller
     {
         $slider = Slider::findOrFail($id);
         if (Slider::destroy($id)) {
-            //unlink($slider->photo);
+            // unlink($slider->photo);
             flash(translate('Slider has been deleted successfully'))->success();
         } else {
             flash(translate('Something went wrong'))->error();
         }
+
         return redirect()->route('home_settings.index');
     }
 }

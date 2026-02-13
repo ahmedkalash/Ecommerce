@@ -37,20 +37,22 @@
         @if(get_setting('product_query_activation') == 1)
             <!-- Ask about this product -->
             <div class="col-xl-3 col-lg-4 col-md-3 col-sm-4 mb-3">
-                <a href="javascript:void();" onclick="goToView('product_query')" class="text-primary fs-14 fw-600 d-flex">
+                <a href="javascript:void();" onclick="goToView('product_query')"
+                   class="text-primary fs-14 fw-600 d-flex">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32">
                         <g id="Group_25571" data-name="Group 25571" transform="translate(-975 -411)">
                             <g id="Path_32843" data-name="Path 32843" transform="translate(975 411)" fill="#fff">
                                 <path
                                     d="M 16 31 C 11.9933500289917 31 8.226519584655762 29.43972969055176 5.393400192260742 26.60659980773926 C 2.560270071029663 23.77347946166992 1 20.00665092468262 1 16 C 1 11.9933500289917 2.560270071029663 8.226519584655762 5.393400192260742 5.393400192260742 C 8.226519584655762 2.560270071029663 11.9933500289917 1 16 1 C 20.00665092468262 1 23.77347946166992 2.560270071029663 26.60659980773926 5.393400192260742 C 29.43972969055176 8.226519584655762 31 11.9933500289917 31 16 C 31 20.00665092468262 29.43972969055176 23.77347946166992 26.60659980773926 26.60659980773926 C 23.77347946166992 29.43972969055176 20.00665092468262 31 16 31 Z"
-                                    stroke="none" />
+                                    stroke="none"/>
                                 <path
                                     d="M 16 2 C 12.26045989990234 2 8.744749069213867 3.456249237060547 6.100500106811523 6.100500106811523 C 3.456249237060547 8.744749069213867 2 12.26045989990234 2 16 C 2 19.73954010009766 3.456249237060547 23.2552490234375 6.100500106811523 25.89949989318848 C 8.744749069213867 28.54375076293945 12.26045989990234 30 16 30 C 19.73954010009766 30 23.2552490234375 28.54375076293945 25.89949989318848 25.89949989318848 C 28.54375076293945 23.2552490234375 30 19.73954010009766 30 16 C 30 12.26045989990234 28.54375076293945 8.744749069213867 25.89949989318848 6.100500106811523 C 23.2552490234375 3.456249237060547 19.73954010009766 2 16 2 M 16 0 C 24.8365592956543 0 32 7.163440704345703 32 16 C 32 24.8365592956543 24.8365592956543 32 16 32 C 7.163440704345703 32 0 24.8365592956543 0 16 C 0 7.163440704345703 7.163440704345703 0 16 0 Z"
-                                    stroke="none" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                    stroke="none" fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                             </g>
                             <path id="Path_32842" data-name="Path 32842"
-                                d="M28.738,30.935a1.185,1.185,0,0,1-1.185-1.185,3.964,3.964,0,0,1,.942-2.613c.089-.095.213-.207.361-.344.735-.658,2.252-2.032,2.252-3.555a2.228,2.228,0,0,0-2.37-2.37,2.228,2.228,0,0,0-2.37,2.37,1.185,1.185,0,1,1-2.37,0,4.592,4.592,0,0,1,4.74-4.74,4.592,4.592,0,0,1,4.74,4.74c0,2.577-2.044,4.432-3.028,5.333l-.284.255a1.89,1.89,0,0,0-.243.948A1.185,1.185,0,0,1,28.738,30.935Zm0,3.561a1.185,1.185,0,0,1-.835-2.026,1.226,1.226,0,0,1,1.671,0,1.061,1.061,0,0,1,.148.184,1.345,1.345,0,0,1,.113.2,1.41,1.41,0,0,1,.065.225,1.138,1.138,0,0,1,0,.462,1.338,1.338,0,0,1-.065.219,1.185,1.185,0,0,1-.113.207,1.06,1.06,0,0,1-.148.184A1.185,1.185,0,0,1,28.738,34.5Z"
-                                transform="translate(962.004 400.504)" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                  d="M28.738,30.935a1.185,1.185,0,0,1-1.185-1.185,3.964,3.964,0,0,1,.942-2.613c.089-.095.213-.207.361-.344.735-.658,2.252-2.032,2.252-3.555a2.228,2.228,0,0,0-2.37-2.37,2.228,2.228,0,0,0-2.37,2.37,1.185,1.185,0,1,1-2.37,0,4.592,4.592,0,0,1,4.74-4.74,4.592,4.592,0,0,1,4.74,4.74c0,2.577-2.044,4.432-3.028,5.333l-.284.255a1.89,1.89,0,0,0-.243.948A1.185,1.185,0,0,1,28.738,30.935Zm0,3.561a1.185,1.185,0,0,1-.835-2.026,1.226,1.226,0,0,1,1.671,0,1.061,1.061,0,0,1,.148.184,1.345,1.345,0,0,1,.113.2,1.41,1.41,0,0,1,.065.225,1.138,1.138,0,0,1,0,.462,1.338,1.338,0,0,1-.065.219,1.185,1.185,0,0,1-.113.207,1.06,1.06,0,0,1-.148.184A1.185,1.185,0,0,1,28.738,34.5Z"
+                                  transform="translate(962.004 400.504)"
+                                  fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                         </g>
                     </svg>
                     <span class="ml-2 text-primary animate-underline-blue">{{ translate('Product Inquiry') }}</span>
@@ -62,13 +64,13 @@
                 <div class="d-flex">
                     <!-- Add to wishlist button -->
                     <a href="javascript:void(0)" onclick="addToWishList({{ $detailedProduct->id }})"
-                        class="mr-3 fs-14 text-dark opacity-60 has-transitiuon hov-opacity-100">
+                       class="mr-3 fs-14 text-dark opacity-60 has-transitiuon hov-opacity-100">
                         <i class="la la-heart-o mr-1"></i>
                         {{ translate('Add to Wishlist') }}
                     </a>
                     <!-- Add to compare button -->
                     <a href="javascript:void(0)" onclick="addToCompare({{ $detailedProduct->id }})"
-                        class="fs-14 text-dark opacity-60 has-transitiuon hov-opacity-100">
+                       class="fs-14 text-dark opacity-60 has-transitiuon hov-opacity-100">
                         <i class="las la-sync mr-1"></i>
                         {{ translate('Add to Compare') }}
                     </a>
@@ -83,7 +85,7 @@
         <div class="d-flex flex-wrap align-items-center mb-3">
             <span class="text-secondary fs-14 fw-400 mr-4 w-80px">{{ translate('Brand') }}</span><br>
             <a href="{{ route('products.brand', $detailedProduct->brand->slug) }}"
-                class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->brand->name }}</a>
+               class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->brand->name }}</a>
         </div>
     @endif
 
@@ -91,13 +93,13 @@
     @if ($detailedProduct->has_warranty == 1 && $detailedProduct->warranty_id != null)
         <div class="d-flex flex-wrap align-items-center mb-3">
             <span class="text-secondary fs-14 fw-400 mr-4 w-80px">{{ translate('Warranty') }}</span><br>
-            <img src="{{ uploaded_asset($detailedProduct->warranty->logo) }}" height="40">
+            <img src="{{ get_file_by_id($detailedProduct->warranty->logo) }}" height="40">
             <span class="border border-secondary-base btn fs-12 ml-3 px-3 py-1 rounded-1 text-secondary">
                 {{ $detailedProduct->warranty->getTranslation('text')}}
                 @if($detailedProduct->warranty_note_id != null)
-                    <span href="javascript:void(1);" 
-                        data-toggle="modal" data-target="#warranty-note-modal"
-                        class="border-bottom border-bottom-4 ml-2 text-secondary-base">
+                    <span href="javascript:void(1);"
+                          data-toggle="modal" data-target="#warranty-note-modal"
+                          class="border-bottom border-bottom-4 ml-2 text-secondary-base">
                         {{ translate('View Details') }}
                     </span>
                 @endif
@@ -112,7 +114,7 @@
             @if ($detailedProduct->added_by == 'seller' && get_setting('vendor_system_activation') == 1)
                 <span class="text-secondary fs-14 fw-400 mr-4 w-80px">{{ translate('Sold by') }}</span>
                 <a href="{{ route('shop.visit', $detailedProduct->user->shop->slug) }}"
-                    class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->user->shop->name }}</a>
+                   class="text-reset hov-text-primary fs-14 fw-700">{{ $detailedProduct->user->shop->name }}</a>
             @else
                 <p class="mb-0 fs-14 fw-700">{{ translate('Inhouse product') }}</p>
             @endif
@@ -121,23 +123,28 @@
         <!-- Messase to seller -->
         @if (get_setting('conversation_system') == 1)
             <div class="">
-                <button class="btn btn-sm btn-soft-secondary-base btn-outline-secondary-base hov-svg-white hov-text-white rounded-4"
+                <button
+                    class="btn btn-sm btn-soft-secondary-base btn-outline-secondary-base hov-svg-white hov-text-white rounded-4"
                     onclick="show_chat_modal()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"
-                        class="mr-2 has-transition">
+                         class="mr-2 has-transition">
                         <g id="Group_23918" data-name="Group 23918" transform="translate(1053.151 256.688)">
                             <path id="Path_3012" data-name="Path 3012"
-                                d="M134.849,88.312h-8a2,2,0,0,0-2,2v5a2,2,0,0,0,2,2v3l2.4-3h5.6a2,2,0,0,0,2-2v-5a2,2,0,0,0-2-2m1,7a1,1,0,0,1-1,1h-8a1,1,0,0,1-1-1v-5a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1Z"
-                                transform="translate(-1178 -341)" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                  d="M134.849,88.312h-8a2,2,0,0,0-2,2v5a2,2,0,0,0,2,2v3l2.4-3h5.6a2,2,0,0,0,2-2v-5a2,2,0,0,0-2-2m1,7a1,1,0,0,1-1,1h-8a1,1,0,0,1-1-1v-5a1,1,0,0,1,1-1h8a1,1,0,0,1,1,1Z"
+                                  transform="translate(-1178 -341)"
+                                  fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                             <path id="Path_3013" data-name="Path 3013"
-                                d="M134.849,81.312h8a1,1,0,0,1,1,1v5a1,1,0,0,1-1,1h-.5a.5.5,0,0,0,0,1h.5a2,2,0,0,0,2-2v-5a2,2,0,0,0-2-2h-8a2,2,0,0,0-2,2v.5a.5.5,0,0,0,1,0v-.5a1,1,0,0,1,1-1"
-                                transform="translate(-1182 -337)" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                  d="M134.849,81.312h8a1,1,0,0,1,1,1v5a1,1,0,0,1-1,1h-.5a.5.5,0,0,0,0,1h.5a2,2,0,0,0,2-2v-5a2,2,0,0,0-2-2h-8a2,2,0,0,0-2,2v.5a.5.5,0,0,0,1,0v-.5a1,1,0,0,1,1-1"
+                                  transform="translate(-1182 -337)"
+                                  fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                             <path id="Path_3014" data-name="Path 3014"
-                                d="M131.349,93.312h5a.5.5,0,0,1,0,1h-5a.5.5,0,0,1,0-1"
-                                transform="translate(-1181 -343.5)" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                  d="M131.349,93.312h5a.5.5,0,0,1,0,1h-5a.5.5,0,0,1,0-1"
+                                  transform="translate(-1181 -343.5)"
+                                  fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                             <path id="Path_3015" data-name="Path 3015"
-                                d="M131.349,99.312h5a.5.5,0,1,1,0,1h-5a.5.5,0,1,1,0-1"
-                                transform="translate(-1181 -346.5)" fill="{{ get_setting('secondary_base_color', '#ffc519') }}" />
+                                  d="M131.349,99.312h5a.5.5,0,1,1,0,1h-5a.5.5,0,1,1,0-1"
+                                  transform="translate(-1181 -346.5)"
+                                  fill="{{ get_setting('secondary_base_color', '#ffc519') }}"/>
                         </g>
                     </svg>
 
@@ -145,7 +152,7 @@
                 </button>
             </div>
         @endif
-         @if (get_setting('whatsapp_order') == 1)
+        @if (get_setting('whatsapp_order') == 1)
             @php
                 $storeName = env('APP_NAME');
                 $productTitle = $detailedProduct->getTranslation('name');
@@ -161,12 +168,12 @@
                 $whatsappUrl = "https://wa.me/{$whatsappNumber}?text=" . urlencode($message);
             @endphp
             @if (($detailedProduct->added_by == 'seller' && get_setting('whatsapp_order_seller_prods') == 1) || ($detailedProduct->added_by == 'admin'))
-            <div class="ml-2">
-                <a class="btn btn-sm btn-soft-whatsapp-base hov-svg-white hov-text-white rounded-4"
-                    href="{{ $whatsappUrl }}" target="_blank">
-                    <i class="lab la-whatsapp mr-1"></i>{{ translate('Order Via WhatsApp') }}
-                </a>
-            </div>
+                <div class="ml-2">
+                    <a class="btn btn-sm btn-soft-whatsapp-base hov-svg-white hov-text-white rounded-4"
+                       href="{{ $whatsappUrl }}" target="_blank">
+                        <i class="lab la-whatsapp mr-1"></i>{{ translate('Order Via WhatsApp') }}
+                    </a>
+                </div>
             @endif
         @endif
 
@@ -178,7 +185,8 @@
         @endphp
         @if($sizeChartId != 0)
             <div class=" ml-4">
-                <a href="javascript:void(1);" onclick='showSizeChartDetail({{ $sizeChartId }}, "{{ $sizeChartName }}")' class="animate-underline-primary">{{ translate('Show size guide') }}</a>
+                <a href="javascript:void(1);" onclick='showSizeChartDetail({{ $sizeChartId }}, "{{ $sizeChartName }}")'
+                   class="animate-underline-primary">{{ translate('Show size guide') }}</a>
             </div>
         @endif
     </div>
@@ -194,7 +202,7 @@
             <div class="col-sm-10">
                 @if ($detailedProduct->auction_end_date > strtotime('now'))
                     <div class="aiz-count-down align-items-center"
-                        data-date="{{ date('Y/m/d H:i:s', $detailedProduct->auction_end_date) }}"></div>
+                         data-date="{{ date('Y/m/d H:i:s', $detailedProduct->auction_end_date) }}"></div>
                 @else
                     <p>{{ translate('Ended') }}</p>
                 @endif
@@ -250,20 +258,20 @@
             <!-- Wholesale -->
             <table class="table mb-3">
                 <thead>
-                    <tr>
-                        <th class="border-top-0">{{ translate('Min Qty') }}</th>
-                        <th class="border-top-0">{{ translate('Max Qty') }}</th>
-                        <th class="border-top-0">{{ translate('Unit Price') }}</th>
-                    </tr>
+                <tr>
+                    <th class="border-top-0">{{ translate('Min Qty') }}</th>
+                    <th class="border-top-0">{{ translate('Max Qty') }}</th>
+                    <th class="border-top-0">{{ translate('Unit Price') }}</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach ($detailedProduct->stocks->first()->wholesalePrices as $wholesalePrice)
-                        <tr>
-                            <td>{{ $wholesalePrice->min_qty }}</td>
-                            <td>{{ $wholesalePrice->max_qty }}</td>
-                            <td>{{ single_price($wholesalePrice->price) }}</td>
-                        </tr>
-                    @endforeach
+                @foreach ($detailedProduct->stocks->first()->wholesalePrices as $wholesalePrice)
+                    <tr>
+                        <td>{{ $wholesalePrice->min_qty }}</td>
+                        <td>{{ $wholesalePrice->max_qty }}</td>
+                        <td>{{ single_price($wholesalePrice->price) }}</td>
+                    </tr>
+                @endforeach
                 </tbody>
             </table>
         @else
@@ -290,29 +298,30 @@
                             <!-- Discount percentage -->
                             @if (discount_in_percentage($detailedProduct) > 0)
                                 <span class="bg-primary ml-2 fs-11 fw-700 text-white w-35px text-center p-1"
-                                    style="padding-top:2px;padding-bottom:2px;">-{{ discount_in_percentage($detailedProduct) }}%</span>
+                                      style="padding-top:2px;padding-bottom:2px;">-{{ discount_in_percentage($detailedProduct) }}%</span>
                             @endif
                             <!-- Club Point -->
                             @if (addon_is_activated('club_point') && $detailedProduct->earn_point > 0)
-                                <div class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
+                                <div
+                                    class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
                                     style="width: fit-content;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                        viewBox="0 0 12 12">
+                                         viewBox="0 0 12 12">
                                         <g id="Group_23922" data-name="Group 23922" transform="translate(-973 -633)">
                                             <circle id="Ellipse_39" data-name="Ellipse 39" cx="6"
-                                                cy="6" r="6" transform="translate(973 633)"
-                                                fill="#fff" />
+                                                    cy="6" r="6" transform="translate(973 633)"
+                                                    fill="#fff"/>
                                             <g id="Group_23920" data-name="Group 23920"
-                                                transform="translate(973 633)">
+                                               transform="translate(973 633)">
                                                 <path id="Path_28698" data-name="Path 28698"
-                                                    d="M7.667,3H4.333L3,5,6,9,9,5Z" transform="translate(0 0)"
-                                                    fill="#f3af3d" />
+                                                      d="M7.667,3H4.333L3,5,6,9,9,5Z" transform="translate(0 0)"
+                                                      fill="#f3af3d"/>
                                                 <path id="Path_28699" data-name="Path 28699"
-                                                    d="M5.33,3h-1L3,5,6,9,4.331,5Z" transform="translate(0 0)"
-                                                    fill="#f3af3d" opacity="0.5" />
+                                                      d="M5.33,3h-1L3,5,6,9,4.331,5Z" transform="translate(0 0)"
+                                                      fill="#f3af3d" opacity="0.5"/>
                                                 <path id="Path_28700" data-name="Path 28700"
-                                                    d="M12.666,3h1L15,5,12,9l1.664-4Z" transform="translate(-5.995 0)"
-                                                    fill="#f3af3d" />
+                                                      d="M12.666,3h1L15,5,12,9l1.664-4Z" transform="translate(-5.995 0)"
+                                                      fill="#f3af3d"/>
                                             </g>
                                         </g>
                                     </svg>
@@ -340,25 +349,26 @@
                             @endif
                             <!-- Club Point -->
                             @if (addon_is_activated('club_point') && $detailedProduct->earn_point > 0)
-                                <div class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
+                                <div
+                                    class="ml-2 bg-secondary-base d-flex justify-content-center align-items-center px-3 py-1"
                                     style="width: fit-content;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
-                                        viewBox="0 0 12 12">
+                                         viewBox="0 0 12 12">
                                         <g id="Group_23922" data-name="Group 23922" transform="translate(-973 -633)">
                                             <circle id="Ellipse_39" data-name="Ellipse 39" cx="6"
-                                                cy="6" r="6" transform="translate(973 633)"
-                                                fill="#fff" />
+                                                    cy="6" r="6" transform="translate(973 633)"
+                                                    fill="#fff"/>
                                             <g id="Group_23920" data-name="Group 23920"
-                                                transform="translate(973 633)">
+                                               transform="translate(973 633)">
                                                 <path id="Path_28698" data-name="Path 28698"
-                                                    d="M7.667,3H4.333L3,5,6,9,9,5Z" transform="translate(0 0)"
-                                                    fill="#f3af3d" />
+                                                      d="M7.667,3H4.333L3,5,6,9,9,5Z" transform="translate(0 0)"
+                                                      fill="#f3af3d"/>
                                                 <path id="Path_28699" data-name="Path 28699"
-                                                    d="M5.33,3h-1L3,5,6,9,4.331,5Z" transform="translate(0 0)"
-                                                    fill="#f3af3d" opacity="0.5" />
+                                                      d="M5.33,3h-1L3,5,6,9,4.331,5Z" transform="translate(0 0)"
+                                                      fill="#f3af3d" opacity="0.5"/>
                                                 <path id="Path_28700" data-name="Path 28700"
-                                                    d="M12.666,3h1L15,5,12,9l1.664-4Z" transform="translate(-5.995 0)"
-                                                    fill="#f3af3d" />
+                                                      d="M12.666,3h1L15,5,12,9l1.664-4Z" transform="translate(-5.995 0)"
+                                                      fill="#f3af3d"/>
                                             </g>
                                         </g>
                                     </svg>
@@ -393,8 +403,8 @@
                                     @foreach ($choice->values as $key => $value)
                                         <label class="aiz-megabox pl-0 mr-2 mb-0">
                                             <input type="radio" name="attribute_id_{{ $choice->attribute_id }}"
-                                                value="{{ $value }}"
-                                                @if ($key == 0) checked @endif>
+                                                   value="{{ $value }}"
+                                                   @if ($key == 0) checked @endif>
                                             <span
                                                 class="aiz-megabox-elem rounded-0 d-flex align-items-center justify-content-center py-1 px-3">
                                                 {{ $value }}
@@ -417,14 +427,14 @@
                             <div class="aiz-radio-inline">
                                 @foreach (json_decode($detailedProduct->colors) as $key => $color)
                                     <label class="aiz-megabox pl-0 mr-2 mb-0" data-toggle="tooltip"
-                                        data-title="{{ get_single_color_name($color) }}">
+                                           data-title="{{ get_single_color_name($color) }}">
                                         <input type="radio" name="color"
-                                            value="{{ get_single_color_name($color) }}"
-                                            @if ($key == 0) checked @endif>
+                                               value="{{ get_single_color_name($color) }}"
+                                               @if ($key == 0) checked @endif>
                                         <span
                                             class="aiz-megabox-elem rounded-0 d-flex align-items-center justify-content-center p-1">
                                             <span class="size-25px d-inline-block rounded"
-                                                style="background: {{ $color }};"></span>
+                                                  style="background: {{ $color }};"></span>
                                         </span>
                                     </label>
                                 @endforeach
@@ -442,15 +452,15 @@
                         <div class="product-quantity d-flex align-items-center">
                             <div class="row no-gutters align-items-center aiz-plus-minus mr-3" style="width: 130px;">
                                 <button class="btn col-auto btn-icon btn-sm btn-light rounded-0" type="button"
-                                    data-type="minus" data-field="quantity" disabled="">
+                                        data-type="minus" data-field="quantity" disabled="">
                                     <i class="las la-minus"></i>
                                 </button>
                                 <input type="number" name="quantity"
-                                    class="col border-0 text-center flex-grow-1 fs-16 input-number" placeholder="1"
-                                    value="{{ $detailedProduct->min_qty }}" min="{{ $detailedProduct->min_qty }}"
-                                    max="10" lang="en">
+                                       class="col border-0 text-center flex-grow-1 fs-16 input-number" placeholder="1"
+                                       value="{{ $detailedProduct->min_qty }}" min="{{ $detailedProduct->min_qty }}"
+                                       max="10" lang="en">
                                 <button class="btn col-auto btn-icon btn-sm btn-light rounded-0" type="button"
-                                    data-type="plus" data-field="quantity">
+                                        data-type="plus" data-field="quantity">
                                     <i class="las la-plus"></i>
                                 </button>
                             </div>
@@ -505,7 +515,7 @@
                         class="badge badge-inline badge-danger">{{ translate('Seller cannot Place Bid to His Own Product') }}</span>
                 @else
                     <button type="button" class="btn btn-primary buy-now  fw-600 min-w-150px rounded-0"
-                        onclick="bid_modal()">
+                            onclick="bid_modal()">
                         <i class="las la-gavel"></i>
                         @if (Auth::check() &&
                                 Auth::user()->product_bids->where('product_id', $detailedProduct->id)->first() != null)
@@ -518,43 +528,47 @@
             </div>
         @endif
     @else
-    <!-- Add to cart & Buy now Buttons -->
-   
+        <!-- Add to cart & Buy now Buttons -->
 
-    <div class="mt-3">
-        @if ($detailedProduct->digital == 0)
-        @if (((get_setting('product_external_link_for_seller') == 1) && ($detailedProduct->added_by == "seller") && ($detailedProduct->external_link != null)) ||
-        (($detailedProduct->added_by != "seller") && ($detailedProduct->external_link != null)))
-        <a type="button" class="btn btn-primary buy-now fw-600 add-to-cart px-4 rounded-0"
-            href="{{ $detailedProduct->external_link }}">
-            <i class="la la-share"></i> {{ translate($detailedProduct->external_link_btn) }}
-        </a>
-        @else
-        <button type="button"
-            class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
-            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
-            <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
-        </button>
-        <button type="button" class="btn btn-primary mr-2 buy-now fw-600 add-to-cart min-w-150px rounded-0"
-            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="buyNow()" @else onclick="showLoginModal()" @endif>
-            <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
-        </button>
-        @endif
-        <button type="button" class="btn btn-secondary out-of-stock fw-600 d-none" disabled>
-            <i class="la la-cart-arrow-down"></i> {{ translate('Out of Stock') }}
-        </button>
-        @elseif ($detailedProduct->digital == 1)
-        <button type="button"
-            class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
-            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
-            <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
-        </button>
-        <button type="button" class="btn btn-primary mr-2 buy-now fw-600 add-to-cart min-w-150px rounded-0"
-            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="BuyNow()" @else onclick="showLoginModal()" @endif>
-            <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
-        </button>
-        @endif
-    </div>
+
+        <div class="mt-3">
+            @if ($detailedProduct->digital == 0)
+                @if (((get_setting('product_external_link_for_seller') == 1) && ($detailedProduct->added_by == "seller") && ($detailedProduct->external_link != null)) ||
+                (($detailedProduct->added_by != "seller") && ($detailedProduct->external_link != null)))
+                    <a type="button" class="btn btn-primary buy-now fw-600 add-to-cart px-4 rounded-0"
+                       href="{{ $detailedProduct->external_link }}">
+                        <i class="la la-share"></i> {{ translate($detailedProduct->external_link_btn) }}
+                    </a>
+                @else
+                    <button type="button"
+                            class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
+                            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="addToCart()"
+                            @else onclick="showLoginModal()" @endif>
+                        <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
+                    </button>
+                    <button type="button" class="btn btn-primary mr-2 buy-now fw-600 add-to-cart min-w-150px rounded-0"
+                            @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="buyNow()"
+                            @else onclick="showLoginModal()" @endif>
+                        <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
+                    </button>
+                @endif
+                <button type="button" class="btn btn-secondary out-of-stock fw-600 d-none" disabled>
+                    <i class="la la-cart-arrow-down"></i> {{ translate('Out of Stock') }}
+                </button>
+            @elseif ($detailedProduct->digital == 1)
+                <button type="button"
+                        class="btn btn-secondary-base mr-2 add-to-cart fw-600 min-w-150px rounded-0 text-white"
+                        @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="addToCart()"
+                        @else onclick="showLoginModal()" @endif>
+                    <i class="las la-shopping-bag"></i> {{ translate('Add to cart') }}
+                </button>
+                <button type="button" class="btn btn-primary mr-2 buy-now fw-600 add-to-cart min-w-150px rounded-0"
+                        @if (Auth::check() || get_Setting('guest_checkout_activation')==1) onclick="BuyNow()"
+                        @else onclick="showLoginModal()" @endif>
+                    <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
+                </button>
+            @endif
+        </div>
 
         <!-- Promote Link -->
         <div class="d-table width-100 mt-3">
@@ -576,8 +590,8 @@
                     @endphp
                     <div>
                         <button type="button" id="ref-cpurl-btn" class="btn btn-secondary w-200px rounded-0"
-                            data-attrcpy="{{ translate('Copied') }}" onclick="CopyToClipboard(this)"
-                            data-url="{{ $referral_code_url }}">{{ translate('Copy the Promote Link') }}</button>
+                                data-attrcpy="{{ translate('Copied') }}" onclick="CopyToClipboard(this)"
+                                data-url="{{ $referral_code_url }}">{{ translate('Copy the Promote Link') }}</button>
                     </div>
                 @endif
             </div>
@@ -596,21 +610,22 @@
                     @if ($detailedProduct->refundable == 1)
                         <a href="{{ route('returnpolicy') }}" target="_blank">
                             @if ($refund_sticker != null)
-                                <img src="{{ uploaded_asset($refund_sticker) }}" height="36">
+                                <img src="{{ get_file_by_id($refund_sticker) }}" height="36">
                             @else
                                 <img src="{{ static_asset('assets/img/refund-sticker.jpg') }}" height="36">
                             @endif
                         </a>
                         @if($detailedProduct->refund_note_id != null)
-                            <span href="javascript:void(1);" 
-                                data-toggle="modal" data-target="#refund-note-modal"
-                                class="border-bottom border-bottom-4 ml-2 text-secondary-base">
+                            <span href="javascript:void(1);"
+                                  data-toggle="modal" data-target="#refund-note-modal"
+                                  class="border-bottom border-bottom-4 ml-2 text-secondary-base">
                                 {{ translate('Refund Note') }}
                             </span>
                         @endif
-                        
-                        <a href="{{ route('returnpolicy') }}" class="text-blue hov-text-primary fs-14 ml-3" target="_blank">{{ translate('View Policy') }}</a>
-                        
+
+                        <a href="{{ route('returnpolicy') }}" class="text-blue hov-text-primary fs-14 ml-3"
+                           target="_blank">{{ translate('View Policy') }}</a>
+
                     @else
                         <div class="text-dark fs-14 fw-400 mt-2">{{ translate('Not Applicable') }}</div>
                     @endif

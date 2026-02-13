@@ -14,10 +14,10 @@ class ShopCollection extends ResourceCollection
                     'id' => $data->id,
                     'slug' => $data->slug,
                     'name' => $data->name,
-                    'logo' => uploaded_asset($data->logo),
+                    'logo' => get_file_by_id($data->logo),
                     'rating' => $data->rating,
                 ];
-            })
+            }),
         ];
     }
 
@@ -25,16 +25,17 @@ class ShopCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 
     protected function convertPhotos($data)
     {
-        $result = array();
+        $result = [];
         foreach ($data as $key => $item) {
-            array_push($result, uploaded_asset($item));
+            array_push($result, get_file_by_id($item));
         }
+
         return $result;
     }
 }

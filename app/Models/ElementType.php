@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class ElementType extends Model
 {
     use PreventDemoModeChanges;
 
     protected $fillable = [
-        'is_default'
+        'is_default',
     ];
 
     public function element()
@@ -20,7 +20,7 @@ class ElementType extends Model
 
     public function image()
     {
-        return $this->belongsTo(Upload::class,);
+        return $this->belongsTo(Media::class);
     }
 
     public function element_styles()

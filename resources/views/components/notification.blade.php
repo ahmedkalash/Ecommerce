@@ -48,9 +48,9 @@
                         @if($notificationShowDesign != 'only_text')
                             <div class="size-35px mr-2">
                                 <img
-                                    src="{{ uploaded_asset($notificationType->image) }}"
+                                    src="{{ get_file_by_id($notificationType->image) }}"
                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/notification.png') }}';"
-                                    class="img-fit h-100 {{ $notifyImageDesign }}" >
+                                    class="img-fit h-100 {{ $notifyImageDesign }}">
                             </div>
                         @endif
                         <div>
@@ -66,7 +66,7 @@
                                     $notifyContent = str_replace('[[order_code]]', $orderCode, $notifyContent);
                                 @endphp
 
-                            {{-- Shop Verification Related Notifications --}}
+                                {{-- Shop Verification Related Notifications --}}
                             @elseif ($notification->type == 'App\Notifications\ShopVerificationNotification')
                                 @php
                                     if($notification->data['status'] == 'submitted'){
@@ -76,7 +76,7 @@
                                     }
                                 @endphp
 
-                            {{-- Shop Product Related Notifications --}}
+                                {{-- Shop Product Related Notifications --}}
                             @elseif ($notification->type == 'App\Notifications\ShopProductNotification')
                                 @php
                                     $product_id     = $notification->data['id'];
@@ -94,7 +94,7 @@
                                     $notifyContent = str_replace('[[product_name]]', $productName, $notifyContent);
                                 @endphp
 
-                            {{-- Seller Payout Notifications --}}
+                                {{-- Seller Payout Notifications --}}
                             @elseif ($notification->type == 'App\Notifications\PayoutNotification')
                                 @php
                                     $amount = single_price($notification->data['payment_amount']);

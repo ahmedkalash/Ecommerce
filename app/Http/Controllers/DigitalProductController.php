@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
-use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductTax;
 use App\Models\ProductTranslation;
-use App\Models\Upload;
-use App\Services\ProductService;
-use App\Services\ProductTaxService;
-use App\Services\ProductStockService;
 use App\Services\FrequentlyBoughtProductService;
+use App\Services\ProductService;
+use App\Services\ProductStockService;
+use App\Services\ProductTaxService;
 use Artisan;
+use Illuminate\Http\Request;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class DigitalProductController extends Controller
 {
@@ -34,15 +34,16 @@ class DigitalProductController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search    = null;
-        $products       = Product::query();
+        $sort_search = null;
+        $products = Product::query();
         $products->where('added_by', 'admin');
         if ($request->has('search')) {
-            $sort_search    = $request->search;
-            $products       = $products->where('name', 'like', '%' . $sort_search . '%');
+            $sort_search = $request->search;
+            $products = $products->where('name', 'like', '%'.$sort_search.'%');
         }
         $products = $products->where('digital', 1)->orderBy('created_at', 'desc')->paginate(10);
         $type = 'Admin';
+
         return view('backend.product.digital_products.index', compact('products', 'sort_search', 'type'));
     }
 
@@ -57,6 +58,7 @@ class DigitalProductController extends Controller
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();
+
         return view('backend.product.digital_products.create', compact('categories'));
     }
 
@@ -70,41 +72,42 @@ class DigitalProductController extends Controller
     {
         // Product Store
         $product = (new ProductService)->store($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type'
+            '_token', 'tax_id', 'tax', 'tax_type',
         ]));
 
         $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
 
-        //Product categories
+        // Product categories
         $product->categories()->attach($request->category_ids);
 
-        //Product Stock
+        // Product Stock
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id'
+            'unit_price', 'current_stock', 'product_id',
         ]), $product);
 
-        //VAT & Tax
+        // VAT & Tax
         if ($request->tax_id) {
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id', 'tax', 'tax_type', 'product_id',
             ]));
         }
 
         // Frequently Bought Products
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'description', 'product_id'
+            'lang', 'name', 'description', 'product_id',
         ]));
 
         flash(translate('Product has been inserted successfully'))->success();
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
+
         return redirect()->route('digitalproducts.index');
     }
 
@@ -133,6 +136,7 @@ class DigitalProductController extends Controller
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();
+
         return view('backend.product.digital_products.edit', compact('product', 'lang', 'categories'));
     }
 
@@ -145,39 +149,39 @@ class DigitalProductController extends Controller
      */
     public function update(ProductRequest $request, $id)
     {
-        $product                    = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
 
-        //Product Update
+        // Product Update
         $product = (new ProductService)->update($request->except([
-             '_token', 'tax_id', 'tax', 'tax_type'
-         ]), $product);
+            '_token', 'tax_id', 'tax', 'tax_type',
+        ]), $product);
 
-        //Product Stock
+        // Product Stock
         foreach ($product->stocks as $key => $stock) {
             $stock->delete();
         }
 
-        $request->merge(['product_id' => $product->id,'current_stock' => 0]);
+        $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
 
-        //Product categories
+        // Product categories
         $product->categories()->sync($request->category_ids);
 
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id'
+            'unit_price', 'current_stock', 'product_id',
         ]), $product);
 
-        //VAT & Tax
+        // VAT & Tax
         if ($request->tax_id) {
             ProductTax::where('product_id', $product->id)->delete();
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id', 'tax', 'tax_type', 'product_id',
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
         ]));
 
         // Product Translations
@@ -190,6 +194,7 @@ class DigitalProductController extends Controller
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
+
         return back();
     }
 
@@ -201,27 +206,21 @@ class DigitalProductController extends Controller
      */
     public function destroy($id)
     {
-       (new ProductService)->destroy($id);
+        (new ProductService)->destroy($id);
 
         flash(translate('Product has been deleted successfully'))->success();
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
-        
+
         return back();
     }
-
 
     public function download(Request $request)
     {
         $product = Product::findOrFail(decrypt($request->id));
 
-        $upload = Upload::findOrFail($product->file_name);
-        if (env('FILESYSTEM_DRIVER') == "s3") {
-            return \Storage::disk('s3')->download($upload->file_name, $upload->file_original_name . "." . $upload->extension);
-        } else {
-            if (file_exists(base_path('public/' . $upload->file_name))) {
-                return response()->download(base_path('public/' . $upload->file_name));
-            }
-        }
+        $upload = Media::findOrFail($product->file_name);
+
+        return response()->download($upload->getPath(), config('app.name').'_'.$upload->name.'.'.$upload->extension);
     }
 }

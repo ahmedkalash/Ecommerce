@@ -271,7 +271,7 @@
                                     class="d-block small opacity-60 text-right">{{ Auth::guard('admin')->user()->user_type }}</span>
                             </span>
                             <span class="size-40px rounded-content overflow-hidden ml-md-2">
-                                <img src="{{ uploaded_asset(Auth::guard('admin')->user()->avatar_original) }}"
+                                <img src="{{ get_file_by_id(Auth::guard('admin')->user()->avatar_original) }}"
                                      class="img-fit"
                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                             </span>

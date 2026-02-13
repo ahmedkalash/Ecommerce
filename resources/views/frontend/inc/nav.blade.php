@@ -3,7 +3,7 @@
     $topbar_banner = get_setting('topbar_banner');
     $topbar_banner_medium = get_setting('topbar_banner_medium');
     $topbar_banner_small = get_setting('topbar_banner_small');
-    $topbar_banner_asset = uploaded_asset($topbar_banner);
+    $topbar_banner_asset = get_file_by_id($topbar_banner);
 @endphp
 @if ($topbar_banner != null)
     <div class="position-relative top-banner removable-session z-1035 d-none" data-key="top-banner"
@@ -13,10 +13,11 @@
             <img src="{{ $topbar_banner_asset }}" class="d-none d-xl-block img-fit h-100"
                  alt="{{ translate('topbar_banner') }}">
             <!-- For Medium device -->
-            <img src="{{ $topbar_banner_medium != null ? uploaded_asset($topbar_banner_medium) : $topbar_banner_asset }}"
-                 class="d-none d-md-block d-xl-none img-fit h-100" alt="{{ translate('topbar_banner') }}">
+            <img
+                src="{{ $topbar_banner_medium != null ? get_file_by_id($topbar_banner_medium) : $topbar_banner_asset }}"
+                class="d-none d-md-block d-xl-none img-fit h-100" alt="{{ translate('topbar_banner') }}">
             <!-- For Small device -->
-            <img src="{{ $topbar_banner_small != null ? uploaded_asset($topbar_banner_small) : $topbar_banner_asset }}"
+            <img src="{{ $topbar_banner_small != null ? get_file_by_id($topbar_banner_small) : $topbar_banner_asset }}"
                  class="d-md-none img-fit h-100" alt="{{ translate('topbar_banner') }}">
         </a>
         <button class="btn text-white h-100 absolute-top-right set-session" data-key="top-banner" data-value="removed"
@@ -56,7 +57,7 @@
             <span class="d-flex align-items-center nav-user-info pl-4">
             <!-- Image -->
             <span
-                    class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
+                class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img">
                 <svg xmlns="http://www.w3.org/2000/svg" width="19.902" height="20.012" viewBox="0 0 19.902 20.012">
                     <path id="fe2df171891038b33e9624c27e96e367"
                           d="M15.71,12.71a6,6,0,1,0-7.42,0,10,10,0,0,0-6.22,8.18,1.006,1.006,0,1,0,2,.22,8,8,0,0,1,15.9,0,1,1,0,0,0,1,.89h.11a1,1,0,0,0,.88-1.1,10,10,0,0,0-6.25-8.19ZM12,12a4,4,0,1,1,4-4A4,4,0,0,1,12,12Z"

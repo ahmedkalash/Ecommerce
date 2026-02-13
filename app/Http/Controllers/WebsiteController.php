@@ -6,9 +6,9 @@ use App\Models\Element;
 use App\Models\ElementType;
 use App\Models\Language;
 use App\Models\Page;
-use App\Models\Upload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class WebsiteController extends Controller
 {
@@ -29,22 +29,29 @@ class WebsiteController extends Controller
         $user = Auth::user();
         $system_language = Language::where('code', app()->getLocale())->first();
         $element_type = ElementType::find(get_setting('header_element'));
+
         return view('backend.website_settings.header', compact('system_language', 'user', 'element_type'));
     }
+
     public function footer(Request $request)
     {
         $lang = $request->lang;
+
         return view('backend.website_settings.footer', compact('lang'));
     }
+
     public function pages(Request $request)
     {
         $page = Page::where('type', '!=', 'home_page')->get();
+
         return view('backend.website_settings.pages.index', compact('page'));
     }
+
     public function appearance(Request $request)
     {
         return view('backend.website_settings.appearance');
     }
+
     public function select_homepage(Request $request)
     {
         return view('backend.website_settings.select_homepage');
@@ -56,7 +63,9 @@ class WebsiteController extends Controller
         $element_types = ElementType::where('element_id', $element->id)->get();
         $user = Auth::user();
         $system_language = Language::where('code', app()->getLocale())->first();
-        return view('backend.website_settings.select_header', compact('element', 'element_types', 'user', 'system_language'));
+
+        return view('backend.website_settings.select_header',
+            compact('element', 'element_types', 'user', 'system_language'));
     }
 
     public function authentication_layout_settings(Request $request)
@@ -68,15 +77,15 @@ class WebsiteController extends Controller
     {
         $header_logo_id = $request->header_logo;
 
-        if (!$header_logo_id) {
+        if (! $header_logo_id) {
             return response()->json(['html' => ''], 400);
         }
 
-        $img_url = uploaded_asset($header_logo_id);
+        $img_url = get_file_by_id($header_logo_id);
 
         $html = '
-        <a href="' . route('home') . '">
-            <img src="' . $img_url . '" alt="' . env('APP_NAME') . '" class="mw-100 h-30px h-md-40px" height="40">
+        <a href="'.route('home').'">
+            <img src="'.$img_url.'" alt="'.env('APP_NAME').'" class="mw-100 h-30px h-md-40px" height="40">
         </a>
     ';
 
@@ -87,12 +96,12 @@ class WebsiteController extends Controller
     {
         $id = $request->id;
 
-        $upload = Upload::find($id);
+        $upload = Media::find($id);
 
         if ($upload) {
             return response()->json([
                 'success' => true,
-                'file_name' => $upload->file_name,
+                'file_name' => $upload->getUrl(), // Returning URL as file name for parity if used for preview
             ]);
         } else {
             return response()->json([
@@ -110,13 +119,14 @@ class WebsiteController extends Controller
 
         // Attach image URL using uploaded_asset()
         $element_types->map(function ($type) {
-            $upload = Upload::find($type->image_id);
-            $type->image_url = $upload ? uploaded_asset($upload->id) : null;
+            $upload = Media::find($type->image_id);
+            $type->image_url = $upload ? get_file_by_id($upload->id) : null;
+
             return $type;
         });
 
         return response()->json([
-            'element_types' => $element_types
+            'element_types' => $element_types,
         ]);
     }
 }

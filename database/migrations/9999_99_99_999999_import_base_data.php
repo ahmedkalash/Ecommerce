@@ -94,6 +94,7 @@ class ImportBaseData extends Migration
             // TESTING ENVIRONMENT: Import minimal data only
             return [
                 join_paths('for_testing_env', '0_init_db_config.sql'),             // DB initialization (required)
+                join_paths('for_testing_env', '0.1_app_table.sql'),                // App table (ID 1)
                 join_paths('for_testing_env', '2_business_settings_table.sql'),    // Critical app settings (required)
                 join_paths('for_testing_env', '6.multiple_tables.sql'),            // UI elements (486KB)
                 join_paths('for_testing_env', '10_roles_and_permissions.sql'),     // Roles & Permissions
@@ -105,6 +106,7 @@ class ImportBaseData extends Migration
         // Total: ~4-8MB depending on selections
         return [
             '0_init_db_config.sql',             // DB initialization
+            '0.1_app_table.sql',                // App table (ID 1)
             '1_app_translations_table.sql',     // UI translations (224KB)
             '2_business_settings_table.sql',    // Critical app settings (REQUIRED)
             '3.multiple_tables.sql',            // Product demo data (19KB)
@@ -112,7 +114,7 @@ class ImportBaseData extends Migration
             '5_states_table.sql',               // States database (334KB)
             '6.multiple_tables.sql',            // UI elements (486KB)
             '7_translations_table.sql',         // Entity translations (3.1MB)
-            '8_uploads_table.sql',              // Demo uploads
+            '8_media_table.sql',                // Media Library Dump
             '9_users_table.sql',                // Demo users
             '10_roles_and_permissions.sql',     // Roles & Permissions
             '100_final_db_config.sql',          // Finalization/COMMIT

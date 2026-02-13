@@ -12,10 +12,10 @@
             $user_avatar = null;
             $carts = [];
             if ($user && $user->avatar_original != null) {
-            $user_avatar = uploaded_asset($user->avatar_original);
+            $user_avatar = get_file_by_id($user->avatar_original);
             }
         @endphp
-                <!-- Customer info -->
+            <!-- Customer info -->
         <div class="p-4 text-center mb-4 border-bottom position-relative">
             <!-- Image -->
             <span class="avatar avatar-md mb-3">
@@ -61,7 +61,7 @@
                     $payment_status_viewed = get_count_by_payment_status_viewed();
                 @endphp
 
-                        <!-- Purchase History -->
+                    <!-- Purchase History -->
                 <li class="aiz-side-nav-item">
                     <a href="{{ route('purchase_history.index') }}"
                        class="aiz-side-nav-link {{ areActiveRoutes(['purchase_history.index', 'purchase_history.details']) }}">
@@ -436,7 +436,7 @@
                                 <a href="{{ route('affiliate.user.withdraw_request_history') }}"
                                    class="aiz-side-nav-link">
                                 <span
-                                        class="aiz-side-nav-text">{{ translate('Withdraw request history') }}</span>
+                                    class="aiz-side-nav-text">{{ translate('Withdraw request history') }}</span>
                                 </a>
                             </li>
 
@@ -451,7 +451,7 @@
                     ->count();
                 @endphp
 
-                        <!-- Support Ticket -->
+                    <!-- Support Ticket -->
                 <li class="aiz-side-nav-item">
                     <a href="{{ route('support_ticket.index') }}"
                        class="aiz-side-nav-link {{ areActiveRoutes(['support_ticket.index', 'support_ticket.show']) }}">

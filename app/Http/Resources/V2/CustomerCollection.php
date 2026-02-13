@@ -9,23 +9,23 @@ class CustomerCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'name' => $data->name,
                     'email' => $data->email,
-                    'avatar' => uploaded_asset($data->avatar),
-                    'address' => $data->address??"",
-                    'country' => $data->country??"",
-                    'state' => $data->state??"",
-                    'city' => $data->city??"",
-                    'postal_code' => $data->postal_code??"",
-                    'phone' =>$data->phone??"",
-                    'balance' =>single_price($data->balance),
+                    'avatar' => get_file_by_id($data->avatar),
+                    'address' => $data->address ?? '',
+                    'country' => $data->country ?? '',
+                    'state' => $data->state ?? '',
+                    'city' => $data->city ?? '',
+                    'postal_code' => $data->postal_code ?? '',
+                    'phone' => $data->phone ?? '',
+                    'balance' => single_price($data->balance),
                     'remaining_uploads' => $data->remaining_uploads,
-                    'package_id' => $data->customer_package_id??"",
-                    'package_name' => $data->customer_package->name??"",
+                    'package_id' => $data->customer_package_id ?? '',
+                    'package_name' => $data->customer_package->name ?? '',
                 ];
-            })
+            }),
         ];
     }
 
@@ -33,7 +33,7 @@ class CustomerCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

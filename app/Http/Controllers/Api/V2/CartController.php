@@ -15,10 +15,10 @@ class CartController extends Controller
     public function summary(Request $request)
     {
         // $user  = auth()->user();
-        $user  = $request->user_id != null ? User::where('id', $request->user_id)->first() : null;
+        $user = $request->user_id != null ? User::where('id', $request->user_id)->first() : null;
         $items = ($user != null) ?
-                Cart::where('user_id', $user->id)->active()->get() :
-                ($request->has('temp_user_id') ? Cart::where('temp_user_id', $request->temp_user_id)->active()->get() : [] );
+            Cart::where('user_id', $user->id)->active()->get() :
+            ($request->has('temp_user_id') ? Cart::where('temp_user_id', $request->temp_user_id)->active()->get() : []);
 
         if ($items->isEmpty()) {
             return response()->json([
@@ -28,7 +28,7 @@ class CartController extends Controller
                 'discount' => format_price(0.00),
                 'grand_total' => format_price(0.00),
                 'grand_total_value' => 0.00,
-                'coupon_code' => "",
+                'coupon_code' => '',
                 'coupon_applied' => false,
             ]);
         }
@@ -62,12 +62,12 @@ class CartController extends Controller
     {
         $user_id = $request->user_id;
         $temp_user_id = $request->temp_user_id;
-        $items  = ($user_id != null) ?
-                    Cart::where('user_id', $user_id)->active()->get() :
-                    ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->active()->get() : [] );
+        $items = ($user_id != null) ?
+            Cart::where('user_id', $user_id)->active()->get() :
+            ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->active()->get() : []);
 
         return response()->json([
-            'count' => sizeof($items),
+            'count' => count($items),
             'status' => true,
         ]);
     }
@@ -78,47 +78,54 @@ class CartController extends Controller
         $temp_user_id = $request->temp_user_id;
 
         $owner_ids = ($user_id != null) ?
-            Cart::where('user_id', $user_id)->active()->select('owner_id')->groupBy('owner_id')->pluck('owner_id')->toArray() :
-            ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->active()->select('owner_id')->groupBy('owner_id')->pluck('owner_id')->toArray() : [] );
-
+            Cart::where('user_id',
+                $user_id)->active()->select('owner_id')->groupBy('owner_id')->pluck('owner_id')->toArray() :
+            ($temp_user_id != null ? Cart::where('temp_user_id',
+                $temp_user_id)->active()->select('owner_id')->groupBy('owner_id')->pluck('owner_id')->toArray() : []);
 
         $currency_symbol = currency_symbol();
         $shops = [];
         $sub_total = 0.00;
         $grand_total = 0.00;
-        if (!empty($owner_ids)) {
+        if (! empty($owner_ids)) {
             foreach ($owner_ids as $owner_id) {
-                $shop = array();
+                $shop = [];
                 $shop_items_raw_data = ($user_id != null) ?
                     Cart::where('user_id', $user_id)->where('owner_id', $owner_id)->active()->get()->toArray() :
-                    ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->where('owner_id', $owner_id)->active()->get()->toArray() : [] );
-                $shop_items_data = array();
-                if (!empty($shop_items_raw_data)) {
+                    ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->where('owner_id',
+                        $owner_id)->active()->get()->toArray() : []);
+                $shop_items_data = [];
+                if (! empty($shop_items_raw_data)) {
                     foreach ($shop_items_raw_data as $shop_items_raw_data_item) {
-                        $product = Product::where('id', $shop_items_raw_data_item["product_id"])->first();
-                        $price = cart_product_price($shop_items_raw_data_item, $product, false, false) * intval($shop_items_raw_data_item["quantity"]);
+                        $product = Product::where('id', $shop_items_raw_data_item['product_id'])->first();
+                        $price = cart_product_price($shop_items_raw_data_item, $product, false,
+                            false) * intval($shop_items_raw_data_item['quantity']);
                         $tax = cart_product_tax($shop_items_raw_data_item, $product, false);
-                        $shop_items_data_item["id"] = intval($shop_items_raw_data_item["id"]);
-                        $shop_items_data_item["status"] = intval($shop_items_raw_data_item["status"]);
-                        $shop_items_data_item["owner_id"] = intval($shop_items_raw_data_item["owner_id"]);
-                        $shop_items_data_item["user_id"] = intval($shop_items_raw_data_item["user_id"]);
-                        $shop_items_data_item["product_id"] = intval($shop_items_raw_data_item["product_id"]);
-                        $shop_items_data_item["product_name"] = $product->getTranslation('name');
-                        $shop_items_data_item["auction_product"] = $product->auction_product;
-                        $shop_items_data_item["product_thumbnail_image"] = uploaded_asset($product->thumbnail_img);
-                        $shop_items_data_item["variation"] = $shop_items_raw_data_item["variation"];
-                        $shop_items_data_item["price"] = (float) cart_product_price($shop_items_raw_data_item, $product, false, false);
-                        $shop_items_data_item["currency_symbol"] = $currency_symbol;
-                        $shop_items_data_item["tax"] = (float) cart_product_tax($shop_items_raw_data_item, $product, false);
-                        $shop_items_data_item["price"] = single_price($price);
-                        $shop_items_data_item["currency_symbol"] = $currency_symbol;
-                        $shop_items_data_item["tax"] = single_price($tax);
-                        $shop_items_data_item["shipping_cost"] = (float) $shop_items_raw_data_item["shipping_cost"];
-                        $shop_items_data_item["quantity"] = intval($shop_items_raw_data_item["quantity"]);
-                        $shop_items_data_item["lower_limit"] = intval($product->min_qty);
-                        $shop_items_data_item["upper_limit"] = intval($product->stocks->where('variant', $shop_items_raw_data_item['variation'])->first()->qty);
-                        $shop_items_data_item["digital"] = $product->digital;   
-                        $shop_items_data_item["stock"] = $product->stocks->where('variant', $shop_items_raw_data_item['variation'])->first()->qty; 
+                        $shop_items_data_item['id'] = intval($shop_items_raw_data_item['id']);
+                        $shop_items_data_item['status'] = intval($shop_items_raw_data_item['status']);
+                        $shop_items_data_item['owner_id'] = intval($shop_items_raw_data_item['owner_id']);
+                        $shop_items_data_item['user_id'] = intval($shop_items_raw_data_item['user_id']);
+                        $shop_items_data_item['product_id'] = intval($shop_items_raw_data_item['product_id']);
+                        $shop_items_data_item['product_name'] = $product->getTranslation('name');
+                        $shop_items_data_item['auction_product'] = $product->auction_product;
+                        $shop_items_data_item['product_thumbnail_image'] = get_file_by_id($product->thumbnail_img);
+                        $shop_items_data_item['variation'] = $shop_items_raw_data_item['variation'];
+                        $shop_items_data_item['price'] = (float) cart_product_price($shop_items_raw_data_item, $product,
+                            false, false);
+                        $shop_items_data_item['currency_symbol'] = $currency_symbol;
+                        $shop_items_data_item['tax'] = (float) cart_product_tax($shop_items_raw_data_item, $product,
+                            false);
+                        $shop_items_data_item['price'] = single_price($price);
+                        $shop_items_data_item['currency_symbol'] = $currency_symbol;
+                        $shop_items_data_item['tax'] = single_price($tax);
+                        $shop_items_data_item['shipping_cost'] = (float) $shop_items_raw_data_item['shipping_cost'];
+                        $shop_items_data_item['quantity'] = intval($shop_items_raw_data_item['quantity']);
+                        $shop_items_data_item['lower_limit'] = intval($product->min_qty);
+                        $shop_items_data_item['upper_limit'] = intval($product->stocks->where('variant',
+                            $shop_items_raw_data_item['variation'])->first()->qty);
+                        $shop_items_data_item['digital'] = $product->digital;
+                        $shop_items_data_item['stock'] = $product->stocks->where('variant',
+                            $shop_items_raw_data_item['variation'])->first()->qty;
                         $sub_total += $price + $tax;
                         $shop_items_data[] = $shop_items_data_item;
                     }
@@ -132,7 +139,7 @@ class CartController extends Controller
                     $shop['sub_total'] = single_price($sub_total);
                     $shop['cart_items'] = $shop_items_data;
                 } else {
-                    $shop['name'] = translate("Inhouse");
+                    $shop['name'] = translate('Inhouse');
                     $shop['owner_id'] = (int) $owner_id;
                     $shop['sub_total'] = single_price($sub_total);
                     $shop['cart_items'] = $shop_items_data;
@@ -143,20 +150,19 @@ class CartController extends Controller
         }
 
         return response()->json([
-            "grand_total" => single_price($grand_total),
-            "data" => $shops
+            'grand_total' => single_price($grand_total),
+            'data' => $shops,
         ]);
     }
 
     public function add(Request $request)
     {
-        $user_id =  $request->user_id != null ? $request->user_id : null;
-        $temp_user_id =   $request->temp_user_id != null ? $request->temp_user_id : null;
-        if($user_id != null) {
+        $user_id = $request->user_id != null ? $request->user_id : null;
+        $temp_user_id = $request->temp_user_id != null ? $request->temp_user_id : null;
+        if ($user_id != null) {
             $carts = Cart::where('user_id', $user_id)->active()->get();
-        }
-        else {
-            if($temp_user_id == null){
+        } else {
+            if ($temp_user_id == null) {
                 $temp_user_id = bin2hex(random_bytes(10));
             }
             $carts = Cart::where('temp_user_id', $temp_user_id)->active()->get();
@@ -169,14 +175,14 @@ class CartController extends Controller
             return response()->json([
                 'result' => false,
                 'temp_user_id' => $temp_user_id,
-                'message' => translate('Remove auction product from cart to add this product.')
+                'message' => translate('Remove auction product from cart to add this product.'),
             ], 200);
         }
         if ($check_auction_in_cart == false && count($carts) > 0 && $product->auction_product == 1) {
             return response()->json([
                 'result' => false,
                 'temp_user_id' => $temp_user_id,
-                'message' => translate('Remove other products from cart to add this auction product.')
+                'message' => translate('Remove other products from cart to add this auction product.'),
             ], 200);
         }
 
@@ -184,7 +190,7 @@ class CartController extends Controller
             return response()->json([
                 'result' => false,
                 'temp_user_id' => $temp_user_id,
-                'message' => translate("Minimum") . " {$product->min_qty} " . translate("item(s) should be ordered")
+                'message' => translate('Minimum')." {$product->min_qty} ".translate('item(s) should be ordered'),
             ], 200);
         }
 
@@ -194,28 +200,27 @@ class CartController extends Controller
 
         $product_stock = $product->stocks->where('variant', $variant)->first();
 
-        if($user_id != null) {
+        if ($user_id != null) {
             $cart = Cart::firstOrNew([
                 'variation' => $variant,
                 'user_id' => $user_id,
-                'product_id' => $request['id']
+                'product_id' => $request['id'],
             ]);
         } else {
             $cart = Cart::firstOrNew([
                 'variation' => $variant,
                 'temp_user_id' => $temp_user_id,
-                'product_id' => $request['id']
+                'product_id' => $request['id'],
             ]);
         }
 
-
-        $variant_string = $variant != null && $variant != "" ? translate("for") . " ($variant)" : "";
+        $variant_string = $variant != null && $variant != '' ? translate('for')." ($variant)" : '';
 
         if ($cart->exists && $product->digital == 0) {
             if ($product->auction_product == 1 && ($cart->product_id == $product->id)) {
                 return response()->json([
                     'result' => false,
-                    'message' => translate('This auction product is already added to your cart.')
+                    'message' => translate('This auction product is already added to your cart.'),
                 ], 200);
             }
             if ($product_stock->qty < $cart->quantity + $request['quantity']) {
@@ -223,13 +228,13 @@ class CartController extends Controller
                     return response()->json([
                         'result' => false,
                         'temp_user_id' => $temp_user_id,
-                        'message' => translate("Stock out")
+                        'message' => translate('Stock out'),
                     ], 200);
                 } else {
                     return response()->json([
                         'result' => false,
                         'temp_user_id' => $temp_user_id,
-                        'message' => translate("Only") . " {$product_stock->qty} " . translate("item(s) are available") . " {$variant_string}"
+                        'message' => translate('Only')." {$product_stock->qty} ".translate('item(s) are available')." {$variant_string}",
                     ], 200);
                 }
             }
@@ -237,7 +242,7 @@ class CartController extends Controller
                 return response()->json([
                     'result' => false,
                     'temp_user_id' => $temp_user_id,
-                    'message' => translate('Already added this product')
+                    'message' => translate('Already added this product'),
                 ]);
             }
             $quantity = $cart->quantity + $request['quantity'];
@@ -254,25 +259,30 @@ class CartController extends Controller
         return response()->json([
             'result' => true,
             'temp_user_id' => $temp_user_id,
-            'message' => translate('Product added to cart successfully')
+            'message' => translate('Product added to cart successfully'),
         ]);
     }
+
     public function changeQuantity(Request $request)
     {
         $cart = Cart::find($request->id);
         if ($cart != null) {
             $product = Product::find($cart->product_id);
             if ($product->auction_product == 1) {
-                return response()->json(['result' => false, 'message' => translate('Maximum available quantity reached')], 200);
+                return response()->json([
+                    'result' => false, 'message' => translate('Maximum available quantity reached'),
+                ], 200);
             }
             if ($cart->product->stocks->where('variant', $cart->variation)->first()->qty >= $request->quantity) {
                 $cart->update([
-                    'quantity' => $request->quantity
+                    'quantity' => $request->quantity,
                 ]);
 
                 return response()->json(['result' => true, 'message' => translate('Cart updated')], 200);
             } else {
-                return response()->json(['result' => false, 'message' => translate('Maximum available quantity reached')], 200);
+                return response()->json([
+                    'result' => false, 'message' => translate('Maximum available quantity reached'),
+                ], 200);
             }
         }
 
@@ -281,30 +291,39 @@ class CartController extends Controller
 
     public function process(Request $request)
     {
-        $cart_ids = explode(",", $request->cart_ids);
-        $cart_quantities = explode(",", $request->cart_quantities);
+        $cart_ids = explode(',', $request->cart_ids);
+        $cart_quantities = explode(',', $request->cart_quantities);
 
-        if (!empty($cart_ids)) {
+        if (! empty($cart_ids)) {
             $i = 0;
             foreach ($cart_ids as $cart_id) {
                 $cart_item = Cart::where('id', $cart_id)->first();
                 $product = Product::where('id', $cart_item->product_id)->first();
 
                 if ($product->min_qty > $cart_quantities[$i]) {
-                    return response()->json(['result' => false, 'message' => translate("Minimum") . " {$product->min_qty} " . translate("item(s) should be ordered for") . " {$product->name}"], 200);
+                    return response()->json([
+                        'result' => false,
+                        'message' => translate('Minimum')." {$product->min_qty} ".translate('item(s) should be ordered for')." {$product->name}",
+                    ], 200);
                 }
 
                 $stock = $cart_item->product->stocks->where('variant', $cart_item->variation)->first()->qty;
-                $variant_string = $cart_item->variation != null && $cart_item->variation != "" ? " ($cart_item->variation)" : "";
+                $variant_string = $cart_item->variation != null && $cart_item->variation != '' ? " ($cart_item->variation)" : '';
                 if ($stock >= $cart_quantities[$i] || $product->digital == 1) {
                     $cart_item->update([
-                        'quantity' => $cart_quantities[$i]
+                        'quantity' => $cart_quantities[$i],
                     ]);
                 } else {
                     if ($stock == 0) {
-                        return response()->json(['result' => false, 'message' => translate("No item is available for") . " {$product->name}{$variant_string}," . translate("remove this from cart")], 200);
+                        return response()->json([
+                            'result' => false,
+                            'message' => translate('No item is available for')." {$product->name}{$variant_string},".translate('remove this from cart'),
+                        ], 200);
                     } else {
-                        return response()->json(['result' => false, 'message' => translate("Only") . " {$stock} " . translate("item(s) are available for") . " {$product->name}{$variant_string}"], 200);
+                        return response()->json([
+                            'result' => false,
+                            'message' => translate('Only')." {$stock} ".translate('item(s) are available for')." {$product->name}{$variant_string}",
+                        ], 200);
                     }
                 }
 
@@ -320,16 +339,20 @@ class CartController extends Controller
     public function destroy($id)
     {
         Cart::destroy($id);
-        return response()->json(['result' => true, 'message' => translate('Product is successfully removed from your cart')], 200);
-    }
-
-    public function guestCustomerInfoCheck(Request $request){
-        $user = addon_is_activated('otp_system') ?
-                User::where('email', $request->email)->orWhere('phone','+'.$request->phone)->first() :
-                User::where('email', $request->email)->first();
 
         return response()->json([
-            'result' => ($user != null) ? true : false
+            'result' => true, 'message' => translate('Product is successfully removed from your cart'),
+        ], 200);
+    }
+
+    public function guestCustomerInfoCheck(Request $request)
+    {
+        $user = addon_is_activated('otp_system') ?
+            User::where('email', $request->email)->orWhere('phone', '+'.$request->phone)->first() :
+            User::where('email', $request->email)->first();
+
+        return response()->json([
+            'result' => ($user != null) ? true : false,
         ]);
     }
 
@@ -338,18 +361,18 @@ class CartController extends Controller
         $product_ids = $request->product_ids;
         $user_id = $request->user_id;
         $temp_user_id = $request->temp_user_id;
-        $carts  = ($user_id != null) ?
-                    Cart::where('user_id', $user_id)->get() :
-                    ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->get() : [] );
+        $carts = ($user_id != null) ?
+            Cart::where('user_id', $user_id)->get() :
+            ($temp_user_id != null ? Cart::where('temp_user_id', $temp_user_id)->get() : []);
 
         $carts->toQuery()->update(['status' => 0]);
-        if($product_ids != null){
+        if ($product_ids != null) {
             $carts->toQuery()->whereIn('product_id', $product_ids)->update(['status' => 1]);
         }
 
         return response()->json([
             'result' => true,
-            'message' => translate('Cart status updated successfully')
+            'message' => translate('Cart status updated successfully'),
         ]);
     }
 }

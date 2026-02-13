@@ -18,7 +18,8 @@
                 </div>
 
                 <div class="col-lg-2">
-                    <select class="form-control form-control-sm aiz-selectpicker" name="rating" id="rating" onchange="sort_reiewed_products()" data-selected="{{ $sortByRating }}">
+                    <select class="form-control form-control-sm aiz-selectpicker" name="rating" id="rating"
+                            onchange="sort_reiewed_products()" data-selected="{{ $sortByRating }}">
                         <option value="">{{translate('Filter by Rating')}}</option>
                         <option value="desc">{{translate('Rating (High > Low)')}}</option>
                         <option value="asc">{{translate('Rating (Low > High)')}}</option>
@@ -27,8 +28,8 @@
                 <div class="col-lg-2">
                     <div class="form-group form-group-sm mb-0">
                         <input type="text" class="form-control form-control-sm" id="search"
-                            name="search" value="{{ $sortSearch }}"
-                            placeholder="{{ translate('Type Product Name & Hit Enter') }}">
+                               name="search" value="{{ $sortSearch }}"
+                               placeholder="{{ translate('Type Product Name & Hit Enter') }}">
                     </div>
                 </div>
             </div>
@@ -36,42 +37,45 @@
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
-                    <tr>
-                        <th data-breakpoints="lg">#</th>
-                        <th width="40%">{{translate('Product Name')}}</th>
-                        <th data-breakpoints="lg">{{translate('Rating')}}</th>
-                        <th data-breakpoints="lg">{{translate('Reviews')}}</th>
-                        <th class="text-right">{{translate('Options')}}</th>
-                    </tr>
+                <tr>
+                    <th data-breakpoints="lg">#</th>
+                    <th width="40%">{{translate('Product Name')}}</th>
+                    <th data-breakpoints="lg">{{translate('Rating')}}</th>
+                    <th data-breakpoints="lg">{{translate('Reviews')}}</th>
+                    <th class="text-right">{{translate('Options')}}</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach($products as $key => $product)
+                @foreach($products as $key => $product)
                     <tr>
                         <td>{{ ($key+1) + ($products->currentPage() - 1)*$products->perPage() }}</td>
                         <td>
                             <div class="row gutters-5">
                                 <div class="col-auto">
-                                    <img src="{{ uploaded_asset($product->thumbnail)}}" alt="Image" class="size-50px img-fit">
+                                    <img src="{{ get_file_by_id($product->thumbnail)}}" alt="Image"
+                                         class="size-50px img-fit">
                                 </div>
                                 <div class="col">
-                                    <span class="text-muted text-truncate-2">{{ $product->getTranslation('product_name') }}</span>
+                                    <span
+                                        class="text-muted text-truncate-2">{{ $product->getTranslation('product_name') }}</span>
                                 </div>
                             </div>
                         </td>
                         <td>{{ $product->rating }}</td>
                         <td>
-                            {{ $product->preorderProductreviews->count()}} 
+                            {{ $product->preorderProductreviews->count()}}
                             @if($product->preorderProductreviews()->where('viewed',0)->count() > 0)
                                 <span class="badge badge-inline badge-danger">{{ translate('new') }}</span>
                             @endif
                         </td>
                         <td>
                             <div class="form-group mb-0 text-right">
-                                <a href="{{ route('seller.preorder_product_detail_reviews', $product->id) }}" class="btn btn-primary btn-sm rounded-2">{{ translate('View Reviews') }}</a>
+                                <a href="{{ route('seller.preorder_product_detail_reviews', $product->id) }}"
+                                   class="btn btn-primary btn-sm rounded-2">{{ translate('View Reviews') }}</a>
                             </div>
                         </td>
                     </tr>
-                    @endforeach
+                @endforeach
                 </tbody>
             </table>
             <div class="aiz-pagination">
@@ -83,7 +87,7 @@
 
 @section('script')
     <script type="text/javascript">
-        function sort_reiewed_products(el){
+        function sort_reiewed_products(el) {
             $('#sort_reiewed_products').submit();
         }
     </script>

@@ -28,7 +28,7 @@
                 <div class="box-inline pad-rgt pull-left">
                     <div class="" style="min-width: 200px;">
                         <input type="text" class="form-control" id="search" name="search" @isset($sort_search)
-                        value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type name & Enter') }}">
+                            value="{{ $sort_search }}" @endisset placeholder="{{ translate('Type name & Enter') }}">
                     </div>
                 </div>
             </form>
@@ -36,19 +36,19 @@
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
-                    <tr>
-                        <th data-breakpoints="lg" width="5%">#</th>
-                        <th data-breakpoints="lg" width="10%">{{translate('Icon')}}</th>
-                        <th width="20%">{{translate('Name')}}</th>
-                        <th data-breakpoints="lg" width="20%">{{ translate('Parent Category') }}</th>
-                        <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Inhouse Products') }}</th>
-                        <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Seller Products?') }}</th>
-                        <th data-breakpoints="lg" width="15%">{{ translate('Refund Request Time(Days)') }}</th>
-                        <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Action') }}</th>
-                    </tr>
+                <tr>
+                    <th data-breakpoints="lg" width="5%">#</th>
+                    <th data-breakpoints="lg" width="10%">{{translate('Icon')}}</th>
+                    <th width="20%">{{translate('Name')}}</th>
+                    <th data-breakpoints="lg" width="20%">{{ translate('Parent Category') }}</th>
+                    <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Inhouse Products') }}</th>
+                    <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Seller Products?') }}</th>
+                    <th data-breakpoints="lg" width="15%">{{ translate('Refund Request Time(Days)') }}</th>
+                    <th data-breakpoints="lg" width="10%" class="text-center">{{ translate('Action') }}</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach($categories as $key => $category)
+                @foreach($categories as $key => $category)
                     @php
                         $isCategoryBasedRefund = get_setting('refund_type') == 'category_based_refund';
                     @endphp
@@ -57,7 +57,7 @@
                         <td>
                             @if($category->icon != null)
                                 <span class="avatar avatar-square avatar-xs">
-                                    <img src="{{ uploaded_asset($category->icon) }}" alt="{{translate('icon')}}">
+                                    <img src="{{ get_file_by_id($category->icon) }}" alt="{{translate('icon')}}">
                                 </span>
                             @else
                                 —
@@ -66,8 +66,9 @@
                         <td class="align-items-center d-flex fw-800">
                             {{ $category->getTranslation('name') }}
                             @if($category->digital == 1)
-                                <img src="{{ static_asset('assets/img/digital_tag.png') }}" alt="{{translate('Digital')}}"
-                                    class="ml-2 h-25px" style="cursor: pointer;" title="Digital">
+                                <img src="{{ static_asset('assets/img/digital_tag.png') }}"
+                                     alt="{{translate('Digital')}}"
+                                     class="ml-2 h-25px" style="cursor: pointer;" title="Digital">
                             @endif
                         </td>
                         <td class="fw-600">
@@ -80,36 +81,36 @@
                                 —
                             @endif
                         </td>
-                
+
                         <td class="text-center ">
                             {{ $category->products->where('added_by', 'admin')->count()}}
                         </td>
-                
+
                         <td class="d-flex justify-content-center align-items-center">
                             <span class="me-3 mr-3">
                                 {{ $category->products->where('added_by', 'seller')->count() }}
                             </span>
                         </td>
-                
+
                         <td>
                             <div class="input-group">
-                                <input 
-                                    type="number" 
-                                    class="form-control" 
+                                <input
+                                    type="number"
+                                    class="form-control"
                                     name="refund_request_time"
-                                    value="{{ $category->refund_request_time }}" 
-                                    min="1" 
+                                    value="{{ $category->refund_request_time }}"
+                                    min="1"
                                     placeholder="{{ translate('Days') }}"
                                     style="border-radius: 8px 0 0 8px;"
                                     {{ $isCategoryBasedRefund ? '' : 'disabled' }}
                                 >
                             </div>
                         </td>
-                
+
                         <td class="text-right">
                             <div class="form-group mb-0 text-right">
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onclick="{{ $isCategoryBasedRefund ? 'trigger_alert(' . $category->id . ')' : 'AIZ.plugins.notify(\'danger\', \'' . translate('Category based refund is not enabled') . '\')' }}"
                                     class="btn btn-primary btn-sm rounded-2 w-120px"
                                     {{ $isCategoryBasedRefund ? '' : 'disabled' }}
@@ -140,7 +141,7 @@
                             <g id="alert" transform="translate(0.14 1.02)">
                                 <path
                                     d="M40.159,3.309a4.623,4.623,0,0,0-7.981,0L.759,58.153a4.54,4.54,0,0,0,0,4.578A4.718,4.718,0,0,0,4.75,65.02H67.587a4.476,4.476,0,0,0,3.945-2.289,4.773,4.773,0,0,0,.046-4.578Zm.6,52.555H31.582V46.708h9.173Zm0-13.734H31.582V23.818h9.173Z"
-                                    transform="translate(-0.14 -1.02)" fill="#ffc700" />
+                                    transform="translate(-0.14 -1.02)" fill="#ffc700"/>
                             </g>
                         </g>
                     </svg>
@@ -149,9 +150,9 @@
                     </p>
                     <div>
                         <button type="button" class="btn btn-light rounded-2 mt-2 fs-13 fw-700 w-150px"
-                            data-dismiss="modal">{{ translate('Cancel') }}</button>
+                                data-dismiss="modal">{{ translate('Cancel') }}</button>
                         <a href="javascript:void(0)" id="confirm-set-btn"
-                            class="btn btn-warning rounded-2 mt-2 fs-13 fw-700 w-250px">
+                           class="btn btn-warning rounded-2 mt-2 fs-13 fw-700 w-250px">
                             {{ translate('Confirm') }}
                         </a>
                     </div>
@@ -193,16 +194,16 @@
                     id: categoryIdToSave,
                     refund_request_time: refundTime,
                 },
-                success: function(response) {
+                success: function (response) {
                     AIZ.plugins.notify('success', response.message);
                     $('#confirm-modal').modal('hide');
                     window.location.reload();
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     const msg = xhr.responseJSON?.message ?? '{{ translate('An error occurred.') }}';
                     AIZ.plugins.notify('danger', msg);
                 },
-                complete: function() {
+                complete: function () {
                     $('#confirm-set-btn').prop('disabled', false).text('{{ translate('Confirm') }}');
                 }
             });

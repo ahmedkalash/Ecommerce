@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Shop;
-use App\Models\Upload;
 use App\Models\User;
 use Artisan;
 use Cache;
@@ -19,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sitemap\SitemapGenerator;
 
 class AdminController extends Controller
@@ -212,7 +212,7 @@ class AdminController extends Controller
                                                     when payment_type in ("wallet") then "wallet"
                                                     when payment_type NOT in ("cash_on_delivery") then "others"
                                                     else cast(payment_type as char)
-                                                    end as payment_type, SUM(grand_total)  as total_amount'),)
+                                                    end as payment_type, SUM(grand_total)  as total_amount'), )
             ->where('user_id', '!=', null)
             ->where('seller_id', $admin_id)
             ->groupBy(DB::raw('1'))
@@ -248,7 +248,7 @@ class AdminController extends Controller
         $category_array = [];
         $new_array = [];
         foreach ($top_categories_products as $key => $row) {
-            $row->product_thumbnail_img = Upload::where('id', $row->product_thumbnail_img)->first();
+            $row->product_thumbnail_img = Media::find($row->product_thumbnail_img);
             $category_array[] = $row->category_id;
             $new_array[$row->category_id][] = $row;
         }
@@ -405,7 +405,7 @@ class AdminController extends Controller
         $brand_array = [];
         $new_array = [];
         foreach ($top_brands_products as $key => $row) {
-            $row->product_thumbnail_img = Upload::where('id', $row->product_thumbnail_img)->first();
+            $row->product_thumbnail_img = Media::find($row->product_thumbnail_img);
             $brand_array[] = $row->brand_id;
             $new_array[$row->brand_id][] = $row;
         }
@@ -502,7 +502,7 @@ class AdminController extends Controller
     public function DeleteSitemapFile(Request $request)
     {
 
-        if (isset($request->file_name) && !empty($request->file_name)) {
+        if (isset($request->file_name) && ! empty($request->file_name)) {
 
             if (Storage::disk('public')->exists($request->file_name)) {
 
@@ -523,7 +523,7 @@ class AdminController extends Controller
     public function DownloadSingleSitemapFile(Request $request)
     {
 
-        if (isset($request->file_name) && !empty($request->file_name)) {
+        if (isset($request->file_name) && ! empty($request->file_name)) {
 
             $download = Storage::disk('public')->download($request->file_name);
             $status_code = $download->getStatusCode();

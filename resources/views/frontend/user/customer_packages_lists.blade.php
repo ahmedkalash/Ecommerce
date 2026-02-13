@@ -20,8 +20,8 @@
                             <div class="card-body">
                                 <!-- Package name -->
                                 <div class="text-center mb-4 mt-3">
-                                    <img class="mw-100 mx-auto mb-4" src="{{ uploaded_asset($customer_package->logo) }}"
-                                        height="100">
+                                    <img class="mw-100 mx-auto mb-4" src="{{ get_file_by_id($customer_package->logo) }}"
+                                         height="100">
                                     <h5 class="mb-3 h5 fw-600">{{ $customer_package->getTranslation('name') }}</h5>
                                 </div>
                                 <!-- No. of product upload -->
@@ -45,14 +45,14 @@
                                 <div class="text-center">
                                     @if ($customer_package->amount == 0)
                                         <button class="btn btn-primary rounded-0"
-                                            onclick="get_free_package({{ $customer_package->id }})">{{ translate('Free Package') }}</button>
+                                                onclick="get_free_package({{ $customer_package->id }})">{{ translate('Free Package') }}</button>
                                     @else
                                         @if (addon_is_activated('offline_payment'))
                                             <button class="btn btn-primary rounded-0"
-                                                onclick="select_payment_type({{ $customer_package->id }})">{{ translate('Purchase Package') }}</button>
+                                                    onclick="select_payment_type({{ $customer_package->id }})">{{ translate('Purchase Package') }}</button>
                                         @else
                                             <button class="btn btn-primary rounded-0"
-                                                onclick="show_price_modal({{ $customer_package->id }})">{{ translate('Purchase Package') }}</button>
+                                                    onclick="show_price_modal({{ $customer_package->id }})">{{ translate('Purchase Package') }}</button>
                                         @endif
                                     @endif
                                 </div>
@@ -68,8 +68,9 @@
 @section('modal')
 
     <!-- Select Payment Type Modal -->
-    <div class="modal fade" id="select_payment_type_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="select_payment_type_modal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -84,8 +85,9 @@
                         </div>
                         <div class="col-md-10">
                             <div class="mb-3">
-                                <select class="form-control aiz-selectpicker rounded-0" onchange="payment_type(this.value)"
-                                    data-minimum-results-for-search="Infinity">
+                                <select class="form-control aiz-selectpicker rounded-0"
+                                        onchange="payment_type(this.value)"
+                                        data-minimum-results-for-search="Infinity">
                                     <option value="">{{ translate('Select One') }}</option>
                                     <option value="online">{{ translate('Online payment') }}</option>
                                     <option value="offline">{{ translate('Offline payment') }}</option>
@@ -95,7 +97,7 @@
                     </div>
                     <div class="form-group text-right">
                         <button type="button" class="btn btn-sm btn-primary rounded-0 transition-3d-hover mr-1"
-                            id="select_type_cancel" data-dismiss="modal">{{ translate('Cancel') }}</button>
+                                id="select_type_cancel" data-dismiss="modal">{{ translate('Cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -105,7 +107,7 @@
 
     <!-- Online payment Modal -->
     <div class="modal fade" id="price_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -114,7 +116,7 @@
                 </div>
                 <div class="modal-body gry-bg px-3 pt-3" style="overflow-y: inherit;">
                     <form class="" id="package_payment_form" action="{{ route('customer_packages.purchase') }}"
-                        method="post">
+                          method="post">
                         @csrf
                         <input type="hidden" name="customer_package_id" value="">
                         <div class="row">
@@ -123,7 +125,8 @@
                             </div>
                             <div class="col-md-10">
                                 <div class="mb-3">
-                                    <select class="form-control selectpicker rounded-0" data-live-search="true" name="payment_option">
+                                    <select class="form-control selectpicker rounded-0" data-live-search="true"
+                                            name="payment_option">
                                         @include('partials.online_payment_options')
                                         @if (get_setting('wallet_system') == 1)
                                             <option value="wallet">{{ translate('Wallet') }}</option>
@@ -135,9 +138,9 @@
 
                         <div class="form-group text-right">
                             <button type="button" class="btn btn-sm btn-secondary rounded-0 transition-3d-hover mr-1"
-                                data-dismiss="modal">{{ translate('cancel') }}</button>
+                                    data-dismiss="modal">{{ translate('cancel') }}</button>
                             <button type="submit"
-                                class="btn btn-sm btn-primary rounded-0 transition-3d-hover mr-1">{{ translate('Confirm') }}</button>
+                                    class="btn btn-sm btn-primary rounded-0 transition-3d-hover mr-1">{{ translate('Confirm') }}</button>
                         </div>
                     </form>
                 </div>
@@ -148,7 +151,7 @@
 
     <!-- offline payment Modal -->
     <div class="modal fade" id="offline_customer_package_purchase_modal" tabindex="-1" role="dialog"
-        aria-labelledby="exampleModalLabel" aria-hidden="true">
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -179,7 +182,7 @@
                 $.post('{{ route('offline_customer_package_purchase_modal') }}', {
                     _token: '{{ csrf_token() }}',
                     package_id: package_id
-                }, function(data) {
+                }, function (data) {
                     $('#offline_customer_package_purchase_modal_body').html(data);
                     $('#offline_customer_package_purchase_modal').modal('show');
                 });

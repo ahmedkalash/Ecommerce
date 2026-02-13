@@ -8,7 +8,7 @@
                 <!-- Left Side Image-->
                 <div class="col-xxl-6 col-lg-7">
                     <div class="h-100">
-                        <img src="{{ uploaded_asset(get_setting('customer_login_page_image')) }}" alt=""
+                        <img src="{{ get_file_by_id(get_setting('customer_login_page_image')) }}" alt=""
                              class="img-fit h-100">
                     </div>
                 </div>
@@ -20,7 +20,7 @@
                             <div class="col-xxl-6 p-4 p-lg-5">
                                 <!-- Site Icon -->
                                 <div class="size-48px mb-3 mx-auto mx-lg-0">
-                                    <img src="{{ uploaded_asset(get_setting('site_icon')) }}"
+                                    <img src="{{ get_file_by_id(get_setting('site_icon')) }}"
                                          alt="{{ translate('Site Icon')}}" class="img-fit h-100">
                                 </div>
                                 <!-- Titles -->
@@ -103,8 +103,9 @@
                                                 @if(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_customer_login') == 1)
 
                                                     @if ($errors->has('g-recaptcha-response'))
-                                                        <span class="border invalid-feedback rounded p-2 mb-3 bg-danger text-white"
-                                                              role="alert" style="display: block;">
+                                                        <span
+                                                            class="border invalid-feedback rounded p-2 mb-3 bg-danger text-white"
+                                                            role="alert" style="display: block;">
                                                 <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
                                             </span>
                                                     @endif
@@ -116,7 +117,8 @@
                                                         <label class="aiz-checkbox">
                                                             <input type="checkbox"
                                                                    name="remember" {{ old('remember') ? 'checked' : '' }}>
-                                                            <span class="has-transition fs-12 fw-400 text-gray-dark hov-text-primary">{{ translate('Remember Me') }}</span>
+                                                            <span
+                                                                class="has-transition fs-12 fw-400 text-gray-dark hov-text-primary">{{ translate('Remember Me') }}</span>
                                                             <span class="aiz-square-check"></span>
                                                         </label>
                                                     </div>
@@ -161,7 +163,8 @@
                                         <!-- Social Login -->
                                         @if(get_setting('google_login') == 1 || get_setting('facebook_login') == 1 || get_setting('twitter_login') == 1 || get_setting('apple_login') == 1)
                                             <div class="text-center mb-3">
-                                                <span class="bg-white fs-12 text-gray">{{ translate('Or Login With')}}</span>
+                                                <span
+                                                    class="bg-white fs-12 text-gray">{{ translate('Or Login With')}}</span>
                                             </div>
                                             <ul class="list-inline social colored text-center mb-4">
                                                 @if (get_setting('facebook_login') == 1)

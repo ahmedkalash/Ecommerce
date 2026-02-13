@@ -8,7 +8,7 @@
                 <!-- Left Side -->
                 <div class="col-xxl-9 col-lg-8">
                     <div class="h-100" style="max-height: 100vh">
-                        <img src="{{ uploaded_asset(get_setting('seller_register_page_image')) }}" alt=""
+                        <img src="{{ get_file_by_id(get_setting('seller_register_page_image')) }}" alt=""
                              class="img-fit h-100">
                     </div>
                 </div>
@@ -19,7 +19,7 @@
                         <div class="py-3 py-lg-4 px-3 px-xl-5 flex-grow-1">
                             <!-- Site Icon -->
                             <div class="size-48px mb-3 mx-auto mx-lg-0">
-                                <img src="{{ uploaded_asset(get_setting('site_icon')) }}"
+                                <img src="{{ get_file_by_id(get_setting('site_icon')) }}"
                                      alt="{{ translate('Site Icon')}}" class="img-fit h-100">
                             </div>
                             <!-- Titles -->
@@ -89,7 +89,8 @@
                                                 <i class="password-toggle las la-2x la-eye"></i>
                                             </div>
                                             <div class="text-right mt-1">
-                                                <span class="fs-12 fw-400 text-gray-dark">{{ translate('Password must contain at least 8 digits') }}</span>
+                                                <span
+                                                    class="fs-12 fw-400 text-gray-dark">{{ translate('Password must contain at least 8 digits') }}</span>
                                             </div>
                                             @if ($errors->has('password'))
                                                 <span class="invalid-feedback" role="alert">
@@ -146,8 +147,9 @@
                                         @if(get_setting('google_recaptcha') == 1 && get_setting('recaptcha_seller_register') == 1)
 
                                             @if ($errors->has('g-recaptcha-response'))
-                                                <span class="border invalid-feedback rounded p-2 mb-3 bg-danger text-white"
-                                                      role="alert" style="display: block;">
+                                                <span
+                                                    class="border invalid-feedback rounded p-2 mb-3 bg-danger text-white"
+                                                    role="alert" style="display: block;">
                                                     <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
                                                 </span>
                                             @endif
