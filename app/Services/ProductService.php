@@ -147,7 +147,16 @@ class ProductService
             'published',
         ))->toArray();
 
-        $product = Product::create($data);
+        $productData = collect($data)->except([
+            'thumbnail_img',
+            'photos',
+            'meta_img',
+            'pdf',
+            'short_video',
+            'short_video_thumbnail',
+        ])->toArray();
+
+        $product = Product::create($productData);
 
         $this->syncMedia($product, $data);
 
@@ -295,7 +304,16 @@ class ProductService
             'attributes',
         ))->toArray();
 
-        $product->update($data);
+        $productData = collect($data)->except([
+            'thumbnail_img',
+            'photos',
+            'meta_img',
+            'pdf',
+            'short_video',
+            'short_video_thumbnail',
+        ])->toArray();
+
+        $product->update($productData);
 
         $this->syncMedia($product, $data);
 
@@ -340,6 +358,13 @@ class ProductService
                 Log::info("Uploaded short video for Product #{$product->id}");
             }
 
+            // 6. Handle Short Video Thumbnail (Local File Upload)
+            if (isset($data['short_video_thumbnail']) && $data['short_video_thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+                $product->addMedia($data['short_video_thumbnail'])
+                    ->toMediaCollection('video_thumbnail');
+                Log::info("Uploaded short video thumbnail for Product #{$product->id}");
+            }
+
         } catch (\Exception $e) {
             Log::error("Media synchronization failed for Product #{$product->id}", [
                 'error' => $e->getMessage(),
@@ -374,7 +399,7 @@ class ProductService
         return $product_new;
     }
 
-    public function destroy($id)
+    public function destroy($id): void
     {
         $product = Product::findOrFail($id);
         $product->product_translations()->delete();
@@ -387,7 +412,9 @@ class ProductService
         $product->last_viewed_products()->delete();
         $product->flash_deal_products()->delete();
         deleteProductReview($product);
-        Product::destroy($id);
+
+        // Spatie's InteractsWithMedia auto-deletes all media via model events
+        $product->delete();
     }
 
     public function product_search(array $data)

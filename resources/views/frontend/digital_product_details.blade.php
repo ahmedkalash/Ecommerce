@@ -16,7 +16,7 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="{{ $detailedProduct->meta_title }}">
     <meta itemprop="description" content="{{ $detailedProduct->meta_description }}">
-    <meta itemprop="image" content="{{ get_file_by_id($detailedProduct->meta_img) }}">
+    <meta itemprop="image" content="{{ $detailedProduct->meta_img }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="product">
@@ -24,7 +24,7 @@
     <meta name="twitter:title" content="{{ $detailedProduct->meta_title }}">
     <meta name="twitter:description" content="{{ $detailedProduct->meta_description }}">
     <meta name="twitter:creator" content="@author_handle">
-    <meta name="twitter:image" content="{{ get_file_by_id($detailedProduct->meta_img) }}">
+    <meta name="twitter:image" content="{{ $detailedProduct->meta_img }}">
     <meta name="twitter:data1" content="{{ single_price($detailedProduct->unit_price) }}">
     <meta name="twitter:label1" content="Price">
 
@@ -32,7 +32,7 @@
     <meta property="og:title" content="{{ $detailedProduct->meta_title }}"/>
     <meta property="og:type" content="product"/>
     <meta property="og:url" content="{{ route('product', $detailedProduct->slug) }}"/>
-    <meta property="og:image" content="{{ get_file_by_id($detailedProduct->meta_img) }}"/>
+    <meta property="og:image" content="{{ $detailedProduct->meta_img }}"/>
     <meta property="og:description" content="{{ $detailedProduct->meta_description }}"/>
     <meta property="og:site_name" content="{{ get_setting('meta_title') }}"/>
     <meta property="og:price:amount" content="{{ single_price($detailedProduct->unit_price) }}"/>
@@ -46,18 +46,18 @@
                     <!-- Product Photos -->
                     <div class="col-xl-5 col-lg-6 mb-4">
                         <div class="sticky-top z-3 row gutters-10">
-                            @if($detailedProduct->photos != null)
-                                @php
-                                    $photos = explode(',',$detailedProduct->photos);
-                                @endphp
+                            @php
+                                $galleryMedia = $detailedProduct->getMedia('gallery');
+                            @endphp
+                            @if ($galleryMedia->isNotEmpty())
                                 <div class="col order-1 order-md-2">
                                     <div class="aiz-carousel product-gallery" data-nav-for='.product-gallery-thumb'
                                          data-fade='true' data-auto-height='true'>
-                                        @foreach ($photos as $key => $photo)
+                                        @foreach ($galleryMedia as $key => $media)
                                             <div class="carousel-box img-zoom rounded">
                                                 <img class="img-fluid lazyload"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ get_file_by_id($photo) }}"
+                                                     data-src="{{ $media->getUrl() }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -66,11 +66,11 @@
                                 <div class="col-auto w-80px w-md-90px order-2 order-md-1 mt-3 mt-md-0">
                                     <div class="aiz-carousel carousel-thumb product-gallery-thumb" data-items='5'
                                          data-nav-for='.product-gallery' data-vertical='true' data-focus-select='true'>
-                                        @foreach ($photos as $key => $photo)
+                                        @foreach ($galleryMedia as $key => $media)
                                             <div class="carousel-box c-pointer border rounded-0">
                                                 <img class="lazyload mw-100 size-60px mx-auto"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ get_file_by_id($photo) }}"
+                                                     data-src="{{ $media->getUrl() }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -576,7 +576,7 @@
                                                    class="d-block text-reset">
                                                     <img class="img-fit lazyload h-xl-80px h-120px has-transition"
                                                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                         data-src="{{ get_file_by_id($top_product->thumbnail_img) }}"
+                                                         data-src="{{ $top_product->thumbnail_img }}"
                                                          alt="{{ $top_product->getTranslation('name') }}"
                                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>
@@ -621,7 +621,7 @@
                                 <a href="#tab_default_2" data-toggle="tab"
                                    class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Video') }}</a>
                             @endif
-                            @if ($detailedProduct->pdf != null)
+                            @if ($detailedProduct->pdf_url != null)
                                 <a href="#tab_default_3" data-toggle="tab"
                                    class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Downloads') }}</a>
                             @endif
@@ -663,7 +663,7 @@
                             <!-- Download -->
                             <div class="tab-pane fade" id="tab_default_3">
                                 <div class="py-5 text-center ">
-                                    <a href="{{ get_file_by_id($detailedProduct->pdf) }}"
+                                    <a href="{{ $detailedProduct->pdf_url }}"
                                        class="btn btn-primary">{{ translate('Download') }}</a>
                                 </div>
                             </div>
@@ -738,7 +738,7 @@
                                                     <img
                                                         class="img-fit lazyload mx-auto h-140px h-md-190px has-transition"
                                                         src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                        data-src="{{ get_file_by_id($related_product->thumbnail_img) }}"
+                                                        data-src="{{ $related_product->thumbnail_img }}"
                                                         alt="{{ $related_product->getTranslation('name') }}"
                                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>

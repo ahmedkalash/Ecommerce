@@ -1,13 +1,9 @@
 <div class="sticky-top z-3 row gutters-10">
     @php
-        $photos = $detailedProduct->photos != null ? explode(',', $detailedProduct->photos) : [];
-
+        $galleryMedia = $detailedProduct->getMedia('gallery');
         $videos = $detailedProduct->video_link;
-
-        $short_video = $detailedProduct->short_video != null ? explode(',', $detailedProduct->short_video) : [];
-        $short_video_thumb =
-            $detailedProduct->short_video != null ? explode(',', $detailedProduct->short_video_thumbnail) : [];
-
+        $shortVideoMedia = $detailedProduct->getMedia('short_video');
+        $videoThumbnailUrl = $detailedProduct->getFirstMediaUrl('video_thumbnail');
     @endphp
 
         <!-- Gallery Images -->
@@ -28,35 +24,30 @@
                 @endforeach
             @endif
 
-            @if ($photos && count($photos) == 1)
+            @if ($galleryMedia->count() == 1)
                 <div class="carousel-box img-zoom rounded-0" style="height: 100%">
                     <img class="img-fluid h-full lazyload mx-auto" style="height: 450px;"
-                         src="{{ get_file_by_id($photos[0]) }}"
+                         src="{{ $galleryMedia->first()->getUrl() }}"
                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                 </div>
             @else
-                @foreach ($photos as $key => $photo)
+                @foreach ($galleryMedia as $key => $media)
                     <div class="carousel-box img-zoom rounded-0" style="height: 100%">
                         <img class="img-fluid h-full lazyload mx-auto" style="height: 450px;"
                              src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                             data-src="{{ get_file_by_id($photo) }}"
+                             data-src="{{ $media->getUrl() }}"
                              onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                     </div>
                 @endforeach
-                          
             @endif
 
-            @foreach ($short_video as $index => $video)
+            @foreach ($shortVideoMedia as $index => $videoMedia)
                 <div class="carousel-box img-zoom rounded-0">
                     <div class="video-container">
                         <video class="upload_video" preload="metadata"
-                               poster="{{ $detailedProduct->short_video_thumbnail
-                                ? get_file_by_id(
-                                    count($short_video_thumb) == count($short_video) ? $short_video_thumb[$index] : $short_video_thumb[0],
-                                )
-                                : '' }}"
+                               poster="{{ $videoThumbnailUrl ?: '' }}"
                                disablePictureInPicture>
-                            <source src="{{ get_file_by_id($video) }}" type="video/mp4">
+                            <source src="{{ $videoMedia->getUrl() }}" type="video/mp4">
                         </video>
 
                         <button class="custom-play-btn playButton">▶</button>
@@ -121,23 +112,19 @@
                 @endforeach
             @endif
 
-            @foreach ($photos as $key => $photo)
+            @foreach ($galleryMedia as $key => $media)
                 <div class="carousel-box c-pointer rounded-0">
                     <img class="lazyload mw-100 size-60px mx-auto border p-1"
-                         src="{{ static_asset('assets/img/placeholder.jpg') }}" data-src="{{ get_file_by_id($photo) }}"
+                         src="{{ static_asset('assets/img/placeholder.jpg') }}" data-src="{{ $media->getUrl() }}"
                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                 </div>
             @endforeach
 
-            @foreach ($short_video as $index => $video)
+            @foreach ($shortVideoMedia as $index => $videoMedia)
                 <div class="carousel-box c-pointer rounded-0 position-relative" data-variation="short-video">
                     <img class="lazyload mw-100 size-60px mx-auto border p-1"
                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                         data-src="{{ $detailedProduct->short_video_thumbnail
-                            ? get_file_by_id(
-                                count($short_video_thumb) == count($short_video) ? $short_video_thumb[$index] : $short_video_thumb[0],
-                            )
-                            : '' }}"
+                         data-src="{{ $videoThumbnailUrl ?: '' }}"
                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
 
                     <div
@@ -170,4 +157,5 @@
 
         </div>
     </div>
+
 </div>

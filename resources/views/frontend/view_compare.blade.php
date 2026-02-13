@@ -36,7 +36,7 @@
                                                 <span class="fs-12 text-gray">{{ translate('Image')}}</span>
                                                 <div>
                                                     <img loading="lazy"
-                                                         src="{{ get_file_by_id(get_single_product($item)->thumbnail_img) }}"
+                                                         src="{{ $product->thumbnail_img }}"
                                                          alt="{{ translate('Product Image') }}"
                                                          class="img-fluid py-4 h-180px h-sm-220px">
                                                 </div>

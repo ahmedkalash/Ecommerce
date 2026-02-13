@@ -3,7 +3,7 @@
     <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="{{ $customer_product->meta_title }}">
     <meta itemprop="description" content="{{ $customer_product->meta_description }}">
-    <meta itemprop="image" content="{{ get_file_by_id($customer_product->meta_img) }}">
+    <meta itemprop="image" content="{{ $customer_product->meta_img }}">
 
     <!-- Twitter Card data -->
     <meta name="twitter:card" content="product">
@@ -12,7 +12,7 @@
     <meta name="twitter:description" content="{{ $customer_product->meta_description }}">
     <meta name="twitter:creator"
           content="@author_handle">
-    <meta name="twitter:image" content="{{ get_file_by_id($customer_product->meta_img) }}">
+    <meta name="twitter:image" content="{{ $customer_product->meta_img }}">
     <meta name="twitter:data1" content="{{ single_price($customer_product->unit_price) }}">
     <meta name="twitter:label1" content="Price">
 
@@ -20,7 +20,7 @@
     <meta property="og:title" content="{{ $customer_product->meta_title }}"/>
     <meta property="og:type" content="product"/>
     <meta property="og:url" content="{{ route('product', $customer_product->slug) }}"/>
-    <meta property="og:image" content="{{ get_file_by_id($customer_product->meta_img) }}"/>
+    <meta property="og:image" content="{{ $customer_product->meta_img }}"/>
     <meta property="og:description" content="{{ $customer_product->meta_description }}"/>
     <meta property="og:site_name" content="{{ get_setting('meta_title') }}"/>
     <meta property="og:price:amount" content="{{ single_price($customer_product->unit_price) }}"/>
@@ -33,20 +33,20 @@
                 <div class="row ">
                     <div class="col-xl-5 col-lg-6 mb-4">
                         <div class="sticky-top z-3 row gutters-10">
-                            @if ($customer_product->photos != null)
-                                @php
-                                    $photos = explode(',',$customer_product->photos);
-                                @endphp
+                            @php
+                                $galleryMedia = $customer_product->getMedia('gallery');
+                            @endphp
+                            @if ($galleryMedia->isNotEmpty())
                                     <!-- Gallery Images -->
                                 <div class="col-12">
                                     <div class="aiz-carousel product-gallery arrow-lg-none"
                                          data-nav-for='.product-gallery-thumb' data-fade='true' data-auto-height='true'
                                          data-arrows='true'>
-                                        @foreach ($photos as $key => $photo)
+                                        @foreach ($galleryMedia as $key => $media)
                                             <div class="carousel-box img-zoom rounded-0">
                                                 <img class="img-fluid h-auto lazyload mx-auto"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ get_file_by_id($photo) }}"
+                                                     data-src="{{ $media->getUrl() }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -57,11 +57,11 @@
                                     <div class="aiz-carousel product-gallery-thumb" data-items='5'
                                          data-nav-for='.product-gallery' data-focus-select='true' data-arrows='true'
                                          data-vertical='false' data-auto-height='true'>
-                                        @foreach ($photos as $key => $photo)
+                                        @foreach ($galleryMedia as $key => $media)
                                             <div class="carousel-box c-pointer rounded-0">
                                                 <img class="lazyload mw-100 size-60px mx-auto border p-1"
                                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                     data-src="{{ get_file_by_id($photo) }}"
+                                                     data-src="{{ $media->getUrl() }}"
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                             </div>
                                         @endforeach
@@ -166,7 +166,7 @@
                         <a href="#tab_default_2" data-toggle="tab"
                            class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Video') }}</a>
                     @endif
-                    @if ($customer_product->pdf != null)
+                    @if ($customer_product->pdf_url != null)
                         <a href="#tab_default_3" data-toggle="tab"
                            class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Downloads') }}</a>
                     @endif
@@ -203,7 +203,7 @@
                     <!-- Download -->
                     <div class="tab-pane" id="tab_default_3">
                         <div class="p-4 text-center ">
-                            <a href="{{ get_file_by_id($customer_product->pdf) }}"
+                            <a href="{{ $customer_product->pdf_url }}"
                                class="btn btn-primary">{{ translate('Download') }}</a>
                         </div>
                     </div>
@@ -238,7 +238,7 @@
                                         <a href="{{ route('customer.product', $product->slug) }}" class="d-block">
                                             <img class="img-fit lazyload mx-auto h-140px h-md-210px"
                                                  src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                 data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                                 data-src="{{ $product->thumbnail_img }}"
                                                  alt="{{ $product->getTranslation('name') }}"
                                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                         </a>

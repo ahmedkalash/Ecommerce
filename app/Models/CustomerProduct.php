@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App;
-use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class CustomerProduct extends Model
+class CustomerProduct extends Model implements HasMedia
 {
-    use PreventDemoModeChanges;
+    use InteractsWithMedia;
 
     protected $with = ['customer_product_translations'];
 
@@ -67,8 +68,71 @@ class CustomerProduct extends Model
         return $this->hasMany(CustomerProductTranslation::class);
     }
 
-    public function thumbnail()
+    /**
+     * Register Spatie media collections for classified products.
+     */
+    public function registerMediaCollections(): void
     {
-        return $this->belongsTo(Media::class, 'thumbnail_img');
+        $this->addMediaCollection('thumbnail')
+            ->singleFile()
+            ->useFallbackUrl(static_asset('assets/img/placeholder.jpg'));
+
+        $this->addMediaCollection('gallery');
+
+        $this->addMediaCollection('meta')
+            ->singleFile();
+
+        $this->addMediaCollection('pdf')
+            ->singleFile()
+            ->acceptsMimeTypes(['application/pdf']);
+    }
+
+    /**
+     * Get the product thumbnail URL.
+     * Prioritizes 'thumbnail' collection, then first gallery image, then placeholder.
+     */
+    public function thumbnailImg(): Attribute
+    {
+        return Attribute::get(function () {
+            $thumbnailUrl = $this->getFirstMediaUrl('thumbnail');
+            if ($thumbnailUrl) {
+                return $thumbnailUrl;
+            }
+
+            $firstGallery = $this->getFirstMediaUrl('gallery');
+            if ($firstGallery) {
+                return $firstGallery;
+            }
+
+            return static_asset('assets/img/placeholder.jpg');
+        });
+    }
+
+    /**
+     * Get all gallery media items.
+     */
+    public function galleryMedia(): \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection
+    {
+        return $this->getMedia('gallery');
+    }
+
+    /**
+     * Get the primary meta image URL.
+     */
+    public function metaImg(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('meta') ?: null;
+        });
+    }
+
+    /**
+     * Get the PDF file URL.
+     */
+    public function pdfUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('pdf') ?: null;
+        });
     }
 }

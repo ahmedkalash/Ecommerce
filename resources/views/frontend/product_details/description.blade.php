@@ -7,7 +7,7 @@
             <a href="#tab_default_2" data-toggle="tab"
                class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Video') }}</a>
         @endif
-        @if ($detailedProduct->pdf != null)
+        @if ($detailedProduct->pdf_url != null)
             <a href="#tab_default_3" data-toggle="tab"
                class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Downloads') }}</a>
         @endif
@@ -28,7 +28,7 @@
         <!-- Download -->
         <div class="tab-pane fade" id="tab_default_3">
             <div class="py-5 text-center ">
-                <a href="{{ get_file_by_id($detailedProduct->pdf) }}"
+                <a href="{{ $detailedProduct->pdf_url }}"
                    class="btn btn-primary">{{ translate('Download') }}</a>
             </div>
         </div>
