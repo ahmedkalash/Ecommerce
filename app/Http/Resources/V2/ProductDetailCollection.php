@@ -17,28 +17,13 @@ class ProductDetailCollection extends ResourceCollection
                 $calculable_price = number_format($calculable_price, $precision, '.', '');
                 $calculable_price = floatval($calculable_price);
                 // $calculable_price = round($calculable_price, 2);
-                $photo_paths = get_images_path($data->photos);
-
                 $photos = [];
 
-                if (! empty($photo_paths)) {
-                    for ($i = 0; $i < count($photo_paths); $i++) {
-                        if ($photo_paths[$i] != '') {
-                            $item = [];
-                            $item['variant'] = '';
-                            $item['path'] = $photo_paths[$i];
-                            $photos[] = $item;
-                        }
-                    }
-                }
-
-                foreach ($data->stocks as $stockItem) {
-                    if ($stockItem->image != null && $stockItem->image != '') {
-                        $item = [];
-                        $item['variant'] = $stockItem->variant;
-                        $item['path'] = get_file_by_id($stockItem->image);
-                        $photos[] = $item;
-                    }
+                foreach ($data->galleryMedia() as $mediaItem) {
+                    $photos[] = [
+                        'variant' => '',
+                        'path' => $mediaItem->getUrl(),
+                    ];
                 }
 
                 $brand = [
@@ -72,7 +57,7 @@ class ProductDetailCollection extends ResourceCollection
                     'shop_name' => $data->added_by == 'admin' ? translate('In House Product') : $data->user->shop->name,
                     'shop_logo' => $data->added_by == 'admin' ? get_file_by_id(get_setting('header_logo')) : get_file_by_id($data->user->shop->logo) ?? '',
                     'photos' => $photos,
-                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'tags' => explode(',', $data->tags),
                     'price_high_low' => (float) explode('-',
                         home_discounted_base_price($data, false))[0] == (float) explode('-',
@@ -94,7 +79,7 @@ class ProductDetailCollection extends ResourceCollection
                     'rating_count' => (int) Review::where(['product_id' => $data->id])->count(),
                     'earn_point' => (float) $data->earn_point,
                     'description' => $data->getTranslation('description'),
-                    'downloads' => $data->pdf ? get_file_by_id($data->pdf) : null,
+                    'downloads' => $data->pdf_url,
                     'video_link' => $data->video_link != null ? $data->video_link : '',
                     'brand' => $brand,
                     'link' => route('product', $data->slug),

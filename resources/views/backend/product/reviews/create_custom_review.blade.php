@@ -73,7 +73,7 @@
                                     <option value="">{{translate('Please Select Category First') }}</option>
                                 @else
                                     <option value="{{ $product->id }}"
-                                            data-content="<img src='{{ get_file_by_id($product->thumbnail_img)}}' class='img-fit size-40px'><span class='fw-600'> {{ $product->getTranslation('name') }} </span>">
+                                            data-content="<img src='{{ $product->thumbnail_img}}' class='img-fit size-40px'><span class='fw-600'> {{ $product->getTranslation('name') }} </span>">
                                     </option>
                                 @endif
                             </select>

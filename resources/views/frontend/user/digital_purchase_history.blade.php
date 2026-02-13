@@ -23,7 +23,7 @@
                             <a href="{{ route('product', $order->product->slug) }}" class="d-flex align-items-center">
                                 <img class="lazyload img-fit size-80px"
                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                     data-src="{{ get_file_by_id($order->product->thumbnail_img) }}"
+                                     data-src="{{ $order->product->thumbnail_img }}"
                                      alt="{{  $order->product->getTranslation('name')  }}"
                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                 <span class="ml-2">{{ $order->product->getTranslation('name') }}</span>

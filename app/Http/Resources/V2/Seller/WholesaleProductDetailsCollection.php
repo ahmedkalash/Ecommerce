@@ -5,7 +5,6 @@ namespace App\Http\Resources\V2\Seller;
 use App\Http\Resources\V2\UploadedFileCollection;
 use App\Models\WholesalePrice;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class WholesaleProductDetailsCollection extends JsonResource
 {
@@ -26,9 +25,8 @@ class WholesaleProductDetailsCollection extends JsonResource
             'category_id' => $this->category_id,
             'category_ids' => $this->categories()->pluck('category_id')->toArray(),
             'brand_id' => $this->brand_id,
-            'photos' => new UploadedFileCollection(Media::whereIn('id', explode(',', $this->photos))->get()),
-            'thumbnail_img' => new UploadedFileCollection(Media::whereIn('id',
-                explode(',', $this->thumbnail_img))->get()),
+            'photos' => new UploadedFileCollection($this->getMedia('gallery')),
+            'thumbnail_img' => new UploadedFileCollection($this->getMedia('thumbnail')),
             'video_provider' => $this->video_provider,
             'video_link' => $this->video_link,
             'tags' => $this->tags,
@@ -64,8 +62,8 @@ class WholesaleProductDetailsCollection extends JsonResource
             'num_of_sale' => $this->num_of_sale,
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
-            'meta_img' => new UploadedFileCollection(Media::where('id', $this->meta_img)->get()),
-            'pdf' => new UploadedFileCollection(Media::whereIn('id', explode(',', $this->pdf))->get()),
+            'meta_img' => new UploadedFileCollection($this->getMedia('meta')),
+            'pdf' => new UploadedFileCollection($this->getMedia('pdf')),
             'slug' => $this->slug,
             'barcode' => $this->barcode,
             'file_name' => $this->file_name,

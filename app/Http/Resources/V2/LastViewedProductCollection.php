@@ -17,7 +17,7 @@ class LastViewedProductCollection extends ResourceCollection
                     'id' => $product->id,
                     'slug' => $product->slug,
                     'name' => $product->getTranslation('name'),
-                    'thumbnail_image' => $product->thumbnail_img == null ? '' : get_file_by_id($product->thumbnail_img),
+                    'thumbnail_image' => $product->thumbnail_img ?? '',
                     'has_discount' => home_base_price($product, false) != home_discounted_base_price($product, false),
                     'discount' => '-'.discount_in_percentage($product).'%',
                     'stroked_price' => home_base_price($product),

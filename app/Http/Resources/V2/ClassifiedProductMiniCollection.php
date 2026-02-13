@@ -15,7 +15,7 @@ class ClassifiedProductMiniCollection extends ResourceCollection
                     'id' => $data->id,
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
-                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'condition' => $data->conditon,
                     'unit_price' => single_price($data->unit_price),
                     'category' => $data->category->getTranslation('name'),

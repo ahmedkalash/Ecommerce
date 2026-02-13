@@ -14,7 +14,7 @@
                                class="d-block text-reset">
                                 <img class="img-fit lazyload h-80px h-md-150px h-lg-80px has-transition"
                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                     data-src="{{ get_file_by_id($top_product->thumbnail_img) }}"
+                                     data-src="{{ $top_product->thumbnail_img }}"
                                      alt="{{ $top_product->getTranslation('name') }}"
                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                             </a>

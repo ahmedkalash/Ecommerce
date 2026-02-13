@@ -98,7 +98,7 @@
                                class="text-reset hov-text-primary d-flex align-items-center">
                                 <img class="lazyload img-fit size-70px"
                                      src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                     data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                     data-src="{{ $product->thumbnail_img }}"
                                      alt="{{  $product->getTranslation('name')  }}"
                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                 <span class="ml-1">{{ $product->name }}</span>

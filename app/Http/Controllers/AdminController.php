@@ -18,7 +18,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sitemap\SitemapGenerator;
 
 class AdminController extends Controller
@@ -248,7 +247,8 @@ class AdminController extends Controller
         $category_array = [];
         $new_array = [];
         foreach ($top_categories_products as $key => $row) {
-            $row->product_thumbnail_img = Media::find($row->product_thumbnail_img);
+            $product = Product::find($row->product_id);
+            $row->product_thumbnail_img = $product ? $product->thumbnail_img : static_asset('assets/img/placeholder.jpg');
             $category_array[] = $row->category_id;
             $new_array[$row->category_id][] = $row;
         }
@@ -405,7 +405,8 @@ class AdminController extends Controller
         $brand_array = [];
         $new_array = [];
         foreach ($top_brands_products as $key => $row) {
-            $row->product_thumbnail_img = Media::find($row->product_thumbnail_img);
+            $product = Product::find($row->product_id);
+            $row->product_thumbnail_img = $product ? $product->thumbnail_img : static_asset('assets/img/placeholder.jpg');
             $brand_array[] = $row->brand_id;
             $new_array[$row->brand_id][] = $row;
         }

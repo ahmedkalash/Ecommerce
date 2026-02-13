@@ -15,7 +15,7 @@ class CartCollection extends ResourceCollection
                     'seller_id' => $data->seller_id,
                     'product' => [
                         'name' => $data->product->name,
-                        'image' => get_file_by_id($data->product->thumbnail_img),
+                        'image' => $data->product->thumbnail_img,
                     ],
                     'variation' => $data->variation,
                     'price' => (float) cart_product_price($data, $data->product, false, false),

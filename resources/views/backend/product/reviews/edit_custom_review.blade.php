@@ -48,7 +48,7 @@
                             <label for="product">{{ translate('Product')}} <span class="text-danger">*</span></label>
                             <select class="form-control aiz-selectpicker" disabled>
                                 <option
-                                    data-content="<img src='{{ get_file_by_id($review->product->thumbnail_img)}}' class='img-fit size-40px'><span class='fw-600'> {{ $review->product->getTranslation('name') }} </span>"></option>
+                                    data-content="<img src='{{ $review->product->thumbnail_img}}' class='img-fit size-40px'><span class='fw-600'> {{ $review->product->getTranslation('name') }} </span>"></option>
                             </select>
                         </div>
 

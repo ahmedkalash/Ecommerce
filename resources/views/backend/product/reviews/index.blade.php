@@ -74,7 +74,7 @@
                         <td>
                             <div class="row gutters-5">
                                 <div class="col-auto">
-                                    <img src="{{ get_file_by_id($product->thumbnail_img)}}" alt="Image"
+                                    <img src="{{ $product->thumbnail_img}}" alt="Image"
                                          class="size-50px img-fit">
                                 </div>
                                 <div class="col">

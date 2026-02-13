@@ -37,7 +37,7 @@
                         <div class="d-flex search-product align-items-center">
                             <div class="mr-3">
                                 <img class="size-40px img-fit rounded"
-                                     src="{{ get_file_by_id($product->thumbnail_img) }}">
+                                     src="{{ $product->thumbnail_img }}">
                             </div>
                             <div class="flex-grow-1 overflow--hidden minw-0">
                                 <div class="product-name text-truncate fs-14 mb-5px">

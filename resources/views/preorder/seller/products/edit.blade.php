@@ -965,7 +965,7 @@
                                                                         style="vertical-align: middle;">
                                                                         <p class="d-block size-48px">
                                                                             <img
-                                                                                src="{{ get_file_by_id($fQBproduct->thumbnail_img) }}"
+                                                                                src="{{ $fQBproduct->thumbnail_img }}"
                                                                                 alt="{{ translate('Image')}}"
                                                                                 class="h-100 img-fit lazyload"
                                                                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

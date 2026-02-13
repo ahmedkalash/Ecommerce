@@ -14,7 +14,7 @@ class PosProductCollection extends ResourceCollection
                     'id' => $data->id,
                     'stock_id' => $data->stock_id,
                     'name' => $data->name,
-                    'thumbnail_image' => ($data->stock_image == null) ? get_file_by_id($data->thumbnail_img) : get_file_by_id($data->stock_image),
+                    'thumbnail_image' => ($data->stock_image == null) ? $data->thumbnail_img : get_file_by_id($data->stock_image),
                     'price' => home_discounted_base_price_by_stock_id($data->stock_id),
                     'base_price' => home_base_price_by_stock_id($data->stock_id),
                     'qty' => $data->stock_qty,

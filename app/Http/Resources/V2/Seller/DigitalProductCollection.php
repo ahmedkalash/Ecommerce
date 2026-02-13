@@ -19,7 +19,7 @@ class DigitalProductCollection extends ResourceCollection
                 return [
                     'id' => $data->id,
                     'name' => $data->getTranslation('name'),
-                    'thumbnail_img' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_img' => $data->thumbnail_img,
                     'category' => $data->main_category ? $data->main_category->getTranslation('name') : '',
                     'price	' => $data->unit_price,
                     'status' => $data->published == 0 ? false : true,

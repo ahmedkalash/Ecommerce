@@ -172,11 +172,11 @@
                                     @if ($orderDetail->product != null && $orderDetail->product->auction_product == 0)
                                         <a href="{{ route('product', $orderDetail->product->slug) }}"
                                            target="_blank"><img height="50"
-                                                                src="{{ get_file_by_id($orderDetail->product->thumbnail_img) }}"></a>
+                                                                src="{{ $orderDetail->product->thumbnail_img }}"></a>
                                     @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
                                         <a href="{{ route('auction-product', $orderDetail->product->slug) }}"
                                            target="_blank"><img height="50"
-                                                                src="{{ get_file_by_id($orderDetail->product->thumbnail_img) }}"></a>
+                                                                src="{{ $orderDetail->product->thumbnail_img }}"></a>
                                     @else
                                         <strong>{{ translate('N/A') }}</strong>
                                     @endif

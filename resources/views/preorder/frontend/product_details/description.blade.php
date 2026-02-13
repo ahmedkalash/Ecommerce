@@ -43,7 +43,7 @@
         <!-- Download -->
         <div class="tab-pane fade" id="tab_default_3">
             <div class="py-5 text-center ">
-                <a href="{{ get_file_by_id($product->pdf) }}"
+                <a href="{{ $product->pdf_url }}"
                    class="btn btn-primary">{{ translate('Download') }}</a>
             </div>
         </div>

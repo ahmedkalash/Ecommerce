@@ -111,7 +111,7 @@
                                             <!-- Product Image & name -->
                                             <div class="col-md-5 col-10 d-flex align-items-center mb-2 mb-md-0">
                                                 <span class="mr-2 ml-0">
-                                                    <img src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                                    <img src="{{ $product->thumbnail_img }}"
                                                          class="img-fit size-64px"
                                                          alt="{{ $product->getTranslation('name')  }}"
                                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
@@ -245,7 +245,7 @@
                                                 <!-- Product Image & name -->
                                                 <div class="col-md-5 col-10 d-flex align-items-center mb-2 mb-md-0">
                                                     <span class="mr-2 ml-0">
-                                                        <img src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                                        <img src="{{ $product->thumbnail_img }}"
                                                              class="img-fit size-64px"
                                                              alt="{{ $product->getTranslation('name')  }}"
                                                              onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">

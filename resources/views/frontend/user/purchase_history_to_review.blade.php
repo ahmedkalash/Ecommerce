@@ -15,7 +15,7 @@
                         @endif
                         <div class="row">
                             <div class="col-md-7 d-flex align-items-center">
-                                <img src="{{ get_file_by_id($orderDetail->product->thumbnail_img) }}"
+                                <img src="{{ $orderDetail->product->thumbnail_img }}"
                                      class="img-fluid mr-3 product-history-img">
 
                                 <div class="w-300px text-wrap">

@@ -542,7 +542,7 @@
                                                    class="d-block overflow-hidden h-auto h-md-150px text-center">
                                                     <img class="img-fluid lazyload mx-auto has-transition"
                                                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                         data-src="{{ get_file_by_id($classified_product->thumbnail_img) }}"
+                                                         data-src="{{ $classified_product->thumbnail_img }}"
                                                          alt="{{ $classified_product->getTranslation('name') }}"
                                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>
@@ -591,7 +591,7 @@
                                            class="flex-shrink-0 w-100px">
                                             <img class="img-fluid lazyload has-transition w-100"
                                                  src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                 data-src="{{ get_file_by_id($classified_product->thumbnail_img) }}"
+                                                 data-src="{{ $classified_product->thumbnail_img }}"
                                                  alt="{{ $classified_product->getTranslation('name') }}"
                                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                         </a>

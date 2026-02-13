@@ -18,7 +18,7 @@
     <!-- Product Info -->
     <div class="media mb-1">
         <img src="{{ static_asset('assets/img/placeholder.jpg') }}"
-             data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+             data-src="{{ $product->thumbnail_img }}"
              class="mr-4 lazyload size-90px img-fit rounded-0" alt="Product Image"
              onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
         <div class="media-body mt-2 text-left d-flex flex-column justify-content-between">
@@ -57,7 +57,7 @@
                                 <a href="{{ route('product', $related_product->slug) }}" class="d-block">
                                     <img class="img-fit lazyload mx-auto h-140px h-md-200px has-transition"
                                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                         data-src="{{ get_file_by_id($related_product->thumbnail_img) }}"
+                                         data-src="{{ $related_product->thumbnail_img }}"
                                          alt="{{ $related_product->getTranslation('name') }}"
                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                 </a>

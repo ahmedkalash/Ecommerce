@@ -11,7 +11,7 @@
                                        value="{{ $product->id }}">
                                 <span class="aiz-square-check"></span>
                             </label>
-                            <img class="size-48px img-fit" src="{{ get_file_by_id($product->thumbnail_img)}}">
+                            <img class="size-48px img-fit" src="{{ $product->thumbnail_img}}">
                         </div>
                         <div class="col">
                             <span>{{ $product->getTranslation('name') }}</span>

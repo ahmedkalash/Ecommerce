@@ -50,6 +50,7 @@ class ProductRequest extends FormRequest
         $rules['meta_img'] = 'sometimes|nullable|numeric';
         $rules['pdf'] = 'sometimes|nullable|numeric';
         $rules['short_video'] = 'sometimes|nullable|file|mimetypes:video/mp4,video/webm|max:10240'; // 10MB limit
+        $rules['short_video_thumbnail'] = 'sometimes|nullable|file|mimes:jpeg,png,jpg,gif,svg|max:2048'; // 2MB limit
 
         return $rules;
     }
@@ -85,6 +86,8 @@ class ProductRequest extends FormRequest
             // Media Messages
             'short_video.max' => translate('Short video must not exceed 10MB'),
             'short_video.mimetypes' => translate('Only MP4 and WebM videos are allowed'),
+            'short_video_thumbnail.mimes' => translate('Only jpeg, png, jpg, gif, svg images are allowed'),
+            'short_video_thumbnail.max' => translate('Short video thumbnail must not exceed 2MB'),
         ];
     }
 

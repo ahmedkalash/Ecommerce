@@ -17,7 +17,7 @@ class PurchasedResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->getTranslation('name'),
-            'thumbnail_image' => get_file_by_id($this->thumbnail_img),
+            'thumbnail_image' => $this->thumbnail_img,
         ];
     }
 }

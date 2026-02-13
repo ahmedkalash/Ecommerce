@@ -15,7 +15,7 @@ class Product extends Model implements HasMedia
 
     protected $guarded = ['choice_attributes'];
 
-    protected $with = ['product_translations', 'taxes', 'thumbnail'];
+    protected $with = ['product_translations', 'taxes', 'media'];
 
     public function getTranslation($field = '', $lang = false)
     {
@@ -100,11 +100,6 @@ class Product extends Model implements HasMedia
         return $this->hasMany(AuctionProductBid::class);
     }
 
-    public function thumbnail()
-    {
-        return $this->belongsTo(Media::class, 'thumbnail_img');
-    }
-
     public function scopePhysical($query)
     {
         return $query->where('digital', 0);
@@ -145,11 +140,6 @@ class Product extends Model implements HasMedia
         return $this->belongsTo(Note::class, 'refund_note_id');
     }
 
-    // add gallery image to thumb
-
-    // add gallery image to thumb
-    // Old thumbnailImg removed here
-
     /**
      * Register specifically named media collections for Products.
      * This provides a "Source of Truth" for what each image represents.
@@ -178,19 +168,36 @@ class Product extends Model implements HasMedia
     }
 
     /**
-     * Get the comma-separated URLs for the gallery images.
-     * Prioritizes Spatie Media Library and falls back to legacy 'photos' column.
+     * Get the gallery media collection (Spatie MediaCollection).
+     * Use this when you need to iterate over individual media items.
+     */
+    public function galleryMedia(): \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection
+    {
+        return $this->getMedia('gallery');
+    }
+
+    /**
+     * Get gallery image URLs as a comma-separated string.
+     * Accessed as $product->gallery.
      */
     public function gallery(): Attribute
     {
-        return Attribute::get(function ($value, $attributes) {
+        return Attribute::get(function () {
             $media = $this->getMedia('gallery');
-            if ($media->isNotEmpty()) {
-                return $media->map(fn ($item) => $item->getUrl())->implode(',');
-            }
 
-            return $attributes['photos'] ?? '';
+            return $media->isNotEmpty()
+                ? $media->map(fn ($item) => $item->getUrl())->implode(',')
+                : '';
         });
+    }
+
+    /**
+     * Backward-compatible accessor: $product->photos returns gallery URLs.
+     * Alias of gallery() for views that still reference ->photos.
+     */
+    public function photos(): Attribute
+    {
+        return Attribute::get(fn () => $this->gallery);
     }
 
     /**
@@ -198,56 +205,59 @@ class Product extends Model implements HasMedia
      */
     public function metaImg(): Attribute
     {
-        return Attribute::get(function ($value, $attributes) {
-            $url = $this->getFirstMediaUrl('meta');
-            if ($url) {
-                return $url;
-            }
-
-            // If it's a numeric ID from legacy, we wrap it in a helper check
-            if (is_numeric($value)) {
-                return get_file_by_id($value);
-            }
-
-            return $value;
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('meta') ?: null;
         });
     }
 
     /**
      * Get the product thumbnail URL.
-     * Prioritizes 'thumbnail' collection, then first photo from gallery, then placeholder.
+     * Prioritizes 'thumbnail' collection, then first gallery image, then placeholder.
      */
     public function thumbnailImg(): Attribute
     {
-        return Attribute::get(function ($value, $attributes) {
-            $mediaUrl = $this->getFirstMediaUrl('thumbnail');
-            if ($mediaUrl) {
-                return $mediaUrl;
+        return Attribute::get(function () {
+            $thumbnailUrl = $this->getFirstMediaUrl('thumbnail');
+            if ($thumbnailUrl) {
+                return $thumbnailUrl;
             }
 
-            // Fallback to specific legacy ID if exists
-            if (isset($attributes['thumbnail_img']) && is_numeric($attributes['thumbnail_img'])) {
-                return get_file_by_id($attributes['thumbnail_img']);
-            }
-
-            // Fallback to first image in photos list
-            $photos = $attributes['photos'] ?? null;
-            if ($photos) {
-                $photosArray = explode(',', $photos);
-                if (count($photosArray) > 0) {
-                    $firstPhotoId = $photosArray[0];
-                    if (is_numeric($firstPhotoId)) {
-                        return get_file_by_id($firstPhotoId);
-                    }
-
-                    $legacyPath = 'uploads/all/'.$firstPhotoId;
-                    if (file_exists(public_path($legacyPath))) {
-                        return static_asset($legacyPath);
-                    }
-                }
+            $firstGallery = $this->getFirstMediaUrl('gallery');
+            if ($firstGallery) {
+                return $firstGallery;
             }
 
             return static_asset('assets/img/placeholder.jpg');
+        });
+    }
+
+    /**
+     * Get the short video URL.
+     */
+    public function shortVideo(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('short_video') ?: null;
+        });
+    }
+
+    /**
+     * Get the short video thumbnail URL.
+     */
+    public function shortVideoThumbnail(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('video_thumbnail') ?: null;
+        });
+    }
+
+    /**
+     * Get the PDF file URL.
+     */
+    public function pdfUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            return $this->getFirstMediaUrl('pdf') ?: null;
         });
     }
 

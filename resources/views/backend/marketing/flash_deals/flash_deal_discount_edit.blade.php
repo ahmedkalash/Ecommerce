@@ -26,7 +26,7 @@
                 <td>
                     <div class="form-group row">
                         <div class="col-auto">
-                            <img src="{{ get_file_by_id($product->thumbnail_img)}}" class="size-60px img-fit">
+                            <img src="{{ $product->thumbnail_img}}" class="size-60px img-fit">
                         </div>
                         <div class="col">
                             <span>{{  $product->getTranslation('name')  }}</span>

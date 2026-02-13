@@ -18,18 +18,12 @@ class AuctionProductDetailCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
 
-                // photos
-                $photo_paths = get_images_path($data->photos);
                 $photos = [];
-                if (! empty($photo_paths)) {
-                    for ($i = 0; $i < count($photo_paths); $i++) {
-                        if ($photo_paths[$i] != '') {
-                            $item = [];
-                            $item['variant'] = '';
-                            $item['path'] = $photo_paths[$i];
-                            $photos[] = $item;
-                        }
-                    }
+                foreach ($data->galleryMedia() as $mediaItem) {
+                    $photos[] = [
+                        'variant' => '',
+                        'path' => $mediaItem->getUrl(),
+                    ];
                 }
 
                 // branc
@@ -66,7 +60,7 @@ class AuctionProductDetailCollection extends ResourceCollection
                     'shop_name' => $data->added_by == 'admin' ? translate('In House Product') : $data->user->shop->name,
                     'shop_logo' => $data->added_by == 'admin' ? get_file_by_id(get_setting('header_logo')) : get_file_by_id($data->user->shop->logo) ?? '',
                     'photos' => $photos,
-                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'tags' => explode(',', $data->tags),
                     'rating' => (float) $data->rating,
                     'rating_count' => (int) Review::where(['product_id' => $data->id])->count(),

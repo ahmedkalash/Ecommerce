@@ -37,7 +37,7 @@ class AuctionBidProducts extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'thumbnail_image' => get_file_by_id($this->thumbnail_img),
+            'thumbnail_image' => $this->thumbnail_img,
             'my_bid' => single_price($my_bided_product->amount),
             'highest_bid' => single_price($highest_bid),
             'auction_end_date' => $this->auction_end_date < strtotime('now') ? translate('Ended') : date('d.m.Y H:i:s',

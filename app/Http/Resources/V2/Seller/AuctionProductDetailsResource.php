@@ -4,7 +4,6 @@ namespace App\Http\Resources\V2\Seller;
 
 use App\Http\Resources\V2\UploadedFileCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AuctionProductDetailsResource extends JsonResource
 {
@@ -26,9 +25,8 @@ class AuctionProductDetailsResource extends JsonResource
             'product_unit' => $this->getTranslation('unit', $this->lang),
             'weight' => $this->weight,
             'tags' => $this->tags,
-            'photos' => new UploadedFileCollection(Media::whereIn('id', explode(',', $this->photos))->get()),
-            'thumbnail_img' => new UploadedFileCollection(Media::whereIn('id',
-                explode(',', $this->thumbnail_img))->get()),
+            'photos' => new UploadedFileCollection($this->getMedia('gallery')),
+            'thumbnail_img' => new UploadedFileCollection($this->getMedia('thumbnail')),
             'video_provider' => $this->video_provider,
             'video_link' => $this->video_link,
             'starting_bid' => $this->starting_bid,
@@ -41,10 +39,10 @@ class AuctionProductDetailsResource extends JsonResource
             'est_shipping_days' => $this->est_shipping_days,
             'tax' => $this->taxes,
             'tax_type' => $this->tax_type,
-            'pdf' => new UploadedFileCollection(Media::whereIn('id', explode(',', $this->pdf))->get()),
+            'pdf' => new UploadedFileCollection($this->getMedia('pdf')),
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
-            'meta_img' => new UploadedFileCollection(Media::where('id', $this->meta_img)->get()),
+            'meta_img' => new UploadedFileCollection($this->getMedia('meta')),
             'slug' => $this->slug,
         ];
     }

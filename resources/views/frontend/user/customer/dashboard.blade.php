@@ -290,7 +290,7 @@
                         <div class="position-relative h-140px h-md-200px img-fit overflow-hidden mb-3">
                             <!-- Image -->
                             <a href="{{ route('product', $wishlist->product->slug) }}" class="d-block h-100">
-                                <img src="{{ get_file_by_id($wishlist->product->thumbnail_img) }}"
+                                <img src="{{ $wishlist->product->thumbnail_img }}"
                                      class="lazyload mx-auto img-fit"
                                      title="{{ $wishlist->product->getTranslation('name') }}">
                             </a>

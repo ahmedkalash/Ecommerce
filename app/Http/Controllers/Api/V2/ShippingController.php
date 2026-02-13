@@ -123,7 +123,7 @@ class ShippingController extends Controller
                         $shop_items_data_item['temp_user_id'] = intval($shop_items_raw_data_item['temp_user_id']);
                         $shop_items_data_item['product_id'] = intval($shop_items_raw_data_item['product_id']);
                         $shop_items_data_item['product_name'] = $product->getTranslation('name');
-                        $shop_items_data_item['product_thumbnail_image'] = get_file_by_id($product->thumbnail_img);
+                        $shop_items_data_item['product_thumbnail_image'] = $product->thumbnail_img;
                         $shop_items_data_item['product_is_digital'] = $product->digital == 1;
                         $shop_items_data[] = $shop_items_data_item;
                     }

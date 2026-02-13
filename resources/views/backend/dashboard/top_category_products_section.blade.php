@@ -55,10 +55,7 @@
                 <tbody>
                 @foreach($top_categories_product as $row)
                     @php
-                        $product_img = null;
-                        if($row->product_thumbnail_img){
-                            $product_img = ($row->product_thumbnail_img->external_link == null) ? get_file_by_path($row->product_thumbnail_img->file_name) : $row->product_thumbnail_img->external_link;
-                        }
+                        $product_img = $row->product_thumbnail_img ?? static_asset('assets/img/placeholder.jpg');
                         $product_url = route('product', $row->product_slug);
                         if ($row->auction_product == 1) {
                             $product_url = route('auction-product', $row->product_slug);

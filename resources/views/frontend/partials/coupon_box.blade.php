@@ -81,8 +81,8 @@
                         <a href="{{ route('product', $product->slug) }}" title="{{ $product->name }}"
                            class='p-1 border border-transparent hov-border' target="_blank">
                             <img class="img-fit mx-auto h-48px w-48px"
-                                 src="{{ get_file_by_id($product->thumbnail_img) }}"
-                                 data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                 src="{{ $product->thumbnail_img }}"
+                                 data-src="{{ $product->thumbnail_img }}"
                                  onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';"
                                  alt="">
                         </a>

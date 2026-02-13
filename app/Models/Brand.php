@@ -6,10 +6,12 @@ use App;
 use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Brand extends Model
+class Brand extends Model implements HasMedia
 {
-    use HasFactory, PreventDemoModeChanges;
+    use HasFactory, InteractsWithMedia, PreventDemoModeChanges;
 
     protected $with = ['brand_translations'];
 

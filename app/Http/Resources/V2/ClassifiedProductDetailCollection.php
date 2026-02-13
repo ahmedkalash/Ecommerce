@@ -4,7 +4,6 @@ namespace App\Http\Resources\V2;
 
 use App\Models\Attribute;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ClassifiedProductDetailCollection extends ResourceCollection
 {
@@ -13,18 +12,12 @@ class ClassifiedProductDetailCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
 
-                $photo_paths = get_images_path($data->photos);
-
                 $photos = [];
-                if (! empty($photo_paths)) {
-                    for ($i = 0; $i < count($photo_paths); $i++) {
-                        if ($photo_paths[$i] != '') {
-                            $item = [];
-                            $item['variant'] = '';
-                            $item['path'] = $photo_paths[$i];
-                            $photos[] = $item;
-                        }
-                    }
+                foreach ($data->galleryMedia() as $mediaItem) {
+                    $photos[] = [
+                        'variant' => '',
+                        'path' => $mediaItem->getUrl(),
+                    ];
                 }
 
                 $brand = [
@@ -51,9 +44,8 @@ class ClassifiedProductDetailCollection extends ResourceCollection
                     'added_by' => $data->user->name,
                     'phone' => $data->user->phone ?? '',
                     'condition' => $data->conditon,
-                    'photos' => new UploadedFileCollection(Media::whereIn('id', explode(',', $data->photos))->get()),
-                    'thumbnail_image' => new UploadedFileCollection(Media::whereIn('id',
-                        explode(',', $data->thumbnail_img))->get()),
+                    'photos' => new UploadedFileCollection($data->getMedia('gallery')),
+                    'thumbnail_image' => new UploadedFileCollection($data->getMedia('thumbnail')),
                     'tags' => explode(',', $data->tags),
                     'location' => $data->location,
                     'unit_price' => single_price($data->unit_price),
@@ -65,9 +57,8 @@ class ClassifiedProductDetailCollection extends ResourceCollection
                     'link' => route('customer.product', $data->slug),
                     'meta_title' => $data->meta_title,
                     'meta_description' => $data->meta_description,
-                    'meta_image' => new UploadedFileCollection(Media::whereIn('id',
-                        explode(',', $data->meta_img))->get()),
-                    'pdf' => new UploadedFileCollection(Media::whereIn('id', explode(',', $data->pdf))->get()),
+                    'meta_image' => new UploadedFileCollection($data->getMedia('meta')),
+                    'pdf' => new UploadedFileCollection($data->getMedia('pdf')),
                 ];
             }),
         ];

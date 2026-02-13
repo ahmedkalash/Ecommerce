@@ -18,7 +18,7 @@ class ProductMiniCollection extends ResourceCollection
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
                     'slug' => $data->slug,
-                    'thumbnail_image' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'has_discount' => home_base_price($data, false) != home_discounted_base_price($data, false),
                     'discount' => '-'.discount_in_percentage($data).'%',
                     'stroked_price' => home_base_price($data),

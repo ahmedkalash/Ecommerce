@@ -25,7 +25,7 @@ class ProductCollection extends ResourceCollection
                 return [
                     'id' => $data->id,
                     'name' => $data->name,
-                    'thumbnail_img' => get_file_by_id($data->thumbnail_img),
+                    'thumbnail_img' => $data->thumbnail_img,
                     'price' => format_price($data->unit_price),
                     'current_stock' => $qty,
                     'status' => $data->published == 0 ? false : true,

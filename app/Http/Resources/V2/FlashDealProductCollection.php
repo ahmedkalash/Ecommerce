@@ -19,7 +19,7 @@ class FlashDealProductCollection extends ResourceCollection
                 return [
                     'id' => $data->product_id,
                     'name' => $data->product->name,
-                    'image' => get_file_by_id($data->product->thumbnail_img),
+                    'image' => $data->product->thumbnail_img,
                     'price' => home_discounted_base_price($data->product),
                     'links' => [
                         'details' => route('products.show', $data->product_id),

@@ -199,7 +199,7 @@
                                                    class="d-block">
                                                     <img class="img-fit lazyload mx-auto h-140px h-md-210px"
                                                          src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                         data-src="{{ get_file_by_id($product->thumbnail_img) }}"
+                                                         data-src="{{ $product->thumbnail_img }}"
                                                          alt="{{  $product->getTranslation('name')  }}"
                                                          onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 </a>
