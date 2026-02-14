@@ -305,6 +305,13 @@ VALUES (1, 'add_new_product', 'product', 'admin', '2022-06-12 09:31:31', '2022-0
 
 
 --
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`)
+VALUES (1, 'Super Admin', 'admin', '2022-06-13 00:29:58', '2022-06-12 12:00:00');
+
+--
 -- Dumping data for table `model_has_roles`
 --
 

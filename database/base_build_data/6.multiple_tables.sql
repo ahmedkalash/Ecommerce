@@ -873,7 +873,6 @@ VALUES (1, 'English', 'en', 'en', 0, 1, '2019-01-20 12:13:20', '2019-01-20 12:13
        (3, 'Bangla', 'bd', 'bn', 0, 1, '2019-02-17 06:35:37', '2019-02-18 06:49:51'),
        (4, 'Arabic', 'sa', 'ar', 1, 1, '2019-04-28 18:34:12', '2019-04-28 18:34:12');
 
-
 --
 -- Truncate table before insert `notification_types`
 --
@@ -1007,6 +1006,7 @@ VALUES (1, 'paypal', 0, NULL, '2024-05-18 23:31:18', '2024-05-18 23:31:18'),
        (23, 'flutterwave', 0, 'african_pg', '2024-05-18 23:36:10', '2024-05-18 23:36:10'),
        (24, 'payfast', 0, 'african_pg', '2024-05-18 23:36:10', '2024-05-18 23:36:10'),
        (25, 'tap', 0, NULL, '2024-07-14 06:16:47', '2024-07-14 06:16:47');
+
 --
 -- Truncate table before insert `products`
 --
@@ -1016,16 +1016,17 @@ TRUNCATE TABLE `products`;
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `added_by`, `user_id`, `category_id`, `brand_id`, `video_provider`, `video_link`,
-                        `tags`, `description`, `unit_price`, `purchase_price`, `variant_product`, `attributes`,
-                        `choice_options`, `colors`, `variations`, `todays_deal`, `published`, `approved`,
-                        `stock_visibility_state`, `cash_on_delivery`, `featured`, `seller_featured`, `current_stock`,
-                        `unit`, `weight`, `min_qty`, `low_stock_quantity`, `discount`, `discount_type`,
-                        `discount_start_date`, `discount_end_date`, `tax`, `tax_type`, `shipping_type`, `shipping_cost`,
-                        `is_quantity_multiplied`, `est_shipping_days`, `num_of_sale`, `meta_title`, `meta_description`,
-                        `slug`, `rating`, `barcode`, `digital`, `auction_product`, `file_name`, `file_path`,
-                        `external_link`, `external_link_btn`, `wholesale_product`, `frequently_bought_selection_type`,
-                        `has_warranty`, `warranty_id`, `warranty_note_id`, `created_at`, `updated_at`)
+INSERT INTO `products` (`id`, `name`, `added_by`, `user_id`, `category_id`, `brand_id`,
+                        `video_provider`, `video_link`, `tags`, `description`,
+                        `unit_price`, `purchase_price`, `variant_product`, `attributes`, `choice_options`, `colors`,
+                        `variations`, `todays_deal`, `published`, `approved`, `stock_visibility_state`,
+                        `cash_on_delivery`, `featured`, `seller_featured`, `current_stock`, `unit`, `weight`, `min_qty`,
+                        `low_stock_quantity`, `discount`, `discount_type`, `discount_start_date`, `discount_end_date`,
+                        `tax`, `tax_type`, `shipping_type`, `shipping_cost`, `is_quantity_multiplied`,
+                        `est_shipping_days`, `num_of_sale`, `meta_title`, `meta_description`, `slug`,
+                        `rating`, `barcode`, `digital`, `auction_product`, `file_name`, `file_path`, `external_link`,
+                        `external_link_btn`, `wholesale_product`, `frequently_bought_selection_type`, `has_warranty`,
+                        `warranty_id`, `warranty_note_id`, `created_at`, `updated_at`)
 VALUES (1, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell Gaiter Hoodie', 'admin', 9, 1, 3,
         'youtube', NULL, '',
         '<div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Navy Shirt</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Style Code</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">LRSHCSLFL01619</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Closure</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Button</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fit</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Slim</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Pure Cotton</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Sleeve</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Half Sleeve</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Pattern</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Checkered</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Reversible</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">No</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Collar</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Spread</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Color</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Dark Blue</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric Care</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Gentle Machine Wash</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Suitable For</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Western Wear</div><div><br></div></div>',
@@ -1164,9 +1165,19 @@ VALUES (1, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell G
         '[]', '[]', NULL, 1, 1, 1, 'quantity', 1, 0, 0, 233, 'Pc', 1.00, 1, 1, 0.00, 'amount', 1651017600, 1745798399,
         NULL, NULL, 'free', 0.00, 0, 2, 0, '2 Piece Wellness Anti-Fatigue Mat Set',
         '2 Piece Wellness Anti-Fatigue Mat Set', '2-piece-wellness-anti-fatigue-mat-set', 0.00, NULL, 0, 0, NULL, NULL,
-        NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-17 14:21:19', '2024-01-08 10:20:40'),
-       (`product_id`, `category_id`),
-       (2, 1),
+        NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-17 14:21:19', '2024-01-08 10:20:40');
+
+--
+-- Truncate table before insert `product_categories`
+--
+
+TRUNCATE TABLE `product_categories`;
+--
+-- Dumping data for table `product_categories`
+--
+
+INSERT INTO `product_categories` (`product_id`, `category_id`)
+VALUES (2, 1),
        (2, 8),
        (2, 9),
        (2, 48),
@@ -1253,136 +1264,222 @@ VALUES (1, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell G
        (22, 28),
        (22, 29),
        (22, 30),
-       (22, 31),
-       (`id`, `product_id`, `variant`, `sku`, `price`, `qty`, `updated_at`),
-       (1, 22, '', NULL, 5.32, 233, '2024-01-08 10:20:40'),
-       (2, 21, '', NULL, 5.43, 299, '2024-01-08 10:22:08'),
-       (3, 20, '', NULL, 12.34, 120, '2024-01-08 10:26:37'),
-       (4, 19, '', NULL, 13.43, 235, '2024-01-08 10:28:24'),
-       (5, 18, '', NULL, 12.00, 198, '2024-01-08 10:29:26'),
-       (6, 6, '', NULL, 12.00, 0, '2024-01-08 11:35:57'),
-       (7, 3, 'Crimson', NULL, 15.00, 106, '2024-01-08 12:15:19'),
-       (8, 2, 'DarkOrange', NULL, 12.00, 101, '2024-01-08 12:17:06'),
-       (9, 14, '', NULL, 12.23, 129, '2024-01-08 12:33:17'),
-       (10, 15, '', NULL, 13.30, 227, '2024-01-08 12:35:00'),
-       (11, 16, '', NULL, 12.22, 0, '2024-01-08 12:37:31'),
-       (12, 10, '', NULL, 12.00, 123, '2024-01-08 12:39:12'),
-       (13, 11, '', NULL, 12.00, 128, '2024-01-08 12:41:05'),
-       (14, 17, '', NULL, 21.32, 229, '2024-01-08 12:47:34'),
-       (15, 9, '', NULL, 22.00, 1210, '2024-01-08 12:49:21'),
-       (16, 8, '', NULL, 12.40, 110, '2024-01-08 12:51:09'),
-       (17, 5, 'AntiqueWhite', NULL, 34.00, 109, '2024-01-08 13:05:45'),
-       (18, 13, '', NULL, 15.30, 125, '2024-01-08 13:09:38'),
-       (19, 12, '', NULL, 12.00, 120, '2024-01-08 13:12:38'),
-       (20, 4, 'DarkGray', NULL, 3.00, 107, '2024-01-08 13:14:45'),
-       (21, 7, '', NULL, 12.00, 109, '2024-01-08 13:17:03'),
-       (`id`, `product_id`, `tax_id`, `tax`, `tax_type`, `created_at`),
-       (1, 22, 3, 0.00, 'amount', '2024-01-08 10:20:40'),
-       (2, 21, 3, 0.00, 'amount', '2024-01-08 10:22:08'),
-       (3, 20, 3, 0.00, 'amount', '2024-01-08 10:26:37'),
-       (4, 19, 3, 0.00, 'amount', '2024-01-08 10:28:24'),
-       (5, 18, 3, 0.00, 'amount', '2024-01-08 10:29:26'),
-       (6, 6, 3, 0.00, 'amount', '2024-01-08 11:35:57'),
-       (7, 3, 3, 0.00, 'amount', '2024-01-08 12:15:19'),
-       (8, 2, 3, 0.00, 'amount', '2024-01-08 12:17:06'),
-       (9, 14, 3, 0.00, 'amount', '2024-01-08 12:33:17'),
-       (10, 15, 3, 0.00, 'amount', '2024-01-08 12:35:00'),
-       (11, 16, 3, 0.00, 'amount', '2024-01-08 12:37:31'),
-       (12, 10, 3, 0.00, 'amount', '2024-01-08 12:39:12'),
-       (13, 11, 3, 0.00, 'amount', '2024-01-08 12:41:05'),
-       (14, 17, 3, 0.00, 'amount', '2024-01-08 12:47:34'),
-       (15, 9, 3, 0.00, 'amount', '2024-01-08 12:49:22'),
-       (16, 8, 3, 0.00, 'amount', '2024-01-08 12:51:09'),
-       (17, 5, 3, 0.00, 'amount', '2024-01-08 13:05:45'),
-       (18, 13, 3, 0.00, 'amount', '2024-01-08 13:09:38'),
-       (19, 12, 3, 0.00, 'amount', '2024-01-08 13:12:38'),
-       (20, 4, 3, 0.00, 'amount', '2024-01-08 13:14:45'),
-       (21, 7, 3, 0.00, 'amount', '2024-01-08 13:17:03'),
-       (`id`, `product_id`, `name`, `unit`, `description`, `lang`),
-       (1, 2, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell Gaiter Hoodie', 'Pc',
+       (22, 31);
+
+
+--
+-- Truncate table before insert `product_stocks`
+--
+
+TRUNCATE TABLE `product_stocks`;
+--
+-- Dumping data for table `product_stocks`
+--
+
+INSERT INTO `product_stocks` (`id`, `product_id`, `variant`, `sku`, `price`, `qty`, `image`, `created_at`, `updated_at`)
+VALUES (1, 22, '', NULL, 5.32, 233, NULL, '2024-01-08 10:20:40', '2024-01-08 10:20:40'),
+       (2, 21, '', NULL, 5.43, 299, NULL, '2024-01-08 10:22:08', '2024-01-08 10:22:08'),
+       (3, 20, '', NULL, 12.34, 120, NULL, '2024-01-08 10:26:37', '2024-01-08 10:26:37'),
+       (4, 19, '', NULL, 13.43, 235, NULL, '2024-01-08 10:28:24', '2024-01-08 10:28:24'),
+       (5, 18, '', NULL, 12.00, 198, NULL, '2024-01-08 10:29:26', '2024-01-08 10:29:26'),
+       (6, 6, '', NULL, 12.00, 0, NULL, '2024-01-08 11:35:57', '2024-01-08 11:35:57'),
+       (7, 3, 'Crimson', NULL, 15.00, 106, NULL, '2024-01-08 12:15:19', '2024-01-08 12:15:19'),
+       (8, 2, 'DarkOrange', NULL, 12.00, 101, NULL, '2024-01-08 12:17:06', '2024-01-08 12:17:06'),
+       (9, 14, '', NULL, 12.23, 129, NULL, '2024-01-08 12:33:17', '2024-01-08 12:33:17'),
+       (10, 15, '', NULL, 13.30, 227, NULL, '2024-01-08 12:35:00', '2024-01-08 12:35:00'),
+       (11, 16, '', NULL, 12.22, 0, NULL, '2024-01-08 12:37:31', '2024-01-08 12:37:31'),
+       (12, 10, '', NULL, 12.00, 123, NULL, '2024-01-08 12:39:12', '2024-01-08 12:39:12'),
+       (13, 11, '', NULL, 12.00, 128, NULL, '2024-01-08 12:41:05', '2024-01-08 12:41:05'),
+       (14, 17, '', NULL, 21.32, 229, NULL, '2024-01-08 12:47:34', '2024-01-08 12:47:34'),
+       (15, 9, '', NULL, 22.00, 1210, NULL, '2024-01-08 12:49:21', '2024-01-08 12:49:21'),
+       (16, 8, '', NULL, 12.40, 110, NULL, '2024-01-08 12:51:09', '2024-01-08 12:51:09'),
+       (17, 5, 'AntiqueWhite', NULL, 34.00, 109, NULL, '2024-01-08 13:05:45', '2024-01-08 13:05:45'),
+       (18, 13, '', NULL, 15.30, 125, NULL, '2024-01-08 13:09:38', '2024-01-08 13:09:38'),
+       (19, 12, '', NULL, 12.00, 120, NULL, '2024-01-08 13:12:38', '2024-01-08 13:12:38'),
+       (20, 4, 'DarkGray', NULL, 3.00, 107, NULL, '2024-01-08 13:14:45', '2024-01-08 13:14:45'),
+       (21, 7, '', NULL, 12.00, 109, NULL, '2024-01-08 13:17:03', '2024-01-08 13:17:03');
+
+--
+-- Truncate table before insert `product_taxes`
+--
+
+TRUNCATE TABLE `product_taxes`;
+--
+-- Dumping data for table `product_taxes`
+--
+
+INSERT INTO `product_taxes` (`id`, `product_id`, `tax_id`, `tax`, `tax_type`, `created_at`, `updated_at`)
+VALUES (1, 22, 3, 0.00, 'amount', '2024-01-08 10:20:40', '2024-01-08 10:20:40'),
+       (2, 21, 3, 0.00, 'amount', '2024-01-08 10:22:08', '2024-01-08 10:22:08'),
+       (3, 20, 3, 0.00, 'amount', '2024-01-08 10:26:37', '2024-01-08 10:26:37'),
+       (4, 19, 3, 0.00, 'amount', '2024-01-08 10:28:24', '2024-01-08 10:28:24'),
+       (5, 18, 3, 0.00, 'amount', '2024-01-08 10:29:26', '2024-01-08 10:29:26'),
+       (6, 6, 3, 0.00, 'amount', '2024-01-08 11:35:57', '2024-01-08 11:35:57'),
+       (7, 3, 3, 0.00, 'amount', '2024-01-08 12:15:19', '2024-01-08 12:15:19'),
+       (8, 2, 3, 0.00, 'amount', '2024-01-08 12:17:06', '2024-01-08 12:17:06'),
+       (9, 14, 3, 0.00, 'amount', '2024-01-08 12:33:17', '2024-01-08 12:33:17'),
+       (10, 15, 3, 0.00, 'amount', '2024-01-08 12:35:00', '2024-01-08 12:35:00'),
+       (11, 16, 3, 0.00, 'amount', '2024-01-08 12:37:31', '2024-01-08 12:37:31'),
+       (12, 10, 3, 0.00, 'amount', '2024-01-08 12:39:12', '2024-01-08 12:39:12'),
+       (13, 11, 3, 0.00, 'amount', '2024-01-08 12:41:05', '2024-01-08 12:41:05'),
+       (14, 17, 3, 0.00, 'amount', '2024-01-08 12:47:34', '2024-01-08 12:47:34'),
+       (15, 9, 3, 0.00, 'amount', '2024-01-08 12:49:22', '2024-01-08 12:49:22'),
+       (16, 8, 3, 0.00, 'amount', '2024-01-08 12:51:09', '2024-01-08 12:51:09'),
+       (17, 5, 3, 0.00, 'amount', '2024-01-08 13:05:45', '2024-01-08 13:05:45'),
+       (18, 13, 3, 0.00, 'amount', '2024-01-08 13:09:38', '2024-01-08 13:09:38'),
+       (19, 12, 3, 0.00, 'amount', '2024-01-08 13:12:38', '2024-01-08 13:12:38'),
+       (20, 4, 3, 0.00, 'amount', '2024-01-08 13:14:45', '2024-01-08 13:14:45'),
+       (21, 7, 3, 0.00, 'amount', '2024-01-08 13:17:03', '2024-01-08 13:17:03');
+
+--
+-- Truncate table before insert `product_translations`
+--
+
+TRUNCATE TABLE `product_translations`;
+--
+-- Dumping data for table `product_translations`
+--
+
+INSERT INTO `product_translations` (`id`, `product_id`, `name`, `unit`, `description`, `lang`, `created_at`,
+                                    `updated_at`)
+VALUES (1, 2, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell Gaiter Hoodie', 'Pc',
         '<div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Navy Shirt</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Style Code</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">LRSHCSLFL01619</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Closure</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Button</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fit</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Slim</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Pure Cotton</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Sleeve</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Half Sleeve</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Pattern</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Checkered</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Reversible</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">No</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Collar</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Spread</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Color</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Dark Blue</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric Care</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Gentle Machine Wash</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Suitable For</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Western Wear</div><div><br></div></div>',
-        'en'),
+        'en', '2023-12-14 11:12:23', '2023-12-14 11:12:23'),
        (2, 3,
         'Women\'s Christmas Sweatshirt Casual Fashion Printing Long Sleeve O-Neck Pullover Top Blouse Wool Sweater, S-3XLc',
         'Pc',
         '<p>\"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?\"<br></p>',
-        'en'),
+        'en', '2023-12-14 11:16:03', '2023-12-14 11:16:03'),
        (3, 4,
         'ESR for iPhone 15 Pro Max Case with MagSafe, Supports Magnetic Charging, Slim Liquid Silicone Case, Shock Absorbing, Screen and Camera Protection, Cloud Series, Light Tan',
         'Pc',
         '<p><span style=\"font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"</span><br></p>',
-        'en'),
+        'en', '2023-12-14 11:59:25', '2023-12-14 11:59:25'),
        (4, 5,
         'HUAWEI Mate 50 Pro Dual-SIM 256GB ROM + 8GB RAM (Only GSM | No CDMA) Factory Unlocked 4G/LTE Smartphone (Black) - International Version',
         'Pc',
         '<p><span style=\"font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"</span><br></p>',
-        'en'),
+        'en', '2023-12-14 12:06:29', '2023-12-14 12:06:29'),
        (5, 6, 'Premium executive estate with plenty of cargo capacity', 'Pc',
-        '<p>Premium executive estate with plenty of cargo capacity<br></p>', 'en'),
+        '<p>Premium executive estate with plenty of cargo capacity<br></p>', 'en', '2023-12-14 13:22:30',
+        '2023-12-14 13:22:30'),
        (6, 7, 'Philips Rice Cooker 0.6L', 'Pc',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Rice Cooker 0.6L</h2>', 'en'),
+        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Rice Cooker 0.6L</h2>', 'en', '2023-12-14 13:56:49',
+        '2023-12-14 13:56:49'),
        (7, 8, 'Philips Mixer Grinder HL7555/00', 'Pc',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Mixer Grinder HL7555/00</h2>', 'en'),
+        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Mixer Grinder HL7555/00</h2>', 'en', '2023-12-14 14:00:49',
+        '2023-12-14 14:00:49'),
        (8, 9, 'Philipps Airfryer XXL', 'Pc', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philipps Airfryer XXL</h2>',
-        'en'),
-       (9, 10, 'Disney Men\'s Mickey and Friends Button Down Shirt', 'Pc', NULL, 'en'),
+        'en', '2023-12-14 14:02:06', '2023-12-14 14:02:06'),
+       (9, 10, 'Disney Men\'s Mickey and Friends Button Down Shirt', 'Pc', NULL, 'en', '2023-12-14 14:06:04',
+        '2023-12-14 14:06:04'),
        (10, 11, 'The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress', 'Pc',
         '<h2 class=\"mb-2 fs-16 fw-700 text-dark\">The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress</h2>',
-        'en'),
-       (11, 12, 'Berne Men\'s Heritage Thermal-Lined Full-Zip Hooded Sweatshirt', 'pc', NULL, 'en'),
+        'en', '2023-12-14 14:07:34', '2023-12-14 14:07:34'),
+       (11, 12, 'Berne Men\'s Heritage Thermal-Lined Full-Zip Hooded Sweatshirt', 'pc', NULL, 'en',
+        '2023-12-14 14:59:09', '2023-12-14 14:59:09'),
        (12, 13, 'Self Design, Embellished, Embroidered Satin Blend, Net Semi Stitched Flared/A-line Gown', 'pc', NULL,
-        'en'),
+        'en', '2023-12-14 15:00:45', '2023-12-14 15:00:45'),
        (13, 14, 'VredeVogel Women\'s Cotton Silk Blend Straight Kurta with Trouser Pant & Banarasi Silk Dupatta', 'pc',
-        NULL, 'en'),
-       (14, 15, 'Adidas Fitness Tights for Women', 'pc', NULL, 'en'),
-       (15, 16, 'Adidas Men\'s Originals Poly Tape Shorts', 'pc', NULL, 'en'),
-       (16, 17, 'AirPods Max', 'pc', NULL, 'en'),
-       (17, 18, 'Apple - AirPods Max', 'Pc', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Apple - AirPods Max</h2>',
-        'en'),
+        NULL, 'en', '2023-12-14 15:04:11', '2023-12-14 15:04:11'),
+       (14, 15, 'Adidas Fitness Tights for Women', 'pc', NULL, 'en', '2023-12-14 15:18:23', '2023-12-14 15:18:23'),
+       (15, 16, 'Adidas Men\'s Originals Poly Tape Shorts', 'pc', NULL, 'en', '2023-12-14 15:22:25',
+        '2023-12-14 15:22:25'),
+       (16, 17, 'AirPods Max', 'pc', NULL, 'en', '2023-12-14 15:25:12', '2023-12-14 15:25:12'),
+       (17, 18, 'Apple - AirPods Max', 'Pc', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Apple - AirPods Max</h2>', 'en',
+        '2023-12-17 13:24:39', '2023-12-17 13:24:39'),
        (18, 19, 'OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max', 'Pc',
         '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max</h2>',
-        'en'),
-       (19, 20, 'Men\'s Hoodies', 'Pc', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Men\'s Hoodies</h2>', 'en'),
+        'en', '2023-12-17 13:26:12', '2023-12-17 13:26:12'),
+       (19, 20, 'Men\'s Hoodies', 'Pc', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Men\'s Hoodies</h2>', 'en',
+        '2023-12-17 13:58:39', '2023-12-17 13:58:39'),
        (20, 21, 'Fleck Splash Round Kitchen Mat', 'Pc',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Fleck Splash Round Kitchen Mat</h2>', 'en'),
+        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Fleck Splash Round Kitchen Mat</h2>', 'en', '2023-12-17 14:14:58',
+        '2023-12-17 14:14:58'),
        (21, 22, '2 Piece Wellness Anti-Fatigue Mat Set', 'Pc',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">2 Piece Wellness Anti-Fatigue Mat Set</h2>', 'en'),
-       (`id`, `query`, `count`, `created_at`, `updated_at`),
-       (2, 'dcs', 1, '2020-03-08 00:29:09', '2020-03-08 00:29:09'),
-       (3, 'das', 3, '2020-03-08 00:29:15', '2020-03-08 00:29:50'),
-       (`id`, `user_id`, `rating`, `num_of_reviews`, `num_of_sale`, `verification_status`, `admin_to_pay`, `bank_name`,
-        `bank_acc_name`, `bank_acc_no`, `bank_routing_no`, `bank_payment_status`, `created_at`, `updated_at`),
-       (1, 3, 0.00, 0, 0, 1, 78.40, NULL, NULL, NULL, NULL, 0, '2018-10-07 04:42:57', '2020-01-26 04:21:11'),
-       (`id`, `user_id`, `name`, `logo`, `sliders`, `top_banner`, `banner_full_width_2`, `phone`, `address`, `rating`,
-        `num_of_reviews`, `num_of_sale`, `seller_package_id`, `product_upload_limit`, `package_invalid_at`,
-        `registration_approval`, `verification_status`, `verification_info`, `cash_on_delivery_status`, `admin_to_pay`,
-        `facebook`, `instagram`, `google`, `twitter`, `youtube`, `slug`, `meta_title`, `meta_description`,
-        `pick_up_point_id`, `shipping_cost`, `commission_percentage`, `delivery_pickup_latitude`,
-        `delivery_pickup_longitude`, `bank_name`, `bank_acc_name`, `bank_acc_no`, `bank_routing_no`,
-        `bank_payment_status`, `top_banner_image`, `top_banner_link`, `slider_images`, `slider_links`,
-        `banner_full_width_1_images`, `banner_full_width_1_links`, `banners_half_width_images`,
-        `banners_half_width_links`, `banner_full_width_2_images`, `banner_full_width_2_links`, `custom_followers`,
-        `created_at`, `updated_at`),
-       (1, 3, 'Demo Seller Shop', NULL, NULL, NULL, NULL, NULL, 'House : Demo, Road : Demo, Section : Demo', 0.00, 0, 0,
-        NULL, 0, NULL, 0, 0, NULL, 0, 0.00, 'www.facebook.com', NULL, 'www.google.com', 'www.twitter.com',
+        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">2 Piece Wellness Anti-Fatigue Mat Set</h2>', 'en',
+        '2023-12-17 14:21:19', '2023-12-17 14:21:19');
+
+--
+-- Truncate table before insert `searches`
+--
+
+TRUNCATE TABLE `searches`;
+--
+-- Dumping data for table `searches`
+--
+
+INSERT INTO `searches` (`id`, `query`, `count`, `created_at`, `updated_at`)
+VALUES (2, 'dcs', 1, '2020-03-08 00:29:09', '2020-03-08 00:29:09'),
+       (3, 'das', 3, '2020-03-08 00:29:15', '2020-03-08 00:29:50');
+
+--
+-- Truncate table before insert `sellers`
+--
+
+TRUNCATE TABLE `sellers`;
+--
+-- Dumping data for table `sellers`
+--
+
+INSERT INTO `sellers` (`id`, `user_id`, `rating`, `num_of_reviews`, `num_of_sale`, `verification_status`,
+                       `verification_info`, `cash_on_delivery_status`, `admin_to_pay`, `bank_name`, `bank_acc_name`,
+                       `bank_acc_no`, `bank_routing_no`, `bank_payment_status`, `created_at`, `updated_at`)
+VALUES (1, 3, 0.00, 0, 0, 1,
+        '[{\"type\":\"text\",\"label\":\"Name\",\"value\":\"Mr. Seller\"},{\"type\":\"select\",\"label\":\"Marital Status\",\"value\":\"Married\"},{\"type\":\"multi_select\",\"label\":\"Company\",\"value\":\"[\\\"Company\\\"]\"},{\"type\":\"select\",\"label\":\"Gender\",\"value\":\"Male\"},{\"type\":\"file\",\"label\":\"Image\",\"value\":\"uploads\\/verification_form\\/CRWqFifcbKqibNzllBhEyUSkV6m1viknGXMEhtiW.png\"}]',
+        1, 78.40, NULL, NULL, NULL, NULL, 0, '2018-10-07 04:42:57', '2020-01-26 04:21:11');
+
+--
+-- Truncate table before insert `shops`
+--
+
+TRUNCATE TABLE `shops`;
+--
+-- Dumping data for table `shops`
+--
+
+INSERT INTO `shops` (`id`, `user_id`, `name`, `logo`, `sliders`, `top_banner`, `banner_full_width_1`,
+                     `banners_half_width`, `banner_full_width_2`, `phone`, `address`, `rating`, `num_of_reviews`,
+                     `num_of_sale`, `seller_package_id`, `product_upload_limit`, `package_invalid_at`,
+                     `registration_approval`, `verification_status`, `verification_info`, `cash_on_delivery_status`,
+                     `admin_to_pay`, `facebook`, `instagram`, `google`, `twitter`, `youtube`, `slug`, `meta_title`,
+                     `meta_description`, `pick_up_point_id`, `shipping_cost`, `commission_percentage`,
+                     `delivery_pickup_latitude`, `delivery_pickup_longitude`, `bank_name`, `bank_acc_name`,
+                     `bank_acc_no`, `bank_routing_no`, `bank_payment_status`, `top_banner_image`, `top_banner_link`,
+                     `slider_images`, `slider_links`, `banner_full_width_1_images`, `banner_full_width_1_links`,
+                     `banners_half_width_images`, `banners_half_width_links`, `banner_full_width_2_images`,
+                     `banner_full_width_2_links`, `custom_followers`, `created_at`, `updated_at`)
+VALUES (1, 3, 'Demo Seller Shop', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'House : Demo, Road : Demo, Section : Demo',
+        0.00, 0, 0, NULL, 0, NULL, 0, 0, NULL, 0, 0.00, 'www.facebook.com', NULL, 'www.google.com', 'www.twitter.com',
         'www.youtube.com', 'Demo-Seller-Shop-1', 'Demo Seller Shop Title', 'Demo description', NULL, 0.00, 0.00, NULL,
         NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
         '2018-11-27 10:23:13', '2019-08-06 06:43:16'),
-       (2, 4, 'Filon Asset Store', '146', NULL, NULL, NULL, '56468753', 'Filon Asset Storel', 0.00, 0, 0, NULL, 0, NULL,
-        0, 1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Filon-Asset-Store-2', 'Filon Asset Store',
+       (2, 4, 'Filon Asset Store', '146', NULL, NULL, NULL, NULL, NULL, '56468753', 'Filon Asset Storel', 0.00, 0, 0,
+        NULL, 0, NULL, 0, 1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Filon-Asset-Store-2', 'Filon Asset Store',
         'Filon Asset Store', NULL, 0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL,
         NULL, NULL, NULL, NULL, NULL, 0, '2023-12-12 15:06:54', '2024-01-09 12:03:49'),
-       (3, 5, 'Pink Horizon', '148', NULL, NULL, NULL, '256546', 'Enim officia dolore', 0.00, 0, 0, NULL, 0, NULL, 0, 1,
-        NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Pink-Horizon-6', 'Pink Horizon', 'Pink Horizon', NULL, 0.00, 0.00,
-        NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-        '2024-01-09 12:13:59', '2024-01-09 12:15:05'),
-       (4, 6, 'LOUIS VUITTON', '149', NULL, NULL, NULL, '2656454', 'Asperiores exercitat', 0.00, 0, 0, NULL, 0, NULL, 0,
-        1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'LOUIS-VUITTON-7', 'LOUIS VUITTON', 'LOUIS VUITTON', NULL, 0.00,
-        0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-        '2024-01-09 12:16:40', '2024-01-09 12:21:55'),
-       (5, 7, 'Lavish Look', '150', NULL, NULL, NULL, '265646', 'Ullamco nemo in veli', 0.00, 0, 0, NULL, 0, NULL, 0, 1,
-        NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Lavish-Look-8', 'Lavish Look', 'Lavish Look', NULL, 0.00, 0.00,
-        NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
-        '2024-01-09 12:18:07', '2024-01-09 12:21:53'),
-       (`id`, `name`, `tax_status`, `created_at`, `updated_at`),
-       (3, 'Tax', 1, '2021-03-07 11:45:33', '2021-03-07 11:45:33') );
+       (3, 5, 'Pink Horizon', '148', NULL, NULL, NULL, NULL, NULL, '256546', 'Enim officia dolore', 0.00, 0, 0, NULL, 0,
+        NULL, 0, 1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Pink-Horizon-6', 'Pink Horizon', 'Pink Horizon', NULL,
+        0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        0, '2024-01-09 12:13:59', '2024-01-09 12:15:05'),
+       (4, 6, 'LOUIS VUITTON', '149', NULL, NULL, NULL, NULL, NULL, '2656454', 'Asperiores exercitat', 0.00, 0, 0, NULL,
+        0, NULL, 0, 1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'LOUIS-VUITTON-7', 'LOUIS VUITTON', 'LOUIS VUITTON',
+        NULL, 0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        NULL, 0, '2024-01-09 12:16:40', '2024-01-09 12:21:55'),
+       (5, 7, 'Lavish Look', '150', NULL, NULL, NULL, NULL, NULL, '265646', 'Ullamco nemo in veli', 0.00, 0, 0, NULL, 0,
+        NULL, 0, 1, NULL, 0, 0.00, NULL, NULL, NULL, NULL, NULL, 'Lavish-Look-8', 'Lavish Look', 'Lavish Look', NULL,
+        0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+        0, '2024-01-09 12:18:07', '2024-01-09 12:21:53');
+
+
+--
+-- Truncate table before insert `taxes`
+--
+
+TRUNCATE TABLE `taxes`;
+--
+-- Dumping data for table `taxes`
+--
+
+INSERT INTO `taxes` (`id`, `name`, `tax_status`, `created_at`, `updated_at`)
+VALUES (3, 'Tax', 1, '2021-03-07 11:45:33', '2021-03-07 11:45:33');
