@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\CustomerProduct;
 use App\Models\CustomerProductTranslation;
-use App\Models\Category;
-use App\Models\Brand;
-use Auth;
-use Illuminate\Support\Str;
 use App\Utility\CategoryUtility;
+use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CustomerProductController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_classified_products'])->only('customer_product_index');
         $this->middleware(['permission:publish_classified_product'])->only('updatePublished');
@@ -27,16 +28,18 @@ class CustomerProductController extends Controller
      */
     public function index()
     {
-        if(get_setting('classified_product') != 1){
+        if (get_setting('classified_product') != 1) {
             return redirect()->route('dashboard');
         }
         $products = CustomerProduct::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->paginate(10);
+
         return view('frontend.user.customer.products', compact('products'));
     }
 
     public function customer_product_index()
     {
         $products = CustomerProduct::orderBy('created_at', 'desc')->paginate(10);
+
         return view('backend.customer.classified_products.index', compact('products'));
     }
 
@@ -47,19 +50,18 @@ class CustomerProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
 
-        if(Auth::user()->user_type == "customer" && Auth::user()->remaining_uploads > 0){
+        if (Auth::user()->user_type == 'customer' && Auth::user()->remaining_uploads > 0) {
             return view('frontend.user.customer.product_upload', compact('categories'));
-        }
-        elseif (Auth::user()->user_type == "seller" && Auth::user()->remaining_uploads > 0) {
+        } elseif (Auth::user()->user_type == 'seller' && Auth::user()->remaining_uploads > 0) {
             return view('frontend.user.customer.product_upload', compact('categories'));
-        }
-        else{
+        } else {
             flash(translate('Your classified product upload limit has been reached. Please buy a package.'))->error();
+
             return redirect()->route('customer_packages_list_show');
         }
     }
@@ -67,56 +69,56 @@ class CustomerProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $customer_product                       = new CustomerProduct;
-        $customer_product->name                 = $request->name;
-        $customer_product->added_by             = $request->added_by;
-        $customer_product->user_id              = Auth::user()->id;
-        $customer_product->category_id          = $request->category_id;
-        $customer_product->brand_id             = $request->brand_id;
-        $customer_product->conditon             = $request->conditon;
-        $customer_product->location             = $request->location;
-        $customer_product->photos               = $request->photos;
-        $customer_product->thumbnail_img        = $request->thumbnail_img;
-        $customer_product->unit                 = $request->unit;
+        $customer_product = new CustomerProduct;
+        $customer_product->name = $request->name;
+        $customer_product->added_by = $request->added_by;
+        $customer_product->user_id = Auth::user()->id;
+        $customer_product->category_id = $request->category_id;
+        $customer_product->brand_id = $request->brand_id;
+        $customer_product->conditon = $request->conditon;
+        $customer_product->location = $request->location;
+        $customer_product->photos = $request->photos;
+        $customer_product->thumbnail_img = $request->thumbnail_img;
+        $customer_product->unit = $request->unit;
 
-        $tags = array();
-        if($request->tags[0] != null){
+        $tags = [];
+        if ($request->tags[0] != null) {
             foreach (json_decode($request->tags[0]) as $key => $tag) {
                 array_push($tags, $tag->value);
             }
         }
 
-        $customer_product->tags                 = implode(',', $tags);
-        $customer_product->description          = $request->description;
-        $customer_product->video_provider       = $request->video_provider;
-        $customer_product->video_link           = $request->video_link;
-        $customer_product->unit_price           = $request->unit_price;
-        $customer_product->meta_title           = $request->meta_title;
-        $customer_product->meta_description     = $request->meta_description;
-        $customer_product->meta_img             = $request->meta_img;
-        $customer_product->pdf                  = $request->pdf;
-        $customer_product->slug                 = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5));
-        if($customer_product->save()){
+        $customer_product->tags = implode(',', $tags);
+        $customer_product->description = $request->description;
+        $customer_product->video_provider = $request->video_provider;
+        $customer_product->video_link = $request->video_link;
+        $customer_product->unit_price = $request->unit_price;
+        $customer_product->meta_title = $request->meta_title;
+        $customer_product->meta_description = $request->meta_description;
+        $customer_product->meta_img = $request->meta_img;
+        $customer_product->pdf = $request->pdf;
+        $customer_product->slug = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5));
+        if ($customer_product->save()) {
             $user = Auth::user();
             $user->remaining_uploads -= 1;
             $user->save();
 
-            $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'customer_product_id' => $customer_product->id]);
-            $customer_product_translation->name         = $request->name;
-            $customer_product_translation->unit         = $request->unit;
-            $customer_product_translation->description  = $request->description;
+            $customer_product_translation = CustomerProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'customer_product_id' => $customer_product->id]);
+            $customer_product_translation->name = $request->name;
+            $customer_product_translation->unit = $request->unit;
+            $customer_product_translation->description = $request->description;
             $customer_product_translation->save();
 
             flash(translate('Product has been inserted successfully'))->success();
+
             return redirect()->route('customer_products.index');
-        }
-        else{
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -140,67 +142,68 @@ class CustomerProductController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
-        $product    = CustomerProduct::find($id);
-        $lang       = $request->lang;
-        return view('frontend.user.customer.product_edit', compact('categories', 'product','lang'));
+        $product = CustomerProduct::find($id);
+        $lang = $request->lang;
+
+        return view('frontend.user.customer.product_edit', compact('categories', 'product', 'lang'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $customer_product                       = CustomerProduct::find($id);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
-            $customer_product->name             = $request->name;
-            $customer_product->unit             = $request->unit;
-            $customer_product->description      = $request->description;
+        $customer_product = CustomerProduct::find($id);
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
+            $customer_product->name = $request->name;
+            $customer_product->unit = $request->unit;
+            $customer_product->description = $request->description;
         }
-        $customer_product->user_id              = Auth::user()->id;
-        $customer_product->category_id          = $request->category_id;
-        $customer_product->brand_id             = $request->brand_id;
-        $customer_product->conditon             = $request->conditon;
-        $customer_product->location             = $request->location;
-        $customer_product->photos               = $request->photos;
-        $customer_product->thumbnail_img        = $request->thumbnail_img;
+        $customer_product->user_id = Auth::user()->id;
+        $customer_product->category_id = $request->category_id;
+        $customer_product->brand_id = $request->brand_id;
+        $customer_product->conditon = $request->conditon;
+        $customer_product->location = $request->location;
+        $customer_product->photos = $request->photos;
+        $customer_product->thumbnail_img = $request->thumbnail_img;
 
-        $tags = array();
-        if($request->tags[0] != null){
+        $tags = [];
+        if ($request->tags[0] != null) {
             foreach (json_decode($request->tags[0]) as $key => $tag) {
                 array_push($tags, $tag->value);
             }
         }
 
-        $customer_product->tags                 = implode(',', $tags);
-        $customer_product->video_provider       = $request->video_provider;
-        $customer_product->video_link           = $request->video_link;
-        $customer_product->unit_price           = $request->unit_price;
-        $customer_product->meta_title           = $request->meta_title;
-        $customer_product->meta_description     = $request->meta_description;
-        $customer_product->meta_img             = $request->meta_img;
-        $customer_product->pdf                  = $request->pdf;
-        $customer_product->slug                 = strtolower($request->slug);
-        if($customer_product->save()){
+        $customer_product->tags = implode(',', $tags);
+        $customer_product->video_provider = $request->video_provider;
+        $customer_product->video_link = $request->video_link;
+        $customer_product->unit_price = $request->unit_price;
+        $customer_product->meta_title = $request->meta_title;
+        $customer_product->meta_description = $request->meta_description;
+        $customer_product->meta_img = $request->meta_img;
+        $customer_product->pdf = $request->pdf;
+        $customer_product->slug = strtolower($request->slug);
+        if ($customer_product->save()) {
 
-            $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => $request->lang, 'customer_product_id' => $customer_product->id]);
-            $customer_product_translation->name         = $request->name;
-            $customer_product_translation->unit         = $request->unit;
-            $customer_product_translation->description  = $request->description;
+            $customer_product_translation = CustomerProductTranslation::firstOrNew(['lang' => $request->lang, 'customer_product_id' => $customer_product->id]);
+            $customer_product_translation->name = $request->name;
+            $customer_product_translation->unit = $request->unit;
+            $customer_product_translation->description = $request->description;
             $customer_product_translation->save();
 
             flash(translate('Product has been inserted successfully'))->success();
+
             return back();
-        }
-        else{
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -218,6 +221,7 @@ class CustomerProductController extends Controller
 
         if (CustomerProduct::destroy($id)) {
             flash(translate('Product has been deleted successfully'))->success();
+
             return redirect()->route('customer_products.index');
         }
     }
@@ -236,9 +240,10 @@ class CustomerProductController extends Controller
     {
         $product = CustomerProduct::findOrFail($request->id);
         $product->status = $request->status;
-        if($product->save()){
+        if ($product->save()) {
             return 1;
         }
+
         return 0;
     }
 
@@ -246,9 +251,10 @@ class CustomerProductController extends Controller
     {
         $product = CustomerProduct::findOrFail($request->id);
         $product->published = $request->status;
-        if($product->save()){
+        if ($product->save()) {
             return 1;
         }
+
         return 0;
     }
 
@@ -259,11 +265,11 @@ class CustomerProductController extends Controller
 
     public function customer_product($slug)
     {
-        if(get_setting('classified_product') != 1){
+        if (get_setting('classified_product') != 1) {
             return redirect('/');
         }
-        $customer_product  = CustomerProduct::where('slug', $slug)->first();
-        if($customer_product!=null){
+        $customer_product = CustomerProduct::where('slug', $slug)->first();
+        if ($customer_product != null) {
             return view('frontend.customer_product_details', compact('customer_product'));
         }
         abort(404);
@@ -271,7 +277,7 @@ class CustomerProductController extends Controller
 
     public function search(Request $request)
     {
-        if(get_setting('classified_product') != 1){
+        if (get_setting('classified_product') != 1) {
             return redirect('/');
         }
 
@@ -282,20 +288,20 @@ class CustomerProductController extends Controller
 
         $conditions = ['published' => 1, 'status' => 1];
 
-        if($brand_id != null){
+        if ($brand_id != null) {
             $conditions = array_merge($conditions, ['brand_id' => $brand_id]);
         }
 
         $customer_products = CustomerProduct::where($conditions);
 
-        if($category_id != null){
+        if ($category_id != null) {
             $category_ids = CategoryUtility::children_ids($category_id);
             $category_ids[] = $category_id;
 
             $customer_products = $customer_products->whereIn('category_id', $category_ids);
         }
 
-        if($sort_by != null){
+        if ($sort_by != null) {
             switch ($sort_by) {
                 case '1':
                     $customer_products->orderBy('created_at', 'desc');
@@ -321,7 +327,7 @@ class CustomerProductController extends Controller
             }
         }
 
-        if($condition != null){
+        if ($condition != null) {
             $customer_products->where('conditon', $condition);
         }
 

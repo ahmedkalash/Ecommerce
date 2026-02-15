@@ -220,7 +220,8 @@ class ProductService
 
         if ($collection['lang'] != env('DEFAULT_LANGUAGE')) {
             unset($collection['name']);
-            unset($collection['unit']);
+            unset($collection['name']);
+            unset($collection['description']);
             unset($collection['description']);
         }
         unset($collection['lang']);
@@ -364,7 +365,6 @@ class ProductService
                     ->toMediaCollection('video_thumbnail');
                 Log::info("Uploaded short video thumbnail for Product #{$product->id}");
             }
-
         } catch (\Exception $e) {
             Log::error("Media synchronization failed for Product #{$product->id}", [
                 'error' => $e->getMessage(),
@@ -429,8 +429,10 @@ class ProductService
             $products = $category->products();
         }
 
-        $products = in_array($auth_user->user_type, ['admin', 'staff']) ? $products->where('products.added_by',
-            'admin') : $products->where('products.user_id', $auth_user->id);
+        $products = in_array($auth_user->user_type, ['admin', 'staff']) ? $products->where(
+            'products.added_by',
+            'admin'
+        ) : $products->where('products.user_id', $auth_user->id);
         $products->where('published', '1')->where('auction_product', 0)->where('approved', '1');
 
         if ($productType == 'physical') {
@@ -519,7 +521,6 @@ class ProductService
                     'discount_start_date' => $admin_discount_start_date,
                     'discount_end_date' => $admin_discount_end_date,
                 ]);
-
             } elseif ($auth_user->user_type == 'seller') {
                 $products->where('user_id', $auth_user->id);
                 $seller_discount = $data['discount'];
@@ -542,7 +543,6 @@ class ProductService
                     $sellerCat->discount_end_date = $seller_discount_end_date;
                     $sellerCat->save();
                 }
-
             }
 
             $products->update([

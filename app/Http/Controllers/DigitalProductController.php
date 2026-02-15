@@ -54,7 +54,7 @@ class DigitalProductController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();
@@ -132,7 +132,7 @@ class DigitalProductController extends Controller
     {
         $lang = $request->lang;
         $product = Product::findOrFail($id);
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();

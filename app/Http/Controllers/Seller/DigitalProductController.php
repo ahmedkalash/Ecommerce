@@ -48,7 +48,7 @@ class DigitalProductController extends Controller
                 return back();
             }
         }
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();

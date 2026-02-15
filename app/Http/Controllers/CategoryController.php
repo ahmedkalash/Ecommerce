@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
-use App\Models\Product;
 use App\Models\CategoryTranslation;
-use App\Models\User;
+use App\Models\Product;
 use App\Utility\CategoryUtility;
-use Illuminate\Support\Str;
 use Cache;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_product_categories'])->only('index');
         $this->middleware(['permission:add_product_category'])->only('create');
@@ -28,13 +28,14 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search =null;
+        $sort_search = null;
         $categories = Category::orderBy('order_level', 'desc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
+
         return view('backend.product.categories.index', compact('categories', 'sort_search'));
     }
 
@@ -45,7 +46,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
@@ -56,7 +57,6 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -64,7 +64,7 @@ class CategoryController extends Controller
         $category = new Category;
         $category->name = $request->name;
         $category->order_level = 0;
-        if($request->order_level != null) {
+        if ($request->order_level != null) {
             $category->order_level = $request->order_level;
         }
         $category->digital = $request->digital;
@@ -74,17 +74,16 @@ class CategoryController extends Controller
         $category->meta_title = $request->meta_title;
         $category->meta_description = $request->meta_description;
 
-        if ($request->parent_id != "0") {
+        if ($request->parent_id) {
             $category->parent_id = $request->parent_id;
 
             $parent = Category::find($request->parent_id);
-            $category->level = $parent->level + 1 ;
+            $category->level = $parent->level + 1;
         }
 
         if ($request->slug != null) {
             $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug));
-        }
-        else {
+        } else {
             $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5);
         }
         if ($request->commision_rate != null) {
@@ -100,6 +99,7 @@ class CategoryController extends Controller
         $category_translation->save();
 
         flash(translate('Category has been inserted successfully'))->success();
+
         return redirect()->route('categories.index');
     }
 
@@ -124,15 +124,15 @@ class CategoryController extends Controller
     {
         $lang = $request->lang;
         $category = Category::findOrFail($id);
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', $category->digital)
             // ->with('childrenCategories')
             // ->whereNotIn('id', CategoryUtility::children_ids($category->id, true))->where('id', '!=' , $category->id)
             ->with(['childrenCategories' => function ($query) use ($category) {
                 $query->whereNotIn('id', CategoryUtility::children_ids($category->id, true))
-                      ->where('id', '!=' , $category->id);
+                    ->where('id', '!=', $category->id);
             }])
-            ->orderBy('name','asc')
+            ->orderBy('name', 'asc')
             ->get();
 
         return view('backend.product.categories.edit', compact('category', 'categories', 'lang'));
@@ -141,17 +141,16 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $category->name = $request->name;
         }
-        if($request->order_level != null) {
+        if ($request->order_level != null) {
             $category->order_level = $request->order_level;
         }
         $category->digital = $request->digital;
@@ -163,14 +162,13 @@ class CategoryController extends Controller
 
         $previous_level = $category->level;
 
-        if ($request->parent_id != "0") {
+        if ($request->parent_id) {
             $category->parent_id = $request->parent_id;
 
             $parent = Category::find($request->parent_id);
-            $category->level = $parent->level + 1 ;
-        }
-        else{
-            $category->parent_id = 0;
+            $category->level = $parent->level + 1;
+        } else {
+            $category->parent_id = null;
             $category->level = 0;
         }
 
@@ -183,11 +181,9 @@ class CategoryController extends Controller
 
         if ($request->slug != null) {
             $category->slug = strtolower($request->slug);
-        }
-        else {
+        } else {
             $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5);
         }
-
 
         if ($request->commision_rate != null) {
             $category->commision_rate = $request->commision_rate;
@@ -195,7 +191,7 @@ class CategoryController extends Controller
 
         $category->save();
 
-        //Updating childer categories level
+        // Updating childer categories level
         CategoryUtility::update_child_level($category->id);
 
         $category->attributes()->sync($request->filtering_attributes);
@@ -206,6 +202,7 @@ class CategoryController extends Controller
 
         Cache::forget('featured_categories');
         flash(translate('Category has been updated successfully'))->success();
+
         return back();
     }
 
@@ -234,6 +231,7 @@ class CategoryController extends Controller
         Cache::forget('featured_categories');
 
         flash(translate('Category has been deleted successfully'))->success();
+
         return redirect()->route('categories.index');
     }
 
@@ -243,12 +241,13 @@ class CategoryController extends Controller
         $category->featured = $request->status;
         $category->save();
         Cache::forget('featured_categories');
+
         return 1;
     }
 
     public function categoriesByType(Request $request)
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', $request->digital)
             ->with('childrenCategories')
             ->get();
@@ -256,57 +255,59 @@ class CategoryController extends Controller
         return view('backend.product.categories.categories_option', compact('categories'));
     }
 
-    public function categoriesWiseProductDiscount(Request $request){
-        $sort_search =null;
+    public function categoriesWiseProductDiscount(Request $request)
+    {
+        $sort_search = null;
         $categories = Category::with('sellerDiscounts')->orderBy('order_level', 'desc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
+
         return view('backend.product.category_wise_discount.set_discount', compact('categories', 'sort_search'));
     }
-    
-    public function categoriesWiseCommission(Request $request){
-        $sort_search =null;
+
+    public function categoriesWiseCommission(Request $request)
+    {
+        $sort_search = null;
         $categories = Category::orderBy('order_level', 'desc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
+
         return view('backend.sellers.category_wise_commission.set_commission', compact('categories', 'sort_search'));
     }
 
     public function categoriesWiseCommissionUpdate(Request $request)
     {
-     
+
         $categoryId = $request->input('category_id');
         $commissionRate = $request->input('commission');
-    
+
         $category = Category::findOrFail($categoryId);
-    
+
         // Update the main category
         $category->commision_rate = $commissionRate;
         $category->save();
-    
+
         // Recursively update all children
         $this->updateChildrenCommissionRate($category, $commissionRate);
-    
-       
+
         return 1;
     }
-    
+
     private function updateChildrenCommissionRate(Category $category, $commissionRate)
     {
         foreach ($category->categories as $child) {
             $child->commision_rate = $commissionRate;
             $child->save();
-    
+
             if ($child->categories->isNotEmpty()) {
                 $this->updateChildrenCommissionRate($child, $commissionRate);
             }
         }
     }
-
 }

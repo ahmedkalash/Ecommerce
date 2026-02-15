@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\CategoryCollection;
-use App\Models\BusinessSetting;
 use App\Models\Category;
 use Cache;
 
 class CategoryController extends Controller
 {
-
-    public function index($parent_id = 0)
+    public function index($parent_id = null)
     {
         if (request()->has('parent_id') && request()->parent_id) {
             $category = Category::where('slug', request()->parent_id)->first();
@@ -18,7 +16,14 @@ class CategoryController extends Controller
         }
 
         // return Cache::remember("app.categories-$parent_id", 86400, function () use ($parent_id) {
-            return new CategoryCollection(Category::where('parent_id', $parent_id)->whereDigital(0)->get());
+        $query = Category::query()->whereDigital(0);
+        if ($parent_id === null) {
+            $query->whereNull('parent_id');
+        } else {
+            $query->where('parent_id', $parent_id);
+        }
+
+        return new CategoryCollection($query->get());
         // });
     }
 

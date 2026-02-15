@@ -5,13 +5,12 @@ namespace App\Services;
 use AizPackages\CombinationGenerate\Services\CombinationService;
 use App\Models\ProductStock;
 use App\Utility\ProductUtility;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductStockService
 {
     public function store(array $data, $product)
     {
-        Media::$collection = collect($data);
+        $collection = collect($data);
 
         $options = ProductUtility::get_attribute_options($collection);
 

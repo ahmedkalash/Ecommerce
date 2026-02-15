@@ -40,8 +40,10 @@ class ProductsImport implements ToCollection, ToModel, WithHeadingRow, WithValid
                     'name' => $row['name'],
                     'description' => $row['description'],
                     'added_by' => $user->user_type == 'seller' ? 'seller' : 'admin',
-                    'user_id' => $user->user_type == 'seller' ? $user->id : User::where('user_type',
-                        'admin')->first()->id,
+                    'user_id' => $user->user_type == 'seller' ? $user->id : User::where(
+                        'user_type',
+                        'admin'
+                    )->first()->id,
                     'approved' => $approved,
                     'category_id' => $row['category_id'],
                     'brand_id' => $row['brand_id'],
@@ -49,15 +51,18 @@ class ProductsImport implements ToCollection, ToModel, WithHeadingRow, WithValid
                     'video_link' => $row['video_link'],
                     'tags' => $row['tags'],
                     'unit_price' => $row['unit_price'],
-                    'unit' => $row['unit'],
+
                     'meta_title' => $row['meta_title'],
                     'meta_description' => $row['meta_description'],
                     'est_shipping_days' => $row['est_shipping_days'],
                     'colors' => json_encode([]),
                     'choice_options' => json_encode([]),
                     'variations' => json_encode([]),
-                    'slug' => preg_replace('/[^A-Za-z0-9\-]/', '',
-                        str_replace(' ', '-', strtolower($row['slug']))).'-'.Str::random(5),
+                    'slug' => preg_replace(
+                        '/[^A-Za-z0-9\-]/',
+                        '',
+                        str_replace(' ', '-', strtolower($row['slug']))
+                    ) . '-' . Str::random(5),
                     'thumbnail_img' => $this->downloadThumbnail($row['thumbnail_img']),
                     'photos' => $this->downloadGalleryImages($row['photos']),
                 ]);

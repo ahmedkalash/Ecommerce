@@ -31,7 +31,7 @@ class DigitalProductController extends Controller
 
     public function getCategory()
     {
-        $categories = Category::where('parent_id', 0)
+        $categories = Category::whereNull('parent_id')
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();
@@ -53,7 +53,10 @@ class DigitalProductController extends Controller
 
         // Product Store
         $product = (new ProductService)->store($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type',
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type',
         ]));
 
         $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
@@ -63,24 +66,35 @@ class DigitalProductController extends Controller
 
         // Product Stock
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id',
+            'unit_price',
+            'current_stock',
+            'product_id',
         ]), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
         // Frequently Bought Products
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id',
+            'lang',
+            'name',
+            'description',
+            'product_id',
         ]));
 
         return $this->success(translate('Digital Product has been inserted successfully'));
@@ -98,7 +112,10 @@ class DigitalProductController extends Controller
     {
         // Product Update
         $product = (new ProductService)->update($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type',
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type',
         ]), $product);
 
         // Product Stock
@@ -112,21 +129,29 @@ class DigitalProductController extends Controller
         $product->categories()->sync($request->category_ids);
 
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id',
+            'unit_price',
+            'current_stock',
+            'product_id',
         ]), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
             ProductTax::where('product_id', $product->id)->delete();
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // Product Translations

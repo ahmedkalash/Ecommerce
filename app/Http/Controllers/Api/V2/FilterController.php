@@ -12,22 +12,20 @@ class FilterController extends Controller
 {
     public function categories()
     {
-        //if you want to show base categories
+        // if you want to show base categories
         return Cache::remember('app.filter_categories', 86400, function () {
-            return new CategoryCollection(Category::where('parent_id', 0)->get());
+            return new CategoryCollection(Category::whereNull('parent_id')->get());
         });
 
-        //if you want to show featured categories
-        //return new CategoryCollection(Category::where('featured', 1)->get());
+        // if you want to show featured categories
+        // return new CategoryCollection(Category::where('featured', 1)->get());
     }
 
     public function brands()
     {
-        //show only top 20 brands
+        // show only top 20 brands
         return Cache::remember('app.filter_brands', 86400, function () {
             return new BrandCollection(Brand::where('top', 1)->limit(20)->get());
         });
     }
-
-
 }

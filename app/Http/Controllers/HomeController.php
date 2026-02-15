@@ -25,10 +25,8 @@ use Cache;
 use Carbon\Carbon;
 use Cookie;
 use DB;
-use Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use ZipArchive;
 
@@ -82,7 +80,7 @@ class HomeController extends Controller
 
     public function load_auction_products_section()
     {
-        if (!addon_is_activated('auction')) {
+        if (! addon_is_activated('auction')) {
             return;
         }
         $lang = get_system_language() ? get_system_language()->code : null;
@@ -154,7 +152,6 @@ class HomeController extends Controller
         }
     }
 
-
     public function flash_deal_details($slug)
     {
         $today = strtotime(date('Y-m-d H:i:s'));
@@ -183,7 +180,7 @@ class HomeController extends Controller
 
     public function product(Request $request, $slug)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             session(['link' => url()->current()]);
         }
 
@@ -201,7 +198,7 @@ class HomeController extends Controller
                 abort(404);
             }
 
-            if (!addon_is_activated('wholesale') && $detailedProduct->wholesale_product == 1) {
+            if (! addon_is_activated('wholesale') && $detailedProduct->wholesale_product == 1) {
                 abort(404);
             }
 
@@ -467,7 +464,7 @@ class HomeController extends Controller
 
     public function all_categories(Request $request)
     {
-        $categories = Category::with('childrenCategories')->where('parent_id', 0)->orderBy(
+        $categories = Category::with('childrenCategories')->whereNull('parent_id')->orderBy(
             'order_level',
             'desc'
         )->get();
