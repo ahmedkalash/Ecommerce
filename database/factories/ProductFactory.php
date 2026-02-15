@@ -55,7 +55,7 @@ class ProductFactory extends Factory
             'featured' => 0,
             'seller_featured' => 0,
             'current_stock' => 100,
-            'unit' => 'pc',
+
             'weight' => 0,
             'min_qty' => 1,
             'low_stock_quantity' => 1,

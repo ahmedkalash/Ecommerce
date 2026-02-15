@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Traits\User\UserRelationships;
 use App\Notifications\EmailVerificationNotification;
 use App\Notifications\ResetPasswordNotification;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,9 +16,14 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasMedia, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasMedia, MustVerifyEmail
 {
     use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable, UserRelationships;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isSuperAdmin() || $this->isStaff();
+    }
 
     public function sendEmailVerificationNotification(): void
     {

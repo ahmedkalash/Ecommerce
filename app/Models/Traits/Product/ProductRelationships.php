@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Models\Traits\Product;
+
+use App\Models\AuctionProductBid;
+use App\Models\Brand;
+use App\Models\Cart;
+use App\Models\Category;
+use App\Models\FlashDealProduct;
+use App\Models\FrequentlyBoughtProduct;
+use App\Models\LastViewedProduct;
+use App\Models\Note;
+use App\Models\OrderDetail;
+use App\Models\ProductCategory;
+use App\Models\ProductQuery;
+use App\Models\ProductStock;
+use App\Models\ProductTax;
+use App\Models\ProductTranslation;
+use App\Models\Review;
+use App\Models\User;
+use App\Models\Warranty;
+use App\Models\Wishlist;
+
+trait ProductRelationships
+{
+    public function product_translations()
+    {
+        return $this->hasMany(ProductTranslation::class);
+    }
+
+    public function main_category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'product_categories');
+    }
+
+    public function frequently_bought_products()
+    {
+        return $this->hasMany(FrequentlyBoughtProduct::class);
+    }
+
+    public function product_categories()
+    {
+        return $this->hasMany(ProductCategory::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function product_queries()
+    {
+        return $this->hasMany(ProductQuery::class);
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class);
+    }
+
+    public function taxes()
+    {
+        return $this->hasMany(ProductTax::class);
+    }
+
+    public function flash_deal_products()
+    {
+        return $this->hasMany(FlashDealProduct::class);
+    }
+
+    public function bids()
+    {
+        return $this->hasMany(AuctionProductBid::class);
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    public function last_viewed_products()
+    {
+        return $this->hasMany(LastViewedProduct::class);
+    }
+
+    public function warranty()
+    {
+        return $this->belongsTo(Warranty::class);
+    }
+
+    public function warrantyNote()
+    {
+        return $this->belongsTo(Note::class, 'warranty_note_id');
+    }
+
+    public function refundNote()
+    {
+        return $this->belongsTo(Note::class, 'refund_note_id');
+    }
+}

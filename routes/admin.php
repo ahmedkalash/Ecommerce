@@ -57,7 +57,6 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
-
 // use App\Http\Controllers\Cybersource\CybersourceSettingController;
 use App\Http\Controllers\ZoneController;
 
@@ -88,7 +87,7 @@ Route::controller(AdminController::class)->group(function () {
 });
 
 Route::get('/admin', [AdminController::class, 'admin_dashboard'])->name('admin.dashboard')->middleware([
-    'auth:admin', 'admin', 'prevent-back-history'
+    'auth:admin', 'admin', 'prevent-back-history',
 ]);
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prevent-back-history']], function () {
 
