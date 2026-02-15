@@ -43,10 +43,6 @@ class AuctionProductDetailCollection extends ResourceCollection
                         'logo' => get_file_by_id($data->brand->logo),
                     ];
                 }
-                $unit = '';
-                if ($data->unit != null) {
-                    $unit = $data->getTranslation('unit');
-                }
                 // highest bids
                 $highest_bid = $data->bids->max('amount');
 
@@ -68,7 +64,6 @@ class AuctionProductDetailCollection extends ResourceCollection
                     // "auction_end_date" => $data->auction_end_date > strtotime('now') ? date('Y/m/d H:i:s', $data->auction_end_date) : 'Ended',
                     'auction_end_date' => $data->auction_end_date > strtotime('now') ? $data->auction_end_date : 'Ended',
                     'starting_bid' => single_price($data->starting_bid),
-                    'unit' => $unit,
                     'min_bid_price' => $highest_bid != null ? ($highest_bid + 1) : $data->starting_bid,
                     'highest_bid' => $highest_bid != null ? single_price($highest_bid) : '',
                     'description' => str_replace('&nbsp;', ' ', strip_tags($data->getTranslation('description'))),

@@ -20,7 +20,6 @@ class ProductCollection extends ResourceCollection
                     'base_discounted_price' => (float) home_discounted_base_price($data, false),
                     'todays_deal' => (int) $data->todays_deal,
                     'featured' => (int) $data->featured,
-                    'unit' => $data->unit,
                     'discount' => (float) $data->discount,
                     'discount_type' => $data->discount_type,
                     'rating' => (float) $data->rating,

@@ -19,7 +19,6 @@ class ProductDetailsCollection extends JsonResource
             'id' => $this->id,
             'lang' => $this->lang,
             'product_name' => $this->getTranslation('name', $this->lang),
-            'product_unit' => $this->getTranslation('unit', $this->lang),
             'description' => $this->getTranslation('description', $this->lang),
             'category_id' => $this->category_id,
             'category_ids' => $this->categories()->pluck('category_id')->toArray(),

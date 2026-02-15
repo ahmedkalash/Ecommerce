@@ -22,7 +22,6 @@ class AuctionProductDetailsResource extends JsonResource
             'category_id' => $this->category_id,
             'category_ids' => $this->categories()->pluck('category_id')->toArray(),
             'brand_id' => $this->brand_id,
-            'product_unit' => $this->getTranslation('unit', $this->lang),
             'weight' => $this->weight,
             'tags' => $this->tags,
             'photos' => new UploadedFileCollection($this->getMedia('gallery')),

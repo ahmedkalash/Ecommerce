@@ -27,7 +27,6 @@ class WholesaleProductCollection extends ResourceCollection
                     'discount_percentage' => '-'.discount_in_percentage($data).'%',
                     'todays_deal' => (int) $data->todays_deal,
                     'featured' => (int) $data->featured,
-                    'unit' => $data->unit,
                     'discount' => (float) $data->discount,
                     'discount_type' => $data->discount_type,
                     'rating' => (float) $data->rating,
