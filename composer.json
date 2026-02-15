@@ -19,6 +19,8 @@
         "enshrined/svg-sanitize": "^0.15.4",
         "filament/filament": "3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.3",
+        "filament/spatie-laravel-settings-plugin": "^3.3",
+        "filament/spatie-laravel-tags-plugin": "3.0",
         "genealabs/laravel-sign-in-with-apple": "*",
         "genealabs/laravel-socialiter": "*",
         "guzzlehttp/guzzle": "^7.5",
