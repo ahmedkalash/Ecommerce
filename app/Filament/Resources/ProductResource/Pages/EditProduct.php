@@ -3,8 +3,13 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
+use App\Services\ProductService;
+use Exception;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EditProduct extends EditRecord
 {
@@ -15,6 +20,32 @@ class EditProduct extends EditRecord
         return [
             Actions\DeleteAction::make(),
         ];
+    }
+
+    /**
+     * Handle the record update process.
+     *
+     *
+     * @throws \Throwable
+     */
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        return DB::transaction(function () use ($record, $data) {
+            try {
+                /** @var ProductService $productService */
+                $productService = app(ProductService::class);
+
+                return $productService->update($data, $record);
+            } catch (Exception $e) {
+                Log::error('Product update failed (Filament): '.$e->getMessage(), [
+                    'product_id' => $record->id,
+                    'trace' => $e->getTraceAsString(),
+                    'data' => $data,
+                ]);
+
+                throw $e;
+            }
+        });
     }
 
     /**
@@ -31,22 +62,7 @@ class EditProduct extends EditRecord
             $data['tags'] = array_filter(explode(',', $data['tags']));
         }
 
-        return $data;
-    }
-
-    /**
-     * Mutate form data before saving the product record.
-     * Converts tags array back to comma-separated string for storage.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        // Convert tags array to comma-separated string
-        if (isset($data['tags']) && is_array($data['tags'])) {
-            $data['tags'] = implode(',', $data['tags']);
-        }
+        // choice_options and stocks are handled by Filament via relationships/casts automatically.
 
         return $data;
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\Enums\UserType;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
 use App\Models\Cart;
@@ -59,7 +60,8 @@ class ProductController extends Controller
         $query = null;
         $sort_search = null;
 
-        $products = Product::where('added_by', 'admin')->where('auction_product', 0)->where('wholesale_product', 0);
+        $products = Product::where('added_by', UserType::ADMIN->value)->where('auction_product',
+            0)->where('wholesale_product', 0);
 
         if ($request->type != null) {
             $var = explode(',', $request->type);
@@ -91,7 +93,8 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::where('added_by', 'seller')->where('auction_product', 0)->where('wholesale_product', 0);
+        $products = Product::where('added_by', UserType::SELLER->value)->where('auction_product',
+            0)->where('wholesale_product', 0);
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
@@ -130,7 +133,7 @@ class ProductController extends Controller
         $sort_search = null;
         $products = Product::where('auction_product', 0)->where('wholesale_product', 0);
         if (get_setting('vendor_system_activation') != 1) {
-            $products = $products->where('added_by', 'admin');
+            $products = $products->where('added_by', UserType::ADMIN->value);
         }
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
@@ -533,7 +536,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($request->id);
         $product->published = $request->status;
 
-        if ($product->added_by == 'seller' && addon_is_activated('seller_subscription') && $request->status == 1) {
+        if ($product->added_by == UserType::SELLER->value && addon_is_activated('seller_subscription') && $request->status == 1) {
             $shop = $product->user->shop;
             if (
                 $shop->package_invalid_at == null
@@ -557,7 +560,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($request->id);
         $product->approved = $request->approved;
 
-        if ($product->added_by == 'seller' && addon_is_activated('seller_subscription')) {
+        if ($product->added_by == UserType::SELLER->value && addon_is_activated('seller_subscription')) {
             $shop = $product->user->shop;
             if (
                 $shop->package_invalid_at == null

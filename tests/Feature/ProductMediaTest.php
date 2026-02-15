@@ -84,7 +84,7 @@ class ProductMediaTest extends TestCase
         $this->assertNotNull($mediaItem);
 
         // Call ProductService destroy
-        $service = new ProductService;
+        $service = app(ProductService::class);
         $service->destroy($product->id);
 
         // Assert Product is deleted

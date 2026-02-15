@@ -57,7 +57,7 @@
     @php
         $followed_sellers = [];
         if (Auth::check()) {
-            $followed_sellers = get_followed_sellers();
+        $followed_sellers = get_followed_sellers();
         }
     @endphp
 
@@ -75,8 +75,8 @@
     @endif
 
     <section
-        class="@if (!isset($type) || $type == 'top-selling' || $type == 'cupons') mb-3 @endif border-top border-bottom"
-        style="background: #fcfcfd;">
+            class="@if (!isset($type) || $type == 'top-selling' || $type == 'cupons') mb-3 @endif border-top border-bottom"
+            style="background: #fcfcfd;">
         <div class="container">
             <!-- Seller Info -->
             <div class="py-4">
@@ -99,28 +99,28 @@
                                     {{ $shop->name }}
                                     @if ($shop->verification_status == 1)
                                         <span class="ml-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="17.5" height="17.5"
-                                                 viewBox="0 0 17.5 17.5">
-                                                <g id="Group_25616" data-name="Group 25616"
-                                                   transform="translate(-537.249 -1042.75)">
-                                                    <path id="Union_5" data-name="Union 5"
-                                                          d="M0,8.75A8.75,8.75,0,1,1,8.75,17.5,8.75,8.75,0,0,1,0,8.75Zm.876,0A7.875,7.875,0,1,0,8.75.875,7.883,7.883,0,0,0,.876,8.75Zm.875,0a7,7,0,1,1,7,7A7.008,7.008,0,0,1,1.751,8.751Zm3.73-.907a.789.789,0,0,0,0,1.115l2.23,2.23a.788.788,0,0,0,1.115,0l3.717-3.717a.789.789,0,0,0,0-1.115.788.788,0,0,0-1.115,0l-3.16,3.16L6.6,7.844a.788.788,0,0,0-1.115,0Z"
-                                                          transform="translate(537.249 1042.75)" fill="#3490f3"/>
-                                                </g>
-                                            </svg>
-                                        </span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17.5" height="17.5"
+                                         viewBox="0 0 17.5 17.5">
+                                        <g id="Group_25616" data-name="Group 25616"
+                                           transform="translate(-537.249 -1042.75)">
+                                            <path id="Union_5" data-name="Union 5"
+                                                  d="M0,8.75A8.75,8.75,0,1,1,8.75,17.5,8.75,8.75,0,0,1,0,8.75Zm.876,0A7.875,7.875,0,1,0,8.75.875,7.883,7.883,0,0,0,.876,8.75Zm.875,0a7,7,0,1,1,7,7A7.008,7.008,0,0,1,1.751,8.751Zm3.73-.907a.789.789,0,0,0,0,1.115l2.23,2.23a.788.788,0,0,0,1.115,0l3.717-3.717a.789.789,0,0,0,0-1.115.788.788,0,0,0-1.115,0l-3.16,3.16L6.6,7.844a.788.788,0,0,0-1.115,0Z"
+                                                  transform="translate(537.249 1042.75)" fill="#3490f3"/>
+                                        </g>
+                                    </svg>
+                                </span>
                                     @else
                                         <span class="ml-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="17.5" height="17.5"
-                                                 viewBox="0 0 17.5 17.5">
-                                                <g id="Group_25616" data-name="Group 25616"
-                                                   transform="translate(-537.249 -1042.75)">
-                                                    <path id="Union_5" data-name="Union 5"
-                                                          d="M0,8.75A8.75,8.75,0,1,1,8.75,17.5,8.75,8.75,0,0,1,0,8.75Zm.876,0A7.875,7.875,0,1,0,8.75.875,7.883,7.883,0,0,0,.876,8.75Zm.875,0a7,7,0,1,1,7,7A7.008,7.008,0,0,1,1.751,8.751Zm3.73-.907a.789.789,0,0,0,0,1.115l2.23,2.23a.788.788,0,0,0,1.115,0l3.717-3.717a.789.789,0,0,0,0-1.115.788.788,0,0,0-1.115,0l-3.16,3.16L6.6,7.844a.788.788,0,0,0-1.115,0Z"
-                                                          transform="translate(537.249 1042.75)" fill="red"/>
-                                                </g>
-                                            </svg>
-                                        </span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17.5" height="17.5"
+                                         viewBox="0 0 17.5 17.5">
+                                        <g id="Group_25616" data-name="Group 25616"
+                                           transform="translate(-537.249 -1042.75)">
+                                            <path id="Union_5" data-name="Union 5"
+                                                  d="M0,8.75A8.75,8.75,0,1,1,8.75,17.5,8.75,8.75,0,0,1,0,8.75Zm.876,0A7.875,7.875,0,1,0,8.75.875,7.883,7.883,0,0,0,.876,8.75Zm.875,0a7,7,0,1,1,7,7A7.008,7.008,0,0,1,1.751,8.751Zm3.73-.907a.789.789,0,0,0,0,1.115l2.23,2.23a.788.788,0,0,0,1.115,0l3.717-3.717a.789.789,0,0,0,0-1.115.788.788,0,0,0-1.115,0l-3.16,3.16L6.6,7.844a.788.788,0,0,0-1.115,0Z"
+                                                  transform="translate(537.249 1042.75)" fill="red"/>
+                                        </g>
+                                    </svg>
+                                </span>
                                     @endif
                                 </a>
                                 <!-- Ratting -->
@@ -141,7 +141,7 @@
                                 <div class="pr-md-3 mt-2 mt-md-0 border-md-right">
                                     <div class="fs-10 fw-400 text-secondary">{{ translate('Member Since') }}</div>
                                     <div
-                                        class="mt-1 fs-16 fw-700 text-secondary">{{ date('d M Y',strtotime($shop->created_at)) }}</div>
+                                            class="mt-1 fs-16 fw-700 text-secondary">{{ date('d M Y',strtotime($shop->created_at)) }}</div>
                                 </div>
                                 <!-- Social Links -->
                                 @if ($shop->facebook || $shop->instagram || $shop->google || $shop->twitter || $shop->youtube)
@@ -241,10 +241,10 @@
                         <div class="d-flex">
                             <a type="button" class="arrow-prev slide-arrow text-secondary mr-2"
                                onclick="clickToSlide('slick-prev','section_featured')"><i
-                                    class="las la-angle-left fs-20 fw-600"></i></a>
+                                        class="las la-angle-left fs-20 fw-600"></i></a>
                             <a type="button" class="arrow-next slide-arrow text-secondary ml-2"
                                onclick="clickToSlide('slick-next','section_featured')"><i
-                                    class="las la-angle-right fs-20 fw-600"></i></a>
+                                        class="las la-angle-right fs-20 fw-600"></i></a>
                         </div>
                     </div>
                     <!-- Products Section -->
@@ -254,7 +254,7 @@
                              data-xs-items="2.5" data-arrows='true' data-autoplay='true' data-infinute="true">
                             @foreach ($feature_products as $key => $product)
                                 <div
-                                    class="carousel-box px-3 position-relative has-transition hov-animate-outline border-right border-top border-bottom @if($key == 0) border-left @endif">
+                                        class="carousel-box px-3 position-relative has-transition hov-animate-outline border-right border-top border-bottom @if($key == 0) border-left @endif">
                                     @include('frontend.'.get_setting('homepage_select').'.partials.product_box_1',['product' => $product])
                                 </div>
                             @endforeach
@@ -307,12 +307,12 @@
                         <div class="d-flex">
                             <a type="button" class="arrow-prev slide-arrow link-disable text-secondary mr-2"
                                onclick="clickToSlide('slick-prev','section_coupons')"><i
-                                    class="las la-angle-left fs-20 fw-600"></i></a>
+                                        class="las la-angle-left fs-20 fw-600"></i></a>
                             <a class="text-blue fs-12 fw-700 hov-text-primary"
                                href="{{ route('shop.visit.type', ['slug'=>$shop->slug, 'type'=>'cupons']) }}">{{ translate('View All') }}</a>
                             <a type="button" class="arrow-next slide-arrow text-secondary ml-2"
                                onclick="clickToSlide('slick-next','section_coupons')"><i
-                                    class="las la-angle-right fs-20 fw-600"></i></a>
+                                        class="las la-angle-right fs-20 fw-600"></i></a>
                         </div>
                     </div>
                     <!-- Coupons Section -->
@@ -380,38 +380,38 @@
             <div class="d-flex mb-4 align-items-baseline justify-content-between">
                 <!-- Title -->
                 <h3 class="fs-16 fs-md-20 fw-700 mb-3 mb-sm-0">
-                    <span class="pb-3">
-                        @if (!isset($type))
-                            {{ translate('New Arrival Products')}}
-                        @elseif ($type == 'top-selling')
-                            {{ translate('Top Selling')}}
-                        @elseif ($type == 'cupons')
-                            {{ translate('All Cupons')}}
-                        @endif
-                    </span>
+                <span class="pb-3">
+                    @if (!isset($type))
+                        {{ translate('New Arrival Products')}}
+                    @elseif ($type == 'top-selling')
+                        {{ translate('Top Selling')}}
+                    @elseif ($type == 'cupons')
+                        {{ translate('All Cupons')}}
+                    @endif
+                </span>
                 </h3>
                 @if (!isset($type))
                     <!-- Links -->
                     <div class="d-flex">
                         <a type="button" class="arrow-prev slide-arrow link-disable text-secondary mr-2"
                            onclick="clickToSlide('slick-prev','section_types')"><i
-                                class="las la-angle-left fs-20 fw-600"></i></a>
+                                    class="las la-angle-left fs-20 fw-600"></i></a>
                         <a type="button" class="arrow-next slide-arrow text-secondary ml-2"
                            onclick="clickToSlide('slick-next','section_types')"><i
-                                class="las la-angle-right fs-20 fw-600"></i></a>
+                                    class="las la-angle-right fs-20 fw-600"></i></a>
                     </div>
                 @endif
             </div>
 
             @php
                 if (!isset($type)){
-                    $products = get_seller_products($shop->user->id);
+                $products = get_seller_products($shop->user->id);
                 }
                 elseif ($type == 'top-selling'){
-                    $products = get_shop_best_selling_products($shop->user->id);
+                $products = get_shop_best_selling_products($shop->user->id);
                 }
                 elseif ($type == 'cupons'){
-                    $coupons = get_coupons($shop->user->id , 24);
+                $coupons = get_coupons($shop->user->id , 24);
                 }
             @endphp
 
@@ -423,7 +423,7 @@
                          data-arrows='true' data-infinite='false'>
                         @foreach ($products as $key => $product)
                             <div
-                                class="carousel-box px-3 position-relative has-transition hov-animate-outline border-right border-top border-bottom @if($key == 0) border-left @endif">
+                                    class="carousel-box px-3 position-relative has-transition hov-animate-outline border-right border-top border-bottom @if($key == 0) border-left @endif">
                                 @include('frontend.'.get_setting('homepage_select').'.partials.product_box_1',['product' => $product])
                             </div>
                         @endforeach
@@ -474,7 +474,7 @@
                                      data-target=".aiz-filter-sidebar" data-same=".filter-sidebar-thumb"></div>
                                 <div class="collapse-sidebar c-scrollbar-light text-left">
                                     <div
-                                        class="d-flex d-xl-none justify-content-between align-items-center pl-3 border-bottom">
+                                            class="d-flex d-xl-none justify-content-between align-items-center pl-3 border-bottom">
                                         <h3 class="h6 mb-0 fw-600">{{ translate('Filters') }}</h3>
                                         <button type="button" class="btn btn-sm p-2 filter-sidebar-thumb"
                                                 data-toggle="class-toggle" data-target=".aiz-filter-sidebar">
@@ -495,16 +495,16 @@
                                             @foreach (get_categories_by_products($shop->user->id) as $category)
                                                 <label class="aiz-checkbox mb-3">
                                                     <input
-                                                        type="checkbox"
-                                                        name="selected_categories[]"
-                                                        value="{{ $category->id }}"
-                                                        @if (in_array($category->id, $selected_categories)) checked
-                                                        @endif
-                                                        onchange="filter()"
+                                                            type="checkbox"
+                                                            name="selected_categories[]"
+                                                            value="{{ $category->id }}"
+                                                            @if (in_array($category->id, $selected_categories)) checked
+                                                            @endif
+                                                            onchange="filter()"
                                                     >
                                                     <span class="aiz-square-check"></span>
                                                     <span
-                                                        class="fs-14 fw-400 text-dark">{{ $category->getTranslation('name') }}</span>
+                                                            class="fs-14 fw-400 text-dark">{{ $category->getTranslation('name') }}</span>
                                                 </label>
                                                 <br>
                                             @endforeach
@@ -519,37 +519,36 @@
                                         <div class="p-3 mr-3">
                                             <div class="aiz-range-slider">
                                                 <div
-                                                    id="input-slider-range"
-                                                    data-range-value-min="@if(get_products_count($shop->user->id) < 1) 0 @else {{ get_product_min_unit_price($shop->user->id) }} @endif"
-                                                    data-range-value-max="@if(get_products_count($shop->user->id) < 1) 0 @else {{ get_product_max_unit_price($shop->user->id) }} @endif"
-                                                ></div>
+                                                        id="input-slider-range"
+                                                        data-range-value-min="@if(get_products_count($shop->user->id) < 1) 0 @else {{ get_product_min_unit_price($shop->user->id) }} @endif"
+                                                        data-range-value-max="@if(get_products_count($shop->user->id) < 1) 0 @else {{ get_product_max_unit_price($shop->user->id) }} @endif"></div>
 
                                                 <div class="row mt-2">
                                                     <div class="col-6">
-                                                        <span
-                                                            class="range-slider-value value-low fs-14 fw-600 opacity-70"
-                                                            @if ($min_price != null)
-                                                                data-range-value-low="{{ $min_price }}"
-                                                            @elseif($products->min('unit_price') > 0)
-                                                                data-range-value-low="{{ $products->min('unit_price') }}"
-                                                            @else
-                                                                data-range-value-low="0"
-                                                            @endif
-                                                            id="input-slider-range-value-low"
-                                                        ></span>
+                                                <span
+                                                        class="range-slider-value value-low fs-14 fw-600 opacity-70"
+                                                        @if ($min_price !=null)
+                                                            data-range-value-low="{{ $min_price }}"
+                                                        @elseif(get_product_min_unit_price($shop->user->id) > 0)
+                                                            data-range-value-low="{{ get_product_min_unit_price($shop->user->id) }}"
+                                                        @else
+                                                            data-range-value-low="0"
+                                                        @endif
+                                                        id="input-slider-range-value-low"
+                                                ></span>
                                                     </div>
                                                     <div class="col-6 text-right">
-                                                        <span
-                                                            class="range-slider-value value-high fs-14 fw-600 opacity-70"
-                                                            @if ($max_price != null)
-                                                                data-range-value-high="{{ $max_price }}"
-                                                            @elseif($products->max('unit_price') > 0)
-                                                                data-range-value-high="{{ $products->max('unit_price') }}"
-                                                            @else
-                                                                data-range-value-high="0"
-                                                            @endif
-                                                            id="input-slider-range-value-high"
-                                                        ></span>
+                                                <span
+                                                        class="range-slider-value value-high fs-14 fw-600 opacity-70"
+                                                        @if ($max_price !=null)
+                                                            data-range-value-high="{{ $max_price }}"
+                                                        @elseif(get_product_max_unit_price($shop->user->id) > 0)
+                                                            data-range-value-high="{{ get_product_max_unit_price($shop->user->id) }}"
+                                                        @else
+                                                            data-range-value-high="0"
+                                                        @endif
+                                                        id="input-slider-range-value-high"
+                                                ></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -571,22 +570,20 @@
                                         <div class="collapse show px-3" id="collapse_2">
                                             <label class="aiz-checkbox mb-3">
                                                 <input
-                                                    type="radio"
-                                                    name="rating"
-                                                    value="5" @if ($rating==5) checked @endif
-                                                    onchange="filter()"
-                                                >
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="5" @if ($rating==5) checked @endif
+                                                        onchange="filter()">
                                                 <span class="aiz-square-check"></span>
                                                 <span class="rating rating-mr-2">{{ renderStarRating(5) }}</span>
                                             </label>
                                             <br>
                                             <label class="aiz-checkbox mb-3">
                                                 <input
-                                                    type="radio"
-                                                    name="rating"
-                                                    value="4" @if ($rating==4) checked @endif
-                                                    onchange="filter()"
-                                                >
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="4" @if ($rating==4) checked @endif
+                                                        onchange="filter()">
                                                 <span class="aiz-square-check"></span>
                                                 <span class="rating rating-mr-2">{{ renderStarRating(4) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
@@ -594,11 +591,10 @@
                                             <br>
                                             <label class="aiz-checkbox mb-3">
                                                 <input
-                                                    type="radio"
-                                                    name="rating"
-                                                    value="3" @if ($rating==3) checked @endif
-                                                    onchange="filter()"
-                                                >
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="3" @if ($rating==3) checked @endif
+                                                        onchange="filter()">
                                                 <span class="aiz-square-check"></span>
                                                 <span class="rating rating-mr-2">{{ renderStarRating(3) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
@@ -606,11 +602,10 @@
                                             <br>
                                             <label class="aiz-checkbox mb-3">
                                                 <input
-                                                    type="radio"
-                                                    name="rating"
-                                                    value="2" @if ($rating==2) checked @endif
-                                                    onchange="filter()"
-                                                >
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="2" @if ($rating==2) checked @endif
+                                                        onchange="filter()">
                                                 <span class="aiz-square-check"></span>
                                                 <span class="rating rating-mr-2">{{ renderStarRating(2) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
@@ -618,11 +613,10 @@
                                             <br>
                                             <label class="aiz-checkbox mb-3">
                                                 <input
-                                                    type="radio"
-                                                    name="rating"
-                                                    value="1" @if ($rating==1) checked @endif
-                                                    onchange="filter()"
-                                                >
+                                                        type="radio"
+                                                        name="rating"
+                                                        value="1" @if ($rating==1) checked @endif
+                                                        onchange="filter()">
                                                 <span class="aiz-square-check"></span>
                                                 <span class="rating rating-mr-2">{{ renderStarRating(1) }}</span>
                                                 <span class="fs-14 fw-400 text-dark">{{ translate('And Up')}}</span>
@@ -648,17 +642,17 @@
                                                             <input value="{{ $brand->slug }}" type="radio"
                                                                    onchange="filter()"
                                                                    name="brand"
-                                                                   @isset($brand_id) @if ($brand_id == $brand->id) checked @endif @endisset>
+                                                                   @isset($brand_id) @if ($brand_id==$brand->id) checked @endif @endisset>
                                                             <span
-                                                                class="d-block aiz-megabox-elem rounded-0 p-3 border-transparent hov-border-primary">
-                                                                <img src="{{ get_file_by_id($brand->logo) }}"
-                                                                     class="img-fit mb-2"
-                                                                     alt="{{ $brand->getTranslation('name') }}">
-                                                                <span class="d-block text-center">
-                                                                    <span
-                                                                        class="d-block fw-400 fs-14">{{ $brand->getTranslation('name') }}</span>
-                                                                </span>
-                                                            </span>
+                                                                    class="d-block aiz-megabox-elem rounded-0 p-3 border-transparent hov-border-primary">
+                                                    <img src="{{ get_file_by_id($brand->logo) }}"
+                                                         class="img-fit mb-2"
+                                                         alt="{{ $brand->getTranslation('name') }}">
+                                                    <span class="d-block text-center">
+                                                        <span
+                                                                class="d-block fw-400 fs-14">{{ $brand->getTranslation('name') }}</span>
+                                                    </span>
+                                                </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -691,13 +685,13 @@
                                                 name="sort_by" onchange="filter()">
                                             <option value="">{{ translate('Sort by')}}</option>
                                             <option value="newest"
-                                                    @isset($sort_by) @if ($sort_by == 'newest') selected @endif @endisset>{{ translate('Newest')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='newest' ) selected @endif @endisset>{{ translate('Newest')}}</option>
                                             <option value="oldest"
-                                                    @isset($sort_by) @if ($sort_by == 'oldest') selected @endif @endisset>{{ translate('Oldest')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='oldest' ) selected @endif @endisset>{{ translate('Oldest')}}</option>
                                             <option value="price-asc"
-                                                    @isset($sort_by) @if ($sort_by == 'price-asc') selected @endif @endisset>{{ translate('Price low to high')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='price-asc' ) selected @endif @endisset>{{ translate('Price low to high')}}</option>
                                             <option value="price-desc"
-                                                    @isset($sort_by) @if ($sort_by == 'price-desc') selected @endif @endisset>{{ translate('Price high to low')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='price-desc' ) selected @endif @endisset>{{ translate('Price high to low')}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -706,7 +700,7 @@
                             <!-- Products -->
                             <div class="px-3">
                                 <div
-                                    class="row gutters-16 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-4 row-cols-md-3 row-cols-2 border-top border-left">
+                                        class="row gutters-16 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-4 row-cols-md-3 row-cols-2 border-top border-left">
                                     @foreach ($products as $key => $product)
                                         <div class="col border-right border-bottom has-transition hov-shadow-out z-1">
                                             @include('frontend.'.get_setting('homepage_select').'.partials.product_box_1',['product' => $product])
@@ -734,7 +728,7 @@
                                      data-target=".aiz-filter-sidebar" data-same=".filter-sidebar-thumb"></div>
                                 <div class="collapse-sidebar c-scrollbar-light text-left">
                                     <div
-                                        class="d-flex d-xl-none justify-content-between align-items-center pl-3 border-bottom">
+                                            class="d-flex d-xl-none justify-content-between align-items-center pl-3 border-bottom">
                                         <h3 class="h6 mb-0 fw-600">{{ translate('Filters') }}</h3>
                                         <button type="button" class="btn btn-sm p-2 filter-sidebar-thumb"
                                                 data-toggle="class-toggle" data-target=".aiz-filter-sidebar">
@@ -760,16 +754,16 @@
                                             @foreach ($product_categories as $category)
                                                 <label class="aiz-checkbox mb-3">
                                                     <input
-                                                        type="checkbox"
-                                                        name="selected_categories[]"
-                                                        value="{{ $category->id }}"
-                                                        @if (in_array($category->id, $selected_categories)) checked
-                                                        @endif
-                                                        onchange="filter()"
+                                                            type="checkbox"
+                                                            name="selected_categories[]"
+                                                            value="{{ $category->id }}"
+                                                            @if (in_array($category->id, $selected_categories)) checked
+                                                            @endif
+                                                            onchange="filter()"
                                                     >
                                                     <span class="aiz-square-check"></span>
                                                     <span
-                                                        class="fs-14 fw-400 text-dark">{{ $category->getTranslation('name') }}</span>
+                                                            class="fs-14 fw-400 text-dark">{{ $category->getTranslation('name') }}</span>
                                                 </label>
                                                 <br>
                                             @endforeach
@@ -793,34 +787,31 @@
                                             <div class="p-3 aiz-checkbox-list">
                                                 <label class="aiz-checkbox mb-3">
                                                     <input
-                                                        type="radio"
-                                                        name="is_available"
-                                                        value="1" @if ($is_available == 1) checked @endif
-                                                        onchange="filter()"
-                                                    >
+                                                            type="radio"
+                                                            name="is_available"
+                                                            value="1" @if ($is_available==1) checked @endif
+                                                            onchange="filter()">
                                                     <span class="aiz-square-check"></span>
                                                     <span
-                                                        class="fs-14 fw-400 text-dark">{{ translate('Available Now') }}</span>
+                                                            class="fs-14 fw-400 text-dark">{{ translate('Available Now') }}</span>
                                                 </label>
                                                 <label class="aiz-checkbox mb-3">
                                                     <input
-                                                        type="radio"
-                                                        name="is_available"
-                                                        value="0" @if ($is_available === '0') checked @endif
-                                                        onchange="filter()"
-                                                    >
+                                                            type="radio"
+                                                            name="is_available"
+                                                            value="0" @if ($is_available==='0' ) checked @endif
+                                                            onchange="filter()">
                                                     <span class="aiz-square-check"></span>
                                                     <span
-                                                        class="fs-14 fw-400 text-dark">{{ translate('Upcoming') }}</span>
+                                                            class="fs-14 fw-400 text-dark">{{ translate('Upcoming') }}</span>
                                                 </label>
                                                 <label class="aiz-checkbox mb-3">
                                                     <input
-                                                        type="radio"
-                                                        name="is_available"
-                                                        value=""
-                                                        @if ($is_available === null) checked @endif
-                                                        onchange="filter()"
-                                                    >
+                                                            type="radio"
+                                                            name="is_available"
+                                                            value=""
+                                                            @if ($is_available===null) checked @endif
+                                                            onchange="filter()">
                                                     <span class="aiz-square-check"></span>
                                                     <span class="fs-14 fw-400 text-dark">{{ translate('All') }}</span>
                                                 </label>
@@ -853,13 +844,13 @@
                                                 name="sort_by" onchange="filter()">
                                             <option value="">{{ translate('Sort by')}}</option>
                                             <option value="newest"
-                                                    @isset($sort_by) @if ($sort_by == 'newest') selected @endif @endisset>{{ translate('Newest')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='newest' ) selected @endif @endisset>{{ translate('Newest')}}</option>
                                             <option value="oldest"
-                                                    @isset($sort_by) @if ($sort_by == 'oldest') selected @endif @endisset>{{ translate('Oldest')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='oldest' ) selected @endif @endisset>{{ translate('Oldest')}}</option>
                                             <option value="price-asc"
-                                                    @isset($sort_by) @if ($sort_by == 'price-asc') selected @endif @endisset>{{ translate('Price low to high')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='price-asc' ) selected @endif @endisset>{{ translate('Price low to high')}}</option>
                                             <option value="price-desc"
-                                                    @isset($sort_by) @if ($sort_by == 'price-desc') selected @endif @endisset>{{ translate('Price high to low')}}</option>
+                                                    @isset($sort_by) @if ($sort_by=='price-desc' ) selected @endif @endisset>{{ translate('Price high to low')}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -868,7 +859,7 @@
                             <!-- Products -->
                             <div class="px-3">
                                 <div
-                                    class="row gutters-16 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-4 row-cols-md-3 row-cols-2 border-top border-left">
+                                        class="row gutters-16 row-cols-xxl-4 row-cols-xl-3 row-cols-lg-4 row-cols-md-3 row-cols-2 border-top border-left">
                                     @foreach ($products as $key => $product)
                                         <div class="col border-right border-bottom has-transition hov-shadow-out z-1">
                                             {{-- @include('frontend.'.get_setting('homepage_select').'.partials.product_box_1',['product' => $product]) --}}
@@ -888,10 +879,10 @@
                 <!-- Top Selling Products Section -->
                 <div class="px-3">
                     <div
-                        class="row gutters-16 row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 border-left border-top">
+                            class="row gutters-16 row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-3 row-cols-2 border-left border-top">
                         @foreach ($products as $key => $product)
                             <div
-                                class="col border-bottom border-right overflow-hidden has-transition hov-shadow-out z-1">
+                                    class="col border-bottom border-right overflow-hidden has-transition hov-shadow-out z-1">
                                 @include('frontend.'.get_setting('homepage_select').'.partials.product_box_1',['product' => $product])
                             </div>
                         @endforeach

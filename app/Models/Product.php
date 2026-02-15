@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App;
 use App\Models\Traits\Product\ProductRelationships;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -14,17 +13,15 @@ class Product extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, ProductRelationships;
 
-    protected $guarded = ['choice_attributes'];
+    protected $guarded = [];
 
     protected $casts = [
-        'colors' => 'array',
-        'choice_options' => 'array',
-        'attributes' => 'array',
-        'video_provider' => 'string',
-        'tags' => 'string',
+        //
     ];
 
-    protected $with = ['product_translations', 'taxes', 'media'];
+    protected $with = [
+        'product_translations', 'taxes', 'media', 'stocks', 'main_category', 'brand',
+    ]; // Added stocks, main_category, brand to eager load if commonly used
 
     public function getTranslation($field = '', $lang = false)
     {
@@ -85,105 +82,13 @@ class Product extends Model implements HasMedia
         return $this->getMedia('gallery');
     }
 
-    /**
-     * Get gallery image URLs as a comma-separated string.
-     * Accessed as $product->gallery.
-     */
-    public function gallery(): Attribute
+    // Stocks relationship
+    public function stocks()
     {
-        return Attribute::get(function () {
-            $media = $this->getMedia('gallery');
-
-            return $media->isNotEmpty()
-                ? $media->map(fn ($item) => $item->getUrl())->implode(',')
-                : '';
-        });
+        return $this->hasMany(ProductStock::class);
     }
 
-    /**
-     * Backward-compatible accessor: $product->photos returns gallery URLs.
-     * Alias of gallery() for views that still reference ->photos.
-     */
-    public function photos(): Attribute
-    {
-        return Attribute::get(fn () => $this->gallery);
-    }
+    // Since we are Strict Schema, we do NOT provide getPriceAttribute accessor on Product.
+    // Frontend/API must request stocks->first()->price etc.
 
-    /**
-     * Get the primary meta image URL.
-     */
-    public function metaImg(): Attribute
-    {
-        return Attribute::get(function () {
-            return $this->getFirstMediaUrl('meta') ?: null;
-        });
-    }
-
-    /**
-     * Get the product thumbnail URL.
-     * Prioritizes 'thumbnail' collection, then first gallery image, then placeholder.
-     */
-    public function thumbnailImg(): Attribute
-    {
-        return Attribute::get(function () {
-            $thumbnailUrl = $this->getFirstMediaUrl('thumbnail');
-            if ($thumbnailUrl) {
-                return $thumbnailUrl;
-            }
-
-            $firstGallery = $this->getFirstMediaUrl('gallery');
-            if ($firstGallery) {
-                return $firstGallery;
-            }
-
-            return static_asset('assets/img/placeholder.jpg');
-        });
-    }
-
-    /**
-     * Get the short video URL.
-     */
-    public function shortVideo(): Attribute
-    {
-        return Attribute::get(function () {
-            return $this->getFirstMediaUrl('short_video') ?: null;
-        });
-    }
-
-    /**
-     * Get the short video thumbnail URL.
-     */
-    public function shortVideoThumbnail(): Attribute
-    {
-        return Attribute::get(function () {
-            return $this->getFirstMediaUrl('video_thumbnail') ?: null;
-        });
-    }
-
-    /**
-     * Get the PDF file URL.
-     */
-    public function pdfUrl(): Attribute
-    {
-        return Attribute::get(function () {
-            return $this->getFirstMediaUrl('pdf') ?: null;
-        });
-    }
-
-    protected function videoLink(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => json_decode($value, true),
-            set: function ($value) {
-                if (! is_array($value)) {
-                    return null;
-                }
-                $filtered = array_filter($value, function ($item) {
-                    return trim($item) !== '';
-                });
-
-                return empty($filtered) ? null : json_encode($filtered);
-            },
-        );
-    }
 }

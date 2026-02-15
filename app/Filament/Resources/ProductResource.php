@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use App\Services\ProductService;
 use CodeWithDennis\FilamentSelectTree\SelectTree;
+use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Tabs;
@@ -13,6 +15,9 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -33,252 +38,171 @@ class ProductResource extends Resource
                         Tabs\Tab::make('General')
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Forms\Components\TextInput::make('name')
-                                    ->required()
-                                    ->maxLength(200)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function (string $operation, $state, Set $set) {
-                                        if ($operation !== 'create') {
-                                            return;
-                                        }
-                                        $set('slug', Str::slug($state));
-                                    }),
-                                Forms\Components\TextInput::make('slug')
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->unique(Product::class, 'slug', ignoreRecord: true),
-                                SelectTree::make('categories')
-                                    ->relationship('categories', 'name', 'parent_id')
-                                    ->label('Product Category')
-                                    ->enableBranchNode()
-                                    ->expandSelected()
-                                    ->withCount()
-                                    ->searchable()
-                                    ->required()
-                                    ->columnSpanFull(),
-                                Forms\Components\Select::make('brand_id')
-                                    ->label('Brand')
-                                    ->relationship('brand', 'name')
-                                    ->searchable()
-                                    ->preload(),
-                                Forms\Components\TextInput::make('min_qty')
-                                    ->label('Min Purchase Qty')
-                                    ->numeric()
-                                    ->default(1)
-                                    ->required(),
-                                Forms\Components\TagsInput::make('tags')
-                                    ->columnSpanFull(),
-                                Forms\Components\RichEditor::make('description')
-                                    ->columnSpanFull(),
-                            ])->columns(2),
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Section::make('Product Information')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('name')
+                                                    ->required()
+                                                    ->maxLength(200)
+                                                    ->live(onBlur: true)
+                                                    ->afterStateUpdated(function (string $operation, $state, Set $set) {
+                                                        if ($operation !== 'create') {
+                                                            return;
+                                                        }
+                                                        $set('slug', Str::slug($state));
+                                                    }),
+                                                Forms\Components\TextInput::make('slug')
+                                                    ->required()
+                                                    ->maxLength(255)
+                                                    ->unique(Product::class, 'slug', ignoreRecord: true),
+                                                Forms\Components\RichEditor::make('description')
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columns(2),
 
-                        // ── Files & Media Tab ──
-                        Tabs\Tab::make('Files & Media')
-                            ->icon('heroicon-o-photo')
-                            ->schema([
-                                SpatieMediaLibraryFileUpload::make('thumbnail')
-                                    ->collection('thumbnail')
-                                    ->label('Thumbnail Image')
-                                    ->image()
-                                    ->imageEditor(),
-                                SpatieMediaLibraryFileUpload::make('gallery')
-                                    ->collection('gallery')
-                                    ->multiple()
-                                    ->reorderable()
-                                    ->label('Gallery Images')
-                                    ->image(),
-                                SpatieMediaLibraryFileUpload::make('meta_img')
-                                    ->collection('meta')
-                                    ->label('Meta Image (SEO)')
-                                    ->image(),
-                            ]),
+                                    ])
+                                    ->columnSpan(['lg' => 2]),
 
-                        // ── Price & Stock Tab ──
-                        Tabs\Tab::make('Price & Stock')
+                                Forms\Components\Group::make()
+                                    ->schema([
+                                        Forms\Components\Section::make('Visibility & Status')
+                                            ->schema([
+                                                Forms\Components\Toggle::make('published')
+                                                    ->required()
+                                                    ->label('Published')
+                                                    ->default(true),
+                                                Forms\Components\Toggle::make('approved')
+                                                    ->label('Approved')
+                                                    ->default(true)
+                                                    ->visible(fn () => auth()->user()->can('approve_products')),
+                                            ]),
+
+                                        Forms\Components\Section::make('Product Image')
+                                            ->schema([
+                                                SpatieMediaLibraryFileUpload::make('thumbnail')
+                                                    ->collection('thumbnail')
+                                                    ->label('Thumbnail Image')
+                                                    ->image()
+                                                    ->imageEditor()
+                                                    ->columnSpanFull(),
+                                            ]),
+
+                                        Forms\Components\Section::make('Organization')
+                                            ->schema([
+                                                SelectTree::make('categories')
+                                                    ->relationship('categories', 'name', 'parent_id')
+                                                    ->label('Product Category')
+                                                    ->enableBranchNode()
+                                                    ->expandSelected()
+                                                    ->withCount()
+                                                    ->searchable()
+                                                    ->required()
+                                                    ->columnSpanFull(),
+                                                Forms\Components\Select::make('brand_id')
+                                                    ->required()
+                                                    ->label('Brand')
+                                                    ->relationship('brand', 'name')
+                                                    ->searchable()
+                                                    ->preload(),
+                                                Forms\Components\TagsInput::make('tags')
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columns(1),
+                                    ])
+                                    ->columnSpan(['lg' => 1]),
+                            ])
+                            ->columns(3),
+
+                        // ── Price & Stock Tab (Variations) ──
+                        Tabs\Tab::make('Variants')
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
-                                Forms\Components\TextInput::make('unit_price')
-                                    ->label('Unit Price')
-                                    ->numeric()
-                                    ->prefix('$')
-                                    ->required(),
-                                Forms\Components\TextInput::make('purchase_price')
-                                    ->label('Purchase Price')
-                                    ->numeric()
-                                    ->prefix('$'),
-                                Forms\Components\TextInput::make('tax')
-                                    ->label('Tax')
-                                    ->numeric()
-                                    ->default(0),
-                                Forms\Components\Select::make('tax_type')
-                                    ->options([
-                                        'amount' => 'Flat',
-                                        'percent' => 'Percent',
-                                    ])
-                                    ->default('amount'),
-                                Forms\Components\TextInput::make('discount')
-                                    ->label('Discount')
-                                    ->numeric()
-                                    ->default(0),
-                                Forms\Components\Select::make('discount_type')
-                                    ->options([
-                                        'amount' => 'Flat',
-                                        'percent' => 'Percent',
-                                    ])
-                                    ->default('amount'),
-                                Forms\Components\TextInput::make('current_stock')
-                                    ->label('Quantity')
-                                    ->numeric()
-                                    ->required()
-                                    ->default(0),
-                                Forms\Components\TextInput::make('sku')
-                                    ->label('SKU')
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('external_link')
-                                    ->placeholder('http://...')
-                                    ->columnSpanFull(),
-                                Forms\Components\TextInput::make('external_link_btn')
-                                    ->label('External Link Button Text')
-                                    ->default('Buy Now'),
-                            ])->columns(2),
 
-                        // ── Variations Tab ──
-                        Tabs\Tab::make('Variations')
-                            ->icon('heroicon-o-swatch')
-                            ->schema([
-                                Forms\Components\Toggle::make('variant_product')
-                                    ->label('Enable Variations')
-                                    ->live(),
-
-                                Forms\Components\Section::make('Variation Configuration')
-                                    ->visible(fn (Forms\Get $get) => $get('variant_product'))
+                                // This repeater manages ALL stocks.
+                                // For simple products, it should contain exactly one item (enforced by logic or UI).
+                                // For variable products, it contains many.
+                                // This repeater manages ALL variants manually.
+                                Forms\Components\Repeater::make('stocks')
+                                    ->label('Product Variants')
+                                    ->relationship()
                                     ->schema([
-                                        Forms\Components\Select::make('colors')
-                                            ->label('Colors')
-                                            ->multiple()
-                                            ->options(\App\Models\Color::all()->pluck('name', 'code'))
-                                            ->searchable(),
+                                        Forms\Components\TextInput::make('variant')
+                                            ->label('Variant Name')
+                                            ->placeholder('e.g., Default, Red XL, 128GB')
+                                            ->default('Default')
+                                            ->required()
+                                            ->columnSpan(2),
 
-                                        Forms\Components\Repeater::make('choice_options')
-                                            ->label('Attributes')
+                                        Forms\Components\TextInput::make('price')
+                                            ->label('Price')
+                                            ->numeric()
+                                            ->prefix('$')
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('sku')
+                                            ->label('SKU'),
+
+                                        Forms\Components\TextInput::make('qty')
+                                            ->label('Quantity')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->required(),
+
+                                        Forms\Components\TextInput::make('min_qty')
+                                            ->label('Min Qty')
+                                            ->numeric()
+                                            ->default(1)
+                                            ->required(),
+
+                                        Forms\Components\Toggle::make('cash_on_delivery')
+                                            ->label('Cash On Delivery')
+                                            ->default(true),
+
+                                        Forms\Components\Section::make('Media & Files')
                                             ->schema([
-                                                Forms\Components\Select::make('attribute_id')
-                                                    ->label('Attribute')
-                                                    ->options(\App\Models\Attribute::all()->pluck('name', 'id'))
-                                                    ->searchable()
-                                                    ->live()
-                                                    ->afterStateUpdated(fn (Forms\Set $set) => $set('values', [])),
-
-                                                Forms\Components\TagsInput::make('values')
-                                                    ->label('Values')
-                                                    ->placeholder('Press Enter to add values')
-                                                    ->suggestions(function (Forms\Get $get) {
-                                                        $attributeId = $get('attribute_id');
-                                                        if (! $attributeId) {
-                                                            return [];
-                                                        }
-
-                                                        return \App\Models\AttributeValue::where('attribute_id',
-                                                            $attributeId)
-                                                            ->pluck('value')
-                                                            ->toArray();
-                                                    }),
-                                            ])
-                                            ->itemLabel(fn (array $state
-                                            ): ?string => \App\Models\Attribute::find($state['attribute_id'] ?? null)?->name ?? null),
-
-                                        Forms\Components\Actions::make([
-                                            Forms\Components\Actions\Action::make('generate_variants')
-                                                ->label('Generate Variants')
-                                                ->icon('heroicon-o-arrow-path')
-                                                ->action(function (Forms\Get $get, Forms\Set $set) {
-                                                    $colors = $get('colors') ?? [];
-                                                    $choiceOptions = $get('choice_options') ?? [];
-                                                    $colorsActive = $get('variant_product') && ! empty($colors);
-
-                                                    $options = [];
-                                                    // 1. Add colors if active
-                                                    if ($colorsActive) {
-                                                        $options[] = $colors;
-                                                    }
-
-                                                    // 2. Add choice options (values)
-                                                    foreach ($choiceOptions as $option) {
-                                                        if (! empty($option['values'])) {
-                                                            $options[] = $option['values'];
-                                                        }
-                                                    }
-
-                                                    // 3. Generate combinations
-                                                    $combinations = (new \AizPackages\CombinationGenerate\Services\CombinationService)->generate_combination($options);
-
-                                                    // 4. Prepare new stock items, preserving existing values
-                                                    $oldStocks = $get('stocks') ?? [];
-                                                    $oldStocksByVariant = collect($oldStocks)->keyBy('variant')->toArray();
-
-                                                    $newStocks = [];
-                                                    foreach ($combinations as $combination) {
-                                                        // Generate variant string
-                                                        $str = '';
-                                                        foreach ($combination as $key => $item) {
-                                                            if ($key > 0) {
-                                                                $str .= '-'.str_replace(' ', '', $item);
-                                                            } else {
-                                                                if ($colorsActive) {
-                                                                    $colorName = \App\Models\Color::where('code',
-                                                                        $item)->first()?->name;
-                                                                    $str .= $colorName;
-                                                                } else {
-                                                                    $str .= str_replace(' ', '', $item);
-                                                                }
-                                                            }
-                                                        }
-
-                                                        // Check if this variant already exists
-                                                        if (isset($oldStocksByVariant[$str])) {
-                                                            $newStocks[] = $oldStocksByVariant[$str];
-                                                        } else {
-                                                            $newStocks[] = [
-                                                                'variant' => $str,
-                                                                'price' => $get('unit_price') ?? 0,
-                                                                'sku' => ($get('sku') ? $get('sku').'-' : '').$str,
-                                                                'qty' => 10,
-                                                            ];
-                                                        }
-                                                    }
-
-                                                    $set('stocks', $newStocks);
-                                                }),
-                                        ]),
-
-                                        Forms\Components\Repeater::make('stocks')
-                                            ->label('Variants')
-                                            ->relationship()
-                                            ->schema([
-                                                Forms\Components\TextInput::make('variant')
-                                                    ->disabled()
-                                                    ->required()
-                                                    ->columnSpan(2),
-                                                Forms\Components\TextInput::make('price')
-                                                    ->numeric()
-                                                    ->prefix('$')
-                                                    ->required(),
-                                                Forms\Components\TextInput::make('sku')
-                                                    ->label('SKU'),
-                                                Forms\Components\TextInput::make('qty')
-                                                    ->numeric()
-                                                    ->default(0)
-                                                    ->required(),
-                                                Forms\Components\FileUpload::make('image')
+                                                SpatieMediaLibraryFileUpload::make('gallery')
+                                                    ->collection('gallery')
+                                                    ->label('Variant Gallery')
+                                                    ->multiple()
+                                                    ->reorderable()
                                                     ->image()
-                                                    ->directory('products/variants'),
+                                                    ->imageEditor()
+                                                    ->columnSpanFull(),
+
+                                                SpatieMediaLibraryFileUpload::make('files')
+                                                    ->collection('files')
+                                                    ->label('Downloadable Files')
+                                                    ->multiple()
+                                                    ->columnSpanFull(),
+
+                                                Forms\Components\Grid::make(2)
+                                                    ->schema([
+                                                        Forms\Components\TextInput::make('video_link')
+                                                            ->label('Video Link')
+                                                            ->placeholder('Video Link'),
+
+                                                        Forms\Components\Select::make('video_provider')
+                                                            ->label('Video Provider')
+                                                            ->options([
+                                                                'youtube' => 'Youtube',
+                                                                'dailymotion' => 'Dailymotion',
+                                                                'vimeo' => 'Vimeo',
+                                                            ]),
+                                                    ]),
                                             ])
-                                            ->columns(6)
-                                            ->reorderable(false)
-                                            ->addable(false)
-                                            ->deletable(false),
-                                    ]),
-                            ])->id('variations-tab'),
+                                            ->collapsed()
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(4)
+                                    ->reorderable(true)
+                                    ->addable(true)
+                                    ->deletable(true)
+                                    ->defaultItems(1)
+                                    ->minItems(1)
+                                    ->addActionLabel('Add Another Variant')
+                                    ->columnSpanFull(),
+                            ]),
 
                         // ── SEO Tab ──
                         Tabs\Tab::make('SEO')
@@ -289,14 +213,18 @@ class ProductResource extends Resource
                                 Forms\Components\Textarea::make('meta_description')
                                     ->maxLength(255)
                                     ->rows(3),
+                                SpatieMediaLibraryFileUpload::make('meta_img')
+                                    ->collection('meta')
+                                    ->label('Meta Image (SEO)')
+                                    ->image()
+                                    ->columnSpanFull(),
                             ]),
 
                         // ── Shipping Tab ──
                         Tabs\Tab::make('Shipping')
                             ->icon('heroicon-o-truck')
                             ->schema([
-                                Forms\Components\Toggle::make('cash_on_delivery')
-                                    ->label('Cash On Delivery Status'),
+                                // Cash on delivery moved to stocks
                                 Forms\Components\Select::make('shipping_type')
                                     ->options([
                                         'free' => 'Free Shipping',
@@ -312,36 +240,7 @@ class ProductResource extends Resource
                                     ->numeric(),
                             ])->columns(2),
 
-                        // ── Status Tab ──
-                        Tabs\Tab::make('Status')
-                            ->icon('heroicon-o-check-circle')
-                            ->schema([
-                                Forms\Components\Toggle::make('published')
-                                    ->label('Published')
-                                    ->default(true),
-                                Forms\Components\Toggle::make('featured')
-                                    ->label('Featured'),
-                                Forms\Components\Toggle::make('todays_deal')
-                                    ->label('Today\'s Deal'),
-                                Forms\Components\Toggle::make('approved')
-                                    ->label('Approved')
-                                    ->default(true)
-                                    ->visible(fn () => auth()->user()->can('approve_products')),
-                            ]),
-
-                        // ── Videos Tab ──
-                        Tabs\Tab::make('Videos')
-                            ->icon('heroicon-o-video-camera')
-                            ->schema([
-                                Forms\Components\Select::make('video_provider')
-                                    ->options([
-                                        'youtube' => 'Youtube',
-                                        'dailymotion' => 'Dailymotion',
-                                        'vimeo' => 'Vimeo',
-                                    ]),
-                                Forms\Components\TextInput::make('video_link')
-                                    ->placeholder('Video Link'),
-                            ]),
+                        // Status tab content moved to General tab
 
                         // ── Warranty Tab ──
                         Tabs\Tab::make('Warranty')
@@ -373,18 +272,24 @@ class ProductResource extends Resource
                     ->label('Category')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('unit_price')
+                Tables\Columns\TextColumn::make('min_price')
+                    ->label('Min Price')
+                    ->state(fn (Product $record) => $record->stocks->min('price')) // Calculate min price from stocks
                     ->money()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('current_stock')
+                Tables\Columns\TextColumn::make('max_price')
+                    ->label('Max Price')
+                    ->state(fn (Product $record) => $record->stocks->max('price')) // Calculate min price from stocks
+                    ->money()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('total_qty')
                     ->label('Qty')
+                    ->state(fn (Product $record) => $record->stocks->sum('qty')) // Calculate total qty
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('featured')
-                    ->boolean()
-                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -395,11 +300,43 @@ class ProductResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->using(function (Product $record) {
+                        return DB::transaction(function () use ($record) {
+                            try {
+                                app(ProductService::class)->destroy($record->id);
+                            } catch (Exception $e) {
+                                Log::error('Product deletion failed (Filament Action): '.$e->getMessage(), [
+                                    'product_id' => $record->id,
+                                    'trace' => $e->getTraceAsString(),
+                                ]);
+
+                                throw $e;
+                            }
+                        });
+                    }),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function (Collection $records) {
+                            return DB::transaction(function () use ($records) {
+                                try {
+                                    $service = app(ProductService::class);
+                                    foreach ($records as $record) {
+                                        $service->destroy($record->id);
+                                    }
+                                } catch (Exception $e) {
+                                    Log::error('Bulk product deletion failed (Filament Action): '.$e->getMessage(), [
+                                        'ids' => $records->pluck('id')->toArray(),
+                                        'trace' => $e->getTraceAsString(),
+                                    ]);
+
+                                    throw $e;
+                                }
+                            });
+                        }),
                 ]),
             ]);
     }

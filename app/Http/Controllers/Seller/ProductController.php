@@ -5,15 +5,14 @@ namespace App\Http\Controllers\Seller;
 use AizPackages\CombinationGenerate\Services\CombinationService;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
-use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
 use App\Models\User;
-use App\Models\Wishlist;
 use App\Notifications\ShopProductNotification;
 use App\Services\FrequentlyBoughtProductService;
+use App\Services\MediaService;
 use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
@@ -37,18 +36,22 @@ class ProductController extends Controller
 
     protected $frequentlyBoughtProductService;
 
+    protected $mediaService;
+
     public function __construct(
         ProductService $productService,
         ProductTaxService $productTaxService,
         ProductFlashDealService $productFlashDealService,
         ProductStockService $productStockService,
-        FrequentlyBoughtProductService $frequentlyBoughtProductService
+        FrequentlyBoughtProductService $frequentlyBoughtProductService,
+        MediaService $mediaService
     ) {
         $this->productService = $productService;
         $this->productTaxService = $productTaxService;
         $this->productFlashDealService = $productFlashDealService;
         $this->productStockService = $productStockService;
         $this->frequentlyBoughtProductService = $frequentlyBoughtProductService;
+        $this->mediaService = $mediaService;
     }
 
     public function index(Request $request)
@@ -118,15 +121,8 @@ class ProductController extends Controller
         }
 
         // Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id',
-        ]), $product);
+        // Pass complete request data so Service can extract what it needs (including video_link, etc.)
+        $this->productStockService->store($request->all(), $product);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
@@ -206,16 +202,8 @@ class ProductController extends Controller
         $product->categories()->sync($request->category_ids);
 
         // Product Stock
-        $product->stocks()->delete();
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id',
-        ]), $product);
+        // Note: productStockService->store handles logic to update/create
+        $this->productStockService->store($request->all(), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
@@ -258,6 +246,7 @@ class ProductController extends Controller
         return back();
     }
 
+    // ... Copy over other methods if needed (sku_combination, etc.)
     public function sku_combination(Request $request)
     {
         $options = [];
@@ -284,6 +273,8 @@ class ProductController extends Controller
 
         $combinations = (new CombinationService)->generate_combination($options);
 
+        // Need to update view to probably show/hide video inputs per variant if needed?
+        // For now adhering to existing view logic.
         return view('backend.product.products.sku_combinations', compact('combinations', 'unit_price', 'colors_active', 'product_name'));
     }
 
@@ -401,37 +392,13 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
+        $this->productService->destroy($id);
 
-        if (Auth::user()->id != $product->user_id) {
-            flash(translate('This product is not yours.'))->warning();
+        flash(translate('Product has been deleted successfully'))->success();
+        Artisan::call('view:clear');
+        Artisan::call('cache:clear');
 
-            return back();
-        }
-
-        $product->product_translations()->delete();
-        $product->categories()->detach();
-        $product->stocks()->delete();
-        $product->taxes()->delete();
-        $product->frequently_bought_products()->delete();
-        $product->last_viewed_products()->delete();
-        $product->flash_deal_products()->delete();
-        deleteProductReview($product);
-        if (Product::destroy($id)) {
-            Cart::where('product_id', $id)->delete();
-            Wishlist::where('product_id', $id)->delete();
-
-            flash(translate('Product has been deleted successfully'))->success();
-
-            Artisan::call('view:clear');
-            Artisan::call('cache:clear');
-
-            return back();
-        } else {
-            flash(translate('Something went wrong'))->error();
-
-            return back();
-        }
+        return back();
     }
 
     public function bulk_product_delete(Request $request)

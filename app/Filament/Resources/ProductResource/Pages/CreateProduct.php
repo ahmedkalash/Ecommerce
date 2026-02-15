@@ -3,58 +3,49 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use App\Models\User;
+use App\Services\ProductService;
+use Exception;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
     /**
-     * Mutate form data before creating the product record.
-     * Sets `added_by`, `user_id`, `slug`, and converts `tags` array to comma-separated string.
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @throws \Throwable
      */
-    protected function mutateFormDataBeforeCreate(array $data): array
+    /**
+     * Handle the record creation process.
+     * Delegates the logic to ProductService but maintains responsibility for
+     * transaction management and UI-level error logging.
+     *
+     *
+     * @throws \Throwable
+     */
+    protected function handleRecordCreation(array $data): Model
     {
-        $authUser = auth()->user();
+        return DB::transaction(function () use ($data) {
+            try {
+                /** @var ProductService $productService */
+                $productService = app(ProductService::class);
 
-        $data['added_by'] = $authUser->user_type === 'seller' ? 'seller' : 'admin';
-        $data['user_id'] = $authUser->user_type === 'seller'
-            ? $authUser->id
-            : User::where('user_type', 'admin')->first()->id;
+                return $productService->store($data);
+            } catch (Exception $e) {
+                Log::error('Product creation failed (Filament): '.$e->getMessage(), [
+                    'trace' => $e->getTraceAsString(),
+                    'data' => $data,
+                ]);
 
-        // Auto-approve unless seller and setting requires admin approval
-        if ($authUser->user_type === 'seller' && get_setting('product_approve_by_admin') == 1) {
-            $data['approved'] = 0;
-        } else {
-            $data['approved'] = $data['approved'] ?? 1;
-        }
+                throw $e;
+            }
+        });
+    }
 
-        // Ensure slug is unique
-        if (empty($data['slug'])) {
-            $data['slug'] = Str::slug($data['name']);
-        }
-
-        $slug = $data['slug'];
-        $count = \App\Models\Product::where('slug', 'LIKE', $slug.'%')->count();
-        if ($count > 0) {
-            $data['slug'] = $slug.'-'.($count + 1);
-        }
-
-        // Convert tags array to comma-separated string
-        if (isset($data['tags']) && is_array($data['tags'])) {
-            $data['tags'] = implode(',', $data['tags']);
-        }
-
-        // Set defaults for fields not in the form
-        $data['colors'] = $data['colors'] ?? json_encode([]);
-        $data['choice_options'] = $data['choice_options'] ?? json_encode([]);
-        $data['attributes'] = $data['attributes'] ?? json_encode([]);
-
-        return $data;
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

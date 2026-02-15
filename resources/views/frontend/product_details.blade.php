@@ -14,21 +14,20 @@
 
 @section('meta')
     @php
-        $availability = "out of stock";
+        // Refactored availability check using stocks relationship
         $qty = 0;
-        if($detailedProduct->variant_product) {
-            foreach ($detailedProduct->stocks as $key => $stock) {
-                $qty += $stock->qty;
-            }
+        // Check if variant product
+        if($detailedProduct->is_variant) {
+        // Sum qty of all stocks
+        $qty = $detailedProduct->stocks->sum('qty');
         }
         else {
-            $qty = optional($detailedProduct->stocks->first())->qty;
+        // Simple product, take first stock qty
+        $qty = optional($detailedProduct->stocks->first())->qty ?? 0;
         }
-        if($qty > 0){
-            $availability = "in stock";
-        }
+        $availability = $qty > 0 ? "in stock" : "out of stock";
     @endphp
-        <!-- Schema.org markup for Google+ -->
+            <!-- Schema.org markup for Google+ -->
     <meta itemprop="name" content="{{ $detailedProduct->meta_title }}">
     <meta itemprop="description" content="{{ $detailedProduct->meta_description }}">
     <meta itemprop="image" content="{{ $detailedProduct->meta_img }}">
@@ -40,7 +39,7 @@
     <meta name="twitter:description" content="{{ $detailedProduct->meta_description }}">
     <meta name="twitter:creator" content="@author_handle">
     <meta name="twitter:image" content="{{ $detailedProduct->meta_img }}">
-    <meta name="twitter:data1" content="{{ single_price($detailedProduct->unit_price) }}">
+    <meta name="twitter:data1" content="{{ single_price($detailedProduct->stocks->min('price')) }}">
     <meta name="twitter:label1" content="Price">
 
     <!-- Open Graph data -->
@@ -50,12 +49,12 @@
     <meta property="og:image" content="{{ $detailedProduct->meta_img }}"/>
     <meta property="og:description" content="{{ $detailedProduct->meta_description }}"/>
     <meta property="og:site_name" content="{{ get_setting('meta_title') }}"/>
-    <meta property="og:price:amount" content="{{ single_price($detailedProduct->unit_price) }}"/>
+    <meta property="og:price:amount" content="{{ single_price($detailedProduct->stocks->min('price')) }}"/>
     <meta property="product:brand"
           content="{{ $detailedProduct->brand ? $detailedProduct->brand->name : env('APP_NAME') }}">
     <meta property="product:availability" content="{{ $availability }}">
     <meta property="product:condition" content="new">
-    <meta property="product:price:amount" content="{{ number_format($detailedProduct->unit_price, 2) }}">
+    <meta property="product:price:amount" content="{{ number_format($detailedProduct->stocks->min('price'), 2) }}">
     <meta property="product:retailer_item_id" content="{{ $detailedProduct->slug }}">
     <meta property="product:price:currency"
           content="{{ get_system_default_currency()->code }}"/>
@@ -83,7 +82,7 @@
 
     <section class="mb-4">
         <div class="container">
-            @if ($detailedProduct->auction_product)
+            @if (false)
                 <!-- Reviews & Ratings -->
                 @include('frontend.product_details.review_section')
 
@@ -178,8 +177,8 @@
                                    required>
                         </div>
                         <div class="form-group">
-                            <textarea class="form-control rounded-0" rows="8" name="message" required
-                                      placeholder="{{ translate('Your Question') }}">{{ route('product', $detailedProduct->slug) }}</textarea>
+                        <textarea class="form-control rounded-0" rows="8" name="message" required
+                                  placeholder="{{ translate('Your Question') }}">{{ route('product', $detailedProduct->slug) }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -193,8 +192,8 @@
         </div>
     </div>
 
-    <!-- Bid Modal -->
-    @if($detailedProduct->auction_product == 1)
+    <!-- Auction product deprecated -->
+    @if(false)
         @php
             $highest_bid = $detailedProduct->bids->max('amount');
             $min_bid_amount = $highest_bid != null ? $highest_bid+1 : $detailedProduct->starting_bid;
@@ -205,7 +204,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">{{ translate('Bid For Product') }}
-                            <small>({{ translate('Min Bid Amount: ').$min_bid_amount }})</small></h5>
+                            <small>({{ translate('Min Bid Amount: ').$min_bid_amount }})</small>
+                        </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         </button>
                     </div>
@@ -286,7 +286,14 @@
 @section('script')
     <script type="text/javascript">
         $(document).ready(function () {
-            getVariantPrice();
+            if ($('#option-choice-form').length > 0) {
+                getVariantPrice();
+
+                // Auto-update price when options change
+                $('#option-choice-form input').on('change', function () {
+                    getVariantPrice();
+                });
+            }
         });
 
         function CopyToClipboard(e) {
@@ -296,31 +303,15 @@
             $temp.val(url).select();
             try {
                 document.execCommand("copy");
-                AIZ.plugins.notify('success', '{{ translate('Link copied to clipboard') }}');
+                AIZ.plugins.notify('success', '{{ translate("Link copied to clipboard") }}');
             } catch (err) {
-                AIZ.plugins.notify('danger', '{{ translate('Oops, unable to copy') }}');
+                AIZ.plugins.notify('danger', '{{ translate("Oops, unable to copy") }}');
             }
             $temp.remove();
-            // if (document.selection) {
-            //     var range = document.body.createTextRange();
-            //     range.moveToElementText(document.getElementById(containerid));
-            //     range.select().createTextRange();
-            //     document.execCommand("Copy");
-
-            // } else if (window.getSelection) {
-            //     var range = document.createRange();
-            //     document.getElementById(containerid).style.display = "block";
-            //     range.selectNode(document.getElementById(containerid));
-            //     window.getSelection().addRange(range);
-            //     document.execCommand("Copy");
-            //     document.getElementById(containerid).style.display = "none";
-
-            // }
-            // AIZ.plugins.notify('success', 'Copied');
         }
 
         function show_chat_modal() {
-            @if (Auth::check())
+            @if(Auth::check())
             $('#chat_modal').modal('show');
             @else
             $('#login_modal').modal('show');
@@ -354,12 +345,14 @@
             $.ajax({
                 url: '?page=' + page,
                 dataType: 'json',
-                data: {type: type},
+                data: {
+                    type: type
+                },
             }).done(function (data) {
                 $('.' + section).html(data);
                 location.hash = page;
             }).fail(function () {
-                alert('Something went worng! Data could not be loaded.');
+                alert('Something went wrong! Data could not be loaded.');
             });
         }
 
@@ -372,9 +365,9 @@
         }
 
         function bid_modal() {
-            @if (isCustomer() || isSeller())
+            @if(isCustomer() || isSeller())
             $('#bid_for_detail_product').modal('show');
-            @elseif (isAdmin())
+            @elseif(isAdmin())
             AIZ.plugins.notify('warning', '{{ translate("Sorry, Only customers & Sellers can Bid.") }}');
             @else
             $('#login_modal').modal('show');
@@ -382,22 +375,23 @@
         }
 
         function product_review(product_id) {
-            @if (isCustomer())
-            @if ($review_status == 1)
-            $.post('{{ route('product_review_modal') }}', {
-                _token: '{{ @csrf_token() }}',
-                product_id: product_id
-            }, function (data) {
-                $('#product-review-modal-content').html(data);
-                $('#product-review-modal').modal('show', {
-                    backdrop: 'static'
+            @if(isCustomer())
+            @if($review_status == 1)
+            $.post('{{ route("product_review_modal") }}', {
+                    _token: '{{ csrf_token() }}',
+                    product_id: product_id
+                },
+                function (data) {
+                    $('#product-review-modal-content').html(data);
+                    $('#product-review-modal').modal('show', {
+                        backdrop: 'static'
+                    });
+                    AIZ.extra.inputRating();
                 });
-                AIZ.extra.inputRating();
-            });
             @else
             AIZ.plugins.notify('warning', '{{ translate("Sorry, You need to buy this product to give review.") }}');
             @endif
-            @elseif (Auth::check() && !isCustomer())
+            @elseif(Auth::check() && !isCustomer())
             AIZ.plugins.notify('warning', '{{ translate("Sorry, Only customers can give review.") }}');
             @else
             $('#login_modal').modal('show');
@@ -421,6 +415,64 @@
                     $('#size-chart-show-modal').modal('show');
                 }
             });
+        }
+
+        // New getVariantPrice function
+        function getVariantPrice() {
+            // Only run if form exists
+            if ($('#option-choice-form').length > 0 && $('#option-choice-form input[name=quantity]').val() > 0 && checkAddToCartValidity()) {
+                $.ajax({
+                    type: "POST",
+                    url: '{{ route('
+                products.variant_price ') }}',
+                    data: $('#option-choice-form').serializeArray(),
+                    success: function (data) {
+                        $('#chosen_price_div').removeClass('d-none');
+                        $('#chosen_price_div #chosen_price').html(data.price);
+
+                        // Update available quantity text
+                        $('#available-quantity').html(data.quantity);
+
+                        // Handle max limit
+                        var quantityInput = $('.input-number');
+                        quantityInput.prop('max', data.max_limit);
+                        if (parseInt(quantityInput.val()) > data.max_limit) {
+                            quantityInput.val(data.max_limit);
+                        }
+
+                        // Handle buttons based on stock
+                        if (data.in_stock == 0) {
+                            $('.buy-now').addClass('d-none');
+                            $('.add-to-cart').addClass('d-none');
+                            $('.out-of-stock').removeClass('d-none');
+                        } else {
+                            $('.buy-now').removeClass('d-none');
+                            $('.add-to-cart').removeClass('d-none');
+                            $('.out-of-stock').addClass('d-none');
+                        }
+                    }
+                });
+            }
+        }
+
+        function checkAddToCartValidity() {
+            var names = {};
+            $('#option-choice-form input:radio').each(function () { // find unique names
+                names[$(this).attr('name')] = true;
+            });
+            var count = 0;
+            $.each(names, function () { // then count them
+                count++;
+            });
+
+            if ($('#option-choice-form input:radio:checked').length == count) {
+                return true;
+            }
+
+            // If no options, valid (simple product)
+            if (count == 0) return true;
+
+            return false;
         }
     </script>
 @endsection

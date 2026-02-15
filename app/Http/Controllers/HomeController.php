@@ -48,7 +48,8 @@ class HomeController extends Controller
 
     public function load_todays_deal_section()
     {
-        $todays_deal_products = filter_products(Product::where('todays_deal', '1'))->orderBy('id', 'desc')->get();
+        $todays_deal_products = filter_products(Product::query())->orderBy('id',
+            'desc')->get(); // todays_deal column removed
 
         return view(
             'frontend.'.get_setting('homepage_select').'.partials.todays_deal',
@@ -184,10 +185,8 @@ class HomeController extends Controller
             session(['link' => url()->current()]);
         }
 
-        $detailedProduct = Product::with('reviews', 'brand', 'stocks', 'user', 'user.shop')->where(
-            'auction_product',
-            0
-        )->where('slug', $slug)->where('approved', 1)->first();
+        $detailedProduct = Product::with('reviews', 'brand', 'stocks', 'user', 'user.shop')
+            ->where('slug', $slug)->where('approved', 1)->first();
 
         if ($detailedProduct != null && $detailedProduct->published) {
             if ((get_setting('vendor_system_activation') != 1) && $detailedProduct->added_by == 'seller') {
@@ -318,7 +317,9 @@ class HomeController extends Controller
                 }
 
                 if ($min_price != null && $max_price != null) {
-                    $products->where('unit_price', '>=', $min_price)->where('unit_price', '<=', $max_price);
+                    $products->whereHas('stocks', function ($q) use ($min_price, $max_price) {
+                        $q->where('price', '>=', $min_price)->where('price', '<=', $max_price);
+                    });
                 }
 
                 if ($request->has('rating')) {
@@ -334,10 +335,10 @@ class HomeController extends Controller
                         $products->orderBy('created_at', 'asc');
                         break;
                     case 'price-asc':
-                        $products->orderBy('unit_price', 'asc');
+                        $products->withMin('stocks as min_price', 'price')->orderBy('min_price', 'asc');
                         break;
                     case 'price-desc':
-                        $products->orderBy('unit_price', 'desc');
+                        $products->withMin('stocks as min_price', 'price')->orderBy('min_price', 'desc');
                         break;
                     default:
                         $products->orderBy('id', 'desc');
@@ -412,7 +413,9 @@ class HomeController extends Controller
                 }
 
                 if ($min_price != null && $max_price != null) {
-                    $products->where('unit_price', '>=', $min_price)->where('unit_price', '<=', $max_price);
+                    $products->whereHas('stocks', function ($q) use ($min_price, $max_price) {
+                        $q->where('price', '>=', $min_price)->where('price', '<=', $max_price);
+                    });
                 }
 
                 if ($request->has('rating')) {
@@ -428,10 +431,10 @@ class HomeController extends Controller
                         $products->orderBy('created_at', 'asc');
                         break;
                     case 'price-asc':
-                        $products->orderBy('unit_price', 'asc');
+                        $products->withMin('stocks as min_price', 'price')->orderBy('min_price', 'asc');
                         break;
                     case 'price-desc':
-                        $products->orderBy('unit_price', 'desc');
+                        $products->withMin('stocks as min_price', 'price')->orderBy('min_price', 'desc');
                         break;
                     default:
                         $products->orderBy('id', 'desc');
@@ -536,6 +539,18 @@ class HomeController extends Controller
 
         $product_stock = $product->stocks->where('variant', $str)->first();
 
+        // Return clear error if stock not found to avoid 500
+        if (! $product_stock) {
+            return [
+                'price' => 0,
+                'quantity' => 0,
+                'digital' => 0,
+                'variation' => $str,
+                'max_limit' => 0,
+                'in_stock' => 0,
+            ];
+        }
+
         $price = $product_stock->price;
 
         if ($product->wholesale_product) {
@@ -552,42 +567,33 @@ class HomeController extends Controller
         $quantity = $product_stock->qty;
         $max_limit = $product_stock->qty;
 
-        if ($quantity >= 1 && $product->min_qty <= $quantity) {
+        // Min Qty now on Stock, not Product?
+        // Migration added min_qty to stock.
+        // ProductService defaults min_qty to 1 if not set but schema has it.
+        // Product model dropped min_qty? Yes.
+        // So use $product_stock->min_qty
+
+        $min_qty = $product_stock->min_qty ?? 1;
+
+        if ($quantity >= 1 && $min_qty <= $quantity) {
             $in_stock = 1;
         } else {
             $in_stock = 0;
         }
 
-        // Product Stock Visibility
-        if ($product->stock_visibility_state == 'text') {
-            if ($quantity >= 1 && $product->min_qty < $quantity) {
-                $quantity = translate('In Stock');
-            } else {
-                $quantity = translate('Out Of Stock');
-            }
-        }
+        // Product Stock Visibility - removed column from product?
+        // "stock_visibility_state" was in the dropped list!
+        // So we default to always showing or checking qty logic.
+        // Let's assume standard behavior: if qty > 0, shows text or qty.
+        // For now, removing the check for stock_visibility_state as it's dropped.
 
         // discount calculation
-        $discount_applicable = false;
-
-        if ($product->discount_start_date == null) {
-            $discount_applicable = true;
-        } elseif (
-            strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
-            strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
-        ) {
-            $discount_applicable = true;
-        }
-
-        if ($discount_applicable) {
-            if ($product->discount_type == 'percent') {
-                $price -= ($price * $product->discount) / 100;
-            } elseif ($product->discount_type == 'amount') {
-                $price -= $product->discount;
-            }
-        }
+        // Dropped discount columns from product.
+        // Any discount now must be processed differently or is removed.
+        // Leaving it out to match schema.
 
         // taxes
+        // Product taxes relationship
         foreach ($product->taxes as $product_tax) {
             if ($product_tax->tax_type == 'percent') {
                 $tax += ($price * $product_tax->tax) / 100;
@@ -601,7 +607,7 @@ class HomeController extends Controller
         return [
             'price' => single_price($price * $request->quantity),
             'quantity' => $quantity,
-            'digital' => $product->digital,
+            'digital' => $product->digital ?? 0,
             'variation' => $str,
             'max_limit' => $max_limit,
             'in_stock' => $in_stock,
@@ -731,7 +737,7 @@ class HomeController extends Controller
     public function todays_deal()
     {
         $todays_deal_products = Cache::rememberForever('todays_deal_products', function () {
-            return filter_products(Product::with('thumbnail')->where('todays_deal', '1'))->get();
+            return filter_products(Product::with('thumbnail'))->get(); // todays_deal column removed
         });
 
         return view('frontend.todays_deal', compact('todays_deal_products'));

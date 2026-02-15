@@ -2,408 +2,263 @@
 
 namespace App\Services;
 
-use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\Enums\ShippingType;
 use App\Models\Category;
-use App\Models\Media;
 use App\Models\Product;
 use App\Models\SellerCategory;
 use App\Models\Shop;
 use App\Models\User;
-use App\Utility\ProductUtility;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+// Added
+
 class ProductService
 {
-    public function store(array $data)
+    protected MediaService $mediaService;
+
+    protected ProductStockService $productStockService;
+
+    public function __construct(MediaService $mediaService, ProductStockService $productStockService) // Modified
+    {
+        $this->mediaService = $mediaService;
+        $this->productStockService = $productStockService; // Added
+    }
+
+    /**
+     * Store a newly created product in the database.
+     *
+     * @param  array  $data  Raw input data from Filament or Request
+     *
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function store(array $data, bool $transaction = true): Product
     {
         $collection = collect($data);
 
-        $approved = 1;
-        if (auth()->user()->user_type == 'seller') {
-            $user_id = auth()->user()->id;
-            if (get_setting('product_approve_by_admin') == 1) {
-                $approved = 0;
-            }
-        } else {
-            $user_id = User::where('user_type', 'admin')->first()->id;
-        }
-        $tags = [];
-        if ($collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
-            }
-        }
-        $collection['tags'] = implode(',', $tags);
-        $discount_start_date = null;
-        $discount_end_date = null;
-        if ($collection['date_range'] != null) {
-            $date_var = explode(' to ', $collection['date_range']);
-            $discount_start_date = strtotime($date_var[0]);
-            $discount_end_date = strtotime($date_var[1]);
-        }
-        unset($collection['date_range']);
+        $user = auth('admin')->user() ?: auth('seller')->user();
 
-        if ($collection['meta_title'] == null) {
+        $user_id = $user->id;
+        $added_by = $user->user_type;
+
+        // Handle approved status (defaults to approved for admin panel)
+        $approved = 1;
+
+        // Tags processing
+        $collection['tags'] = $this->formatTags($collection['tags'] ?? []);
+
+        if (! isset($collection['meta_title']) || empty($collection['meta_title'])) {
             $collection['meta_title'] = $collection['name'];
         }
-        if ($collection['meta_description'] == null) {
-            $collection['meta_description'] = strip_tags($collection['description']);
-        }
-
-        if ($collection['meta_img'] == null) {
-            $collection['meta_img'] = $collection['thumbnail_img'];
+        if (! isset($collection['meta_description']) || empty($collection['meta_description'])) {
+            $collection['meta_description'] = strip_tags($collection['description'] ?? '');
         }
 
         $shipping_cost = 0;
-        if (isset($collection['shipping_type'])) {
-            if ($collection['shipping_type'] == 'free') {
-                $shipping_cost = 0;
-            } elseif ($collection['shipping_type'] == 'flat_rate') {
-                $shipping_cost = $collection['flat_shipping_cost'];
-            }
-        }
-        unset($collection['flat_shipping_cost']);
-
-        $slug = Str::slug($collection['name']);
-        $same_slug_count = Product::where('slug', 'LIKE', $slug.'%')->count();
-        $slug_suffix = $same_slug_count ? '-'.$same_slug_count + 1 : '';
-        $slug .= $slug_suffix;
-
-        $colors = json_encode([]);
-        if (
-            isset($collection['colors_active']) &&
-            $collection['colors_active'] &&
-            $collection['colors'] &&
-            count($collection['colors']) > 0
-        ) {
-            $colors = json_encode($collection['colors']);
+        if (isset($collection['shipping_type']) && $collection['shipping_type'] === 'flat_rate') {
+            $shipping_cost = (float) ($collection['shipping_cost'] ?? 0);
         }
 
-        $options = ProductUtility::get_attribute_options($collection);
+        $slug = $collection['slug'] ?? Str::slug($collection['name']);
+        $slug = $this->ensureUniqueSlug($slug);
 
-        $combinations = (new CombinationService)->generate_combination($options);
+        $published = (int) ($collection['published'] ?? 1);
 
-        if (count($combinations) > 0) {
-            foreach ($combinations as $key => $combination) {
-                $str = ProductUtility::get_combination_string($combination, $collection);
-
-                unset($collection['price_'.str_replace('.', '_', $str)]);
-                unset($collection['sku_'.str_replace('.', '_', $str)]);
-                unset($collection['qty_'.str_replace('.', '_', $str)]);
-                unset($collection['img_'.str_replace('.', '_', $str)]);
-            }
-        }
-
-        unset($collection['colors_active']);
-
-        $choice_options = [];
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
-            $str = '';
-            $item = [];
-            foreach ($collection['choice_no'] as $key => $no) {
-                $str = 'choice_options_'.$no;
-                $item['attribute_id'] = $no;
-                $attribute_data = [];
-                // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
-                foreach ($collection[$str] as $key => $eachValue) {
-                    // array_push($data, $eachValue->value);
-                    array_push($attribute_data, $eachValue);
-                }
-                unset($collection[$str]);
-
-                $item['values'] = $attribute_data;
-                array_push($choice_options, $item);
-            }
-        }
-
-        $choice_options = json_encode($choice_options, JSON_UNESCAPED_UNICODE);
-
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
-            $attributes = json_encode($collection['choice_no']);
-            unset($collection['choice_no']);
-        } else {
-            $attributes = json_encode([]);
-        }
-
-        $published = 1;
-        if ($collection['button'] == 'unpublish' || $collection['button'] == 'draft') {
-            $published = 0;
-        }
-        unset($collection['button']);
-
-        $collection['has_warranty'] = isset($collection['has_warranty']) ? 1 : 0;
-
-        $data = $collection->merge(compact(
-            'user_id',
-            'approved',
-            'discount_start_date',
-            'discount_end_date',
-            'shipping_cost',
-            'slug',
-            'colors',
-            'choice_options',
-            'attributes',
-            'published',
-        ))->toArray();
-
-        $productData = collect($data)->except([
-            'thumbnail_img',
-            'photos',
-            'meta_img',
-            'pdf',
-            'short_video',
-            'short_video_thumbnail',
-        ])->toArray();
+        $productData = [
+            'name' => $collection['name'],
+            'slug' => $slug,
+            'user_id' => $user_id,
+            'added_by' => $added_by,
+            'category_id' => $collection['category_id'],
+            'brand_id' => $collection['brand_id'],
+            'tags' => $collection['tags'],
+            'description' => $collection['description'] ?? null,
+            'shipping_type' => $collection['shipping_type'] ?? ShippingType::FLAT_RATE->value,
+            'shipping_cost' => $shipping_cost,
+            'est_shipping_days' => $collection['est_shipping_days'] ?? null,
+            'meta_title' => $collection['meta_title'],
+            'meta_description' => $collection['meta_description'],
+            'published' => $published,
+            'approved' => $approved,
+            'has_warranty' => isset($collection['has_warranty']) && $collection['has_warranty'] ? 1 : 0,
+        ];
 
         $product = Product::create($productData);
 
-        $this->syncMedia($product, $data);
+        // Sync Media via Spatie Media Library
+        $this->mediaService->syncMedia($product, $data, [
+            'thumbnail_img' => 'thumbnail',
+            'photos' => 'gallery',
+            'meta_img' => 'meta',
+            'pdf' => 'pdf',
+            'short_video' => 'short_video',
+            'short_video_thumbnail' => 'video_thumbnail',
+        ]);
+
+        // Sync Variants and Stocks
+        $this->productStockService->store($data, $product);
 
         return $product;
     }
 
-    public function update(array $data, Product $product)
+    /**
+     * Update an existing product in the database.
+     *
+     * @param  array  $data  Raw input data from Filament or Request
+     * @param  Product  $product  The existing product model
+     *
+     * @throws Exception
+     */
+    public function update(array $data, Product $product): Product
     {
         $collection = collect($data);
 
-        $slug = Str::slug($collection['name']);
-        $slug = $collection['slug'] ? Str::slug($collection['slug']) : Str::slug($collection['name']);
-        $same_slug_count = Product::where('slug', 'LIKE', $slug.'%')->count();
-        $slug_suffix = $same_slug_count > 1 ? '-'.$same_slug_count + 1 : '';
-        $slug .= $slug_suffix;
-
-        if (addon_is_activated('refund_request') && ! isset($collection['refundable'])) {
-            $collection['refundable'] = 0;
-        }
-
-        if (! isset($collection['is_quantity_multiplied'])) {
-            $collection['is_quantity_multiplied'] = 0;
-        }
-
-        if (! isset($collection['cash_on_delivery'])) {
-            $collection['cash_on_delivery'] = 0;
-        }
-        if (! isset($collection['featured'])) {
-            $collection['featured'] = 0;
-        }
-        if (! isset($collection['todays_deal'])) {
-            $collection['todays_deal'] = 0;
-        }
-
-        $tags = [];
-        if ($collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($collection['name'])) {
+            $name = $collection['name'];
+            $slug = $collection['slug'] ?? Str::slug($name);
+            if ($slug !== $product->slug) {
+                $product->slug = $this->ensureUniqueSlug($slug, $product->id);
             }
-        }
-        $collection['tags'] = implode(',', $tags);
-        $discount_start_date = null;
-        $discount_end_date = null;
-        if ($collection['date_range'] != null) {
-            $date_var = explode(' to ', $collection['date_range']);
-            $discount_start_date = strtotime($date_var[0]);
-            $discount_end_date = strtotime($date_var[1]);
-        }
-        unset($collection['date_range']);
-
-        if ($collection['meta_title'] == null) {
-            $collection['meta_title'] = $collection['name'];
-        }
-        if ($collection['meta_description'] == null) {
-            $collection['meta_description'] = strip_tags($collection['description']);
+            $product->name = $name;
         }
 
-        if ($collection['meta_img'] == null) {
-            $collection['meta_img'] = $collection['thumbnail_img'];
+        // Tags processing
+        if (isset($collection['tags'])) {
+            $product->tags = $this->formatTags($collection['tags']);
         }
 
-        if ($collection['lang'] != env('DEFAULT_LANGUAGE')) {
-            unset($collection['name']);
-            unset($collection['name']);
-            unset($collection['description']);
-            unset($collection['description']);
+        if (isset($collection['meta_title'])) {
+            $product->meta_title = $collection['meta_title'] ?: $product->name;
         }
-        unset($collection['lang']);
+        if (isset($collection['meta_description'])) {
+            $product->meta_description = $collection['meta_description'] ?: strip_tags($collection['description'] ?? $product->description);
+        }
 
-        $shipping_cost = 0;
         if (isset($collection['shipping_type'])) {
-            if ($collection['shipping_type'] == 'free') {
-                $shipping_cost = 0;
-            } elseif ($collection['shipping_type'] == 'flat_rate') {
-                $shipping_cost = $collection['flat_shipping_cost'];
-            }
-        }
-        unset($collection['flat_shipping_cost']);
-
-        $colors = json_encode([]);
-        if (
-            isset($collection['colors_active']) &&
-            $collection['colors_active'] &&
-            $collection['colors'] &&
-            count($collection['colors']) > 0
-        ) {
-            $colors = json_encode($collection['colors']);
-        }
-
-        $options = ProductUtility::get_attribute_options($collection);
-
-        $combinations = (new CombinationService)->generate_combination($options);
-        if (count($combinations) > 0) {
-            foreach ($combinations as $key => $combination) {
-                $str = ProductUtility::get_combination_string($combination, $collection);
-
-                unset($collection['price_'.str_replace('.', '_', $str)]);
-                unset($collection['sku_'.str_replace('.', '_', $str)]);
-                unset($collection['qty_'.str_replace('.', '_', $str)]);
-                unset($collection['img_'.str_replace('.', '_', $str)]);
+            $type = $collection['shipping_type'];
+            $product->shipping_type = $type;
+            if (isset($collection['shipping_cost'])) {
+                $product->shipping_cost = ($type === ShippingType::FLAT_RATE->value) ? (float) $collection['shipping_cost'] : 0;
             }
         }
 
-        unset($collection['colors_active']);
-
-        $choice_options = [];
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
-            $str = '';
-            $item = [];
-            foreach ($collection['choice_no'] as $key => $no) {
-                $str = 'choice_options_'.$no;
-                $item['attribute_id'] = $no;
-                $attribute_data = [];
-                // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
-                foreach ($collection[$str] as $key => $eachValue) {
-                    // array_push($data, $eachValue->value);
-                    array_push($attribute_data, $eachValue);
-                }
-                unset($collection[$str]);
-
-                $item['values'] = $attribute_data;
-                array_push($choice_options, $item);
-            }
+        if (isset($collection['description'])) {
+            $product->description = $collection['description'];
+        }
+        if (isset($collection['category_id'])) {
+            $product->category_id = $collection['category_id'];
+        }
+        if (isset($collection['brand_id'])) {
+            $product->brand_id = $collection['brand_id'];
+        }
+        if (isset($collection['est_shipping_days'])) {
+            $product->est_shipping_days = $collection['est_shipping_days'];
         }
 
-        $choice_options = json_encode($choice_options, JSON_UNESCAPED_UNICODE);
-
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
-            $attributes = json_encode($collection['choice_no']);
-            unset($collection['choice_no']);
-        } else {
-            $attributes = json_encode([]);
+        if (isset($collection['published'])) {
+            $product->published = (int) $collection['published'];
+        }
+        if (isset($collection['approved'])) {
+            $product->approved = (int) $collection['approved'];
         }
 
-        $collection['has_warranty'] = isset($collection['has_warranty']) ? 1 : 0;
+        if (isset($collection['has_warranty'])) {
+            $product->has_warranty = (int) $collection['has_warranty'];
+        }
 
-        unset($collection['button']);
+        $product->save();
 
-        $data = $collection->merge(compact(
-            'discount_start_date',
-            'discount_end_date',
-            'shipping_cost',
-            'slug',
-            'colors',
-            'choice_options',
-            'attributes',
-        ))->toArray();
+        // Sync Media
+        $this->mediaService->syncMedia($product, $data, [
+            'thumbnail_img' => 'thumbnail',
+            'photos' => 'gallery',
+            'meta_img' => 'meta',
+            'pdf' => 'pdf',
+            'short_video' => 'short_video',
+            'short_video_thumbnail' => 'video_thumbnail',
+        ]);
 
-        $productData = collect($data)->except([
-            'thumbnail_img',
-            'photos',
-            'meta_img',
-            'pdf',
-            'short_video',
-            'short_video_thumbnail',
-        ])->toArray();
-
-        $product->update($productData);
-
-        $this->syncMedia($product, $data);
+        // Stocks Update
+        $this->productStockService->store($data, $product);
 
         return $product;
     }
 
-    /**
-     * Synchronize media collections with the product.
-     * This moves media from the global pool (attached to App Model) to the Product model.
-     */
-    protected function syncMedia(Product $product, array $data): void
+    protected function formatTags(mixed $tags): string
     {
-        try {
-            // 1. Handle Thumbnail
-            if (! empty($data['thumbnail_img']) && is_numeric($data['thumbnail_img'])) {
-                $this->reassignMedia((int) $data['thumbnail_img'], $product, 'thumbnail');
-            }
-
-            // 2. Handle Gallery
-            if (! empty($data['photos'])) {
-                foreach (explode(',', $data['photos']) as $mediaId) {
-                    if (is_numeric($mediaId)) {
-                        $this->reassignMedia((int) $mediaId, $product, 'gallery');
-                    }
-                }
-            }
-
-            // 3. Handle Meta Image
-            if (! empty($data['meta_img']) && is_numeric($data['meta_img'])) {
-                $this->reassignMedia((int) $data['meta_img'], $product, 'meta');
-            }
-
-            // 4. Handle PDF
-            if (! empty($data['pdf']) && is_numeric($data['pdf'])) {
-                $this->reassignMedia((int) $data['pdf'], $product, 'pdf');
-            }
-
-            // 5. Handle Short Video (Local File Upload)
-            if (isset($data['short_video']) && $data['short_video'] instanceof \Illuminate\Http\UploadedFile) {
-                $product->addMedia($data['short_video'])
-                    ->toMediaCollection('short_video');
-                Log::info("Uploaded short video for Product #{$product->id}");
-            }
-
-            // 6. Handle Short Video Thumbnail (Local File Upload)
-            if (isset($data['short_video_thumbnail']) && $data['short_video_thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
-                $product->addMedia($data['short_video_thumbnail'])
-                    ->toMediaCollection('video_thumbnail');
-                Log::info("Uploaded short video thumbnail for Product #{$product->id}");
-            }
-        } catch (\Exception $e) {
-            Log::error("Media synchronization failed for Product #{$product->id}", [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+        if (is_array($tags)) {
+            return implode(',', $tags);
         }
+
+        if (is_string($tags) && ! empty($tags)) {
+            // Check if it's JSON from Tagify (legacy)
+            $decoded = json_decode($tags);
+            if (is_array($decoded)) {
+                return implode(',', array_column($decoded, 'value'));
+            }
+
+            return $tags;
+        }
+
+        return '';
+    }
+
+    protected function ensureUniqueSlug(string $slug, ?int $ignoreId = null): string
+    {
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (Product::where('slug', $slug)->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = $originalSlug.'-'.$count++;
+        }
+
+        return $slug;
     }
 
     /**
-     * Reassign a media record to a new model and collection.
+     * Duplicate an existing product and its stocks.
+     *
+     * @param  Product  $product  The product to replicate
+     *
+     * @throws Exception
      */
-    protected function reassignMedia(int $mediaId, Product $product, string $collection): void
-    {
-        $media = Media::find($mediaId);
-        if ($media) {
-            $media->update([
-                'model_type' => get_class($product),
-                'model_id' => $product->id,
-                'collection_name' => $collection,
-            ]);
-            Log::info("Reassigned Media #{$mediaId} to Product #{$product->id} in collection '{$collection}'");
-        }
-    }
-
-    public function product_duplicate_store($product)
+    public function product_duplicate_store(Product $product): Product
     {
         $product_new = $product->replicate();
-        $product_new->slug = $product_new->slug.'-'.Str::random(5);
-        $product_new->approved = (get_setting('product_approve_by_admin') == 1 && $product->added_by != 'admin') ? 0 : 1;
+        $product_new->slug = $this->ensureUniqueSlug($product_new->slug.'-copy');
+        $product_new->published = 0; // Draft by default
+
+        // Explicitly check authorized guards (Admin/Seller) for duplication audit
+        $user = auth('admin')->user() ?: auth('seller')->user();
+
+        if ($user) {
+            $product_new->user_id = $user->id;
+            $product_new->added_by = $user->user_type;
+        }
+
         $product_new->save();
+
+        // Duplicate Stocks
+        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
 
         return $product_new;
     }
 
-    public function destroy($id): void
+    /**
+     * Permanently delete a product and its related records.
+     *
+     * @param  int  $id  Product ID
+     *
+     * @throws Exception
+     */
+    public function destroy(int $id): void
     {
         $product = Product::findOrFail($id);
+
+        // Use relationship deletions if cascade isn't set in DB
         $product->product_translations()->delete();
-        $product->categories()->detach();
         $product->stocks()->delete();
         $product->taxes()->delete();
         $product->wishlists()->delete();
@@ -411,12 +266,19 @@ class ProductService
         $product->frequently_bought_products()->delete();
         $product->last_viewed_products()->delete();
         $product->flash_deal_products()->delete();
-        deleteProductReview($product);
 
-        // Spatie's InteractsWithMedia auto-deletes all media via model events
+        if (function_exists('deleteProductReview')) {
+            deleteProductReview($product);
+        }
+
         $product->delete();
     }
 
+    /**
+     * Search for products based on various criteria.
+     *
+     * @param  array  $data  Search criteria including category, product type, search key, etc.
+     */
     public function product_search(array $data)
     {
         $collection = collect($data);
@@ -433,7 +295,7 @@ class ProductService
             'products.added_by',
             'admin'
         ) : $products->where('products.user_id', $auth_user->id);
-        $products->where('published', '1')->where('auction_product', 0)->where('approved', '1');
+        $products->where('published', '1')->where('approved', '1');
 
         if ($productType == 'physical') {
             $products->where('digital', 0)->where('wholesale_product', 0);
@@ -456,6 +318,7 @@ class ProductService
 
     public function setCategoryWiseDiscount(array $data)
     {
+        // Original logic from file step 109
         try {
             $auth_user = auth()->user();
             $discount_start_date = null;
@@ -481,7 +344,7 @@ class ProductService
             $seller_discount = null;
 
             $category = Category::find($data['category_id']);
-            $products = Product::where('category_id', $data['category_id'])->where('auction_product', 0);
+            $products = Product::where('category_id', $data['category_id']);
 
             if (in_array($auth_user->user_type, ['admin', 'staff'])) {
                 $admin_discount = $data['discount'];
@@ -493,14 +356,12 @@ class ProductService
                             ->first();
 
                         if ($seller_cat) {
-                            // Update if record exists
                             $seller_cat->update([
                                 'discount' => $admin_discount,
                                 'discount_start_date' => $admin_discount_start_date,
                                 'discount_end_date' => $admin_discount_end_date,
                             ]);
                         } else {
-                            // Create if not found
                             SellerCategory::create([
                                 'category_id' => $data['category_id'],
                                 'seller_id' => $shop->user_id,
@@ -515,7 +376,6 @@ class ProductService
                 if ($seller_product_discount == 0) {
                     $products->where('user_id', $admin_id);
                 }
-                // Save to category
                 $category->update([
                     'discount' => $admin_discount,
                     'discount_start_date' => $admin_discount_start_date,
@@ -524,7 +384,6 @@ class ProductService
             } elseif ($auth_user->user_type == 'seller') {
                 $products->where('user_id', $auth_user->id);
                 $seller_discount = $data['discount'];
-                // save to sellerCategory
                 $sellerCat = SellerCategory::where('seller_id', $auth_user->id)
                     ->where('category_id', $data['category_id'])
                     ->first();
@@ -548,12 +407,12 @@ class ProductService
             $products->update([
                 'discount' => $data['discount'],
                 'discount_type' => 'percent',
-                'discount_start_date' => $discount_start_date,
-                'discount_end_date' => $discount_end_date,
+                // 'discount_start_date' => $discount_start_date,
+                // 'discount_end_date' => $discount_end_date,
             ]);
 
             return 1;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Discount update failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

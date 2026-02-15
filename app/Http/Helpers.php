@@ -5,7 +5,6 @@ use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\ClubPointController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Resources\V2\CarrierCollection;
-use App\Models\Addon;
 use App\Models\AffiliateConfig;
 use App\Models\AffiliateOption;
 use App\Models\AppTranslation;
@@ -51,13 +50,11 @@ use App\Models\PreorderProduct;
 use App\Models\PreorderProductReview;
 use App\Models\Product;
 use App\Models\ProductStock;
-use App\Models\Seller;
 use App\Models\SellerPackage;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
 use App\Models\Tax;
 use App\Models\Translation;
-// use App\Models\Upload; (Removed)
 use App\Models\User;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
@@ -66,6 +63,8 @@ use App\Utility\EmailUtility;
 use App\Utility\NotificationUtility;
 use App\Utility\SendSMSUtility;
 use Carbon\Carbon;
+
+// use App\Models\Upload; (Removed)
 
 // sensSMS function for OTP
 if (! function_exists('sendSMS')) {
@@ -117,8 +116,10 @@ if (! function_exists('convert_to_usd')) {
     {
         $currency = Currency::find(get_setting('system_default_currency'));
 
-        return (floatval($amount) / floatval($currency->exchange_rate)) * Currency::where('code',
-            'USD')->first()->exchange_rate;
+        return (floatval($amount) / floatval($currency->exchange_rate)) * Currency::where(
+            'code',
+            'USD'
+        )->first()->exchange_rate;
     }
 }
 
@@ -127,8 +128,10 @@ if (! function_exists('convert_to_kes')) {
     {
         $currency = Currency::find(get_setting('system_default_currency'));
 
-        return (floatval($amount) / floatval($currency->exchange_rate)) * Currency::where('code',
-            'KES')->first()->exchange_rate;
+        return (floatval($amount) / floatval($currency->exchange_rate)) * Currency::where(
+            'code',
+            'KES'
+        )->first()->exchange_rate;
     }
 }
 
@@ -298,7 +301,7 @@ if (! function_exists('discount_in_percentage')) {
 if (! function_exists('cart_product_price')) {
     function cart_product_price($cart_product, $product, $formatted = true, $tax = true)
     {
-        if ($product->auction_product == 0) {
+        if (true) { /* auction_product column dropped */
             $str = '';
             if ($cart_product['variation'] != null) {
                 $str = $cart_product['variation'];
@@ -310,34 +313,19 @@ if (! function_exists('cart_product_price')) {
             }
 
             if ($product->wholesale_product) {
-                $wholesalePrice = $product_stock->wholesalePrices->where('min_qty', '<=',
-                    $cart_product['quantity'])->where('max_qty', '>=', $cart_product['quantity'])->first();
+                $wholesalePrice = $product_stock->wholesalePrices->where(
+                    'min_qty',
+                    '<=',
+                    $cart_product['quantity']
+                )->where('max_qty', '>=', $cart_product['quantity'])->first();
                 if ($wholesalePrice) {
                     $price = $wholesalePrice->price;
                 }
             }
 
-            // discount calculation
-            $discount_applicable = false;
-
-            if ($product->discount_start_date == null) {
-                $discount_applicable = true;
-            } elseif (
-                strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
-                strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
-            ) {
-                $discount_applicable = true;
-            }
-
-            if ($discount_applicable) {
-                if ($product->discount_type == 'percent') {
-                    $price -= ($price * $product->discount) / 100;
-                } elseif ($product->discount_type == 'amount') {
-                    $price -= $product->discount;
-                }
-            }
+            // discount calculation - dropped legacy columns
         } else {
-            $price = $product->bids->max('amount');
+            $price = 0;
         }
 
         // calculation of taxes
@@ -371,25 +359,7 @@ if (! function_exists('cart_product_tax')) {
         $product_stock = $product->stocks->where('variant', $str)->first();
         $price = $product_stock->price;
 
-        // discount calculation
-        $discount_applicable = false;
-
-        if ($product->discount_start_date == null) {
-            $discount_applicable = true;
-        } elseif (
-            strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
-            strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
-        ) {
-            $discount_applicable = true;
-        }
-
-        if ($discount_applicable) {
-            if ($product->discount_type == 'percent') {
-                $price -= ($price * $product->discount) / 100;
-            } elseif ($product->discount_type == 'amount') {
-                $price -= $product->discount;
-            }
-        }
+        // discount calculation - legacy columns dropped
 
         // calculation of taxes
         $tax = 0;
@@ -419,26 +389,8 @@ if (! function_exists('cart_product_discount')) {
         $product_stock = $product->stocks->where('variant', $str)->first();
         $price = $product_stock->price;
 
-        // discount calculation
-        $discount_applicable = false;
+        // discount calculation - legacy columns dropped
         $discount = 0;
-
-        if ($product->discount_start_date == null) {
-            $discount_applicable = true;
-        } elseif (
-            strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
-            strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
-        ) {
-            $discount_applicable = true;
-        }
-
-        if ($discount_applicable) {
-            if ($product->discount_type == 'percent') {
-                $discount = ($price * $product->discount) / 100;
-            } elseif ($product->discount_type == 'amount') {
-                $discount = $product->discount;
-            }
-        }
 
         if ($formatted) {
             return format_price(convert_price($discount));
@@ -531,8 +483,12 @@ if (! function_exists('carts_coupon_discount')) {
                             foreach ($coupon_details as $key => $coupon_detail) {
                                 if ($coupon_detail->product_id == $cartItem['product_id']) {
                                     if ($coupon->discount_type == 'percent') {
-                                        $coupon_discount += (cart_product_price($cartItem, $product, false,
-                                            false) * $coupon->discount / 100) * $cartItem['quantity'];
+                                        $coupon_discount += (cart_product_price(
+                                            $cartItem,
+                                            $product,
+                                            false,
+                                            false
+                                        ) * $coupon->discount / 100) * $cartItem['quantity'];
                                     } elseif ($coupon->discount_type == 'amount') {
                                         $coupon_discount += $coupon->discount * $cartItem['quantity'];
                                     }
@@ -573,19 +529,15 @@ if (! function_exists('carts_coupon_discount')) {
 if (! function_exists('home_price')) {
     function home_price($product, $formatted = true)
     {
-        $lowest_price = $product->unit_price;
-        $highest_price = $product->unit_price;
+        $lowest_price = 0;
+        $highest_price = 0;
 
-        if ($product->variant_product) {
-            foreach ($product->stocks as $key => $stock) {
-                if ($lowest_price > $stock->price) {
-                    $lowest_price = $stock->price;
-                }
-                if ($highest_price < $stock->price) {
-                    $highest_price = $stock->price;
-                }
-            }
+        if ($product->stocks->isNotEmpty()) {
+            $lowest_price = $product->stocks->min('price');
+            $highest_price = $product->stocks->max('price');
         }
+
+        // if ($product->variant_product) { ... } // Logic is now covered by min/max on stocks relation which contains all variants including default
 
         foreach ($product->taxes as $product_tax) {
             if ($product_tax->tax_type == 'percent') {
@@ -625,40 +577,15 @@ if (! function_exists('seller_homepage_urls')) {
 if (! function_exists('home_discounted_price')) {
     function home_discounted_price($product, $formatted = true)
     {
-        $lowest_price = $product->unit_price;
-        $highest_price = $product->unit_price;
+        $lowest_price = 0;
+        $highest_price = 0;
 
-        if ($product->variant_product) {
-            foreach ($product->stocks as $key => $stock) {
-                if ($lowest_price > $stock->price) {
-                    $lowest_price = $stock->price;
-                }
-                if ($highest_price < $stock->price) {
-                    $highest_price = $stock->price;
-                }
-            }
+        if ($product->stocks->isNotEmpty()) {
+            $lowest_price = $product->stocks->min('price');
+            $highest_price = $product->stocks->max('price');
         }
 
-        $discount_applicable = false;
-
-        if ($product->discount_start_date == null) {
-            $discount_applicable = true;
-        } elseif (
-            strtotime(date('d-m-Y H:i:s')) >= $product->discount_start_date &&
-            strtotime(date('d-m-Y H:i:s')) <= $product->discount_end_date
-        ) {
-            $discount_applicable = true;
-        }
-
-        if ($discount_applicable) {
-            if ($product->discount_type == 'percent') {
-                $lowest_price -= ($lowest_price * $product->discount) / 100;
-                $highest_price -= ($highest_price * $product->discount) / 100;
-            } elseif ($product->discount_type == 'amount') {
-                $lowest_price -= $product->discount;
-                $highest_price -= $product->discount;
-            }
-        }
+        // discount calculation - legacy columns dropped
 
         foreach ($product->taxes as $product_tax) {
             if ($product_tax->tax_type == 'percent') {
@@ -717,7 +644,10 @@ if (! function_exists('home_base_price_by_stock_id')) {
 if (! function_exists('home_base_price')) {
     function home_base_price($product, $formatted = true)
     {
-        $price = $product->unit_price;
+        $price = 0;
+        if ($product->stocks->isNotEmpty()) {
+            $price = $product->stocks->first()->price;
+        }
         $tax = 0;
 
         foreach ($product->taxes as $product_tax) {
@@ -778,7 +708,10 @@ if (! function_exists('home_discounted_base_price_by_stock_id')) {
 if (! function_exists('home_discounted_base_price')) {
     function home_discounted_base_price($product, $formatted = true)
     {
-        $price = $product->unit_price;
+        $price = 0;
+        if ($product->stocks->isNotEmpty()) {
+            $price = $product->stocks->first()->price;
+        }
         $tax = 0;
 
         $discount_applicable = false;
@@ -900,19 +833,29 @@ if (! function_exists('translation_tables')) {
         if (! in_array($uniqueIdentifier, $noTableAddons)) {
             $addons = [];
             $addons['affiliate'] = [
-                'affiliate_options', 'affiliate_configs', 'affiliate_users', 'affiliate_payments',
-                'affiliate_withdraw_requests', 'affiliate_logs', 'affiliate_stats',
+                'affiliate_options',
+                'affiliate_configs',
+                'affiliate_users',
+                'affiliate_payments',
+                'affiliate_withdraw_requests',
+                'affiliate_logs',
+                'affiliate_stats',
             ];
             $addons['auction'] = ['auction_product_bids'];
             $addons['club_point'] = ['club_points', 'club_point_details'];
             $addons['delivery_boy'] = [
-                'delivery_boys', 'delivery_histories', 'delivery_boy_payments', 'delivery_boy_collections',
+                'delivery_boys',
+                'delivery_histories',
+                'delivery_boy_payments',
+                'delivery_boy_collections',
             ];
             $addons['offline_payment'] = ['manual_payment_methods'];
             $addons['otp_system'] = ['otp_configurations', 'sms_templates'];
             $addons['refund_request'] = ['refund_requests'];
             $addons['seller_subscription'] = [
-                'seller_packages', 'seller_package_translations', 'seller_package_payments',
+                'seller_packages',
+                'seller_package_translations',
+                'seller_package_payments',
             ];
             $addons['wholesale'] = ['wholesale_prices'];
 
@@ -953,8 +896,12 @@ function getShippingCost($carts, $index, $shipping_info = '', $carrier = '')
             // For carrier wise shipping
             if ($shipping_type == 'carrier_wise_shipping') {
                 $admin_product_total_weight += ($item_product->weight * $cart_item['quantity']);
-                $admin_product_total_price += (cart_product_price($cart_item, $item_product, false,
-                    false) * $cart_item['quantity']);
+                $admin_product_total_price += (cart_product_price(
+                    $cart_item,
+                    $item_product,
+                    false,
+                    false
+                ) * $cart_item['quantity']);
             }
         } else {
             $product_ids = [];
@@ -990,8 +937,10 @@ function getShippingCost($carts, $index, $shipping_info = '', $carrier = '')
         if ($product->added_by == 'admin') {
             return get_setting('shipping_cost_admin') / count($admin_products);
         } else {
-            return Shop::where('user_id',
-                $product->user_id)->first()->shipping_cost / count($seller_products[$product->user_id]);
+            return Shop::where(
+                'user_id',
+                $product->user_id
+            )->first()->shipping_cost / count($seller_products[$product->user_id]);
         }
     } elseif ($shipping_type == 'area_wise_shipping') {
         if (isset($shipping_info['area_id']) && $shipping_info['area_id'] !== null && $shipping_info['area_id'] != 0) {
@@ -1010,8 +959,10 @@ function getShippingCost($carts, $index, $shipping_info = '', $carrier = '')
 
         return 0;
     } elseif ($shipping_type == 'carrier_wise_shipping') { // carrier wise shipping
-        $user_zone = $shipping_info['country_id'] != 0 ? Country::where('id',
-            $shipping_info['country_id'])->first()->zone_id : 0;
+        $user_zone = $shipping_info['country_id'] != 0 ? Country::where(
+            'id',
+            $shipping_info['country_id']
+        )->first()->zone_id : 0;
 
         if ($carrier == null || $user_zone == 0) {
             return 0;
@@ -1066,11 +1017,15 @@ if (! function_exists('seller_base_carrier_list')) {
     function seller_base_carrier_list($owner_id, $userId = null, $tempUserId = null, $shipping_info = null)
     {
         $carrier_list = [];
-        $carts = ($userId != null) ? Cart::where('user_id', $userId)->active()->get() : Cart::where('temp_user_id',
-            $tempUserId)->active()->get();
+        $carts = ($userId != null) ? Cart::where('user_id', $userId)->active()->get() : Cart::where(
+            'temp_user_id',
+            $tempUserId
+        )->active()->get();
         if (count($carts) > 0) {
-            $zone = $shipping_info['country_id'] ? Country::where('id',
-                $shipping_info['country_id'])->first()->zone_id : null;
+            $zone = $shipping_info['country_id'] ? Country::where(
+                'id',
+                $shipping_info['country_id']
+            )->first()->zone_id : null;
             $carrier_query = Carrier::query();
             $carrier_query->whereIn('id', function ($query) use ($zone) {
                 $query->select('carrier_id')->from('carrier_range_prices')
@@ -1527,8 +1482,10 @@ if (! function_exists('seller_purchase_payment_done')) {
         $seller->seller_package_id = $seller_package_id;
         $seller_package = SellerPackage::findOrFail($seller_package_id);
         $seller->product_upload_limit = $seller_package->product_upload_limit;
-        $seller->package_invalid_at = date('Y-m-d',
-            strtotime($seller->package_invalid_at.' +'.$seller_package->duration.'days'));
+        $seller->package_invalid_at = date(
+            'Y-m-d',
+            strtotime($seller->package_invalid_at.' +'.$seller_package->duration.'days')
+        );
         $seller->save();
 
         $seller_package = new SellerPackagePayment;
@@ -1830,30 +1787,52 @@ if (! function_exists('get_products_count')) {
         return $products_query->isApprovedPublished()->count();
     }
 }
-
-// get minimum unit price of products
 if (! function_exists('get_product_min_unit_price')) {
     function get_product_min_unit_price($user_id = null)
     {
-        $product_query = Product::query();
-        if ($user_id) {
-            $product_query = $product_query->where('user_id', $user_id);
+        $min = 0;
+        if ($user_id != null) {
+            // Find products by user, then get their stocks min price
+            // This is complex via Eloquent. Raw query is better or join.
+            // ProductStock::whereHas('product', fn($q) => $q->where('user_id', $user_id))->min('price');
+            $min = \App\Models\ProductStock::whereHas('product', function ($q) use ($user_id) {
+                $q->where('user_id', $user_id);
+            })->min('price');
+        } else {
+            $min = \App\Models\ProductStock::min('price');
         }
 
-        return $product_query->isApprovedPublished()->min('unit_price');
+        return $min;
     }
 }
 
-// get maximum unit price of products
 if (! function_exists('get_product_max_unit_price')) {
     function get_product_max_unit_price($user_id = null)
     {
-        $product_query = Product::query();
-        if ($user_id) {
-            $product_query = $product_query->where('user_id', $user_id);
+        $max = 0;
+        if ($user_id != null) {
+            $max = \App\Models\ProductStock::whereHas('product', function ($q) use ($user_id) {
+                $q->where('user_id', $user_id);
+            })->max('price');
+        } else {
+            $max = \App\Models\ProductStock::max('price');
         }
 
-        return $product_query->isApprovedPublished()->max('unit_price');
+        return $max;
+    }
+}
+
+if (! function_exists('get_products_count')) {
+    function get_products_count($user_id = null)
+    {
+        $count = 0;
+        if ($user_id != null) {
+            $count = Product::where('user_id', $user_id)->count();
+        } else {
+            $count = Product::count();
+        }
+
+        return $count;
     }
 }
 
@@ -1886,8 +1865,10 @@ if (! function_exists('get_seller_products')) {
     {
         $product_query = Product::query();
 
-        return $product_query->where('user_id', $user_id)->isApprovedPublished()->orderBy('created_at',
-            'desc')->limit(15)->get();
+        return $product_query->where('user_id', $user_id)->isApprovedPublished()->orderBy(
+            'created_at',
+            'desc'
+        )->limit(15)->get();
     }
 }
 
@@ -1897,8 +1878,10 @@ if (! function_exists('get_shop_best_selling_products')) {
     {
         $product_query = Product::query();
 
-        return $product_query->where('user_id', $user_id)->isApprovedPublished()->orderBy('num_of_sale',
-            'desc')->paginate(24);
+        return $product_query->where('user_id', $user_id)->isApprovedPublished()->orderBy(
+            'num_of_sale',
+            'desc'
+        )->paginate(24);
     }
 }
 
@@ -1911,8 +1894,11 @@ if (! function_exists('get_all_auction_products')) {
         if (get_setting('seller_auction_product') == 0) {
             $products = $products->where('added_by', 'admin');
         }
-        $products = $products->where('auction_start_date', '<=', strtotime('now'))->where('auction_end_date', '>=',
-            strtotime('now'));
+        $products = $products->where('auction_start_date', '<=', strtotime('now'))->where(
+            'auction_end_date',
+            '>=',
+            strtotime('now')
+        );
 
         if ($limit) {
             $products = $products->limit($limit);
@@ -2016,8 +2002,10 @@ if (! function_exists('get_frequently_bought_products')) {
         $productSelectionType = $product->frequently_bought_selection_type;
         $fqbProducts = [];
         if ($productSelectionType == 'product') {
-            $fqbProductIds = $product->frequently_bought_products()->where('category_id',
-                null)->pluck('frequently_bought_product_id')->toArray();
+            $fqbProductIds = $product->frequently_bought_products()->where(
+                'category_id',
+                null
+            )->pluck('frequently_bought_product_id')->toArray();
             $fqbProducts = filter_products(Product::whereIn('id', $fqbProductIds))->get();
         } elseif ($productSelectionType == 'category') {
             $fqb_product_category = $product->frequently_bought_products()->where('category_id', '!=', null)->first();
@@ -2026,8 +2014,10 @@ if (! function_exists('get_frequently_bought_products')) {
                 $category = Category::with('childrenCategories')->find($fqbCategoryID);
 
                 $fqbProducts = $category->products()->where('id', '!=', $product->id);
-                $fqbProducts = $product->added_by == 'admin' ? $fqbProducts->where('added_by',
-                    'admin') : $fqbProducts->where('user_id', $product->user_id);
+                $fqbProducts = $product->added_by == 'admin' ? $fqbProducts->where(
+                    'added_by',
+                    'admin'
+                ) : $fqbProducts->where('user_id', $product->user_id);
 
                 $fqbProducts = filter_products($fqbProducts)->orderByRaw('RAND()')->take(10)->get();
             }
@@ -2073,8 +2063,10 @@ if (! function_exists('get_brands_by_products')) {
     function get_brands_by_products($usrt_id)
     {
         $product_query = Product::query();
-        $brand_ids = $product_query->where('user_id',
-            $usrt_id)->isApprovedPublished()->whereNotNull('brand_id')->pluck('brand_id')->toArray();
+        $brand_ids = $product_query->where(
+            'user_id',
+            $usrt_id
+        )->isApprovedPublished()->whereNotNull('brand_id')->pluck('brand_id')->toArray();
 
         $brand_query = Brand::query();
 
@@ -2122,8 +2114,10 @@ if (! function_exists('get_categories_by_products')) {
     function get_categories_by_products($user_id)
     {
         $product_query = Product::query();
-        $category_ids = $product_query->where('user_id',
-            $user_id)->isApprovedPublished()->pluck('category_id')->toArray();
+        $category_ids = $product_query->where(
+            'user_id',
+            $user_id
+        )->isApprovedPublished()->pluck('category_id')->toArray();
 
         $category_query = Category::query();
 
@@ -2135,8 +2129,10 @@ if (! function_exists('get_categories_by_preorder_products')) {
     function get_categories_by_preorder_products($user_id)
     {
         $product_query = PreorderProduct::query();
-        $category_ids = $product_query->where('user_id', $user_id)->where('is_published',
-            1)->pluck('category_id')->toArray();
+        $category_ids = $product_query->where('user_id', $user_id)->where(
+            'is_published',
+            1
+        )->pluck('category_id')->toArray();
 
         $category_query = Category::query();
 
@@ -2252,8 +2248,10 @@ if (! function_exists('get_user_total_expenditure')) {
     {
         $user_expenditure_query = Order::query();
 
-        return $user_expenditure_query->where('user_id', Auth::user()->id)->where('payment_status',
-            'paid')->sum('grand_total');
+        return $user_expenditure_query->where('user_id', Auth::user()->id)->where(
+            'payment_status',
+            'paid'
+        )->sum('grand_total');
     }
 }
 
@@ -2449,8 +2447,11 @@ if (! function_exists('get_coupons')) {
     function get_coupons($user_id = null, $paginate = null)
     {
         $coupon_query = Coupon::query();
-        $coupon_query = $coupon_query->where('start_date', '<=', strtotime(date('d-m-Y')))->where('end_date', '>=',
-            strtotime(date('d-m-Y')));
+        $coupon_query = $coupon_query->where('start_date', '<=', strtotime(date('d-m-Y')))->where(
+            'end_date',
+            '>=',
+            strtotime(date('d-m-Y'))
+        );
         if ($user_id) {
             $coupon_query = $coupon_query->where('user_id', $user_id);
         }
@@ -2602,8 +2603,10 @@ if (! function_exists('get_pos_user_cart')) {
             $sessionTemUserId = Session::has('pos.temp_user_id') ? Session::get('pos.temp_user_id') : null;
         }
 
-        $cart = Cart::where('owner_id', $owner_id)->where('user_id', $sessionUserID)->where('temp_user_id',
-            $sessionTemUserId)->get();
+        $cart = Cart::where('owner_id', $owner_id)->where('user_id', $sessionUserID)->where(
+            'temp_user_id',
+            $sessionTemUserId
+        )->get();
 
         return $cart;
     }
@@ -2658,8 +2661,10 @@ if (! function_exists('get_notification_type')) {
     function get_notification_type($value, $columnNamre)
     {
         $notificationType = NotificationType::query();
-        $notificationType = $columnNamre == 'id' ? $notificationType->where('id',
-            $value) : $notificationType->where('type', $value);
+        $notificationType = $columnNamre == 'id' ? $notificationType->where(
+            'id',
+            $value
+        ) : $notificationType->where('type', $value);
 
         return $notificationType->first();
     }
@@ -2759,8 +2764,10 @@ if (! function_exists('deleteProductReview')) {
             $seller = $product->user->shop;
             foreach ($product->reviews as $review) {
                 $seller = $seller->fresh();
-                $seller->rating = (($seller->rating * $seller->num_of_reviews) - $product->rating) / max(1,
-                    $seller->num_of_reviews - 1);
+                $seller->rating = (($seller->rating * $seller->num_of_reviews) - $product->rating) / max(
+                    1,
+                    $seller->num_of_reviews - 1
+                );
                 $seller->num_of_reviews -= 1;
                 $seller->save();
             }
@@ -3081,8 +3088,10 @@ if (! function_exists('is_review_given')) {
     function is_review_given($order)
     {
 
-        $review = PreorderProductReview::where('user_id', auth()->id())->where('preorder_product_id',
-            $order->preorder_product->id)->first();
+        $review = PreorderProductReview::where('user_id', auth()->id())->where(
+            'preorder_product_id',
+            $order->preorder_product->id
+        )->first();
         if ($review) {
             return '#28a745';
         }
