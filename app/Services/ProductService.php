@@ -29,7 +29,34 @@ class ProductService
     /**
      * Store a newly created product in the database.
      *
-     * @param  array  $data  Raw input data from Filament or Request
+     * @param array{
+     *     name: string,
+     *     slug?: string,
+     *     brand_id?: int|string|null,
+     *     categories?: int[]|string[],
+     *     tags?: string|string[],
+     *     description?: string|null,
+     *     unit_price?: float|string,
+     *     purchase_price?: float|string,
+     *     discount?: float|string,
+     *     discount_type?: string,
+     *     current_stock?: int,
+     *     shipping_type?: string,
+     *     shipping_cost?: float|string,
+     *     est_shipping_days?: int|null,
+     *     meta_title?: string,
+     *     meta_description?: string,
+     *     published?: bool|int,
+     *     has_warranty?: bool|int,
+     *     thumbnail_img?: mixed,
+     *     photos?: mixed,
+     *     meta_img?: mixed,
+     *     pdf?: mixed,
+     *     colors?: string[],
+     *     choice_no?: int[],
+     *     choice_options?: array<int, array{name: string, values: string[]}>,
+     *     stocks?: array<int, array{variant: string, price: float, sku: string, qty: int, image?: mixed}>
+     * } $data Raw input data from Filament or Request
      *
      * @throws Exception
      * @throws \Throwable
@@ -71,21 +98,26 @@ class ProductService
             'slug' => $slug,
             'user_id' => $user_id,
             'added_by' => $added_by,
-            'category_id' => $collection['category_id'],
+            // 'category_id' => $collection['category_id'], // Removed
             'brand_id' => $collection['brand_id'],
             'tags' => $collection['tags'],
             'description' => $collection['description'] ?? null,
             'shipping_type' => $collection['shipping_type'] ?? ShippingType::FLAT_RATE->value,
             'shipping_cost' => $shipping_cost,
             'est_shipping_days' => $collection['est_shipping_days'] ?? null,
-            'meta_title' => $collection['meta_title'],
-            'meta_description' => $collection['meta_description'],
+            'meta_title' => $collection['meta_title'] ?: $collection['name'],
+            'meta_description' => $collection['meta_description'] ?: strip_tags((string) ($collection['description'] ?? '')),
             'published' => $published,
             'approved' => $approved,
             'has_warranty' => isset($collection['has_warranty']) && $collection['has_warranty'] ? 1 : 0,
         ];
 
         $product = Product::create($productData);
+
+        // Sync Categories
+        if (isset($collection['categories'])) {
+            $product->categories()->sync($collection['categories']);
+        }
 
         // Sync Media via Spatie Media Library
         $this->mediaService->syncMedia($product, $data, [
@@ -106,7 +138,34 @@ class ProductService
     /**
      * Update an existing product in the database.
      *
-     * @param  array  $data  Raw input data from Filament or Request
+     * @param array{
+     *     name?: string,
+     *     slug?: string,
+     *     brand_id?: int|string|null,
+     *     categories?: int[]|string[],
+     *     tags?: string|string[],
+     *     description?: string|null,
+     *     unit_price?: float|string,
+     *     purchase_price?: float|string,
+     *     discount?: float|string,
+     *     discount_type?: string,
+     *     current_stock?: int,
+     *     shipping_type?: string,
+     *     shipping_cost?: float|string,
+     *     est_shipping_days?: int|null,
+     *     meta_title?: string,
+     *     meta_description?: string,
+     *     published?: bool|int,
+     *     has_warranty?: bool|int,
+     *     thumbnail_img?: mixed,
+     *     photos?: mixed,
+     *     meta_img?: mixed,
+     *     pdf?: mixed,
+     *     colors?: string[],
+     *     choice_no?: int[],
+     *     choice_options?: array<int, array{name: string, values: string[]}>,
+     *     stocks?: array<int, array{variant: string, price: float, sku: string, qty: int, image?: mixed}>
+     * } $data Raw input data from Filament or Request
      * @param  Product  $product  The existing product model
      *
      * @throws Exception
@@ -133,7 +192,7 @@ class ProductService
             $product->meta_title = $collection['meta_title'] ?: $product->name;
         }
         if (isset($collection['meta_description'])) {
-            $product->meta_description = $collection['meta_description'] ?: strip_tags($collection['description'] ?? $product->description);
+            $product->meta_description = $collection['meta_description'] ?: strip_tags((string) ($collection['description'] ?? $product->description ?? ''));
         }
 
         if (isset($collection['shipping_type'])) {
@@ -147,8 +206,8 @@ class ProductService
         if (isset($collection['description'])) {
             $product->description = $collection['description'];
         }
-        if (isset($collection['category_id'])) {
-            $product->category_id = $collection['category_id'];
+        if (isset($collection['categories'])) {
+            $product->categories()->sync($collection['categories']);
         }
         if (isset($collection['brand_id'])) {
             $product->brand_id = $collection['brand_id'];
@@ -344,7 +403,9 @@ class ProductService
             $seller_discount = null;
 
             $category = Category::find($data['category_id']);
-            $products = Product::where('category_id', $data['category_id']);
+            $products = Product::whereHas('categories', function ($q) use ($data) {
+                $q->where('categories.id', $data['category_id']);
+            });
 
             if (in_array($auth_user->user_type, ['admin', 'staff'])) {
                 $admin_discount = $data['discount'];
@@ -376,11 +437,14 @@ class ProductService
                 if ($seller_product_discount == 0) {
                     $products->where('user_id', $admin_id);
                 }
+                // Category columns removed via migration
+                /*
                 $category->update([
                     'discount' => $admin_discount,
                     'discount_start_date' => $admin_discount_start_date,
                     'discount_end_date' => $admin_discount_end_date,
                 ]);
+                */
             } elseif ($auth_user->user_type == 'seller') {
                 $products->where('user_id', $auth_user->id);
                 $seller_discount = $data['discount'];

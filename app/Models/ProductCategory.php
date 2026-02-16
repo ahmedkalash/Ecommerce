@@ -2,13 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 
 class ProductCategory extends Model
 {
-    use HasFactory,PreventDemoModeChanges;
+    use HasFactory, PreventDemoModeChanges;
+
+    protected $table = 'product_categories';
+
+    public $incrementing = false;
+
+    protected $primaryKey = null;
+
+    protected $guarded = [];
 
     public function product()
     {

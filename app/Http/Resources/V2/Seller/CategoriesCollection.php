@@ -17,7 +17,6 @@ class CategoriesCollection extends JsonResource
         return [
             'id' => (int) $this->id,
             'parent_id' => $this->parent_id,
-            'level' => $this->level,
             'name' => $this->name,
             'banner' => get_file_by_id($this->banner),
             'icon' => get_file_by_id($this->icon),

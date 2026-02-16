@@ -8,13 +8,13 @@
 
 ## Overview
 
-The `categories` table defines the hierarchical structure for product classification. It supports unlimited nesting
-levels, though typical usage involves 2-3 levels (Category -> Sub-Category -> Sub-Sub-Category).
+The `categories` table defines the hierarchical structure for product classification. It supports unlimited nesting levels, using an adjacency list model.
 
 **Related Tables**:
 
-- `products`: Linked via `category_id`.
-- `categories`: Self-referencing (`parent_id`) for hierarchy.
+- `product_categories`: Pivot table linking `products` to `categories` (Many-to-Many).
+- `category_translations`: Stores multi-language names for categories.
+- `media`: Visual assets (banners, icons, covers) are managed via Spatie Media Library and stored in the `media` table.
 
 ---
 
@@ -30,15 +30,17 @@ int(11) NOT NULL auto_increment primary key
 
 ---
 
-### **Hierarchy**
+### **Hierarchy (Adjacency List)**
 
 #### `parent_id` - Parent Category
 
 ```sql
-int(11) DEFAULT 0
+int(11) DEFAULT NULL
 ```
 
-- **Purpose**: ID of the parent category. `0` indicates a root-level category.
+- **Purpose**: ID of the parent category. 
+- **Constraint**: `FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL`.
+- **Root Nodes**: Store `NULL`. (Refactored from `0` to support `staudenmeir/laravel-adjacency-list` and strict database integrity).
 
 #### `level` - Depth Level
 
@@ -46,7 +48,7 @@ int(11) DEFAULT 0
 int(11) NOT NULL DEFAULT 0
 ```
 
-- **Purpose**: Optimization for hierarchy traversal (0=Root, 1=Sub, 2=Sub-Sub).
+- **Purpose**: Metadata for hierarchy traversal (0=Root, 1=Sub, 2=Sub-Sub).
 
 #### `order_level` - Sort Order
 
@@ -54,17 +56,18 @@ int(11) NOT NULL DEFAULT 0
 int(11) NOT NULL DEFAULT 0
 ```
 
-- **Purpose**: Display order within the same level.
+- **Purpose**: Manual display order within the same parent level.
 
 ---
 
-### **Details**
+### **Core Attributes**
 
 #### `name` - Category Name
 
 ```sql
 varchar(50) NOT NULL
 ```
+- **Note**: Serves as the fallback name. Translatable names live in `category_translations`.
 
 #### `slug` - URL Slug
 
@@ -72,59 +75,80 @@ varchar(50) NOT NULL
 varchar(255) DEFAULT NULL
 ```
 
-- **Purpose**: SEO-friendly URL segment.
+- **Purpose**: Unique, SEO-friendly URL segment.
+- **Index**: `UNIQUE INDEX (slug)`.
 
-#### `banner`, `icon`, `cover_image`
+---
+
+### **Flags & Type**
+
+#### `featured` - Featured Flag
 
 ```sql
-varchar(100) DEFAULT NULL
+int(1) NOT NULL DEFAULT 0
+```
+- **Purpose**: If `1`, category is displayed in homepage "Featured" sections.
+
+#### `top` - Top Category Flag
+
+```sql
+int(1) NOT NULL DEFAULT 0
+```
+- **Purpose**: If `1`, category is highlighted in specific menu layouts.
+
+#### `digital` - Digital Products Flag
+
+```sql
+int(1) NOT NULL DEFAULT 0
 ```
 
-- **Purpose**: References to image paths or upload IDs.
+- **Values**: `1` (Allows digital/downloadable products), `0` (Physical).
 
 ---
 
 ### **Financials & Settings**
 
-#### `commision_rate` - Seller Commission
+#### `commision_rate` - Admin Commission
 
 ```sql
 double(8, 2) NOT NULL DEFAULT 0.00
 ```
 
-- **Purpose**: Percentage of sale taken by admin for products in this category.
+- **Purpose**: Percentage platform fee taken from sales of products in this category.
 
-#### `discount` - Global Discount
-
-```sql
-double(20, 2) NOT NULL DEFAULT 0.00
-```
-
-- **Purpose**: Category-wide discount percentage/amount.
-
-#### `digital` - Digital Products?
+#### `refund_request_time` - Refund Window
 
 ```sql
-int(1) NOT NULL DEFAULT 0
+int(11) DEFAULT NULL
 ```
 
-- **Values**: `1` (Digital), `0` (Physical).
+- **Purpose**: Number of days a customer has to request a refund for items in this category.
 
 ---
 
-### **Status & Visibility**
+### **SEO Metadata**
 
-#### `featured` - Featured?
-
-```sql
-int(1) NOT NULL DEFAULT 0
-```
-
-#### `top` - Top Category?
+#### `meta_title`
 
 ```sql
-int(1) NOT NULL DEFAULT 0
+varchar(255) DEFAULT NULL
 ```
+
+#### `meta_description`
+
+```sql
+text DEFAULT NULL
+```
+
+---
+
+### **Media Assets**
+
+Stored as references to the `media` table (Spatie Media Library).
+
+- **`banner`**: Large image for category pages.
+- **`icon`**: Small image for menus/navigation.
+- **`cover_image`**: Image for category selection grids.
 
 ---
 
@@ -133,6 +157,14 @@ int(1) NOT NULL DEFAULT 0
 #### `created_at`, `updated_at`
 
 ```sql
-timestamp
-DEFAULT NULL
+timestamp DEFAULT CURRENT_TIMESTAMP
 ```
+
+---
+
+## Dropped Columns (Legacy)
+
+The following columns were removed in the V10 Refactor to improve flexibility:
+- `discount`: Category-level discounts are now managed at the Product or Flash Deal level.
+- `discount_start_date` / `discount_end_date`: Removed.
+- `products.category_id`: Removed (migrated to `product_categories` pivot table).

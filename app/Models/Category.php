@@ -2,25 +2,39 @@
 
 namespace App\Models;
 
-use App;
+use Illuminate\Support\Facades\App;
 use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Category extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, PreventDemoModeChanges;
+    use HasFactory, HasRecursiveRelationships, InteractsWithMedia, PreventDemoModeChanges;
 
-    protected $fillable = [
-        'discount',
-        'discount_start_date',
-        'discount_end_date',
-    ];
+    protected $guarded = [];
 
     protected $with = ['category_translations'];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('banner')
+            ->singleFile();
+
+        $this->addMediaCollection('icon')
+            ->singleFile();
+
+        $this->addMediaCollection('cover_image')
+            ->singleFile();
+    }
+
+    public function getParentIdName()
+    {
+        return 'parent_id';
+    }
 
     public function getTranslation($field = '', $lang = false)
     {

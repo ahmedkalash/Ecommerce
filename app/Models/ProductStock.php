@@ -29,8 +29,22 @@ class ProductStock extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('thumbnail')
+            ->singleFile();
+
         $this->addMediaCollection('gallery');
 
         $this->addMediaCollection('files');
+
+        $this->addMediaCollection('short_video')
+            ->singleFile();
+
+        $this->addMediaCollection('video_thumbnail')
+            ->singleFile();
+
+        $this->addMediaCollection('meta_img')
+            ->singleFile();
+
+        $this->addMediaCollection('pdf');
     }
 }

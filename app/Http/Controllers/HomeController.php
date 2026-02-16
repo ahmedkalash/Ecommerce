@@ -43,16 +43,18 @@ class HomeController extends Controller
             return Category::with('bannerImage')->where('featured', 1)->get();
         });
 
-        return view('frontend.'.get_setting('homepage_select').'.index', compact('featured_categories', 'lang'));
+        return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'lang'));
     }
 
     public function load_todays_deal_section()
     {
-        $todays_deal_products = filter_products(Product::query())->orderBy('id',
-            'desc')->get(); // todays_deal column removed
+        $todays_deal_products = filter_products(Product::query())->orderBy(
+            'id',
+            'desc'
+        )->get(); // todays_deal column removed
 
         return view(
-            'frontend.'.get_setting('homepage_select').'.partials.todays_deal',
+            'frontend.' . get_setting('homepage_select') . '.partials.todays_deal',
             compact('todays_deal_products')
         );
     }
@@ -64,19 +66,19 @@ class HomeController extends Controller
         });
 
         return view(
-            'frontend.'.get_setting('homepage_select').'.partials.newest_products_section',
+            'frontend.' . get_setting('homepage_select') . '.partials.newest_products_section',
             compact('newest_products')
         );
     }
 
     public function load_featured_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.featured_products_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.featured_products_section');
     }
 
     public function load_best_selling_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.best_selling_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.best_selling_section');
     }
 
     public function load_auction_products_section()
@@ -86,17 +88,17 @@ class HomeController extends Controller
         }
         $lang = get_system_language() ? get_system_language()->code : null;
 
-        return view('auction.frontend.'.get_setting('homepage_select').'.auction_products_section', compact('lang'));
+        return view('auction.frontend.' . get_setting('homepage_select') . '.auction_products_section', compact('lang'));
     }
 
     public function load_home_categories_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.home_categories_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.home_categories_section');
     }
 
     public function load_best_sellers_section()
     {
-        return view('frontend.'.get_setting('homepage_select').'.partials.best_sellers_section');
+        return view('frontend.' . get_setting('homepage_select') . '.partials.best_sellers_section');
     }
 
     public function load_preorder_featured_products_section()
@@ -117,7 +119,7 @@ class HomeController extends Controller
 
         // });
         return view(
-            'frontend.'.get_setting('homepage_select').'.partials.preorder_products_section',
+            'frontend.' . get_setting('homepage_select') . '.partials.preorder_products_section',
             compact('preorder_products')
         );
     }
@@ -468,8 +470,8 @@ class HomeController extends Controller
     public function all_categories(Request $request)
     {
         $categories = Category::with('childrenCategories')->whereNull('parent_id')->orderBy(
-            'order_level',
-            'desc'
+            'name',
+            'asc'
         )->get();
 
         // dd($categories);
@@ -530,9 +532,9 @@ class HomeController extends Controller
         if (json_decode($product->choice_options) != null) {
             foreach (json_decode($product->choice_options) as $key => $choice) {
                 if ($str != null) {
-                    $str .= '-'.str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
+                    $str .= '-' . str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
                 } else {
-                    $str .= str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
+                    $str .= str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
                 }
             }
         }
@@ -785,11 +787,11 @@ class HomeController extends Controller
         $sql_path = $request->file('sql_file')->store('uploads', 'local');
 
         $zip = new ZipArchive;
-        $zip->open(base_path('public/'.$upload_path));
+        $zip->open(base_path('public/' . $upload_path));
         $zip->extractTo('public/uploads/all');
 
         $zip1 = new ZipArchive;
-        $zip1->open(base_path('public/'.$sql_path));
+        $zip1->open(base_path('public/' . $sql_path));
         $zip1->extractTo('public/uploads');
 
         Artisan::call('cache:clear');
@@ -811,7 +813,7 @@ class HomeController extends Controller
     public function sendEmailUpdateVerificationCode(Request $request)
     {
         $user = auth()->user();
-        $phone = $request->phone != null ? '+'.$request->country_code.$request->phone : null;
+        $phone = $request->phone != null ? '+' . $request->country_code . $request->phone : null;
         $email = $request->email;
         if (isUnique($email) == '0') {
             $response['status'] = 2;

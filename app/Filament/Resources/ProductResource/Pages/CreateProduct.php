@@ -15,13 +15,34 @@ class CreateProduct extends CreateRecord
     protected static string $resource = ProductResource::class;
 
     /**
-     * @throws \Throwable
-     */
-    /**
-     * Handle the record creation process.
-     * Delegates the logic to ProductService but maintains responsibility for
-     * transaction management and UI-level error logging.
-     *
+     * @param array{
+     *     name: string,
+     *     slug?: string,
+     *     brand_id?: int|string|null,
+     *     categories?: int[]|string[],
+     *     tags?: string|string[],
+     *     description?: string|null,
+     *     unit_price?: float|string,
+     *     purchase_price?: float|string,
+     *     discount?: float|string,
+     *     discount_type?: string,
+     *     current_stock?: int,
+     *     shipping_type?: string,
+     *     shipping_cost?: float|string,
+     *     est_shipping_days?: int|null,
+     *     meta_title?: string,
+     *     meta_description?: string,
+     *     published?: bool|int,
+     *     has_warranty?: bool|int,
+     *     thumbnail_img?: mixed,
+     *     photos?: mixed,
+     *     meta_img?: mixed,
+     *     pdf?: mixed,
+     *     colors?: string[],
+     *     choice_no?: int[],
+     *     choice_options?: array<int, array{name: string, values: string[]}>,
+     *     stocks?: array<int, array{variant: string, price: float, sku: string, qty: int, image?: mixed}>
+     * } $data
      *
      * @throws \Throwable
      */
@@ -46,6 +67,6 @@ class CreateProduct extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl('index');
+        return $this->getResource()::getUrl('edit', ['record' => $this->record]);
     }
 }

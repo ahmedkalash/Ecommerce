@@ -25,6 +25,34 @@ class EditProduct extends EditRecord
     /**
      * Handle the record update process.
      *
+     * @param array{
+     *     name?: string,
+     *     slug?: string,
+     *     brand_id?: int|string|null,
+     *     categories?: int[]|string[],
+     *     tags?: string|string[],
+     *     description?: string|null,
+     *     unit_price?: float|string,
+     *     purchase_price?: float|string,
+     *     discount?: float|string,
+     *     discount_type?: string,
+     *     current_stock?: int,
+     *     shipping_type?: string,
+     *     shipping_cost?: float|string,
+     *     est_shipping_days?: int|null,
+     *     meta_title?: string,
+     *     meta_description?: string,
+     *     published?: bool|int,
+     *     has_warranty?: bool|int,
+     *     thumbnail_img?: mixed,
+     *     photos?: mixed,
+     *     meta_img?: mixed,
+     *     pdf?: mixed,
+     *     colors?: string[],
+     *     choice_no?: int[],
+     *     choice_options?: array<int, array{name: string, values: string[]}>,
+     *     stocks?: array<int, array{variant: string, price: float, sku: string, qty: int, image?: mixed}>
+     * } $data
      *
      * @throws \Throwable
      */
@@ -52,7 +80,10 @@ class EditProduct extends EditRecord
      * Mutate form data before filling the form on edit.
      * Converts comma-separated tags string back to an array for the TagsInput component.
      *
-     * @param  array<string, mixed>  $data
+     * @param  array{
+     *      tags?: string|string[],
+     *      [key: string]: mixed
+     *  }  $data
      * @return array<string, mixed>
      */
     protected function mutateFormDataBeforeFill(array $data): array

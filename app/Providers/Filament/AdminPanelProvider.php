@@ -63,10 +63,10 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroups::CATALOG->value,
-                NavigationGroups::SHOP_MANAGEMENT->value,
-                NavigationGroups::USER_MANAGEMENT->value,
-                NavigationGroups::SETTINGS->value,
+                NavigationGroups::CATALOG,
+                NavigationGroups::SHOP_MANAGEMENT,
+                NavigationGroups::USER_MANAGEMENT,
+                NavigationGroups::SETTINGS,
             ]);
     }
 }

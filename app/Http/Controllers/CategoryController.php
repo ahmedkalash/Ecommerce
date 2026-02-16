@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\CategoryTranslation;
-use App\Models\Product;
 use App\Utility\CategoryUtility;
 use Cache;
 use Illuminate\Http\Request;
@@ -29,10 +28,10 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $sort_search = null;
-        $categories = Category::orderBy('order_level', 'desc');
+        $categories = Category::orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
         }
         $categories = $categories->paginate(15);
 
@@ -63,10 +62,6 @@ class CategoryController extends Controller
     {
         $category = new Category;
         $category->name = $request->name;
-        $category->order_level = 0;
-        if ($request->order_level != null) {
-            $category->order_level = $request->order_level;
-        }
         $category->digital = $request->digital;
         $category->banner = $request->banner;
         $category->icon = $request->icon;
@@ -76,15 +71,14 @@ class CategoryController extends Controller
 
         if ($request->parent_id) {
             $category->parent_id = $request->parent_id;
-
-            $parent = Category::find($request->parent_id);
-            $category->level = $parent->level + 1;
+        } else {
+            $category->parent_id = null;
         }
 
         if ($request->slug != null) {
             $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug));
         } else {
-            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5);
+            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)) . '-' . Str::random(5);
         }
         if ($request->commision_rate != null) {
             $category->commision_rate = $request->commision_rate;
@@ -126,8 +120,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $categories = Category::whereNull('parent_id')
             ->where('digital', $category->digital)
-            // ->with('childrenCategories')
-            // ->whereNotIn('id', CategoryUtility::children_ids($category->id, true))->where('id', '!=' , $category->id)
             ->with(['childrenCategories' => function ($query) use ($category) {
                 $query->whereNotIn('id', CategoryUtility::children_ids($category->id, true))
                     ->where('id', '!=', $category->id);
@@ -150,9 +142,6 @@ class CategoryController extends Controller
         if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $category->name = $request->name;
         }
-        if ($request->order_level != null) {
-            $category->order_level = $request->order_level;
-        }
         $category->digital = $request->digital;
         $category->banner = $request->banner;
         $category->icon = $request->icon;
@@ -160,29 +149,16 @@ class CategoryController extends Controller
         $category->meta_title = $request->meta_title;
         $category->meta_description = $request->meta_description;
 
-        $previous_level = $category->level;
-
         if ($request->parent_id) {
             $category->parent_id = $request->parent_id;
-
-            $parent = Category::find($request->parent_id);
-            $category->level = $parent->level + 1;
         } else {
             $category->parent_id = null;
-            $category->level = 0;
         }
-
-        // if($category->level > $previous_level){
-        //     CategoryUtility::move_level_down($category->id);
-        // }
-        // elseif ($category->level < $previous_level) {
-        //     CategoryUtility::move_level_up($category->id);
-        // }
 
         if ($request->slug != null) {
             $category->slug = strtolower($request->slug);
         } else {
-            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5);
+            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)) . '-' . Str::random(5);
         }
 
         if ($request->commision_rate != null) {
@@ -190,9 +166,6 @@ class CategoryController extends Controller
         }
 
         $category->save();
-
-        // Updating childer categories level
-        CategoryUtility::update_child_level($category->id);
 
         $category->attributes()->sync($request->filtering_attributes);
 
@@ -222,10 +195,7 @@ class CategoryController extends Controller
             $category_translation->delete();
         }
 
-        foreach (Product::where('category_id', $category->id)->get() as $product) {
-            $product->category_id = null;
-            $product->save();
-        }
+        $category->products()->detach();
 
         CategoryUtility::delete_category($id);
         Cache::forget('featured_categories');
@@ -258,10 +228,10 @@ class CategoryController extends Controller
     public function categoriesWiseProductDiscount(Request $request)
     {
         $sort_search = null;
-        $categories = Category::with('sellerDiscounts')->orderBy('order_level', 'desc');
+        $categories = Category::with('sellerDiscounts')->orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
         }
         $categories = $categories->paginate(15);
 
@@ -271,10 +241,10 @@ class CategoryController extends Controller
     public function categoriesWiseCommission(Request $request)
     {
         $sort_search = null;
-        $categories = Category::orderBy('order_level', 'desc');
+        $categories = Category::orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
         }
         $categories = $categories->paginate(15);
 

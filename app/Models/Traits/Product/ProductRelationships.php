@@ -28,11 +28,6 @@ trait ProductRelationships
         return $this->hasMany(ProductTranslation::class);
     }
 
-    public function main_category()
-    {
-        return $this->belongsTo(Category::class, 'category_id');
-    }
-
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories');

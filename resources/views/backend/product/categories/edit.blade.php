@@ -3,8 +3,8 @@
 @section('content')
 
 @php
-    CoreComponentRepository::instantiateShopRepository();
-    CoreComponentRepository::initializeCache();
+CoreComponentRepository::instantiateShopRepository();
+CoreComponentRepository::initializeCache();
 @endphp
 
 <div class="aiz-titlebar text-left mt-2 mb-3">
@@ -27,8 +27,8 @@
                 </ul>
                 <form class="p-4" action="{{ route('categories.update', $category->id) }}" method="POST" enctype="multipart/form-data">
                     <input name="_method" type="hidden" value="PATCH">
-    	            <input type="hidden" name="lang" value="{{ $lang }}">
-                	@csrf
+                    <input type="hidden" name="lang" value="{{ $lang }}">
+                    @csrf
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">{{translate('Name')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
                         <div class="col-md-9">
@@ -47,21 +47,13 @@
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">{{translate('Parent Category')}}</label>
                         <div class="col-md-9">
-                            <select class="select2 form-control aiz-selectpicker" name="parent_id" data-toggle="select2" data-placeholder="Choose ..."data-live-search="true" data-selected="{{ $category->parent_id }}">
+                            <select class="select2 form-control aiz-selectpicker" name="parent_id" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" data-selected="{{ $category->parent_id }}">
                                 @include('backend.product.categories.categories_option_edit', ['categories' => $categories])
                             </select>
                         </div>
                     </div>
+
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label">
-                            {{translate('Ordering Number')}}
-                        </label>
-                        <div class="col-md-9">
-                            <input type="number" name="order_level" value="{{ $category->order_level }}" class="form-control" id="order_level" placeholder="{{translate('Order Level')}}">
-                            <small>{{translate('Higher number has high priority')}}</small>
-                        </div>
-                    </div>
-    	            <div class="form-group row">
                         <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}}</label>
                         <div class="col-md-9">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
@@ -127,9 +119,9 @@
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">{{translate('Filtering Attributes')}}</label>
                         <div class="col-md-9">
-                            <select class="select2 form-control aiz-selectpicker" name="filtering_attributes[]" data-toggle="select2" data-placeholder="Choose ..."data-live-search="true" data-selected="{{ $category->attributes->pluck('id') }}" multiple>
+                            <select class="select2 form-control aiz-selectpicker" name="filtering_attributes[]" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" data-selected="{{ $category->attributes->pluck('id') }}" multiple>
                                 @foreach (\App\Models\Attribute::all() as $attribute)
-                                    <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}</option>
+                                <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -148,17 +140,18 @@
 @section('script')
 
 <script type="text/javascript">
-    function categoriesByType(val){
+    function categoriesByType(val) {
         $('select[name="parent_id"]').html('');
         AIZ.plugins.bootstrapSelect('refresh');
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            type:"POST",
-            url:'{{ route('categories.categories-by-type') }}',
-            data:{
-               digital: val
+            type: "POST",
+            url: '{{ route('
+            categories.categories - by - type ') }}',
+            data: {
+                digital: val
             },
             success: function(data) {
                 $('select[name="parent_id"]').html(data);

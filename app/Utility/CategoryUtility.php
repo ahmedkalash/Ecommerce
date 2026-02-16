@@ -9,7 +9,7 @@ class CategoryUtility
     /*when with trashed is true id will get even the deleted items*/
     public static function get_immediate_children($id, $with_trashed = false, $as_array = false)
     {
-        $children = $with_trashed ? Category::where('parent_id', $id)->orderBy('order_level', 'desc')->get() : Category::where('parent_id', $id)->orderBy('order_level', 'desc')->get();
+        $children = $with_trashed ? Category::where('parent_id', $id)->orderBy('name', 'asc')->get() : Category::where('parent_id', $id)->orderBy('name', 'asc')->get();
         $children = $as_array && !is_null($children) ? $children->toArray() : $children;
 
         return $children;
@@ -70,7 +70,7 @@ class CategoryUtility
 
         $category = Category::where('id', $id)->first();
 
-        CategoryUtility::move_level_up($id);
+        // Level logic removed
 
         Category::whereIn('id', $children_ids)->update(['parent_id' => $category->parent_id]);
     }
@@ -80,42 +80,28 @@ class CategoryUtility
         return true;
     }
 
+    /**
+     * @deprecated Level logic removed
+     */
     public static function move_level_up($id)
     {
-        if (CategoryUtility::get_immediate_children_ids($id, true) > 0) {
-            foreach (CategoryUtility::get_immediate_children_ids($id, true) as $value) {
-                $category = Category::find($value);
-                $category->level -= 1;
-                $category->save();
-                return CategoryUtility::move_level_up($value);
-            }
-        }
+        return;
     }
 
+    /**
+     * @deprecated Level logic removed
+     */
     public static function move_level_down($id)
     {
-        if (CategoryUtility::get_immediate_children_ids($id, true) > 0) {
-            foreach (CategoryUtility::get_immediate_children_ids($id, true) as $value) {
-                $category = Category::find($value);
-                $category->level += 1;
-                $category->save();
-                return CategoryUtility::move_level_down($value);
-            }
-        }
+        return;
     }
 
+    /**
+     * @deprecated Level logic removed
+     */
     public static function update_child_level($id)
     {
-        $get_immediate_children_ids = CategoryUtility::get_immediate_children_ids($id, true);
-        if (count($get_immediate_children_ids) > 0) {
-            $parent_category = Category::find($id);
-            foreach ($get_immediate_children_ids as $value) {
-                $category = Category::find($value);
-                $category->level = $parent_category->level + 1;
-                $category->save();
-                CategoryUtility::update_child_level($value);
-            }
-        }
+        return;
     }
 
     public static function delete_category($id)

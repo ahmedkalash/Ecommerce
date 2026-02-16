@@ -2,10 +2,13 @@
 
 namespace App\Filament\Enums;
 
-enum NavigationGroups: string
+class NavigationGroups
 {
-    case CATALOG = 'Catalog';
-    case SHOP_MANAGEMENT = 'Shop Management';
-    case USER_MANAGEMENT = 'User Management';
-    case SETTINGS = 'Settings';
+    public const CATALOG = 'Catalog';
+
+    public const SHOP_MANAGEMENT = 'Shop Management';
+
+    public const USER_MANAGEMENT = 'User Management';
+
+    public const SETTINGS = 'Settings';
 }

@@ -10,7 +10,18 @@ class ProductStockService
     /**
      * Store or update stocks for a given product.
      *
-     * @param  array  $data  Raw input data containing 'stocks'
+     * @param array{
+     *     stocks?: array<int, array{
+     *         variant: string,
+     *         price?: float|string,
+     *         qty?: int|string,
+     *         sku?: string|null,
+     *         min_qty?: int|string,
+     *         cash_on_delivery?: bool|int,
+     *         video_link?: string|null,
+     *         video_provider?: string|null
+     *     }>
+     * } $data Raw input data containing 'stocks'
      * @param  Product  $product  The product record
      */
     public function store(array $data, Product $product): void

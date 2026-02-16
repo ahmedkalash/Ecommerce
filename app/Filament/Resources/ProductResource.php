@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Enums\NavigationGroups;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -26,7 +27,9 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = 'Products';
+    protected static ?string $navigationGroup = NavigationGroups::CATALOG;
+
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -92,7 +95,7 @@ class ProductResource extends Resource
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
-                                                    ->label('Product Category')
+                                                    ->label('Categories')
                                                     ->enableBranchNode()
                                                     ->expandSelected()
                                                     ->withCount()
@@ -118,49 +121,73 @@ class ProductResource extends Resource
                         Tabs\Tab::make('Variants')
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
-
-                                // This repeater manages ALL stocks.
-                                // For simple products, it should contain exactly one item (enforced by logic or UI).
-                                // For variable products, it contains many.
-                                // This repeater manages ALL variants manually.
+                                // This repeater manages ALL stocks (variants).
                                 Forms\Components\Repeater::make('stocks')
                                     ->label('Product Variants')
                                     ->relationship()
                                     ->schema([
-                                        Forms\Components\TextInput::make('variant')
-                                            ->label('Variant Name')
-                                            ->placeholder('e.g., Default, Red XL, 128GB')
-                                            ->default('Default')
-                                            ->required()
-                                            ->columnSpan(2),
+                                        Forms\Components\Group::make()
+                                            ->schema([
+                                                Forms\Components\TextInput::make('variant')
+                                                    ->label('Variant Name')
+                                                    ->placeholder('e.g., Default, Red XL, 128GB')
+                                                    ->default('Default')
+                                                    ->required()
+                                                    ->distinct() // Ensure variant names are unique within the repeater
+                                                    ->columnSpan(2),
 
-                                        Forms\Components\TextInput::make('price')
-                                            ->label('Price')
-                                            ->numeric()
-                                            ->prefix('$')
-                                            ->required(),
+                                                Forms\Components\TextInput::make('sku')
+                                                    ->label('SKU')
+                                                    ->unique('product_stocks', 'sku', ignoreRecord: true), // Ensure SKU is unique in DB
 
-                                        Forms\Components\TextInput::make('sku')
-                                            ->label('SKU'),
+                                                Forms\Components\TextInput::make('price')
+                                                    ->label('Price')
+                                                    ->numeric()
+                                                    ->prefix('$')
+                                                    ->required(),
 
-                                        Forms\Components\TextInput::make('qty')
-                                            ->label('Quantity')
-                                            ->numeric()
-                                            ->default(0)
-                                            ->required(),
+                                                Forms\Components\TextInput::make('qty')
+                                                    ->label('Quantity')
+                                                    ->numeric()
+                                                    ->default(0)
+                                                    ->required(),
 
-                                        Forms\Components\TextInput::make('min_qty')
-                                            ->label('Min Qty')
-                                            ->numeric()
-                                            ->default(1)
-                                            ->required(),
+                                                Forms\Components\TextInput::make('min_qty')
+                                                    ->label('Min Qty')
+                                                    ->numeric()
+                                                    ->default(1)
+                                                    ->required(),
 
-                                        Forms\Components\Toggle::make('cash_on_delivery')
-                                            ->label('Cash On Delivery')
-                                            ->default(true),
+                                                Forms\Components\Toggle::make('cash_on_delivery')
+                                                    ->label('Cash On Delivery')
+                                                    ->default(true)
+                                                    ->columnSpanFull(),
+                                            ])
+                                            ->columns(2),
 
                                         Forms\Components\Section::make('Media & Files')
                                             ->schema([
+                                                Forms\Components\Grid::make(3)
+                                                    ->schema([
+                                                        SpatieMediaLibraryFileUpload::make('thumbnail')
+                                                            ->collection('thumbnail')
+                                                            ->label('Variant Thumbnail')
+                                                            ->image()
+                                                            ->imageEditor(),
+
+                                                        SpatieMediaLibraryFileUpload::make('video_thumbnail')
+                                                            ->collection('video_thumbnail')
+                                                            ->label('Video Thumbnail')
+                                                            ->image()
+                                                            ->imageEditor(),
+
+                                                        SpatieMediaLibraryFileUpload::make('meta_img')
+                                                            ->collection('meta_img')
+                                                            ->label('Meta Image')
+                                                            ->image()
+                                                            ->imageEditor(),
+                                                    ]),
+
                                                 SpatieMediaLibraryFileUpload::make('gallery')
                                                     ->collection('gallery')
                                                     ->label('Variant Gallery')
@@ -168,7 +195,23 @@ class ProductResource extends Resource
                                                     ->reorderable()
                                                     ->image()
                                                     ->imageEditor()
+                                                    ->panelLayout('grid')
                                                     ->columnSpanFull(),
+
+                                                Forms\Components\Grid::make(2)
+                                                    ->schema([
+                                                        SpatieMediaLibraryFileUpload::make('short_video')
+                                                            ->collection('short_video')
+                                                            ->label('Short Video')
+                                                            ->acceptedFileTypes(['video/mp4', 'video/webm', 'video/ogg'])
+                                                            ->maxSize(50000), // 50MB limit
+
+                                                        SpatieMediaLibraryFileUpload::make('pdf')
+                                                            ->collection('pdf')
+                                                            ->label('PDF Specification')
+                                                            ->acceptedFileTypes(['application/pdf'])
+                                                            ->maxSize(10000), // 10MB limit
+                                                    ]),
 
                                                 SpatieMediaLibraryFileUpload::make('files')
                                                     ->collection('files')
@@ -179,8 +222,8 @@ class ProductResource extends Resource
                                                 Forms\Components\Grid::make(2)
                                                     ->schema([
                                                         Forms\Components\TextInput::make('video_link')
-                                                            ->label('Video Link')
-                                                            ->placeholder('Video Link'),
+                                                            ->label('External Video Link')
+                                                            ->placeholder('https://youtube.com/watch?v=...'),
 
                                                         Forms\Components\Select::make('video_provider')
                                                             ->label('Video Provider')
@@ -194,7 +237,7 @@ class ProductResource extends Resource
                                             ->collapsed()
                                             ->columnSpanFull(),
                                     ])
-                                    ->columns(4)
+                                    ->columns(2)
                                     ->reorderable(true)
                                     ->addable(true)
                                     ->deletable(true)
@@ -268,8 +311,10 @@ class ProductResource extends Resource
                     ->sortable()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->name),
-                Tables\Columns\TextColumn::make('main_category.name')
-                    ->label('Category')
+                Tables\Columns\TextColumn::make('categories.name')
+                    ->label('Categories')
+                    ->badge()
+                    ->separator(',')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('min_price')

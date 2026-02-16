@@ -28,10 +28,8 @@ class CategoryFactory extends Factory
         $name = fake()->unique()->words(2, true);
 
         return [
-            'parent_id' => 0,
-            'level' => 0,
+            'parent_id' => null,
             'name' => Str::limit($name, 50, ''),
-            'order_level' => 0,
             'commision_rate' => 0.00,
             'discount' => 0.00,
             'discount_start_date' => null,
@@ -91,7 +89,6 @@ class CategoryFactory extends Factory
 
             return [
                 'parent_id' => $parent->id,
-                'level' => $parent->level + 1,
             ];
         });
     }

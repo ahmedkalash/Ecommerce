@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Product;
 use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ProductsExport implements FromCollection, WithMapping, WithHeadings
+class ProductsExport implements FromCollection, WithHeadings, WithMapping
 {
     use PreventDemoModeChanges;
 
@@ -39,7 +37,7 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings
     }
 
     /**
-     * @var Product $product
+     * @var Product
      */
     public function map($product): array
     {
@@ -47,12 +45,13 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings
         foreach ($product->stocks as $key => $stock) {
             $qty += $stock->qty;
         }
+
         return [
             $product->name,
             $product->description,
             $product->added_by,
             $product->user_id,
-            $product->category_id,
+            $product->categories->pluck('id')->implode(', '),
             $product->brand_id,
             $product->video_provider,
             $product->video_link,

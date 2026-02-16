@@ -342,14 +342,9 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories`
 (
     `id`                  int(11)       NOT NULL AUTO_INCREMENT,
-    `parent_id`           int(11)                DEFAULT 0,
-    `level`               int(11)       NOT NULL DEFAULT 0,
+    `parent_id`           int(11)                DEFAULT NULL,
     `name`                varchar(50)   NOT NULL,
-    `order_level`         int(11)       NOT NULL DEFAULT 0,
     `commision_rate`      double(8, 2)  NOT NULL DEFAULT 0.00,
-    `discount`            double(20, 2) NOT NULL DEFAULT 0.00,
-    `discount_start_date` int(11)                DEFAULT NULL,
-    `discount_end_date`   int(11)                DEFAULT NULL,
     `banner`              varchar(100)           DEFAULT NULL,
     `icon`                varchar(100)           DEFAULT NULL,
     `cover_image`         varchar(100)           DEFAULT NULL,

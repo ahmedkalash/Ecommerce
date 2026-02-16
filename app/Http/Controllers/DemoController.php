@@ -29,7 +29,6 @@ class DemoController extends Controller
     {
         ini_set('memory_limit', '2048M');
         ini_set('max_execution_time', 600);
-
     }
 
     public function cron_1()
@@ -71,7 +70,6 @@ class DemoController extends Controller
         $zip = new ZipArchive;
         $zip->open(base_path('public/uploads.zip'));
         $zip->extractTo('public/uploads');
-
     }
 
     public function remove_folder()
@@ -97,9 +95,7 @@ class DemoController extends Controller
                         }
                     }
                 } catch (\Exception $e) {
-
                 }
-
             }
         }
     }
@@ -139,7 +135,6 @@ class DemoController extends Controller
             $category->meta_description = $value->meta_description;
 
             $category->parent_id = $parent->id;
-            $category->level = $parent->level + 1;
             $category->slug = $value->slug;
             $category->commision_rate = $parent->commision_rate;
 
@@ -166,7 +161,6 @@ class DemoController extends Controller
             $category->meta_description = $value->meta_description;
 
             $category->parent_id = $parent->id;
-            $category->level = $parent->level + 1;
             $category->slug = $value->slug;
             $category->commision_rate = $parent->commision_rate;
 
@@ -191,7 +185,6 @@ class DemoController extends Controller
                     $value->save();
                 }
             } catch (\Exception $e) {
-
             }
         }
 
@@ -205,7 +198,6 @@ class DemoController extends Controller
                     $value->save();
                 }
             } catch (\Exception $e) {
-
             }
         }
 
@@ -243,7 +235,6 @@ class DemoController extends Controller
         foreach ($orders as $order) {
             $this->update_seller_id_in_order($order);
         }
-
     }
 
     public function update_seller_id_in_order($order)

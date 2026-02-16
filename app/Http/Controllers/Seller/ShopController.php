@@ -37,13 +37,10 @@ class ShopController extends Controller
             $shop->logo             = $request->logo;
         }
 
-        if ($request->has('delivery_pickup_longitude') && $request->has('delivery_pickup_latitude'))
-        {
+        if ($request->has('delivery_pickup_longitude') && $request->has('delivery_pickup_latitude')) {
             $shop->delivery_pickup_longitude    = $request->delivery_pickup_longitude;
             $shop->delivery_pickup_latitude     = $request->delivery_pickup_latitude;
-        } 
-        elseif ($request->has('facebook') || $request->has('google') || $request->has('twitter') ||$request->has('youtube') || $request->has('instagram'))
-        {
+        } elseif ($request->has('facebook') || $request->has('google') || $request->has('twitter') || $request->has('youtube') || $request->has('instagram')) {
             $shop->facebook = $request->facebook;
             $shop->instagram = $request->instagram;
             $shop->google = $request->google;
@@ -60,7 +57,8 @@ class ShopController extends Controller
         return back();
     }
 
-    public function bannerUpdate(Request $request){
+    public function bannerUpdate(Request $request)
+    {
         $shop = Shop::find($request->shop_id);
         $shop->top_banner_image     = $request->top_banner_image;
         $shop->top_banner_link      = $request->top_banner_link;
@@ -127,7 +125,7 @@ class ShopController extends Controller
             $data['status'] = 'submitted';
             $data['notification_type_id'] = get_notification_type('shop_verify_request_submitted', 'type')->id;
             Notification::send($users, new ShopVerificationNotification($data));
-            
+
             flash(translate('Your shop verification request has been submitted successfully!'))->success();
             return redirect()->route('seller.dashboard');
         }
@@ -136,16 +134,15 @@ class ShopController extends Controller
         return back();
     }
 
-    public function show()
-    {
-    }
+    public function show() {}
 
-    public function categoriesWiseCommission(Request $request){
-        $sort_search =null;
-        $categories = Category::orderBy('order_level', 'desc');
-        if ($request->has('search')){
+    public function categoriesWiseCommission(Request $request)
+    {
+        $sort_search = null;
+        $categories = Category::orderBy('name', 'asc');
+        if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
+            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
         }
         $categories = $categories->paginate(15);
         return view('seller.categoryWise_commission', compact('categories'))->render();

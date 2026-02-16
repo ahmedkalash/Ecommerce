@@ -20,8 +20,13 @@ class Product extends Model implements HasMedia
     ];
 
     protected $with = [
-        'product_translations', 'taxes', 'media', 'stocks', 'main_category', 'brand',
-    ]; // Added stocks, main_category, brand to eager load if commonly used
+        'product_translations',
+        'taxes',
+        'media',
+        'stocks',
+        'categories',
+        'brand',
+    ]; // Added stocks, categories, brand to eager load if commonly used
 
     public function getTranslation($field = '', $lang = false)
     {
@@ -60,17 +65,6 @@ class Product extends Model implements HasMedia
 
         $this->addMediaCollection('meta')
             ->singleFile();
-
-        $this->addMediaCollection('pdf')
-            ->singleFile()
-            ->acceptsMimeTypes(['application/pdf']);
-
-        $this->addMediaCollection('short_video')
-            ->singleFile()
-            ->acceptsMimeTypes(['video/mp4', 'video/webm']);
-
-        $this->addMediaCollection('video_thumbnail')
-            ->singleFile();
     }
 
     /**
@@ -80,12 +74,6 @@ class Product extends Model implements HasMedia
     public function galleryMedia(): \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection
     {
         return $this->getMedia('gallery');
-    }
-
-    // Stocks relationship
-    public function stocks()
-    {
-        return $this->hasMany(ProductStock::class);
     }
 
     // Since we are Strict Schema, we do NOT provide getPriceAttribute accessor on Product.

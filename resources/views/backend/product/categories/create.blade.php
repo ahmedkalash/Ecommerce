@@ -3,8 +3,8 @@
 @section('content')
 
 @php
-    CoreComponentRepository::instantiateShopRepository();
-    CoreComponentRepository::initializeCache();
+CoreComponentRepository::instantiateShopRepository();
+CoreComponentRepository::initializeCache();
 @endphp
 
 <div class="row">
@@ -15,7 +15,7 @@
             </div>
             <div class="card-body">
                 <form class="form-horizontal" action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data">
-                	@csrf
+                    @csrf
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">{{translate('Name')}}</label>
                         <div class="col-md-9">
@@ -38,23 +38,15 @@
                                 @include('backend.product.categories.categories_option', ['categories' => $categories])
                                 {{-- <option value="0">{{ translate('No Parent') }}</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
-                                    @foreach ($category->childrenCategories as $childCategory)
-                                        @include('categories.child_category', ['child_category' => $childCategory])
-                                    @endforeach
+                                <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                @foreach ($category->childrenCategories as $childCategory)
+                                @include('categories.child_category', ['child_category' => $childCategory])
+                                @endforeach
                                 @endforeach --}}
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-form-label">
-                            {{translate('Ordering Number')}}
-                        </label>
-                        <div class="col-md-9">
-                            <input type="number" name="order_level" class="form-control" id="order_level" placeholder="{{translate('Order Level')}}">
-                            <small>{{translate('Higher number has high priority')}}</small>
-                        </div>
-                    </div>
+
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Banner')}}</label>
                         <div class="col-md-9">
@@ -113,13 +105,13 @@
                             <textarea name="meta_description" rows="5" class="form-control"></textarea>
                         </div>
                     </div>
-                    
+
                     <div class="form-group row">
                         <label class="col-md-3 col-form-label">{{translate('Filtering Attributes')}}</label>
                         <div class="col-md-9">
-                            <select class="select2 form-control aiz-selectpicker" name="filtering_attributes[]" data-toggle="select2" data-placeholder="Choose ..."data-live-search="true" multiple>
+                            <select class="select2 form-control aiz-selectpicker" name="filtering_attributes[]" data-toggle="select2" data-placeholder="Choose ..." data-live-search="true" multiple>
                                 @foreach (\App\Models\Attribute::all() as $attribute)
-                                    <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}</option>
+                                <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -138,17 +130,18 @@
 @section('script')
 
 <script type="text/javascript">
-    function categoriesByType(val){
+    function categoriesByType(val) {
         $('select[name="parent_id"]').html('');
         AIZ.plugins.bootstrapSelect('refresh');
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            type:"POST",
-            url:'{{ route('categories.categories-by-type') }}',
-            data:{
-               digital: val
+            type: "POST",
+            url: '{{ route('
+            categories.categories - by - type ') }}',
+            data: {
+                digital: val
             },
             success: function(data) {
                 $('select[name="parent_id"]').html(data);
