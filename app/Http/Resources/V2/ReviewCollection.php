@@ -9,16 +9,16 @@ class ReviewCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
-                    'user_id'=> $data->user->id,
-                    'user_name'=> $data->user->name,
-                    'avatar'=> uploaded_asset($data->user->avatar_original),
-                    'rating' => floatval(number_format($data->rating,1,'.','')),
+                    'user_id' => $data->user->id,
+                    'user_name' => $data->user->name,
+                    'avatar' => get_file_by_id($data->user->avatar_original),
+                    'rating' => floatval(number_format($data->rating, 1, '.', '')),
                     'comment' => $data->comment,
-                    'time' => $data->updated_at->diffForHumans()
+                    'time' => $data->updated_at->diffForHumans(),
                 ];
-            })
+            }),
         ];
     }
 
@@ -26,7 +26,7 @@ class ReviewCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

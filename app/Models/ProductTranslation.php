@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-    protected $fillable = ['product_id', 'name', 'unit', 'description', 'lang'];
+    protected $fillable = ['product_id', 'name', 'description', 'lang'];
 
-    public function product(){
-      return $this->belongsTo(Product::class);
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

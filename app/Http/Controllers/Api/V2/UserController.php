@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Resources\V2\UserCollection;
 use App\Models\User;
 use Illuminate\Http\Request;
-
 use Laravel\Sanctum\PersonalAccessToken;
-
 
 class UserController extends Controller
 {
@@ -20,10 +18,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($request->user_id);
         $user->update([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
+
         return response()->json([
-            'message' => translate('Profile information has been updated successfully')
+            'message' => translate('Profile information has been updated successfully'),
         ]);
     }
 
@@ -33,23 +32,19 @@ class UserController extends Controller
         $false_response = [
             'result' => false,
             'id' => 0,
-            'name' => "",
-            'email' => "",
-            'avatar' => "",
-            'avatar_original' => "",
-            'phone' => ""
+            'name' => '',
+            'email' => '',
+            'avatar' => '',
+            'avatar_original' => '',
+            'phone' => '',
         ];
 
-
-
         $token = PersonalAccessToken::findToken($request->access_token);
-        if (!$token) {
+        if (! $token) {
             return response()->json($false_response);
         }
 
         $user = $token->tokenable;
-
-
 
         if ($user == null) {
             return response()->json($false_response);
@@ -61,8 +56,8 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'avatar' => $user->avatar,
-            'avatar_original' => uploaded_asset($user->avatar_original),
-            'phone' => $user->phone
+            'avatar_original' => get_file_by_id($user->avatar_original),
+            'phone' => $user->phone,
         ]);
     }
 }

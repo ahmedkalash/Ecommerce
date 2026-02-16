@@ -15,15 +15,14 @@ class CategoriesCollection extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'                =>(int) $this->id,
-            'parent_id'         => $this->parent_id,
-            'level'             => $this->level,
-            'name'              =>$this->name,
-            'banner'            =>uploaded_asset($this->banner),
-            'icon'              => uploaded_asset($this->icon),
-            'featured'          =>$this->featured==0?false:true,
-            'digital'           =>$this->digital==0?false:true,
-            'child'             => ChildCategoriesCollection::collection( $this->childrenCategories)
+            'id' => (int) $this->id,
+            'parent_id' => $this->parent_id,
+            'name' => $this->name,
+            'banner' => get_file_by_id($this->banner),
+            'icon' => get_file_by_id($this->icon),
+            'featured' => $this->featured == 0 ? false : true,
+            'digital' => $this->digital == 0 ? false : true,
+            'child' => ChildCategoriesCollection::collection($this->childrenCategories),
         ];
     }
 }

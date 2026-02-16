@@ -15,9 +15,9 @@ class BrandCollection extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'                =>(int) $this->id,
-            'name'              =>$this->name,
-            'icon'              => uploaded_asset($this->logo)
+            'id' => (int) $this->id,
+            'name' => $this->name,
+            'icon' => get_file_by_id($this->logo),
         ];
     }
 }

@@ -15,13 +15,13 @@ class PickupPointResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id"                	=> $this->id,
-            "staff_id"             	=> $this->staff_id,
-            "name"              	=> $this->name,
-            "address"              	=> $this->address,
-            "phone"       			=> $this->phone,
-            "pick_up_status"        => $this->pick_up_status,
-            "cash_on_pickup_status" => $this->cash_on_pickup_status,
+            'id' => $this->id,
+            'staff_id' => $this->user_id,
+            'name' => $this->name,
+            'address' => $this->address,
+            'phone' => $this->phone,
+            'pick_up_status' => $this->pick_up_status,
+            'cash_on_pickup_status' => $this->cash_on_pickup_status,
         ];
     }
 
@@ -29,7 +29,7 @@ class PickupPointResource extends JsonResource
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

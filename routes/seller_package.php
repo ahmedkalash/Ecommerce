@@ -13,8 +13,8 @@
 
 use App\Http\Controllers\SellerPackageController;
 
-//Admin
-Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function(){
+// Admin
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin']], function () {
     Route::resource('seller_packages', SellerPackageController::class);
     Route::controller(SellerPackageController::class)->group(function () {
         Route::get('/seller_packages/edit/{id}', 'edit')->name('seller_packages.edit');
@@ -22,8 +22,8 @@ Route::group(['prefix' =>'admin', 'middleware' => ['auth', 'admin']], function()
     });
 });
 
-//FrontEnd
-Route::group(['middleware' => ['seller']], function(){
+// FrontEnd
+Route::group(['middleware' => ['seller']], function () {
     Route::controller(SellerPackageController::class)->group(function () {
         Route::get('/seller/seller-packages', 'seller_packages_list')->name('seller.seller_packages_list');
         Route::get('/seller/packages-payment-list', 'packages_payment_list')->name('seller.packages_payment_list');

@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\UserService;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ResetPasswordController extends Controller
 {
@@ -19,14 +24,9 @@ class ResetPasswordController extends Controller
     |
     */
 
-    use ResetsPasswords;
-
-    /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
-     */
-    //protected $redirectTo = '/';
+    use ResetsPasswords {
+        reset as baseReset;
+    }
 
     /**
      * Create a new controller instance.
@@ -39,21 +39,40 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * Get the response for a successful password reset.
+     * Reset the given user's password.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return RedirectResponse|JsonResponse
      */
-    protected function sendResetResponse(Request $request, $response)
+    public function reset(Request $request)
     {
-        if(auth()->user()->user_type == 'admin' || auth()->user()->user_type == 'staff')
-        {
-            return redirect()->route('admin.dashboard')
-                            ->with('status', trans($response));
+        $request->validate($this->rules(), $this->validationErrorMessages());
+
+        if (UserService::isBanned($request->email)) {
+            flash(translate('Your account has been banned.'))->error();
+
+            return back()->withInput($request->only('email'));
         }
 
-        return redirect()->route('home')
-                            ->with('status', trans($response));
+        return $this->baseReset($request);
+    }
+
+    /**
+     * Display the password reset view for the given token.
+     *
+     * @return Factory|View
+     */
+    public function showResetForm(Request $request, ?string $token = null)
+    {
+        return view('auth.'.get_setting('authentication_layout_select').'.reset_password')->with(
+            ['token' => $token, 'email' => $request->email]
+        );
+    }
+
+    /**
+     * Get the Post-Reset Redirect Path
+     */
+    public function redirectPath()
+    {
+        return auth()->user()->homePage();
     }
 }

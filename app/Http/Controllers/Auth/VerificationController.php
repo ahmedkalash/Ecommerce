@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\VerifiesEmails;
+use App\Http\Middleware\HasNotVerifiedEmail;
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
-use App\Http\Controllers\OTPVerificationController;
 
 class VerificationController extends Controller
 {
@@ -25,78 +24,62 @@ class VerificationController extends Controller
     use VerifiesEmails;
 
     /**
-     * Where to redirect users after verification.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/';
-
-    /**
      * Create a new controller instance.
      *
      * @return void
      */
     public function __construct()
     {
-        //$this->middleware('auth');
+        $this->middleware('auth');
         $this->middleware('signed')->only('verify');
         $this->middleware('throttle:6,1')->only('verify', 'resend');
+        $this->middleware(HasNotVerifiedEmail::class)->only('show', 'resend', 'verify');
+    }
+
+    public function redirectTo()
+    {
+        // 1. 'pull' fetches the intended URL AND deletes it from the session immediately.
+        // 2. The second argument is the fallback (if no intended URL exists).
+        return session()->pull('url.intended', \request()->user()->homePage());
     }
 
     /**
      * Show the email verification notice.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+     **/
     public function show(Request $request)
     {
-        if ($request->user()->email != null) {
-            return $request->user()->hasVerifiedEmail()
-                            ? redirect($this->redirectPath())
-                            : view('auth.'.get_setting('authentication_layout_select').'.verify_email');
-        }
-        else {
-            $otpController = new OTPVerificationController;
-            $otpController->send_code($request->user());
-            return redirect()->route('verification');
-        }
+        return view('auth.'.get_setting('authentication_layout_select').'.verify_email');
     }
 
-
-    /**
-     * Resend the email verification notification.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function resend(Request $request)
+    protected function verified(Request $request): void
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return redirect($this->redirectPath());
-        }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return back()->with('resent', true);
+        flash(translate('Your email has been verified successfully'))->success();
     }
 
-    public function verification_confirmation($code){
-        $user = User::where('verification_code', $code)->first();
-        if($user != null){
-            $user->email_verified_at = Carbon::now();
-            $user->save();
-            auth()->login($user, true);
-            offerUserWelcomeCoupon();
-            flash(translate('Your email has been verified successfully'))->success();
-        }
-        else {
-            flash(translate('Sorry, we could not verifiy you. Please try again'))->error();
+    public function emailChangeCallback(Request $request)
+    {
+        if ($request->has('new_email_verificiation_code') && $request->has('email')) {
+            $verification_code_of_url_param = $request->input('new_email_verificiation_code');
+            $user = User::where('new_email_verificiation_code', $verification_code_of_url_param)->first();
+
+            if ($user != null) {
+
+                $user->email = $request->input('email');
+                $user->new_email_verificiation_code = null;
+                $user->save();
+
+                auth()->login($user, true);
+
+                flash(translate('Email Changed successfully'))->success();
+                if ($user->user_type == 'seller') {
+                    return redirect()->route('seller.dashboard');
+                }
+
+                return redirect()->route('dashboard');
+            }
         }
 
-        if($user->user_type == 'seller') {
-            return redirect()->route('seller.dashboard');
-        }
+        flash(translate('Email was not verified. Please resend your mail!'))->error();
 
         return redirect()->route('dashboard');
     }

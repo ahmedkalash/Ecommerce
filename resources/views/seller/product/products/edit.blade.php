@@ -15,13 +15,14 @@
 <div class="alert alert-danger">
     <ul>
         @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
+        <li>{{ $error }}</li>
         @endforeach
     </ul>
 </div>
 @endif
 
-<form class="" action="{{route('seller.products.update', $product->id)}}" method="POST" enctype="multipart/form-data"
+<form class="" action="{{route('seller.products.update', $product->id)}}" method="POST"
+    enctype="multipart/form-data"
     id="choice_form">
     <div class="row gutters-5">
         <div class="col-lg-8">
@@ -36,7 +37,8 @@
                     <li class="nav-item">
                         <a class="nav-link text-reset @if ($language->code == $lang) active @endif py-3"
                             href="{{ route('seller.products.edit', ['id'=>$product->id, 'lang'=> $language->code] ) }}">
-                            <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}" height="11"
+                            <img src="{{ static_asset('assets/img/flags/'.$language->code.'.png') }}"
+                                height="11"
                                 class="mr-1">
                             <span>{{$language->name}}</span>
                         </a>
@@ -45,10 +47,13 @@
                 </ul>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label class="col-lg-3 col-from-label">{{translate('Product Name')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
+                        <label class="col-lg-3 col-from-label">{{translate('Product Name')}} <i
+                                class="las la-language text-danger"
+                                title="{{translate('Translatable')}}"></i></label>
                         <div class="col-lg-8">
                             <input type="text" class="form-control" name="name"
-                                placeholder="{{translate('Product Name')}}" value="{{$product->getTranslation('name',$lang)}}"
+                                placeholder="{{translate('Product Name')}}"
+                                value="{{$product->getTranslation('name',$lang)}}"
                                 required>
                         </div>
                     </div>
@@ -64,18 +69,13 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="form-group row">
-                        <label class="col-lg-3 col-from-label">{{translate('Unit')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control" name="unit"
-                                placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
-                                value="{{$product->getTranslation('unit', $lang)}}" required>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-3 col-from-label">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
+                        <label class="col-md-3 col-from-label">{{translate('Weight')}}
+                            <small>({{ translate('In Kg') }})</small></label>
                         <div class="col-md-8">
-                            <input type="number" class="form-control" name="weight" value="{{ $product->weight }}" step="0.01" placeholder="0.00">
+                            <input type="number" class="form-control" name="weight" value="{{ $product->weight }}"
+                                step="0.01" placeholder="0.00">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -113,12 +113,15 @@
                 <div class="card-body">
 
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Gallery Images')}}</label>
+                        <label class="col-md-3 col-form-label"
+                            for="signinSrEmail">{{translate('Gallery Images')}}</label>
                         <div class="col-md-8">
-                            <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
+                            <div class="input-group" data-toggle="aizuploader" data-type="image"
+                                data-multiple="true">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                        {{ translate('Browse')}}</div>
+                                        {{ translate('Browse')}}
+                                    </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                 <input type="hidden" name="photos" value="{{ $product->photos }}"
@@ -126,16 +129,19 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
-                            <small class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
+                            <small
+                                class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Thumbnail Image')}}</label>
+                        <label class="col-md-3 col-form-label"
+                            for="signinSrEmail">{{translate('Thumbnail Image')}}</label>
                         <div class="col-md-8">
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                        {{ translate('Browse')}}</div>
+                                        {{ translate('Browse')}}
+                                    </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                 <input type="hidden" name="thumbnail_img" value="{{ $product->thumbnail_img }}"
@@ -143,7 +149,8 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
-                            <small class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
+                            <small
+                                class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
                         </div>
                     </div>
                 </div>
@@ -161,7 +168,8 @@
                                 data-multiple="true">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                        {{ translate('Browse') }}</div>
+                                        {{ translate('Browse') }}
+                                    </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                 <input type="hidden" name="short_video" value="{{ $product->short_video }}"
@@ -183,7 +191,8 @@
                                 data-multiple="true">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                        {{ translate('Browse') }}</div>
+                                        {{ translate('Browse') }}
+                                    </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                 <input type="hidden" name="short_video_thumbnail"
@@ -199,56 +208,57 @@
 
                     <!-- Video Link -->
                     <div class="form-group row mb-5">
-                        <label class="col-md-3 col-from-label">{{ translate('Youtube video / shorts link') }}</label>
+                        <label
+                            class="col-md-3 col-from-label">{{ translate('Youtube video / shorts link') }}</label>
                         <div class="video-provider-link col-md-9">
                             {{-- @if (!$product->video_link) --}}
                             @if (empty($product->video_link))
-                                <div class="row">
-                                    <div class="col-md-11">
-                                        <input type="text" class="form-control" name="video_link[]"
-                                            value="" placeholder="{{ translate('Video Link') }}">
-                                        <small
-                                            class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                    </div>
-                                    <div class="col-1 d-flex justify-content-end">
-                                        <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
-                                            data-toggle="remove-parent" data-parent=".row">
-                                            <i class="las la-times"></i>
-                                        </button>
-                                    </div>
+                            <div class="row">
+                                <div class="col-md-11">
+                                    <input type="text" class="form-control" name="video_link[]"
+                                        value="" placeholder="{{ translate('Video Link') }}">
+                                    <small
+                                        class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
                                 </div>
+                                <div class="col-1 d-flex justify-content-end">
+                                    <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
+                                        data-toggle="remove-parent" data-parent=".row">
+                                        <i class="las la-times"></i>
+                                    </button>
+                                </div>
+                            </div>
                             @endif
 
                             @foreach ($product->video_link ?? [] as $index => $video_link)
-                                @if ($index == 0)
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <input type="text" class="form-control" name="video_link[]"
-                                                value="{{ $video_link }}"
-                                                placeholder="{{ translate('Video Link') }}">
-                                            <small
-                                                class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                        </div>
+                            @if ($index == 0)
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="text" class="form-control" name="video_link[]"
+                                        value="{{ $video_link }}"
+                                        placeholder="{{ translate('Video Link') }}">
+                                    <small
+                                        class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                </div>
 
-                                    </div>
-                                @else
-                                    <div class="row">
-                                        <div class="col-md-11">
-                                            <input type="text" class="form-control" name="video_link[]"
-                                                value="{{ $video_link }}"
-                                                placeholder="{{ translate('Video Link') }}">
-                                            <small
-                                                class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                        </div>
-                                        <div class="col-1 d-flex justify-content-end">
-                                            <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
-                                                data-toggle="remove-parent" data-parent=".row">
-                                                <i class="las la-times"></i>
-                                            </button>
-                                        </div>
+                            </div>
+                            @else
+                            <div class="row">
+                                <div class="col-md-11">
+                                    <input type="text" class="form-control" name="video_link[]"
+                                        value="{{ $video_link }}"
+                                        placeholder="{{ translate('Video Link') }}">
+                                    <small
+                                        class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                </div>
+                                <div class="col-1 d-flex justify-content-end">
+                                    <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
+                                        data-toggle="remove-parent" data-parent=".row">
+                                        <i class="las la-times"></i>
+                                    </button>
+                                </div>
 
-                                    </div>
-                                @endif
+                            </div>
+                            @endif
                             @endforeach
                             {{-- @endif --}}
                         </div>
@@ -269,7 +279,7 @@
                                                     </div>
                                                 </div>'
                                 data-target=".video-provider-link">
-                                {{ translate('Add Another') }} 
+                                {{ translate('Add Another') }}
                             </button>
                         </div>
                     </div>
@@ -290,14 +300,17 @@
                                 @foreach (\App\Models\Color::orderBy('name', 'asc')->get() as $key => $color)
                                 <option value="{{ $color->code }}"
                                     data-content="<span><span class='size-15px d-inline-block mr-2 rounded border' style='background:{{ $color->code }}'></span><span>{{ $color->name }}</span></span>"
-                                    <?php if(in_array($color->code, json_decode($product->colors))) echo 'selected'?>></option>
+                                    <?php if (in_array(
+                                        $color->code,
+                                        json_decode($product->colors)
+                                    )) echo 'selected' ?>></option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-lg-1">
                             <label class="aiz-switch aiz-switch-success mb-0">
                                 <input value="1" type="checkbox" name="colors_active"
-                                    <?php if(count(json_decode($product->colors)) > 0) echo "checked";?>>
+                                    <?php if (count(json_decode($product->colors)) > 0) echo "checked"; ?>>
                                 <span></span>
                             </label>
                         </div>
@@ -308,7 +321,8 @@
                             <input type="text" class="form-control" value="{{translate('Attributes')}}" disabled>
                         </div>
                         <div class="col-lg-8">
-                            <select name="choice_attributes[]" data-live-search="true" data-selected-text-format="count"
+                            <select name="choice_attributes[]" data-live-search="true"
+                                data-selected-text-format="count"
                                 id="choice_attributes" class="form-control aiz-selectpicker" multiple
                                 data-placeholder="{{ translate('Choose Attributes') }}">
                                 @foreach (\App\Models\Attribute::all() as $key => $attribute)
@@ -329,17 +343,21 @@
                         @foreach (json_decode($product->choice_options) as $key => $choice_option)
                         <div class="form-group row">
                             <div class="col-lg-3">
-                                <input type="hidden" name="choice_no[]" value="{{ $choice_option->attribute_id }}">
+                                <input type="hidden" name="choice_no[]"
+                                    value="{{ $choice_option->attribute_id }}">
                                 <input type="text" class="form-control" name="choice[]"
                                     value="{{ \App\Models\Attribute::find($choice_option->attribute_id)->getTranslation('name') }}"
                                     placeholder="{{ translate('Choice Title') }}" disabled>
                             </div>
                             <div class="col-lg-8">
-                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_{{ $choice_option->attribute_id }}[]" multiple>
+                                <select class="form-control aiz-selectpicker attribute_choice"
+                                    data-live-search="true"
+                                    name="choice_options_{{ $choice_option->attribute_id }}[]" multiple>
                                     @foreach (\App\Models\AttributeValue::where('attribute_id', $choice_option->attribute_id)->get() as $row)
-                                        <option value="{{ $row->value }}" @if( in_array($row->value, $choice_option->values)) selected @endif>
-                                            {{ $row->value }}
-                                        </option>
+                                    <option value="{{ $row->value }}"
+                                        @if( in_array($row->value, $choice_option->values)) selected @endif>
+                                        {{ $row->value }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 {{-- <input type="text" class="form-control aiz-tag-input" name="choice_options_{{ $choice_option->attribute_id }}[]" placeholder="{{ translate('Enter choice values') }}" value="{{ implode(',', $choice_option->values) }}" data-on-change="update_sku"> --}}
@@ -357,39 +375,49 @@
                     <div class="form-group row">
                         <label class="col-lg-3 col-from-label">{{translate('Unit price')}}</label>
                         <div class="col-lg-6">
-                            <input type="text" placeholder="{{translate('Unit price')}}" name="unit_price" class="form-control"
+                            <input type="text" placeholder="{{translate('Unit price')}}" name="unit_price"
+                                class="form-control"
                                 value="{{$product->unit_price}}" required>
                         </div>
                     </div>
 
                     @php
-                        $date_range = '';
-                        if($product->discount_start_date){
-                            $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
-                            $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
-                            $date_range = $start_date.' to '.$end_date;
-                        }
+                    $date_range = '';
+                    if($product->discount_start_date){
+                    $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
+                    $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
+                    $date_range = $start_date.' to '.$end_date;
+                    }
                     @endphp
 
                     <div class="form-group row">
-                        <label class="col-lg-3 col-from-label" for="start_date">{{translate('Discount Date Range')}}</label>
+                        <label class="col-lg-3 col-from-label"
+                            for="start_date">{{translate('Discount Date Range')}}</label>
                         <div class="col-lg-9">
-                            <input type="text" class="form-control aiz-date-range" value="{{ $date_range }}" name="date_range" placeholder="{{translate('Select Date')}}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
+                            <input type="text" class="form-control aiz-date-range" value="{{ $date_range }}"
+                                name="date_range" placeholder="{{translate('Select Date')}}"
+                                data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to "
+                                autocomplete="off">
                         </div>
                     </div>
 
                     <div class="form-group row">
                         <label class="col-lg-3 col-from-label">{{translate('Discount')}}</label>
                         <div class="col-lg-6">
-                            <input type="number" lang="en" min="0" step="0.01" placeholder="{{translate('Discount')}}"
+                            <input type="number" lang="en" min="0" step="0.01"
+                                placeholder="{{translate('Discount')}}"
                                 name="discount" class="form-control" value="{{ $product->discount }}" required>
                         </div>
                         <div class="col-lg-3">
                             <select class="form-control aiz-selectpicker" name="discount_type" required>
-                                <option value="amount" <?php if($product->discount_type == 'amount') echo "selected";?>>
-                                    {{translate('Flat')}}</option>
-                                <option value="percent" <?php if($product->discount_type == 'percent') echo "selected";?>>
-                                    {{translate('Percent')}}</option>
+                                <option
+                                    value="amount" <?php if ($product->discount_type == 'amount') echo "selected"; ?>>
+                                    {{translate('Flat')}}
+                                </option>
+                                <option
+                                    value="percent" <?php if ($product->discount_type == 'percent') echo "selected"; ?>>
+                                    {{translate('Percent')}}
+                                </option>
                             </select>
                         </div>
                     </div>
@@ -399,7 +427,8 @@
                             <label class="col-lg-3 col-from-label">{{translate('Quantity')}}</label>
                             <div class="col-lg-6">
                                 <input type="number" lang="en" value="{{ $product->stocks->first()->qty }}" step="1"
-                                    placeholder="{{translate('Quantity')}}" name="current_stock" class="form-control">
+                                    placeholder="{{translate('Quantity')}}" name="current_stock"
+                                    class="form-control">
                             </div>
                         </div>
                         <div class="form-group row">
@@ -407,29 +436,36 @@
                                 {{translate('SKU')}}
                             </label>
                             <div class="col-md-6">
-                                <input type="text" placeholder="{{ translate('SKU') }}" value="{{ $product->stocks->first()->sku }}" name="sku" class="form-control">
+                                <input type="text" placeholder="{{ translate('SKU') }}"
+                                    value="{{ $product->stocks->first()->sku }}" name="sku" class="form-control">
                             </div>
                         </div>
                     </div>
                     @if(get_setting('product_external_link_for_seller') == 1)
-                        <div class="form-group row">
-                            <label class="col-md-3 col-from-label">
-                                {{translate('External link')}}
-                            </label>
-                            <div class="col-md-9">
-                                <input type="text" placeholder="{{ translate('External link') }}" name="external_link" value="{{ $product->external_link }}" class="form-control">
-                                <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
-                            </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 col-from-label">
+                            {{translate('External link')}}
+                        </label>
+                        <div class="col-md-9">
+                            <input type="text" placeholder="{{ translate('External link') }}"
+                                name="external_link" value="{{ $product->external_link }}"
+                                class="form-control">
+                            <small
+                                class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
                         </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-from-label">
-                                {{translate('External link button text')}}
-                            </label>
-                            <div class="col-md-9">
-                                <input type="text" placeholder="{{ translate('External link button text') }}" name="external_link_btn" value="{{ $product->external_link_btn }}" class="form-control">
-                                <small class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
-                            </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-3 col-from-label">
+                            {{translate('External link button text')}}
+                        </label>
+                        <div class="col-md-9">
+                            <input type="text" placeholder="{{ translate('External link button text') }}"
+                                name="external_link_btn" value="{{ $product->external_link_btn }}"
+                                class="form-control">
+                            <small
+                                class="text-muted">{{translate('Leave it blank if you do not use external site link')}}</small>
                         </div>
+                    </div>
                     @endif
                     <br>
                     <div class="sku_combination" id="sku_combination">
@@ -443,7 +479,9 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label class="col-lg-3 col-from-label">{{translate('Description')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
+                        <label class="col-lg-3 col-from-label">{{translate('Description')}} <i
+                                class="las la-language text-danger"
+                                title="{{translate('Translatable')}}"></i></label>
                         <div class="col-lg-9">
                             <textarea class="aiz-text-editor"
                                 name="description">{{$product->getTranslation('description',$lang)}}</textarea>
@@ -458,11 +496,13 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('PDF Specification')}}</label>
+                        <label class="col-md-3 col-form-label"
+                            for="signinSrEmail">{{translate('PDF Specification')}}</label>
                         <div class="col-md-8">
                             <div class="input-group" data-toggle="aizuploader">
                                 <div class="input-group-prepend">
-                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
+                                    <div
+                                        class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
                                     </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
@@ -482,7 +522,8 @@
                     <div class="form-group row">
                         <label class="col-lg-3 col-from-label">{{translate('Meta Title')}}</label>
                         <div class="col-lg-8">
-                            <input type="text" class="form-control" name="meta_title" value="{{ $product->meta_title }}"
+                            <input type="text" class="form-control" name="meta_title"
+                                value="{{ $product->meta_title }}"
                                 placeholder="{{translate('Meta Title')}}">
                         </div>
                     </div>
@@ -494,15 +535,19 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label class="col-md-3 col-form-label" for="signinSrEmail">{{translate('Meta Images')}}</label>
+                        <label class="col-md-3 col-form-label"
+                            for="signinSrEmail">{{translate('Meta Images')}}</label>
                         <div class="col-md-8">
-                            <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
+                            <div class="input-group" data-toggle="aizuploader" data-type="image"
+                                data-multiple="true">
                                 <div class="input-group-prepend">
-                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
+                                    <div
+                                        class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
                                     </div>
                                 </div>
                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                <input type="hidden" name="meta_img" value="{{ $product->meta_img }}" class="selected-files">
+                                <input type="hidden" name="meta_img" value="{{ $product->meta_img }}"
+                                    class="selected-files">
                             </div>
                             <div class="file-preview box sm">
                             </div>
@@ -520,49 +565,52 @@
 
             {{-- Refund --}}
             @if (addon_is_activated('refund_request'))
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0 h6">{{ translate('Refund') }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row">
-                            <label class="col-md-2 col-from-label">{{translate('Refundable')}}?</label>
-                            <div class="col-md-10">
-                                <label class="aiz-switch aiz-switch-success mb-0 d-block">
-                                    <input type="checkbox" name="refundable" value="1" @if ($product->refundable == 1) checked
-                                    @endif onchange="isRefundable()">
-                                    <span></span>
-                                </label>
-                                <small id="refundable-note" class="text-muted d-none"></small>
-                            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 h6">{{ translate('Refund') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label class="col-md-2 col-from-label">{{translate('Refundable')}}?</label>
+                        <div class="col-md-10">
+                            <label class="aiz-switch aiz-switch-success mb-0 d-block">
+                                <input type="checkbox" name="refundable" value="1"
+                                    @if ($product->refundable == 1) checked
+                                @endif onchange="isRefundable()">
+                                <span></span>
+                            </label>
+                            <small id="refundable-note" class="text-muted d-none"></small>
                         </div>
+                    </div>
 
-                        <div class="w-100 refund-block @if($product->refundable != 1) d-none @endif">
-                            <div class="form-group row">
-                                <div class="col-md-2"></div>
-                                <div class="col-md-10">
-                                    <input type="hidden" name="refund_note_id" id="refund_note_id" value="{{ $product->refund_note_id }}">
-                                    
-                                    <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Refund Note')}}</h5>
-                                    <div id="refund_note">
-                                        @if($product->refundNote != null)
-                                            <div class="border border-gray my-2 p-2">
-                                                {{ $product->refundNote->getTranslation('description') ?? '' }}
-                                            </div>
-                                        @endif
+                    <div class="w-100 refund-block @if($product->refundable != 1) d-none @endif">
+                        <div class="form-group row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <input type="hidden" name="refund_note_id" id="refund_note_id"
+                                    value="{{ $product->refund_note_id }}">
+
+                                <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
+                                    style="border-bottom: 1px dashed #e4e5eb;">{{translate('Refund Note')}}</h5>
+                                <div id="refund_note">
+                                    @if($product->refundNote != null)
+                                    <div class="border border-gray my-2 p-2">
+                                        {{ $product->refundNote->getTranslation('description') ?? '' }}
                                     </div>
-                                    <button
-                                        type="button"
-                                        class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                        onclick="noteModal('refund')">
-                                        <i class="las la-plus"></i>
-                                        <span class="ml-2">{{ translate('Select Refund Note') }}</span>
-                                    </button>
+                                    @endif
                                 </div>
+                                <button
+                                    type="button"
+                                    class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                    onclick="noteModal('refund')">
+                                    <i class="las la-plus"></i>
+                                    <span class="ml-2">{{ translate('Select Refund Note') }}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             @endif
 
             {{-- Warranty --}}
@@ -575,37 +623,41 @@
                         <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
                         <div class="col-md-10">
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input type="checkbox" name="has_warranty" onchange="warrantySelection()" @if($product->has_warranty == 1) checked @endif> 
+                                <input type="checkbox" name="has_warranty" onchange="warrantySelection()"
+                                    @if($product->has_warranty == 1) checked @endif>
                                 <span></span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="w-100 warranty_selection_div @if($product->has_warranty != 1) d-none @endif" >
+                    <div class="w-100 warranty_selection_div @if($product->has_warranty != 1) d-none @endif">
                         <div class="form-group row">
                             <div class="col-md-2"></div>
                             <div class="col-md-10">
-                                <select class="form-control aiz-selectpicker" 
-                                    name="warranty_id" 
-                                    id="warranty_id" 
-                                    data-selected="{{ $product->warranty_id }}" 
+                                <select class="form-control aiz-selectpicker"
+                                    name="warranty_id"
+                                    id="warranty_id"
+                                    data-selected="{{ $product->warranty_id }}"
                                     data-live-search="true"
                                     @if($product->has_warranty == 1) required @endif
-                                >
+                                    >
                                     <option value="">{{ translate('Select Warranty') }}</option>
                                     @foreach (\App\Models\Warranty::all() as $warranty)
-                                        <option value="{{ $warranty->id }}" @selected(old('warranty_id') == $warranty->id)>{{ $warranty->getTranslation('text') }}</option>
+                                    <option
+                                        value="{{ $warranty->id }}" @selected(old('warranty_id')==$warranty->id)>{{ $warranty->getTranslation('text') }}</option>
                                     @endforeach
                                 </select>
 
-                                <input type="hidden" name="warranty_note_id" id="warranty_note_id" value="{{ $product->warranty_note_id }}">
-                                
-                                <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty Note')}}</h5>
+                                <input type="hidden" name="warranty_note_id" id="warranty_note_id"
+                                    value="{{ $product->warranty_note_id }}">
+
+                                <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
+                                    style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty Note')}}</h5>
                                 <div id="warranty_note">
                                     @if($product->warrantyNote != null)
-                                        <div class="border border-gray my-2 p-2">
-                                            {{ $product->warrantyNote->getTranslation('description') ?? '' }}
-                                        </div>
+                                    <div class="border border-gray my-2 p-2">
+                                        {{ $product->warrantyNote->getTranslation('description') ?? '' }}
+                                    </div>
                                     @endif
                                 </div>
                                 <button
@@ -638,7 +690,8 @@
                                 onchange="fq_bought_product_selection_type()"
                                 @if($product->frequently_bought_selection_type == 'product') checked @endif
                             >
-                            <label for="fq_bought_select_products" class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Product')}}</label>
+                            <label for="fq_bought_select_products"
+                                class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Product')}}</label>
                         </div>
                         <div class="radio mar-btm mr-3 d-flex align-items-center">
                             <input
@@ -649,7 +702,8 @@
                                 onchange="fq_bought_product_selection_type()"
                                 @if($product->frequently_bought_selection_type == 'category') checked @endif
                             >
-                            <label for="fq_bought_select_category" class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Category')}}</label>
+                            <label for="fq_bought_select_category"
+                                class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Category')}}</label>
                         </div>
                     </div>
 
@@ -658,47 +712,57 @@
                             <div class="card-body">
                                 <div class="fq_bought_select_product_div d-none">
                                     @php
-                                        $fq_bought_products = $product->frequently_bought_products()->where('category_id', null)->get();
+                                    $fq_bought_products = $product->frequently_bought_products()->where('category_id', null)->get();
                                     @endphp
 
                                     <div id="selected-fq-bought-products">
                                         @if(count($fq_bought_products) > 0)
-                                            <div class="table-responsive mb-4">
-                                                <table class="table aiz-table mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="opacity-50 pl-0">{{ translate('Product Thumb') }}</th>
-                                                            <th class="opacity-50">{{ translate('Product Name') }}</th>
-                                                            <th class="opacity-50">{{ translate('Category') }}</th>
-                                                            <th class="opacity-50 text-right pr-0">{{ translate('Options') }}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($fq_bought_products as $fQBproduct)
-                                                            <tr class="remove-parent">
-                                                                <input type="hidden" name="fq_bought_product_ids[]" value="{{ $fQBproduct->frequently_bought_product->id }}">
-                                                                <td class="w-150px pl-0" style="vertical-align: middle;">
-                                                                    <p class="d-block size-48px">
-                                                                        <img src="{{ uploaded_asset($fQBproduct->frequently_bought_product->thumbnail_img) }}" alt="{{ translate('Image')}}"
-                                                                            class="h-100 img-fit lazyload" onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                                                    </p>
-                                                                </td>
-                                                                <td style="vertical-align: middle;">
-                                                                    <p class="d-block fs-13 fw-700 hov-text-primary mb-1 text-dark" title="{{ translate('Product Name') }}">
-                                                                        {{ $fQBproduct->frequently_bought_product->getTranslation('name') }}
-                                                                    </p>
-                                                                </td>
-                                                                <td style="vertical-align: middle;">{{ $fQBproduct->frequently_bought_product->main_category->name ?? translate('Category Not Found') }}</td>
-                                                                <td class="text-right pr-0" style="vertical-align: middle;">
-                                                                    <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".remove-parent">
-                                                                        <i class="las la-trash"></i>
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                        <div class="table-responsive mb-4">
+                                            <table class="table aiz-table mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="opacity-50 pl-0">{{ translate('Product Thumb') }}</th>
+                                                        <th class="opacity-50">{{ translate('Product Name') }}</th>
+                                                        <th class="opacity-50">{{ translate('Category') }}</th>
+                                                        <th class="opacity-50 text-right pr-0">{{ translate('Options') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($fq_bought_products as $fQBproduct)
+                                                    <tr class="remove-parent">
+                                                        <input type="hidden" name="fq_bought_product_ids[]"
+                                                            value="{{ $fQBproduct->frequently_bought_product->id }}">
+                                                        <td class="w-150px pl-0"
+                                                            style="vertical-align: middle;">
+                                                            <p class="d-block size-48px">
+                                                                <img
+                                                                    src="{{ $fQBproduct->frequently_bought_product->thumbnail_img }}"
+                                                                    alt="{{ translate('Image')}}"
+                                                                    class="h-100 img-fit lazyload"
+                                                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                            </p>
+                                                        </td>
+                                                        <td style="vertical-align: middle;">
+                                                            <p class="d-block fs-13 fw-700 hov-text-primary mb-1 text-dark"
+                                                                title="{{ translate('Product Name') }}">
+                                                                {{ $fQBproduct->frequently_bought_product->getTranslation('name') }}
+                                                            </p>
+                                                        </td>
+                                                        <td style="vertical-align: middle;">{{ $fQBproduct->frequently_bought_product->main_category->name ?? translate('Category Not Found') }}</td>
+                                                        <td class="text-right pr-0"
+                                                            style="vertical-align: middle;">
+                                                            <button type="button"
+                                                                class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
+                                                                data-toggle="remove-parent"
+                                                                data-parent=".remove-parent">
+                                                                <i class="las la-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                         @endif
                                     </div>
 
@@ -714,8 +778,8 @@
                                 {{-- Select Category for Frequently Bought Product --}}
                                 <div class="fq_bought_select_category_div d-none">
                                     @php
-                                        $fq_bought_product_category_id = $product->frequently_bought_products()->where('category_id','!=', null)->first();
-                                        $fqCategory = $fq_bought_product_category_id != null ? $fq_bought_product_category_id->category_id : null;
+                                    $fq_bought_product_category_id = $product->frequently_bought_products()->where('category_id','!=', null)->first();
+                                    $fqCategory = $fq_bought_product_category_id != null ? $fq_bought_product_category_id->category_id : null;
 
                                     @endphp
                                     <div class="form-group row">
@@ -726,13 +790,13 @@
                                                 data-placeholder="{{ translate('Select a Category')}}"
                                                 name="fq_bought_product_category_id"
                                                 data-live-search="true"
-                                                data-selected="{{ $fqCategory }}"
-                                            >
+                                                data-selected="{{ $fqCategory }}">
                                                 @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
-                                                    @foreach ($category->childrenCategories as $childCategory)
-                                                        @include('categories.child_category', ['child_category' => $childCategory])
-                                                    @endforeach
+                                                <option
+                                                    value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                                @foreach ($category->childrenCategories as $childCategory)
+                                                @include('categories.child_category', ['child_category' => $childCategory])
+                                                @endforeach
                                                 @endforeach
                                             </select>
                                         </div>
@@ -754,21 +818,23 @@
                         {{ translate('Select Main') }}
                         <span class="position-relative main-category-info-icon">
                             <i class="las la-question-circle fs-18 text-info"></i>
-                            <span class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show') }}</span>
+                            <span
+                                class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show') }}</span>
                         </span>
                     </h6>
                 </div>
                 <div class="card-body ">
                     <div class="h-300px overflow-auto c-scrollbar-light">
                         @php
-                            $old_categories = $product->categories()->pluck('category_id')->toArray();
+                        $old_categories = $product->categories()->pluck('category_id')->toArray();
                         @endphp
-                        <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
+                        <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]"
+                            data-radio-name="category_id">
                             @foreach ($categories as $category)
                             <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
-                                @foreach ($category->childrenCategories as $childCategory)
-                                    @include('backend.product.products.child_category', ['child_category' => $childCategory])
-                                @endforeach
+                            @foreach ($category->childrenCategories as $childCategory)
+                            @include('backend.product.products.child_category', ['child_category' => $childCategory])
+                            @endforeach
                             @endforeach
                         </ul>
                     </div>
@@ -787,7 +853,8 @@
                         <label class="col-lg-6 col-from-label">{{translate('Free Shipping')}}</label>
                         <div class="col-lg-6">
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input type="radio" name="shipping_type" value="free" @if($product->shipping_type == 'free')
+                                <input type="radio" name="shipping_type" value="free"
+                                    @if($product->shipping_type == 'free')
                                 checked @endif>
                                 <span></span>
                             </label>
@@ -809,7 +876,8 @@
                         <div class="form-group row">
                             <label class="col-lg-6 col-from-label">{{translate('Shipping cost')}}</label>
                             <div class="col-lg-6">
-                                <input type="number" lang="en" min="0" value="{{ $product->shipping_cost }}" step="0.01"
+                                <input type="number" lang="en" min="0" value="{{ $product->shipping_cost }}"
+                                    step="0.01"
                                     placeholder="{{ translate('Shipping cost') }}" name="flat_shipping_cost"
                                     class="form-control">
                             </div>
@@ -817,10 +885,12 @@
                     </div>
 
                     <div class="form-group row">
-                        <label class="col-md-6 col-from-label">{{translate('Is Product Quantity Mulitiply')}}</label>
+                        <label
+                            class="col-md-6 col-from-label">{{translate('Is Product Quantity Mulitiply')}}</label>
                         <div class="col-md-6">
                             <label class="aiz-switch aiz-switch-success mb-0">
-                                <input type="checkbox" name="is_quantity_multiplied" value="1" @if($product->is_quantity_multiplied == 1) checked @endif>
+                                <input type="checkbox" name="is_quantity_multiplied" value="1"
+                                    @if($product->is_quantity_multiplied == 1) checked @endif>
                                 <span></span>
                             </label>
                         </div>
@@ -843,7 +913,8 @@
                         <label for="name">
                             {{translate('Quantity')}}
                         </label>
-                        <input type="number" name="low_stock_quantity" value="{{ $product->low_stock_quantity }}" min="0"
+                        <input type="number" name="low_stock_quantity" value="{{ $product->low_stock_quantity }}"
+                            min="0"
                             step="1" class="form-control">
                     </div>
                 </div>
@@ -933,7 +1004,8 @@
                         </label>
                         <div class="input-group">
                             <input type="number" class="form-control" name="est_shipping_days"
-                                value="{{ $product->est_shipping_days }}" min="1" step="1" placeholder="{{translate('Shipping Days')}}">
+                                value="{{ $product->est_shipping_days }}" min="1" step="1"
+                                placeholder="{{translate('Shipping Days')}}">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="inputGroupPrepend">{{translate('Days')}}</span>
                             </div>
@@ -954,20 +1026,21 @@
                     </label>
 
                     @php
-                        $tax_amount = 0;
-                        $tax_type = '';
-                        foreach($tax->product_taxes as $row) {
-                            if($product->id == $row->product_id) {
-                                $tax_amount = $row->tax;
-                                $tax_type = $row->tax_type;
-                            }
-                        }
+                    $tax_amount = 0;
+                    $tax_type = '';
+                    foreach($tax->product_taxes as $row) {
+                    if($product->id == $row->product_id) {
+                    $tax_amount = $row->tax;
+                    $tax_type = $row->tax_type;
+                    }
+                    }
                     @endphp
 
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <input type="number" lang="en" min="0" value="{{ $tax_amount }}" step="0.01"
-                                placeholder="{{ translate('Tax') }}" name="tax[]" class="form-control" required>
+                                placeholder="{{ translate('Tax') }}" name="tax[]" class="form-control"
+                                required>
                         </div>
                         <div class="form-group col-md-6">
                             <select class="form-control aiz-selectpicker" name="tax_type[]">
@@ -996,11 +1069,11 @@
 @endsection
 
 @section('modal')
-	<!-- Frequently Bought Product Select Modal -->
-    @include('modals.product_select_modal')
+<!-- Frequently Bought Product Select Modal -->
+@include('modals.product_select_modal')
 
-    {{-- Note Modal --}}
-    @include('modals.note_modal')
+{{-- Note Modal --}}
+@include('modals.note_modal')
 @endsection
 
 @section('script')
@@ -1008,7 +1081,7 @@
 <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
 
 <script type="text/javascript">
-    $(document).ready(function (){
+    $(document).ready(function() {
         show_hide_shipping_div();
 
         $("#treeview").hummingbird();
@@ -1018,16 +1091,16 @@
             const myArray = selected_ids.split(",");
             for (let i = 0; i < myArray.length; i++) {
                 const element = myArray[i];
-                $('#treeview input:checkbox#'+element).prop('checked',true);
-                $('#treeview input:checkbox#'+element).parents( "ul" ).css( "display", "block" );
-                $('#treeview input:checkbox#'+element).parents( "li" ).children('.las').removeClass( "la-plus" ).addClass('la-minus');
+                $('#treeview input:checkbox#' + element).prop('checked', true);
+                $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
+                $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
             }
         }
-        $('#treeview input:radio[value='+main_id+']').prop('checked',true);
+        $('#treeview input:radio[value=' + main_id + ']').prop('checked', true);
         fq_bought_product_selection_type();
     });
 
-    $("[name=shipping_type]").on("change", function (){
+    $("[name=shipping_type]").on("change", function() {
         show_hide_shipping_div();
     });
 
@@ -1036,56 +1109,57 @@
 
         $(".flat_rate_shipping_div").hide();
 
-        if(shipping_val == 'flat_rate'){
+        if (shipping_val == 'flat_rate') {
             $(".flat_rate_shipping_div").show();
         }
     }
 
 
-    function add_more_customer_choice_option(i, name){
+    function add_more_customer_choice_option(i, name) {
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            type:"POST",
-            url:'{{ route('seller.products.add-more-choice-option') }}',
-            data:{
-               attribute_id: i
+            type: "POST",
+            url: '{{ route('
+            seller.products.add - more - choice - option ') }}',
+            data: {
+                attribute_id: i
             },
             success: function(data) {
                 var obj = JSON.parse(data);
                 $('#customer_choice_options').append('\
                 <div class="form-group row">\
                     <div class="col-md-3">\
-                        <input type="hidden" name="choice_no[]" value="'+i+'">\
-                        <input type="text" class="form-control" name="choice[]" value="'+name+'" placeholder="{{ translate('Choice Title') }}" readonly>\
+                        <input type="hidden" name="choice_no[]" value="' + i + '">\
+                        <input type="text" class="form-control" name="choice[]" value="' + name + '" placeholder="{{ translate('
+                    Choice Title ') }}" readonly>\
                     </div>\
                     <div class="col-md-8">\
-                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i +'[]" multiple>\
-                            '+obj+'\
+                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                            ' + obj + '\
                         </select>\
                     </div>\
                 </div>');
                 AIZ.plugins.bootstrapSelect('refresh');
-           }
-       });
+            }
+        });
 
 
     }
 
     $('input[name="colors_active"]').on('change', function() {
-        if(!$('input[name="colors_active"]').is(':checked')){
+        if (!$('input[name="colors_active"]').is(':checked')) {
             $('#colors').prop('disabled', true);
             AIZ.plugins.bootstrapSelect('refresh');
-        }
-        else{
+        } else {
             $('#colors').prop('disabled', false);
             AIZ.plugins.bootstrapSelect('refresh');
         }
         update_sku();
     });
 
-    $(document).on("change", ".attribute_choice",function() {
+    $(document).on("change", ".attribute_choice", function() {
         update_sku();
     });
 
@@ -1093,101 +1167,110 @@
         update_sku();
     });
 
-    function delete_row(em){
+    function delete_row(em) {
         $(em).closest('.form-group').remove();
         update_sku();
     }
 
-    function delete_variant(em){
+    function delete_variant(em) {
         $(em).closest('.variant').remove();
     }
 
-    function update_sku(){
+    function update_sku() {
         $.ajax({
-           type:"POST",
-           url:'{{ route('seller.products.sku_combination_edit') }}',
-           data:$('#choice_form').serialize(),
-           success: function(data){
-               $('#sku_combination').html(data);
-               setTimeout(() => {
-                        AIZ.uploader.previewGenerate();
+            type: "POST",
+            url: '{{ route('
+            seller.products.sku_combination_edit ') }}',
+            data: $('#choice_form').serialize(),
+            success: function(data) {
+                $('#sku_combination').html(data);
+                setTimeout(() => {
+                    AIZ.uploader.previewGenerate();
                 }, "2000");
-               if (data.trim().length > 1) {
-                   $('#show-hide-div').hide();
-                   AIZ.plugins.sectionFooTable('#sku_combination');
-               }
-               else {
+                if (data.trim().length > 1) {
+                    $('#show-hide-div').hide();
+                    AIZ.plugins.sectionFooTable('#sku_combination');
+                } else {
                     $('#show-hide-div').show();
-               }
-           }
-       });
+                }
+            }
+        });
     }
 
     AIZ.plugins.tagify();
 
 
-    $(document).ready(function(){
+    $(document).ready(function() {
         update_sku();
 
-        $('.remove-files').on('click', function(){
+        $('.remove-files').on('click', function() {
             $(this).parents(".col-md-4").remove();
         });
     });
 
     $('#choice_attributes').on('change', function() {
-        $.each($("#choice_attributes option:selected"), function(j, attribute){
+        $.each($("#choice_attributes option:selected"), function(j, attribute) {
             flag = false;
             $('input[name="choice_no[]"]').each(function(i, choice_no) {
-                if($(attribute).val() == $(choice_no).val()){
+                if ($(attribute).val() == $(choice_no).val()) {
                     flag = true;
                 }
             });
-            if(!flag){
+            if (!flag) {
                 add_more_customer_choice_option($(attribute).val(), $(attribute).text());
             }
         });
 
-        var str = @php echo $product->attributes @endphp;
+        var str = @php echo $product - > attributes @endphp;
 
-        $.each(str, function(index, value){
+        $.each(str, function(index, value) {
             flag = false;
-            $.each($("#choice_attributes option:selected"), function(j, attribute){
-                if(value == $(attribute).val()){
+            $.each($("#choice_attributes option:selected"), function(j, attribute) {
+                if (value == $(attribute).val()) {
                     flag = true;
                 }
             });
-            if(!flag){
-                $('input[name="choice_no[]"][value="'+value+'"]').parent().parent().remove();
+            if (!flag) {
+                $('input[name="choice_no[]"][value="' + value + '"]').parent().parent().remove();
             }
         });
 
         update_sku();
     });
 
-    function fq_bought_product_selection_type(){
+    function fq_bought_product_selection_type() {
         var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
-        if(productSelectionType == 'product'){
+        if (productSelectionType == 'product') {
             $('.fq_bought_select_product_div').removeClass('d-none');
             $('.fq_bought_select_category_div').addClass('d-none');
-        }
-        else if(productSelectionType == 'category'){
+        } else if (productSelectionType == 'category') {
             $('.fq_bought_select_category_div').removeClass('d-none');
             $('.fq_bought_select_product_div').addClass('d-none');
         }
     }
 
     function showFqBoughtProductModal() {
-        $('#fq-bought-product-select-modal').modal('show', {backdrop: 'static'});
+        $('#fq-bought-product-select-modal').modal('show', {
+            backdrop: 'static'
+        });
     }
 
     function filterFqBoughtProduct() {
         var productID = $('input[name=id]').val();
         var searchKey = $('input[name=search_keyword]').val();
         var fqBroughCategory = $('select[name=fq_brough_category]').val();
-        $.post('{{ route('seller.product.search') }}', { _token: AIZ.data.csrf, product_id: productID, search_key:searchKey, category:fqBroughCategory, product_type:"physical" }, function(data){
-            $('#product-list').html(data);
-            AIZ.plugins.sectionFooTable('#product-list');
-        });
+        $.post('{{ route('
+            seller.product.search ') }}', {
+                _token: AIZ.data.csrf,
+                product_id: productID,
+                search_key: searchKey,
+                category: fqBroughCategory,
+                product_type: "physical"
+            },
+            function(data) {
+                $('#product-list').html(data);
+                AIZ.plugins.sectionFooTable('#product-list');
+            });
     }
 
     function addFqBoughtProduct() {
@@ -1203,25 +1286,30 @@
 
         var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
 
-        $.post('{{ route('seller.get-selected-products') }}', { _token: AIZ.data.csrf, product_ids:productIds}, function(data){
-            $('#fq-bought-product-select-modal').modal('hide');
-            $('#selected-fq-bought-products').html(data);
-            AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
-        });
+        $.post('{{ route('
+            seller.get - selected - products ') }}', {
+                _token: AIZ.data.csrf,
+                product_ids: productIds
+            },
+            function(data) {
+                $('#fq-bought-product-select-modal').modal('hide');
+                $('#selected-fq-bought-products').html(data);
+                AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
+            });
     }
 
     // Warranty
-    function warrantySelection(){
-        if($('input[name="has_warranty"]').is(':checked')) {
+    function warrantySelection() {
+        if ($('input[name="has_warranty"]').is(':checked')) {
             $('.warranty_selection_div').removeClass('d-none');
             $('#warranty_id').attr('required', true);
-        }
-        else {
+        } else {
             $('.warranty_selection_div').addClass('d-none');
             $('#warranty_id').removeAttr('required');
         }
     }
 
+    @if(addon_is_activated('refund_request'))
     // Refundable
     function isRefundable() {
         const refundType = "{{ get_setting('refund_type') }}";
@@ -1255,12 +1343,12 @@
                 _token: '{{ csrf_token() }}',
                 category_id: categoryId
             },
-            success: function (response) {
+            success: function(response) {
                 if (response.status === 'success' && response.is_refundable) {
                     $refundable.prop('disabled', false);
                     $note.text('{{ translate("This product allows refunds.") }}')
                         .removeClass('d-none');
-                    $refundable.on('change.isRefundableLock', function () {
+                    $refundable.on('change.isRefundableLock', function() {
                         if (!$refundable.is(':checked')) {
                             $('.refund-block').addClass('d-none');
                         } else {
@@ -1275,7 +1363,7 @@
                         .removeClass('d-none');
                 }
             },
-            error: function () {
+            error: function() {
                 $refundable.prop('checked', false);
                 $refundable.prop('disabled', true);
                 $('.refund-block').addClass('d-none');
@@ -1284,26 +1372,33 @@
             }
         });
     }
-    
-    function noteModal(noteType){
-        $.post('{{ route('get_notes') }}',{_token:'{{ @csrf_token() }}', note_type: noteType}, function(data){
-            $('#note_modal #note_modal_content').html(data);
-            $('#note_modal').modal('show', {backdrop: 'static'});
-        });
+    @endif
+
+    function noteModal(noteType) {
+        $.post('{{ route('
+            get_notes ') }}', {
+                _token: '{{ @csrf_token() }}',
+                note_type: noteType
+            },
+            function(data) {
+                $('#note_modal #note_modal_content').html(data);
+                $('#note_modal').modal('show', {
+                    backdrop: 'static'
+                });
+            });
     }
 
-    function addNote(noteId, noteType){
-        var noteDescription = $('#note_description_'+ noteId).val();
-        $('#'+noteType+'_note_id').val(noteId);
-        $('#'+noteType+'_note').html(noteDescription);
-        $('#'+noteType+'_note').addClass('border border-gray my-2 p-2');
+    function addNote(noteId, noteType) {
+        var noteDescription = $('#note_description_' + noteId).val();
+        $('#' + noteType + '_note_id').val(noteId);
+        $('#' + noteType + '_note').html(noteDescription);
+        $('#' + noteType + '_note').addClass('border border-gray my-2 p-2');
         $('#note_modal').modal('hide');
     }
-
 </script>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         var hash = document.location.hash;
         if (hash) {
             $('.nav-tabs a[href="' + hash + '"]').tab('show');
@@ -1314,28 +1409,28 @@
         }
 
         // Change hash for page-reload
-        $('.nav-tabs a').on('shown.bs.tab', function (e) {
+        $('.nav-tabs a').on('shown.bs.tab', function(e) {
             window.location.hash = e.target.hash;
         });
     });
-
-
 </script>
 
 <script type="text/javascript">
-    $(document).ready(function () {
+    $(document).ready(function() {
         warrantySelection();
+        @if(addon_is_activated('refund_request'))
         isRefundable();
 
-        $(document).on('change', 'input[name="category_id"]', function () {
+        $(document).on('change', 'input[name="category_id"]', function() {
             isRefundable();
         });
 
-        $('input[name="refundable"]').on('change', function () {
+        $('input[name="refundable"]').on('change', function() {
             if (!$('input[name="refundable"]').prop('disabled')) {
                 $('.refund-block').toggleClass('d-none', !$(this).is(':checked'));
             }
         });
+        @endif
     });
 </script>
 @endsection

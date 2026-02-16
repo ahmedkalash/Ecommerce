@@ -2,25 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Product;
-use App\Models\ProductStock;
-use App\Models\User;
-use App\Traits\PreventDemoModeChanges;
+use Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Illuminate\Support\Str;
-use Auth;
-use Carbon\Carbon;
-use Storage;
 
-//class ProductsImport implements ToModel, WithHeadingRow, WithValidation
-class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, ToModel
+class ProductsImport implements ToCollection, ToModel, WithHeadingRow, WithValidation
 {
-    use PreventDemoModeChanges;
-
     private $rows = 0;
 
     public function collection(Collection $rows)
@@ -48,7 +40,10 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
                     'name' => $row['name'],
                     'description' => $row['description'],
                     'added_by' => $user->user_type == 'seller' ? 'seller' : 'admin',
-                    'user_id' => $user->user_type == 'seller' ? $user->id : User::where('user_type', 'admin')->first()->id,
+                    'user_id' => $user->user_type == 'seller' ? $user->id : User::where(
+                        'user_type',
+                        'admin'
+                    )->first()->id,
                     'approved' => $approved,
                     'category_id' => $row['category_id'],
                     'brand_id' => $row['brand_id'],
@@ -56,14 +51,18 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
                     'video_link' => $row['video_link'],
                     'tags' => $row['tags'],
                     'unit_price' => $row['unit_price'],
-                    'unit' => $row['unit'],
+
                     'meta_title' => $row['meta_title'],
                     'meta_description' => $row['meta_description'],
                     'est_shipping_days' => $row['est_shipping_days'],
-                    'colors' => json_encode(array()),
-                    'choice_options' => json_encode(array()),
-                    'variations' => json_encode(array()),
-                    'slug' => preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', strtolower($row['slug']))) . '-' . Str::random(5),
+                    'colors' => json_encode([]),
+                    'choice_options' => json_encode([]),
+                    'variations' => json_encode([]),
+                    'slug' => preg_replace(
+                        '/[^A-Za-z0-9\-]/',
+                        '',
+                        str_replace(' ', '-', strtolower($row['slug']))
+                    ) . '-' . Str::random(5),
                     'thumbnail_img' => $this->downloadThumbnail($row['thumbnail_img']),
                     'photos' => $this->downloadGalleryImages($row['photos']),
                 ]);
@@ -74,11 +73,11 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
                     'sku' => $row['sku'],
                     'variant' => '',
                 ]);
-                if($row['multi_categories'] != null){
+                if ($row['multi_categories'] != null) {
                     foreach (explode(',', $row['multi_categories']) as $category_id) {
                         ProductCategory::insert([
-                            "product_id" => $productId->id,
-                            "category_id" => $category_id
+                            'product_id' => $productId->id,
+                            'category_id' => $category_id,
                         ]);
                     }
                 }
@@ -90,7 +89,7 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
 
     public function model(array $row)
     {
-        ++$this->rows;
+        $this->rows++;
     }
 
     public function getRowCount(): int
@@ -103,10 +102,10 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
         return [
             // Can also use callback validation rules
             'unit_price' => function ($attribute, $value, $onFailure) {
-                if (!is_numeric($value)) {
+                if (! is_numeric($value)) {
                     $onFailure('Unit price is not numeric');
                 }
-            }
+            },
         ];
     }
 
@@ -121,15 +120,17 @@ class ProductsImport implements ToCollection, WithHeadingRow, WithValidation, To
             return $upload->id;
         } catch (\Exception $e) {
         }
+
         return null;
     }
 
     public function downloadGalleryImages($urls)
     {
-        $data = array();
+        $data = [];
         foreach (explode(',', str_replace(' ', '', $urls)) as $url) {
             $data[] = $this->downloadThumbnail($url);
         }
+
         return implode(',', $data);
     }
 }

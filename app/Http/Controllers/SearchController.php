@@ -36,41 +36,40 @@ class SearchController extends Controller
 
         $conditions = [];
 
-        if(addon_is_activated('preorder') && $request->product_type == 'preorder_product'){
-                $products = PreorderProduct::where('is_published',1);
-                $products = filter_preorder_product($products);
+        if (addon_is_activated('preorder') && $request->product_type == 'preorder_product') {
+            $products = PreorderProduct::where('is_published', 1);
+            $products = filter_preorder_product($products);
             if ($category_id != null) {
                 $category_ids[] = $category_id;
                 $category = Category::with('childrenCategories')->find($category_id);
 
                 $products = $category->preorderProducts();
             } else {
-                $categories = Category::with('childrenCategories', 'coverImage')->where('level', 0)->orderBy('order_level', 'desc')->get();
+                $categories = Category::with('childrenCategories', 'coverImage')->whereNull('parent_id')->orderBy('name', 'asc')->get();
             }
 
             if ($request->has('is_available') && $request->is_available !== null) {
                 $availability = $request->is_available;
                 $currentDate = Carbon::now()->format('Y-m-d');
-            
+
                 $products->where(function ($query) use ($availability, $currentDate) {
                     if ($availability == 1) {
                         $query->where('is_available', 1)->orWhere('available_date', '<=', $currentDate);
                     } else {
                         $query->where(function ($query) {
                             $query->where('is_available', '!=', 1)
-                                  ->orWhereNull('is_available');
+                                ->orWhereNull('is_available');
                         })
-                        ->where(function ($query) use ($currentDate) {
-                            $query->whereNull('available_date')
-                                  ->orWhere('available_date', '>', $currentDate);
-                        });
+                            ->where(function ($query) use ($currentDate) {
+                                $query->whereNull('available_date')
+                                    ->orWhere('available_date', '>', $currentDate);
+                            });
                     }
                 });
-            
+
                 $is_available = $availability;
             } else {
                 $is_available = null;
-
             }
 
             if ($min_price != null && $max_price != null) {
@@ -93,8 +92,8 @@ class SearchController extends Controller
                 $case2 = '%' . $query . '%';
 
                 $products->orderByRaw('CASE
-                    WHEN product_name LIKE "'.$case1.'" THEN 1
-                    WHEN product_name LIKE "'.$case2.'" THEN 2
+                    WHEN product_name LIKE "' . $case1 . '" THEN 1
+                    WHEN product_name LIKE "' . $case2 . '" THEN 2
                     ELSE 3
                     END');
             }
@@ -117,8 +116,8 @@ class SearchController extends Controller
                     break;
             }
             $products = $products->with('taxes')->paginate(12, ['*'], 'preorder_product')->appends(request()->query());
-            
-            return view('frontend.product_listing', compact('products', 'query', 'category', 'categories', 'category_id', 'brand_id', 'sort_by', 'seller_id', 'min_price', 'max_price', 'attributes', 'selected_attribute_values', 'colors', 'selected_color','product_type','is_available'));            
+
+            return view('frontend.product_listing', compact('products', 'query', 'category', 'categories', 'category_id', 'brand_id', 'sort_by', 'seller_id', 'min_price', 'max_price', 'attributes', 'selected_attribute_values', 'colors', 'selected_color', 'product_type', 'is_available'));
         }
 
 
@@ -141,7 +140,7 @@ class SearchController extends Controller
             $attribute_ids = AttributeCategory::whereIn('category_id', $category_ids)->pluck('attribute_id')->toArray();
             $attributes = Attribute::whereIn('id', $attribute_ids)->get();
         } else {
-            $categories = Category::with('childrenCategories', 'coverImage')->where('level', 0)->orderBy('order_level', 'desc')->get();
+            $categories = Category::with('childrenCategories', 'coverImage')->whereNull('parent_id')->orderBy('name', 'asc')->get();
         }
 
         if ($min_price != null && $max_price != null) {
@@ -169,8 +168,8 @@ class SearchController extends Controller
             $case2 = '%' . $query . '%';
 
             $products->orderByRaw('CASE
-                WHEN name LIKE "'.$case1.'" THEN 1
-                WHEN name LIKE "'.$case2.'" THEN 2
+                WHEN name LIKE "' . $case1 . '" THEN 1
+                WHEN name LIKE "' . $case2 . '" THEN 2
                 ELSE 3
                 END');
         }
@@ -209,10 +208,10 @@ class SearchController extends Controller
                 }
             });
         }
-        
+
         $products = filter_products($products)->with('taxes')->paginate(24)->appends(request()->query());
 
-        return view('frontend.product_listing', compact('products', 'query', 'category', 'categories', 'category_id', 'brand_id', 'sort_by', 'seller_id', 'min_price', 'max_price', 'attributes', 'selected_attribute_values', 'colors', 'selected_color','product_type','is_available'));
+        return view('frontend.product_listing', compact('products', 'query', 'category', 'categories', 'category_id', 'brand_id', 'sort_by', 'seller_id', 'min_price', 'max_price', 'attributes', 'selected_attribute_values', 'colors', 'selected_color', 'product_type', 'is_available'));
     }
 
     public function listing(Request $request)
@@ -222,7 +221,7 @@ class SearchController extends Controller
 
     public function listingByCategory(Request $request, $category_slug)
     {
-        
+
         $category = Category::where('slug', $category_slug)->first();
         if ($category != null) {
             return $this->index($request, $category->id);
@@ -279,8 +278,8 @@ class SearchController extends Controller
         $case2 = '%' . $query . '%';
 
         $products_query->orderByRaw('CASE
-                WHEN name LIKE "'.$case1.'" THEN 1
-                WHEN name LIKE "'.$case2.'" THEN 2
+                WHEN name LIKE "' . $case1 . '" THEN 1
+                WHEN name LIKE "' . $case2 . '" THEN 2
                 ELSE 3
                 END');
         $products = $products_query->limit(3)->get();
@@ -289,26 +288,25 @@ class SearchController extends Controller
 
         $shops = Shop::whereIn('user_id', verified_sellers_id())->where('name', 'like', '%' . $query . '%')->get()->take(3);
 
-        if(addon_is_activated('preorder')){
+        if (addon_is_activated('preorder')) {
             $preorder_products =  PreorderProduct::where('is_published', 1)
-            ->where(function ($queryBuilder) use ($query) {
-                $queryBuilder->where('product_name', 'like', '%' . $query . '%')
-                    ->orWhere('tags', 'like', '%' . $query . '%');
-            })
-            ->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('user_type', 'admin');
-                })->orWhereHas('user.shop', function ($q) {
-                    $q->where('verification_status', 1);
-                });
-            })
-            ->limit(3)
-            ->get();
-            
+                ->where(function ($queryBuilder) use ($query) {
+                    $queryBuilder->where('product_name', 'like', '%' . $query . '%')
+                        ->orWhere('tags', 'like', '%' . $query . '%');
+                })
+                ->where(function ($query) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('user_type', 'admin');
+                    })->orWhereHas('user.shop', function ($q) {
+                        $q->where('verification_status', 1);
+                    });
+                })
+                ->limit(3)
+                ->get();
         }
 
-        if (sizeof($keywords) > 0 || sizeof($categories) > 0 || sizeof($products) > 0 || sizeof($shops) > 0  || sizeof($preorder_products) > 0){
-            return view('frontend.partials.search_content', compact('products', 'categories', 'keywords', 'shops','preorder_products'));
+        if (sizeof($keywords) > 0 || sizeof($categories) > 0 || sizeof($products) > 0 || sizeof($shops) > 0  || sizeof($preorder_products) > 0) {
+            return view('frontend.partials.search_content', compact('products', 'categories', 'keywords', 'shops', 'preorder_products'));
         }
         return '0';
     }

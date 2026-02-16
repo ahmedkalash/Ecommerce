@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-between">
             <div class="row gutters-5 w-400px w-md-500px align-items-center ml-1">
                 <div class="col-auto">
-                    <img src="{{ uploaded_asset($product->thumbnail)}}" alt="Image" class="size-80px img-fit">
+                    <img src="{{ get_file_by_id($product->thumbnail)}}" alt="Image" class="size-80px img-fit">
                 </div>
                 <div class="col">
                     <span class="text-muted text-truncate-2">{{ $product->getTranslation('product_name') }}</span>
@@ -45,26 +45,29 @@
         <div class="card-body">
             <table class="table aiz-table mb-0">
                 <thead>
-                    <tr class="opacity-70">
-                        <th data-breakpoints="lg">#</th>
-                        <th>{{ strtoupper(translate('Customer')) }}</th>
-                        <th>{{ strtoupper(translate('Rating')) }}</th>
-                        <th data-breakpoints="lg">{{ strtoupper(translate('Comment')) }}</th>
-                        <th data-breakpoints="lg" class="text-right"  width="20%">{{ strtoupper(translate('Published')) }}</th>
-                    </tr>
+                <tr class="opacity-70">
+                    <th data-breakpoints="lg">#</th>
+                    <th>{{ strtoupper(translate('Customer')) }}</th>
+                    <th>{{ strtoupper(translate('Rating')) }}</th>
+                    <th data-breakpoints="lg">{{ strtoupper(translate('Comment')) }}</th>
+                    <th data-breakpoints="lg" class="text-right"
+                        width="20%">{{ strtoupper(translate('Published')) }}</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach($preorder_product_reviews as $key => $review)
+                @foreach($preorder_product_reviews as $key => $review)
                     <tr>
-                        <td>{{ ($key+1) + ($preorder_product_reviews->currentPage() - 1)*$preorder_product_reviews->perPage() }}</td> 
+                        <td>{{ ($key+1) + ($preorder_product_reviews->currentPage() - 1)*$preorder_product_reviews->perPage() }}</td>
                         <td>
                             @php
                                 $customerName = $review->user != null ? $review->user->name : translate('Customer Not Found');
-                                $customerAvatar = $review->user != null ? uploaded_asset($review->user->avatar_original) : static_asset('assets/img/avatar-place.png');
+                                $customerAvatar = $review->user != null ? get_file_by_id($review->user->avatar_original) : static_asset('assets/img/avatar-place.png');
                             @endphp
                             <div class="row gutters-5 w-200px w-md-300px mw-100 align-items-center">
                                 <div class="col-auto">
-                                    <img src="{{ $customerAvatar }}" class="size-50px img-fit rounded-circle" alt="Image" onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
+                                    <img src="{{ $customerAvatar }}" class="size-50px img-fit rounded-circle"
+                                         alt="Image"
+                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                 </div>
                                 <div class="col">
                                     <span class="fw-700 text-truncate-2">{{ $customerName }}</span>
@@ -77,14 +80,14 @@
                             @if($review->photos != null)
                                 <div class="spotlight-group d-flex flex-wrap mt-2">
                                     @foreach (explode(',', $review->photos) as $photo)
-                                    <a href="{{ uploaded_asset($photo) }}" 
-                                        class="mr-2 mr-md-3 mb-2 mb-md-3 border overflow-hidden has-transition hov-scale-img hov-border-primary"
-                                        target="_blank">
-                                        <img class="img-fit h-60px lazyload has-transition"
-                                                src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                                data-src="{{ uploaded_asset($photo) }}"
-                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                    </a>
+                                        <a href="{{ get_file_by_id($photo) }}"
+                                           class="mr-2 mr-md-3 mb-2 mb-md-3 border overflow-hidden has-transition hov-scale-img hov-border-primary"
+                                           target="_blank">
+                                            <img class="img-fit h-60px lazyload has-transition"
+                                                 src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                                 data-src="{{ get_file_by_id($photo) }}"
+                                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                        </a>
                                     @endforeach
                                 </div>
                             @endif
@@ -96,15 +99,17 @@
                                 </div>
                                 <div>
                                     @if ($review->status == 1)
-                                        <span class="badge badge-inline badge-success">{{  translate('Published') }}</span>
+                                        <span
+                                            class="badge badge-inline badge-success">{{  translate('Published') }}</span>
                                     @else
-                                        <span class="badge badge-inline badge-danger">{{  translate('Unpublished') }}</span>
+                                        <span
+                                            class="badge badge-inline badge-danger">{{  translate('Unpublished') }}</span>
                                     @endif
                                 </div>
                             </div>
                         </td>
                     </tr>
-                    @endforeach
+                @endforeach
                 </tbody>
             </table>
             <div class="aiz-pagination">

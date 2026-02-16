@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use Cache;
-use App\Models\Shop;
-use App\Models\Color;
-use App\Models\Product;
-use App\Models\FlashDeal;
-use Illuminate\Http\Request;
-use App\Utility\SearchUtility;
-use App\Utility\CategoryUtility;
 use App\Http\Resources\V2\FlashDealCollection;
 use App\Http\Resources\V2\LastViewedProductCollection;
-use App\Http\Resources\V2\ProductMiniCollection;
 use App\Http\Resources\V2\ProductDetailCollection;
+use App\Http\Resources\V2\ProductMiniCollection;
+use App\Http\Resources\V2\Seller\BrandCollection;
 use App\Models\Brand;
 use App\Models\Category;
-use App\Http\Resources\V2\Seller\BrandCollection;
+use App\Models\Color;
+use App\Models\FlashDeal;
+use App\Models\Product;
+use App\Models\Shop;
+use App\Utility\CategoryUtility;
+use App\Utility\SearchUtility;
+use Cache;
+use Illuminate\Http\Request;
+
 class ProductController extends Controller
 {
     public function index()
     {
         return new ProductMiniCollection(Product::latest()->paginate(10));
     }
+
     public function show()
     {
         return new ProductMiniCollection(Product::latest()->paginate(10));
@@ -31,43 +33,42 @@ class ProductController extends Controller
     public function product_details($slug, $user_id)
     {
         $product = Product::where('slug', $slug)->get();
-        if(get_setting('last_viewed_product_activation') == 1 && $user_id != null){
+        if (get_setting('last_viewed_product_activation') == 1 && $user_id != null) {
             lastViewedProducts($product[0]->id, $user_id);
         }
+
         return new ProductDetailCollection($product);
     }
 
     public function getPrice(Request $request)
     {
-        $product = Product::where("slug", $request->slug)->first();
+        $product = Product::where('slug', $request->slug)->first();
         $str = '';
         $tax = 0;
         $quantity = 1;
-
-
 
         if ($request->has('quantity') && $request->quantity != null) {
             $quantity = $request->quantity;
         }
 
         if ($request->has('color') && $request->color != null) {
-            $str = Color::where('code', '#' . $request->color)->first()->name;
+            $str = Color::where('code', '#'.$request->color)->first()->name;
         }
 
         $var_str = str_replace(',', '-', $request->variants);
         $var_str = str_replace(' ', '', $var_str);
 
-        if ($var_str != "") {
-            $temp_str = $str == "" ? $var_str : '-' . $var_str;
+        if ($var_str != '') {
+            $temp_str = $str == '' ? $var_str : '-'.$var_str;
             $str .= $temp_str;
         }
 
         $product_stock = $product->stocks->where('variant', $str)->first();
         $price = $product_stock->price;
 
-
         if ($product->wholesale_product) {
-            $wholesalePrice = $product_stock->wholesalePrices->where('min_qty', '<=', $quantity)->where('max_qty', '>=', $quantity)->first();
+            $wholesalePrice = $product_stock->wholesalePrices->where('min_qty', '<=', $quantity)->where('max_qty', '>=',
+                $quantity)->first();
             if ($wholesalePrice) {
                 $price = $wholesalePrice->price;
             }
@@ -83,7 +84,7 @@ class ProductController extends Controller
             $in_stock = 0;
         }
 
-        //Product Stock Visibility
+        // Product Stock Visibility
         if ($product->stock_visibility_state == 'text') {
             if ($stock_qty >= 1 && $product->min_qty < $stock_qty) {
                 $stock_txt = translate('In Stock');
@@ -92,7 +93,7 @@ class ProductController extends Controller
             }
         }
 
-        //discount calculation
+        // discount calculation
         $discount_applicable = false;
 
         if ($product->discount_start_date == null) {
@@ -136,8 +137,8 @@ class ProductController extends Controller
                     'variation' => $str,
                     'max_limit' => $max_limit,
                     'in_stock' => $in_stock,
-                    'image' => $product_stock->image == null ? "" : uploaded_asset($product_stock->image)
-                ]
+                    'image' => $product_stock->image == null ? '' : get_file_by_id($product_stock->image),
+                ],
 
             ]
         );
@@ -147,10 +148,11 @@ class ProductController extends Controller
     {
         $shop = Shop::findOrFail($id);
         $products = Product::where('added_by', 'seller')->where('user_id', $shop->user_id);
-        if ($request->name != "" || $request->name != null) {
-            $products = $products->where('name', 'like', '%' . $request->name . '%');
+        if ($request->name != '' || $request->name != null) {
+            $products = $products->where('name', 'like', '%'.$request->name.'%');
         }
         $products->where('published', 1);
+
         return new ProductMiniCollection($products->latest()->paginate(10));
     }
 
@@ -160,8 +162,8 @@ class ProductController extends Controller
         $category = Category::with('childrenCategories')->find($category->id);
         $products = $category->products();
 
-        if ($request->name != "" || $request->name != null) {
-            $products = $products->where('name', 'like', '%' . $request->name . '%');
+        if ($request->name != '' || $request->name != null) {
+            $products = $products->where('name', 'like', '%'.$request->name.'%');
         }
 
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
@@ -171,9 +173,10 @@ class ProductController extends Controller
     {
         $brand = Brand::where('slug', $slug)->first();
         $products = Product::where('brand_id', $brand->id)->physical();
-        if ($request->name != "" || $request->name != null) {
-            $products = $products->where('name', 'like', '%' . $request->name . '%');
+        if ($request->name != '' || $request->name != null) {
+            $products = $products->where('name', 'like', '%'.$request->name.'%');
         }
+
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
     }
 
@@ -187,13 +190,16 @@ class ProductController extends Controller
     public function todaysDeal()
     {
         $products = Product::where('todays_deal', 1)->physical();
+
         return new ProductMiniCollection(filter_products($products)->limit(20)->latest()->get());
     }
 
     public function flashDeal()
     {
         return Cache::remember('app.flash_deals', 86400, function () {
-            $flash_deals = FlashDeal::where('status', 1)->where('featured', 1)->where('start_date', '<=', strtotime(date('d-m-Y')))->where('end_date', '>=', strtotime(date('d-m-Y')))->get();
+            $flash_deals = FlashDeal::where('status', 1)->where('featured', 1)->where('start_date', '<=',
+                strtotime(date('d-m-Y')))->where('end_date', '>=', strtotime(date('d-m-Y')))->get();
+
             return new FlashDealCollection($flash_deals);
         });
     }
@@ -201,52 +207,57 @@ class ProductController extends Controller
     public function featured()
     {
         $products = Product::where('featured', 1)->physical();
+
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
     }
 
     public function inhouse()
     {
         $products = Product::where('added_by', 'admin');
+
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(12));
     }
 
     public function digital()
     {
         $products = Product::digital();
+
         return new ProductMiniCollection(filter_products($products)->latest()->paginate(10));
     }
 
     public function bestSeller()
     {
         $products = Product::orderBy('num_of_sale', 'desc')->physical();
+
         return new ProductMiniCollection(filter_products($products)->limit(20)->get());
     }
 
     public function frequentlyBought($slug)
     {
-        $product = Product::where("slug", $slug)->first();
+        $product = Product::where('slug', $slug)->first();
         $products = get_frequently_bought_products($product);
+
         return new ProductMiniCollection($products);
     }
 
     public function topFromSeller($slug)
     {
-        $product = Product::where("slug", $slug)->first();
+        $product = Product::where('slug', $slug)->first();
         $products = Product::where('user_id', $product->user_id)->orderBy('num_of_sale', 'desc')->physical();
+
         return new ProductMiniCollection(filter_products($products)->limit(10)->get());
     }
-
 
     public function search(Request $request)
     {
         $category_ids = [];
         $brand_ids = [];
 
-        if ($request->categories != null && $request->categories != "") {
+        if ($request->categories != null && $request->categories != '') {
             $category_ids = explode(',', $request->categories);
         }
 
-        if ($request->brands != null && $request->brands != "") {
+        if ($request->brands != null && $request->brands != '') {
             $brand_ids = explode(',', $request->brands);
         }
 
@@ -255,39 +266,39 @@ class ProductController extends Controller
         $min = $request->min;
         $max = $request->max;
 
-
         $products = Product::query();
 
         $products->where('published', 1)->physical();
 
-        if (!empty($brand_ids)) {
+        if (! empty($brand_ids)) {
             $products->whereIn('brand_id', $brand_ids);
         }
 
-        if (!empty($category_ids)) {
+        if (! empty($category_ids)) {
             $n_cid = [];
             foreach ($category_ids as $cid) {
                 $n_cid = array_merge($n_cid, CategoryUtility::children_ids($cid));
             }
 
-            if (!empty($n_cid)) {
+            if (! empty($n_cid)) {
                 $category_ids = array_merge($category_ids, $n_cid);
             }
 
             $products->whereIn('category_id', $category_ids);
         }
 
-        if ($name != null && $name != "") {
+        if ($name != null && $name != '') {
             $products->where(function ($query) use ($name) {
                 foreach (explode(' ', trim($name)) as $word) {
-                    $query->where('name', 'like', '%' . $word . '%')->orWhere('tags', 'like', '%' . $word . '%')->orWhereHas('product_translations', function ($query) use ($word) {
-                        $query->where('name', 'like', '%' . $word . '%');
-                    });
+                    $query->where('name', 'like', '%'.$word.'%')->orWhere('tags', 'like',
+                        '%'.$word.'%')->orWhereHas('product_translations', function ($query) use ($word) {
+                            $query->where('name', 'like', '%'.$word.'%');
+                        });
                 }
             });
             SearchUtility::store($name);
-            $case1 = $name . '%';
-            $case2 = '%' . $name . '%';
+            $case1 = $name.'%';
+            $case2 = '%'.$name.'%';
 
             $products->orderByRaw('CASE
                 WHEN name LIKE "'.$case1.'" THEN 1
@@ -296,15 +307,13 @@ class ProductController extends Controller
                 END');
         }
 
-        if ($min != null && $min != "" && is_numeric($min)) {
+        if ($min != null && $min != '' && is_numeric($min)) {
             $products->where('unit_price', '>=', $min);
         }
 
-        if ($max != null && $max != "" && is_numeric($max)) {
+        if ($max != null && $max != '' && is_numeric($max)) {
             $products->where('unit_price', '<=', $max);
         }
-
-
 
         switch ($sort_by) {
             case 'price_low_to_high':
@@ -341,22 +350,25 @@ class ProductController extends Controller
         $str = '';
         $tax = 0;
 
-        if ($request->has('color') && $request->color != "") {
-            $str = Color::where('code', '#' . $request->color)->first()->name;
+        if ($request->has('color') && $request->color != '') {
+            $str = Color::where('code', '#'.$request->color)->first()->name;
         }
 
         $var_str = str_replace(',', '-', $request->variants);
         $var_str = str_replace(' ', '', $var_str);
 
-        if ($var_str != "") {
-            $temp_str = $str == "" ? $var_str : '-' . $var_str;
+        if ($var_str != '') {
+            $temp_str = $str == '' ? $var_str : '-'.$var_str;
             $str .= $temp_str;
         }
-        return   $this->calc($product, $str, $request, $tax);
+
+        return $this->calc($product, $str, $request, $tax);
     }
 
-    public function lastViewedProducts(){
+    public function lastViewedProducts()
+    {
         $lastViewedProducts = getLastViewedProducts();
-        return new LastViewedProductCollection( $lastViewedProducts);
+
+        return new LastViewedProductCollection($lastViewedProducts);
     }
 }

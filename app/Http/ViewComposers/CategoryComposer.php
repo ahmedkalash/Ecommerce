@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Http\ViewComposers;
 
 use App\Models\Category;
 use Illuminate\View\View;
 
-class CategoryComposer {
+class CategoryComposer
+{
 
 
     /**
@@ -16,9 +18,8 @@ class CategoryComposer {
     public function compose(View $view)
     {
         $categories_query = Category::query()->with('coverImage');
-        $categories = $categories_query->where('level', 0)->orderBy('order_level', 'desc')->get();
-        
+        $categories = $categories_query->whereNull('parent_id')->orderBy('name', 'asc')->get();
+
         $view->with(['categories' => $categories]);
     }
-
 }

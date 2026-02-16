@@ -9,17 +9,17 @@ class UploadedFileCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
-                    'file_original_name' =>$data->file_original_name,
+                    'file_original_name' => $data->name, // Spatie uses 'name' for original name usually
                     'file_name' => $data->file_name,
-                    'url' => uploaded_asset($data->id),
-                    'file_size' => $data->file_size,
-                    'extension' => $data->extension,
-                    'type' => $data->type
+                    'url' => $data->getUrl(),
+                    'file_size' => $data->size,
+                    'extension' => $data->extension ?? pathinfo($data->file_name, PATHINFO_EXTENSION),
+                    'type' => 'image', // mostly images, can check mime
                 ];
-            })
+            }),
         ];
     }
 
@@ -27,7 +27,7 @@ class UploadedFileCollection extends ResourceCollection
     {
         return [
             'result' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

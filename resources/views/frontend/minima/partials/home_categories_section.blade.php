@@ -19,9 +19,11 @@
                             <!-- Home category banner & name -->
                             <div class="px-0 pt-0 pb-3 p-sm-4">
                                 <div class="w-sm-260px h-260px mx-auto">
-                                    <a href="{{ route('products.category', $category->slug) }}" class="d-block h-100 w-100 w-xl-auto hov-scale-img overflow-hidden home-category-banner">
+                                    <a href="{{ route('products.category', $category->slug) }}"
+                                       class="d-block h-100 w-100 w-xl-auto hov-scale-img overflow-hidden home-category-banner">
                                         <span class="position-absolute h-100 w-100 overflow-hidden">
-                                            <img src="{{ isset($category->coverImage->file_name) ? my_asset($category->coverImage->file_name) : static_asset('assets/img/placeholder.jpg') }}"
+                                            <img
+                                                src="{{ isset($category->coverImage->file_name) ? get_file_by_path($category->coverImage->file_name) : static_asset('assets/img/placeholder.jpg') }}"
                                                 alt="{{ $category_name }}"
                                                 class="img-fit h-100 has-transition"
                                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
@@ -32,8 +34,9 @@
                             <!-- Category Products -->
                             <div class="p-0 p-sm-4 w-100 overflow-hidden">
                                 <div class="aiz-carousel arrow-x-0 arrow-inactive-none" data-items="5"
-                                    data-xxl-items="5" data-xl-items="3.5" data-lg-items="3" data-md-items="2" data-sm-items="1"
-                                    data-xs-items="2" data-arrows='true' data-infinite='false'>
+                                     data-xxl-items="5" data-xl-items="3.5" data-lg-items="3" data-md-items="2"
+                                     data-sm-items="1"
+                                     data-xs-items="2" data-arrows='true' data-infinite='false'>
                                     @foreach (get_cached_products($category->id) as $product_key => $product)
                                         <div
                                             class="carousel-box px-3 position-relative has-transition hov-animate-outline">

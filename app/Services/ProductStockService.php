@@ -2,58 +2,75 @@
 
 namespace App\Services;
 
-use AizPackages\CombinationGenerate\Services\CombinationService;
-use App\Models\ProductStock;
-use App\Utility\ProductUtility;
+use App\Models\Product;
+use Illuminate\Support\Facades\Log;
 
 class ProductStockService
 {
-    public function store(array $data, $product)
+    /**
+     * Store or update stocks for a given product.
+     *
+     * @param array{
+     *     stocks?: array<int, array{
+     *         variant: string,
+     *         price?: float|string,
+     *         qty?: int|string,
+     *         sku?: string|null,
+     *         min_qty?: int|string,
+     *         cash_on_delivery?: bool|int,
+     *         video_link?: string|null,
+     *         video_provider?: string|null
+     *     }>
+     * } $data Raw input data containing 'stocks'
+     * @param  Product  $product  The product record
+     */
+    public function store(array $data, Product $product): void
     {
-        $collection = collect($data);
+        $stocksData = $data['stocks'] ?? [];
 
-        $options = ProductUtility::get_attribute_options($collection);
-        
-        //Generates the combinations of customer choice options
-        $combinations = (new CombinationService())->generate_combination($options);
-        
-        $variant = '';
-        if (count($combinations) > 0) {
-            $product->variant_product = 1;
-            $product->save();
-            foreach ($combinations as $key => $combination) {
-                $str = ProductUtility::get_combination_string($combination, $collection);
-                $product_stock = new ProductStock();
-                $product_stock->product_id = $product->id;
-                $product_stock->variant = $str;
-                $product_stock->price = request()['price_' . str_replace('.', '_', $str)];
-                $product_stock->sku = request()['sku_' . str_replace('.', '_', $str)];
-                $product_stock->qty = request()['qty_' . str_replace('.', '_', $str)];
-                $product_stock->image = request()['img_' . str_replace('.', '_', $str)];
-                $product_stock->save();
-            }
-        } else {
-            unset($collection['colors_active'], $collection['colors'], $collection['choice_no']);
-            $qty = $collection['current_stock'];
-            $price = $collection['unit_price'];
-            unset($collection['current_stock']);
+        if (empty($stocksData)) {
+            Log::warning('ProductStockService::store called with empty stocks data', [
+                'product_id' => $product->id,
+            ]);
 
-            $data = $collection->merge(compact('variant', 'qty', 'price'))->toArray();
-            
-            ProductStock::create($data);
+            return;
         }
+
+        $processedIds = [];
+
+        foreach ($stocksData as $stockData) {
+            $variantName = $stockData['variant'] ?? '';
+
+            $stock = $product->stocks()->firstOrNew(['variant' => $variantName]);
+
+            $stock->price = (float) ($stockData['price'] ?? 0);
+            $stock->qty = (int) ($stockData['qty'] ?? 0);
+            $stock->sku = $stockData['sku'] ?? null;
+            $stock->min_qty = (int) ($stockData['min_qty'] ?? 1);
+            $stock->cash_on_delivery = (bool) ($stockData['cash_on_delivery'] ?? true);
+            $stock->video_link = $stockData['video_link'] ?? null;
+            $stock->video_provider = $stockData['video_provider'] ?? null;
+
+            $stock->save();
+            $processedIds[] = $stock->id;
+        }
+
+        // Remove stocks that are no longer part of the product definition
+        $product->stocks()->whereNotIn('id', $processedIds)->delete();
     }
 
-    public function product_duplicate_store($product_stocks , $product_new)
+    /**
+     * Replicate stocks for a duplicated product.
+     *
+     * @param  iterable  $stocks  Collection of ProductStock models
+     * @param  Product  $new_product  The new product record
+     */
+    public function product_duplicate_store(iterable $stocks, Product $new_product): void
     {
-        foreach ($product_stocks as $key => $stock) {
-            $product_stock              = new ProductStock;
-            $product_stock->product_id  = $product_new->id;
-            $product_stock->variant     = $stock->variant;
-            $product_stock->price       = $stock->price;
-            $product_stock->sku         = $stock->sku;
-            $product_stock->qty         = $stock->qty;
-            $product_stock->save();
+        foreach ($stocks as $stock) {
+            $new_stock = $stock->replicate();
+            $new_stock->product_id = $new_product->id;
+            $new_stock->save();
         }
     }
 }

@@ -12,23 +12,22 @@
 */
 
 use App\Http\Controllers\PosController;
-use App\Http\Controllers\BusinessSettingsController;
 use App\Http\Controllers\Seller\PosController as SellerPosController;
 
 Route::controller(PosController::class)->group(function () {
-    
 });
 
-//Admin
-Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function () {
-    //pos
+// Admin
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin']], function () {
+    // pos
     Route::controller(PosController::class)->group(function () {
         Route::get('/pos', 'index')->name('poin-of-sales.index');
         Route::get('/pos/products', 'search')->name('pos.search_product');
         Route::post('/add-to-cart-pos', 'addToCart')->name('pos.addToCart');
         Route::post('/update-quantity-cart-pos', 'updateQuantity')->name('pos.updateQuantity');
         Route::post('/remove-from-cart-pos', 'removeFromCart')->name('pos.removeFromCart');
-        Route::post('/update-session-user-cart-data', 'updateSessionUserCartData')->name('pos.updateSessionUserCartData');
+        Route::post('/update-session-user-cart-data',
+            'updateSessionUserCartData')->name('pos.updateSessionUserCartData');
         Route::post('/get_shipping_address', 'getShippingAddress')->name('pos.getShippingAddress');
         Route::post('/setDiscount', 'setDiscount')->name('pos.setDiscount');
         Route::post('/setShipping', 'setShipping')->name('pos.setShipping');
@@ -40,7 +39,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function 
     });
 });
 
-//Seller
+// Seller
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified']], function () {
     Route::controller(SellerPosController::class)->group(function () {
         Route::get('/pos', 'index')->name('poin-of-sales.seller_index');
@@ -48,7 +47,8 @@ Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified']], fun
         Route::post('/add-to-cart-pos', 'addToCart')->name('seller.pos.addToCart');
         Route::post('/update-quantity-cart-pos', 'updateQuantity')->name('seller.pos.updateQuantity');
         Route::post('/remove-from-cart-pos', 'removeFromCart')->name('seller.pos.removeFromCart');
-        Route::post('/update-session-user-cart-data', 'updateSessionUserCartData')->name('seller.pos.updateSessionUserCartData');
+        Route::post('/update-session-user-cart-data',
+            'updateSessionUserCartData')->name('seller.pos.updateSessionUserCartData');
         Route::post('/get_shipping_address', 'getShippingAddress')->name('seller.pos.getShippingAddress');
         Route::post('/setDiscount', 'setDiscount')->name('seller.pos.setDiscount');
         Route::post('/setShipping', 'setShipping')->name('seller.pos.setShipping');

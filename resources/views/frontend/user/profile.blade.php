@@ -21,14 +21,16 @@
             <div class="form-group row">
                 <label class="col-md-2 col-form-label fs-14 fs-14">{{ translate('Your Name') }}</label>
                 <div class="col-md-10">
-                    <input type="text" class="form-control rounded-0" placeholder="{{ translate('Your Name') }}" name="name" value="{{ Auth::user()->name }}">
+                    <input type="text" class="form-control rounded-0" placeholder="{{ translate('Your Name') }}"
+                        name="name" value="{{ Auth::user()->name }}">
                 </div>
             </div>
             <!-- Phone-->
             <div class="form-group row">
                 <label class="col-md-2 col-form-label fs-14">{{ translate('Your Phone') }}</label>
                 <div class="col-md-10">
-                    <input type="text" class="form-control rounded-0" placeholder="{{ translate('Your Phone')}}" name="phone" value="{{ Auth::user()->phone }}">
+                    <input type="text" class="form-control rounded-0" placeholder="{{ translate('Your Phone')}}"
+                        name="phone" value="{{ Auth::user()->phone }}">
                 </div>
             </div>
             <!-- Photo-->
@@ -40,29 +42,58 @@
                             <div class="input-group-text bg-soft-secondary font-weight-medium rounded-0">{{ translate('Browse')}}</div>
                         </div>
                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                        <input type="hidden" name="photo" value="{{ Auth::user()->avatar_original }}" class="selected-files">
+                        <input type="hidden" name="photo" value="{{ Auth::user()->avatar_original }}"
+                            class="selected-files">
                     </div>
                     <div class="file-preview box sm">
                     </div>
                 </div>
             </div>
-            <!-- Password-->
+            <!-- Submit Button-->
+            <div class="form-group mb-0 text-right">
+                <button type="submit"
+                    class="btn btn-primary rounded-0 w-150px mt-3">{{translate('Update Profile')}}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Change Password -->
+<div class="card rounded-0 shadow-none border">
+    <div class="card-header pt-4 border-bottom-0">
+        <h5 class="mb-0 fs-18 fw-700 text-dark">{{ translate('Change Password')}}</h5>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('user.password.update') }}" method="POST">
+            @csrf
+            <!-- Current Password-->
             <div class="form-group row">
-                <label class="col-md-2 col-form-label fs-14">{{ translate('Your Password') }}</label>
+                <label class="col-md-2 col-form-label fs-14">{{ translate('Current Password') }}</label>
                 <div class="col-md-10">
-                    <input type="password" class="form-control rounded-0" placeholder="{{ translate('New Password') }}" name="new_password">
+                    <input type="password" class="form-control rounded-0"
+                        placeholder="{{ translate('Current Password') }}" name="current_password">
+                </div>
+            </div>
+            <!-- New Password-->
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label fs-14">{{ translate('New Password') }}</label>
+                <div class="col-md-10">
+                    <input type="password" class="form-control rounded-0"
+                        placeholder="{{ translate('New Password') }}" name="new_password">
                 </div>
             </div>
             <!-- Confirm Password-->
             <div class="form-group row">
                 <label class="col-md-2 col-form-label fs-14">{{ translate('Confirm Password') }}</label>
                 <div class="col-md-10">
-                    <input type="password" class="form-control rounded-0" placeholder="{{ translate('Confirm Password') }}" name="confirm_password">
+                    <input type="password" class="form-control rounded-0"
+                        placeholder="{{ translate('Confirm Password') }}" name="new_password_confirmation">
                 </div>
             </div>
             <!-- Submit Button-->
             <div class="form-group mb-0 text-right">
-                <button type="submit" class="btn btn-primary rounded-0 w-150px mt-3">{{translate('Update Profile')}}</button>
+                <button type="submit"
+                    class="btn btn-primary rounded-0 w-150px mt-3">{{translate('Update Password')}}</button>
             </div>
         </form>
     </div>
@@ -111,7 +142,8 @@
                 </div>
                 @if ($address->set_default)
                 <div class="absolute-md-top-right pt-2 pt-md-4 pr-md-5">
-                    <span class="badge badge-inline badge-secondary-base text-white p-3 fs-12" style="border-radius: 25px; min-width: 80px !important;">{{ translate('default') }}</span>
+                    <span class="badge badge-inline badge-secondary-base text-white p-3 fs-12"
+                        style="border-radius: 25px; min-width: 80px !important;">{{ translate('default') }}</span>
                 </div>
                 @endif
                 <div class="dropdown position-absolute right-0 top-0 pt-4 mr-1">
@@ -123,9 +155,11 @@
                             {{ translate('Edit') }}
                         </a>
                         @if (!$address->set_default)
-                        <a class="dropdown-item" href="{{ route('addresses.set_default', $address->id) }}">{{ translate('Make This Default') }}</a>
+                        <a class="dropdown-item"
+                            href="{{ route('addresses.set_default', $address->id) }}">{{ translate('Make This Default') }}</a>
                         @endif
-                        <a class="dropdown-item" href="{{ route('addresses.destroy', $address->id) }}">{{ translate('Delete') }}</a>
+                        <a class="dropdown-item"
+                            href="{{ route('addresses.destroy', $address->id) }}">{{ translate('Delete') }}</a>
                     </div>
                 </div>
             </div>
@@ -156,11 +190,14 @@
                 </div>
                 <div class="col-md-10">
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control rounded-0" placeholder="{{ translate('Your Email')}}" name="email" value="{{ Auth::user()->email }}" />
+                        <input type="email" class="form-control rounded-0"
+                            placeholder="{{ translate('Your Email')}}" name="email"
+                            value="{{ Auth::user()->email }}" />
                         <div class="input-group-append">
                             <button type="button" class="btn btn-outline-secondary new-email-verification">
                                 <span class="d-none loading">
-                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>{{ translate('Sending Email...') }}
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true"></span>{{ translate('Sending Email...') }}
                                 </span>
                                 <span class="default">{{ translate('Verify') }}</span>
                             </button>
@@ -174,13 +211,16 @@
                 </div>
                 <div class="col-md-10">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control rounded-0" placeholder="{{ translate('Enter Your Verification Code')}}" name="code" value="" disabled />
+                        <input type="text" class="form-control rounded-0"
+                            placeholder="{{ translate('Enter Your Verification Code')}}" name="code" value=""
+                            disabled />
                         <div class="input-group-append">
-                           
+
                         </div>
                     </div>
                     <div class="form-group mb-0 text-right">
-                        <button type="submit" class="btn btn-primary rounded-0 w-150px mt-3" disabled >{{translate('Update Email')}}</button>
+                        <button type="submit" class="btn btn-primary rounded-0 w-150px mt-3"
+                            disabled>{{translate('Update Email')}}</button>
                     </div>
                 </div>
             </div>
@@ -212,26 +252,20 @@
                 data = JSON.parse(data);
                 $('.default').removeClass('d-none');
                 $('.loading').addClass('d-none');
-                if (data.status == 2){
+                if (data.status == 2) {
                     AIZ.plugins.notify('warning', data.message);
-                }
-                else if (data.status == 1){
+                } else if (data.status == 1) {
                     AIZ.plugins.notify('success', data.message);
                     $('input[name="code"]').prop('disabled', false);
                     $('button[type="submit"]').prop('disabled', false);
-                }
-                else{
+                } else {
                     AIZ.plugins.notify('danger', data.message);
                 }
             });
     });
 
     $(document).ready(function() {
-        @if(get_setting('has_state') == 1)
-            get_states(@json(get_active_countries()[0]->id));
-        @else
-            get_city_by_country(@json(get_active_countries()[0]->id));
-        @endif
+        // Initial country/city load removed temporarily.
     });
 </script>
 

@@ -3,8 +3,8 @@
 namespace App\Http\Resources\V2\Seller;
 
 use App\Http\Resources\V2\UploadedFileCollection;
-use App\Models\Upload;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class StockCollection extends ResourceCollection
 {
@@ -16,18 +16,17 @@ class StockCollection extends ResourceCollection
      */
     public function toArray($request)
     {
-        
-        
+
         return [
-            "data" => $this->collection->map(function ($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
-                    "id" => (int) $data->id,
-                    "product_id" => $data->product_id,
-                    "variant" => $data->variant,
-                    "sku" => $data->sku,
-                    "price" => $data->price,
-                    "qty" => $data->qty,
-                    "image" =>new UploadedFileCollection(Upload::where("id",$data->image)->get())
+                    'id' => (int) $data->id,
+                    'product_id' => $data->product_id,
+                    'variant' => $data->variant,
+                    'sku' => $data->sku,
+                    'price' => $data->price,
+                    'qty' => $data->qty,
+                    'image' => new UploadedFileCollection(Media::where('id', $data->image)->get()),
                 ];
             }),
         ];

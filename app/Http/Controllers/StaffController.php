@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Staff;
-use App\Models\Role;
-use App\Models\User;
-use Hash;
+use App\Enums\UserType;
+use App\Http\Requests\StoreStaffRequest;
+use App\Http\Requests\UpdateStaffRequest;
+use App\Models\Admin;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\View\View;
 
 class StaffController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_staffs'])->only('index');
         $this->middleware(['permission:add_staff'])->only('create');
@@ -20,126 +27,139 @@ class StaffController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): View
     {
-        $staffs = Staff::paginate(10);
+        $staffs = Admin::where('user_type', UserType::STAFF->value)->paginate(10);
+
         return view('backend.staff.staffs.index', compact('staffs'));
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): View
     {
-        $roles = Role::where('id','!=',1)->orderBy('id', 'desc')->get();
+        $roles = Role::orderBy('id', 'desc')->get();
+
         return view('backend.staff.staffs.create', compact('roles'));
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreStaffRequest $request): RedirectResponse
     {
-        if(User::where('email', $request->email)->first() == null){
-            $user = new User;
+        try {
+            DB::beginTransaction();
+
+            $user = new Admin();
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
-            $user->user_type = "staff";
+            $user->user_type = UserType::STAFF->value;
             $user->password = Hash::make($request->password);
-            if($user->save()){
-                $staff = new Staff;
-                $staff->user_id = $user->id;
-                $staff->role_id = $request->role_id;
-                $user->assignRole(Role::findOrFail($request->role_id)->name);
-                if($staff->save()){
-                    flash(translate('Staff has been inserted successfully'))->success();
-                    return redirect()->route('staffs.index');
-                }
-            }
-        }
 
-        flash(translate('Email already used'))->error();
-        return back();
+            if ($user->save()) {
+                // Assign role via Spatie Permission
+                $role = Role::findOrFail($request->role_id);
+                $user->assignRole($role->name);
+
+                DB::commit();
+                flash(translate('Staff has been inserted successfully'))->success();
+
+                return redirect()->route('staffs.index');
+            }
+
+            DB::rollBack();
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Staff storage failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        }
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id): never
     {
-        //
+        throw new NotFoundHttpException();
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id): View
     {
-        $staff = Staff::findOrFail(decrypt($id));
-        $roles = $roles = Role::where('id','!=',1)->orderBy('id', 'desc')->get();
+        $staff = Admin::findOrFail($id);
+        $roles = Role::orderBy('id', 'desc')->get();
+
         return view('backend.staff.staffs.edit', compact('staff', 'roles'));
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateStaffRequest $request, int $id): RedirectResponse
     {
-        $staff = Staff::findOrFail($id);
-        $user = $staff->user;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->mobile;
-        if(strlen($request->password) > 0){
-            $user->password = Hash::make($request->password);
-        }
-        if($user->save()){
-            $staff->role_id = $request->role_id;
-            if($staff->save()){
-                $user->syncRoles(Role::findOrFail($request->role_id)->name);
+        try {
+            DB::beginTransaction();
+
+            $user = Admin::findOrFail($id);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone = $request->mobile;
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+
+            if ($user->save()) {
+                $role = Role::findOrFail($request->role_id);
+                $user->syncRoles($role->name);
+
+                DB::commit();
                 flash(translate('Staff has been updated successfully'))->success();
+
                 return redirect()->route('staffs.index');
             }
-        }
 
-        flash(translate('Something went wrong'))->error();
-        return back();
+            DB::rollBack();
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Staff update failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-        User::destroy(Staff::findOrFail($id)->user->id);
-        if(Staff::destroy($id)){
-            flash(translate('Staff has been deleted successfully'))->success();
-            return redirect()->route('staffs.index');
-        }
+        try {
+            $user = Admin::findOrFail($id);
+            $user->delete();
 
-        flash(translate('Something went wrong'))->error();
-        return back();
+            flash(translate('Staff has been deleted successfully'))->success();
+
+            return back();
+        } catch (\Exception $e) {
+            Log::error('Staff deletion failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        }
     }
 }

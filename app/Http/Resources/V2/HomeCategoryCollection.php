@@ -9,17 +9,17 @@ class HomeCategoryCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'name' => $data->category->getTranslation('name'),
-                    'banner' => uploaded_asset($data->category->banner),
-                    'icon' => uploaded_asset($data->category->icon),
+                    'banner' => get_file_by_id($data->category->banner),
+                    'icon' => get_file_by_id($data->category->icon),
                     'links' => [
                         'products' => route('api.products.category', $data->category->id),
-                        'sub_categories' => route('subCategories.index', $data->category->id)
-                    ]
+                        'sub_categories' => route('subCategories.index', $data->category->id),
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -27,7 +27,7 @@ class HomeCategoryCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

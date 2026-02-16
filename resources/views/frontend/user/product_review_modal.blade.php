@@ -6,7 +6,7 @@
 
 @if($review == null)
     <!-- Add new review -->
-    <form action="{{ route('reviews.store') }}" method="POST" >
+    <form action="{{ route('reviews.store') }}" method="POST">
         @csrf
         <input type="hidden" name="product_id" value="{{ $product->id }}">
         <div class="modal-body">
@@ -43,7 +43,8 @@
             <!-- Comment -->
             <div class="form-group">
                 <label class="opacity-60">{{ translate('Comment')}}</label>
-                <textarea class="form-control rounded-0" rows="4" name="comment" placeholder="{{ translate('Your review')}}" required></textarea>
+                <textarea class="form-control rounded-0" rows="4" name="comment"
+                          placeholder="{{ translate('Your review')}}" required></textarea>
             </div>
             <!-- Review Images -->
             <div class="form-group">
@@ -51,19 +52,22 @@
                 <div class="">
                     <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
                         <div class="input-group-prepend">
-                            <div class="input-group-text bg-soft-secondary font-weight-medium rounded-0">{{ translate('Browse')}}</div>
+                            <div
+                                class="input-group-text bg-soft-secondary font-weight-medium rounded-0">{{ translate('Browse')}}</div>
                         </div>
                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                         <input type="hidden" name="photos[]" class="selected-files">
                     </div>
                     <div class="file-preview box sm">
                     </div>
-                    <small class="text-muted">{{translate('These images are visible in product review page gallery. Upload square images')}}</small>
+                    <small
+                        class="text-muted">{{translate('These images are visible in product review page gallery. Upload square images')}}</small>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-secondary rounded-0" data-dismiss="modal">{{translate('Cancel')}}</button>
+            <button type="button" class="btn btn-sm btn-secondary rounded-0"
+                    data-dismiss="modal">{{translate('Cancel')}}</button>
             <button type="submit" class="btn btn-sm btn-primary rounded-0">{{translate('Submit Review')}}</button>
         </div>
     </form>
@@ -98,9 +102,9 @@
                         @foreach (explode(',', $review->photos) as $photo)
                             <div class="mr-3 mb-3 size-90px">
                                 <img class="img-fit h-100 lazyload border"
-                                    src="{{ static_asset('assets/img/placeholder.jpg') }}"
-                                    data-src="{{ uploaded_asset($photo) }}"
-                                    onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                     src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                     data-src="{{ get_file_by_id($photo) }}"
+                                     onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                             </div>
                         @endforeach
                     </div>

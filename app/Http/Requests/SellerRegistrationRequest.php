@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\RecaptchaAction;
 use App\Rules\Recaptcha;
+use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
@@ -29,39 +31,34 @@ class SellerRegistrationRequest extends FormRequest
     public function rules()
     {
         $rules = [];
-        
-        $rules['name']          = 'required|string|max:255';
-        $rules['email']         = 'required|email|unique:users|max:255';
-        $rules['phone']         = 'required|string|max:20';
-        $rules['password' ]     = 'required|string|min:6|confirmed';
-        $rules['shop_name' ]    = 'required|max:255';
-        $rules['address']       = 'required';
-        $rules['g-recaptcha-response'] = [
-                Rule::when(get_setting('google_recaptcha') == 1 && 
-                get_setting('recaptcha_seller_register') == 1 , 
-                ['required', new Recaptcha()], 
-                ['sometimes'])
-            ];
+
+        $rules['name'] = 'required|string|max:255';
+        $rules['email'] = 'required|email|unique:users|max:255';
+        $rules['phone'] = 'required|string|max:20';
+        $rules['password'] = 'required|string|min:6|confirmed';
+        $rules['shop_name'] = 'required|max:255';
+        $rules['address'] = 'required';
+        $rules['g-recaptcha-response'] = RecaptchaService::validationRules(RecaptchaAction::SELLER_REGISTER);
         return $rules;
     }
 
     public function messages()
     {
         return [
-            'name.required'         => translate('Name is required'),
-            'name.string'           => translate('Name should be string type'),
-            'name.max'              => translate('Max 255 characters'),
-            'email.required'        => translate('Email is required'),
-            'email.email'           => translate('Please type a valid email'),
-            'email.unique'          => translate('Email should be unique'),
-            'email.max'             => translate('Max 255 characters'),
-            'password.required'     => translate('Password is required'),
-            'password.string'       => translate('Password should be string type'),
-            'password.min'          => translate('Min 6 characters'),
-            'password.confirmed'    => translate('Confirm password do not matched'),
-            'shop_name.required'    => translate('Shop name is required'),
-            'shop_name.max'         => translate('Max 255 characters'),
-            'address.required'      => translate('Address is required'),
+            'name.required' => translate('Name is required'),
+            'name.string' => translate('Name should be string type'),
+            'name.max' => translate('Max 255 characters'),
+            'email.required' => translate('Email is required'),
+            'email.email' => translate('Please type a valid email'),
+            'email.unique' => translate('Email should be unique'),
+            'email.max' => translate('Max 255 characters'),
+            'password.required' => translate('Password is required'),
+            'password.string' => translate('Password should be string type'),
+            'password.min' => translate('Min 6 characters'),
+            'password.confirmed' => translate('Confirm password do not matched'),
+            'shop_name.required' => translate('Shop name is required'),
+            'shop_name.max' => translate('Max 255 characters'),
+            'address.required' => translate('Address is required'),
         ];
     }
 
@@ -74,8 +71,8 @@ class SellerRegistrationRequest extends FormRequest
             ], 422));
         } else {
             throw (new ValidationException($validator))
-                    ->errorBag($this->errorBag)
-                    ->redirectTo($this->getRedirectUrl());
+                ->errorBag($this->errorBag)
+                ->redirectTo($this->getRedirectUrl());
         }
     }
 }

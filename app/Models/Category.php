@@ -2,25 +2,45 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 use App\Traits\PreventDemoModeChanges;
-use App;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
-class Category extends Model
+class Category extends Model implements HasMedia
 {
-    use PreventDemoModeChanges;
-    protected $fillable = [
-        'discount',
-        'discount_start_date',
-        'discount_end_date',
-    ];
+    use HasFactory, HasRecursiveRelationships, InteractsWithMedia, PreventDemoModeChanges;
+
+    protected $guarded = [];
 
     protected $with = ['category_translations'];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('banner')
+            ->singleFile();
+
+        $this->addMediaCollection('icon')
+            ->singleFile();
+
+        $this->addMediaCollection('cover_image')
+            ->singleFile();
+    }
+
+    public function getParentIdName()
+    {
+        return 'parent_id';
+    }
 
     public function getTranslation($field = '', $lang = false)
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $category_translation = $this->category_translations->where('lang', $lang)->first();
+
         return $category_translation != null ? $category_translation->$field : $this->$field;
     }
 
@@ -31,12 +51,12 @@ class Category extends Model
 
     public function coverImage()
     {
-        return $this->belongsTo(Upload::class, 'cover_image');
+        return $this->belongsTo(Media::class, 'cover_image');
     }
 
     public function catIcon()
     {
-        return $this->belongsTo(Upload::class, 'icon');
+        return $this->belongsTo(Media::class, 'icon');
     }
 
     public function products()
@@ -51,7 +71,7 @@ class Category extends Model
 
     public function bannerImage()
     {
-        return $this->belongsTo(Upload::class, 'banner');
+        return $this->belongsTo(Media::class, 'banner');
     }
 
     public function classified_products()
@@ -84,7 +104,7 @@ class Category extends Model
         return $this->belongsTo(SizeChart::class, 'id', 'category_id');
     }
 
-   public function sellerDiscount()
+    public function sellerDiscount()
     {
         return $this->hasOne(SellerCategory::class)->where('seller_id', auth()->id());
     }
@@ -93,5 +113,4 @@ class Category extends Model
     {
         return $this->hasMany(SellerCategory::class);
     }
-
 }

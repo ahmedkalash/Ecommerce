@@ -11,12 +11,12 @@ class SliderCollection extends ResourceCollection
 
         return [
             'data' => $this->collection->map(function ($data) {
-                //dd($data);
+                // dd($data);
                 return [
-                    'photo' => uploaded_asset($data['image']),
+                    'photo' => get_file_by_id($data['image']),
                     'url' => ($data['link']),
                 ];
-            })
+            }),
         ];
     }
 
@@ -24,7 +24,7 @@ class SliderCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

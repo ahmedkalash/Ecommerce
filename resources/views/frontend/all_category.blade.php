@@ -29,9 +29,10 @@
             @foreach ($categories as $key => $category)
                 <div class="mb-4 bg-white rounded-0 border">
                     <!-- Category Name -->
-                    <a href="{{ route('products.category', $category->slug) }}" class="text-dark p-4 d-flex align-items-center">
+                    <a href="{{ route('products.category', $category->slug) }}"
+                       class="text-dark p-4 d-flex align-items-center">
                         <div class="size-60px overflow-hidden p-1 border mr-3">
-                            <img src="{{ uploaded_asset($category->banner) }}" alt="" class="img-fit h-100">
+                            <img src="{{ get_file_by_id($category->banner) }}" alt="" class="img-fit h-100">
                         </div>
                         <div class="text-reset fs-16 fs-md-20 fw-700 hov-text-primary">
                             {{ $category->getTranslation('name') }}
@@ -44,7 +45,7 @@
                                     <!-- Sub Category Name -->
                                     <h6 class="text-dark mb-3">
                                         <a class="text-reset fw-700 fs-14 hov-text-primary"
-                                            href="{{ route('products.category', $child_category->slug) }}">
+                                           href="{{ route('products.category', $child_category->slug) }}">
                                             {{ $child_category->getTranslation('name') }}
                                         </a>
                                     </h6>
@@ -55,7 +56,7 @@
                                         @foreach ($child_category->childrenCategories as $key => $second_level_category)
                                             <li class="text-dark mb-2">
                                                 <a class="text-reset fw-400 fs-14 hov-text-primary animate-underline-primary"
-                                                    href="{{ route('products.category', $second_level_category->slug) }}">
+                                                   href="{{ route('products.category', $second_level_category->slug) }}">
                                                     {{ $second_level_category->getTranslation('name') }}
                                                 </a>
                                             </li>
@@ -63,7 +64,7 @@
                                     </ul>
                                     @if ($child_category->childrenCategories->count() > 5)
                                         <a href="javascript:void(1)"
-                                            class="show-hide-cetegoty text-primary hov-text-primary fs-12 fw-700">{{ translate('More') }}
+                                           class="show-hide-cetegoty text-primary hov-text-primary fs-12 fw-700">{{ translate('More') }}
                                             <i class="las la-angle-down"></i></a>
                                     @endif
                                 </div>
@@ -79,7 +80,7 @@
 
 @section('script')
     <script>
-        $('.show-hide-cetegoty').on('click', function() {
+        $('.show-hide-cetegoty').on('click', function () {
             var el = $(this).siblings('ul');
             if (el.hasClass('less')) {
                 el.removeClass('less');

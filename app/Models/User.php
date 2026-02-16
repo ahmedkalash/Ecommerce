@@ -2,32 +2,65 @@
 
 namespace App\Models;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\Cart;
+use App\Models\Traits\User\UserRelationships;
 use App\Notifications\EmailVerificationNotification;
-use App\Traits\PreventDemoModeChanges;
+use App\Notifications\ResetPasswordNotification;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasMedia, MustVerifyEmail
 {
-    use Notifiable, HasApiTokens, HasRoles;
+    use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable, UserRelationships;
 
-
-    public function sendEmailVerificationNotification()
+    public function canAccessPanel(Panel $panel): bool
     {
-        $this->notify(new EmailVerificationNotification());
+        return $this->isSuperAdmin() || $this->isStaff();
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new EmailVerificationNotification);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('uploads')
+            ->useDisk('public');
     }
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that are mass-assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'address', 'city', 'postal_code', 'phone', 'country', 'provider_id', 'email_verified_at', 'verification_code'
+        'name',
+        'user_type',
+        'email',
+        'password',
+        'address',
+        'city',
+        'postal_code',
+        'phone',
+        'country',
+        'provider_id',
+        'email_verified_at',
+        'verification_code',
+        'product_id',
+        'quantity',
     ];
 
     /**
@@ -36,136 +69,56 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
-    public function wishlists()
+    public function homePage(): string
     {
-        return $this->hasMany(Wishlist::class);
+        if ($this->isSuperAdmin() || $this->isStaff()) {
+            return route('admin.dashboard');
+        } elseif ($this->isSeller()) {
+            return route('seller.dashboard');
+        } elseif ($this->isDeliveryBoy()) {
+            return route('dashboard');
+        } elseif ($this->isCustomer()) {
+            return route('home');
+        }
+        throw new \RuntimeException('Unknown user type');
     }
 
-    public function customer()
+    public function isSuperAdmin(): bool
     {
-        return $this->hasOne(Customer::class);
+        return $this->user_type == 'admin';
     }
 
-    public function affiliate_user()
+    public function isStaff(): bool
     {
-        return $this->hasOne(AffiliateUser::class);
+        return $this->user_type == 'staff';
     }
 
-    public function affiliate_withdraw_request()
+    public function isSeller(): bool
     {
-        return $this->hasMany(AffiliateWithdrawRequest::class);
+        return $this->user_type == 'seller';
     }
 
-    public function products()
+    public function isCustomer(): bool
     {
-        return $this->hasMany(Product::class);
+        return $this->user_type == 'customer';
     }
 
-    public function shop()
+    public function isDeliveryBoy(): bool
     {
-        return $this->hasOne(Shop::class);
-    }
-    public function seller()
-    {
-        return $this->hasOne(Seller::class);
+        return $this->user_type == 'delivery_boy';
     }
 
-
-    public function staff()
+    public function isShopApproved(): bool
     {
-        return $this->hasOne(Staff::class);
+        return $this->shop->registration_approval == 1;
     }
 
-    public function orders()
+    public function isBanned(): bool
     {
-        return $this->hasMany(Order::class);
-    }
-
-    public function seller_orders()
-    {
-        return $this->hasMany(Order::class, "seller_id");
-    }
-    public function seller_sales()
-    {
-        return $this->hasMany(OrderDetail::class, "seller_id");
-    }
-
-    public function wallets()
-    {
-        return $this->hasMany(Wallet::class)->orderBy('created_at', 'desc');
-    }
-
-    public function club_point()
-    {
-        return $this->hasOne(ClubPoint::class);
-    }
-
-    public function customer_package()
-    {
-        return $this->belongsTo(CustomerPackage::class);
-    }
-
-    public function customer_package_payments()
-    {
-        return $this->hasMany(CustomerPackagePayment::class);
-    }
-
-    public function customer_products()
-    {
-        return $this->hasMany(CustomerProduct::class);
-    }
-
-    public function seller_package_payments()
-    {
-        return $this->hasMany(SellerPackagePayment::class);
-    }
-
-    public function carts()
-    {
-        return $this->hasMany(Cart::class);
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    public function addresses()
-    {
-        return $this->hasMany(Address::class);
-    }
-
-    public function affiliate_log()
-    {
-        return $this->hasMany(AffiliateLog::class);
-    }
-
-    public function product_bids()
-    {
-        return $this->hasMany(AuctionProductBid::class);
-    }
-
-    public function product_queries(){
-        return $this->hasMany(ProductQuery::class,'customer_id');
-    }
-
-    public function uploads(){
-        return $this->hasMany(Upload::class);
-    }
-
-    public function userCoupon(){
-        return $this->hasOne(UserCoupon::class);
-    }
-
-    public function preorderProducts()
-    {
-        return $this->hasMany(PreorderProduct::class);
-    }
-    public function preorders()
-    {
-        return $this->hasMany(Preorder::class);
+        return $this->banned == 1;
     }
 }

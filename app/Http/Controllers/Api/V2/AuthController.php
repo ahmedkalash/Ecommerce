@@ -5,27 +5,24 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\OTPVerificationController;
-use App\Mail\GuestAccountOpeningMailManager;
 use App\Models\Address;
 use App\Models\BusinessSetting;
-use Illuminate\Http\Request;
+use App\Models\Cart;
 use App\Models\User;
 use App\Notifications\AppEmailVerificationNotification;
-use Hash;
-use Socialite;
-use App\Models\Cart;
-use App\Rules\Recaptcha;
 use App\Utility\EmailUtility;
+use Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Laravel\Sanctum\PersonalAccessToken;
-use Mail;
+use Socialite;
 
 class AuthController extends Controller
 {
     public function signup(Request $request)
     {
-        $messages = array(
+        $messages = [
             'name.required' => translate('Name is required'),
             'email_or_phone.required' => $request->register_by == 'email' ? translate('Email is required') : translate('Phone is required'),
             'email_or_phone.email' => translate('Email must be a valid email address'),
@@ -33,8 +30,8 @@ class AuthController extends Controller
             'email_or_phone.unique' => $request->register_by == 'email' ? translate('The email has already been taken') : translate('The phone has already been taken'),
             'password.required' => translate('Password is required'),
             'password.confirmed' => translate('Password confirmation does not match'),
-            'password.min' => translate('Minimum 6 digits required for password')
-        );
+            'password.min' => translate('Minimum 6 digits required for password'),
+        ];
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'password' => 'required|min:6|confirmed',
@@ -43,19 +40,17 @@ class AuthController extends Controller
                 Rule::when($request->register_by === 'email', ['email', 'unique:users,email']),
                 Rule::when($request->register_by === 'phone', ['numeric', 'unique:users,phone']),
             ],
-            'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1, ['required', new Recaptcha()], ['sometimes'])
-            ]
+            'g-recaptcha-response' => RecaptchaService::validationRules(),
         ], $messages);
 
         if ($validator->fails()) {
             return response()->json([
                 'result' => false,
-                'message' => $validator->errors()->all()
+                'message' => $validator->errors()->all(),
             ]);
         }
 
-        $user = new User();
+        $user = new User;
         $user->name = $request->name;
         if ($request->register_by == 'email') {
 
@@ -68,7 +63,6 @@ class AuthController extends Controller
         $user->verification_code = rand(100000, 999999);
         $user->save();
 
-
         $user->email_verified_at = null;
         if ($user->email != null) {
             if (BusinessSetting::where('type', 'email_verification')->first()->value != 1) {
@@ -79,20 +73,21 @@ class AuthController extends Controller
         if ($user->email_verified_at == null) {
             if ($request->register_by == 'email') {
                 try {
-                    $user->notify(new AppEmailVerificationNotification());
+                    $user->notify(new AppEmailVerificationNotification);
                 } catch (\Exception $e) {
                 }
             } else {
-                $otpController = new OTPVerificationController();
+                $otpController = new OTPVerificationController;
                 $otpController->send_code($user);
             }
         }
 
         $user->save();
-        //create token
+        // create token
         $user->createToken('tokens')->plainTextToken;
 
         $tempUserId = $request->has('temp_user_id') ? $request->temp_user_id : null;
+
         return $this->loginSuccess($user, '', $tempUserId);
     }
 
@@ -103,11 +98,11 @@ class AuthController extends Controller
 
         if ($user->email) {
             try {
-                $user->notify(new AppEmailVerificationNotification());
+                $user->notify(new AppEmailVerificationNotification);
             } catch (\Exception $e) {
             }
         } else {
-            $otpController = new OTPVerificationController();
+            $otpController = new OTPVerificationController;
             $otpController->send_code($user);
         }
 
@@ -127,6 +122,7 @@ class AuthController extends Controller
             $user->email_verified_at = date('Y-m-d H:i:s');
             $user->verification_code = null;
             $user->save();
+
             return response()->json([
                 'result' => true,
                 'message' => translate('Your account is now verified'),
@@ -141,12 +137,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $messages = array(
+        $messages = [
             'email.required' => $request->login_by == 'email' ? translate('Email is required') : translate('Phone is required'),
             'email.email' => translate('Email must be a valid email address'),
             'email.numeric' => translate('Phone must be a number.'),
             'password.required' => translate('Password is required'),
-        );
+        ];
         $validator = Validator::make($request->all(), [
             'password' => 'required',
             'login_by' => 'required',
@@ -154,13 +150,13 @@ class AuthController extends Controller
                 'required',
                 Rule::when($request->login_by === 'email', ['email', 'required']),
                 Rule::when($request->login_by === 'phone', ['numeric', 'required']),
-            ]
+            ],
         ], $messages);
 
         if ($validator->fails()) {
             return response()->json([
                 'result' => false,
-                'message' => $validator->errors()->all()
+                'message' => $validator->errors()->all(),
             ]);
         }
 
@@ -191,27 +187,34 @@ class AuthController extends Controller
                 ->first();
         }
         // if (!$delivery_boy_condition) {
-        if (!$delivery_boy_condition && !$seller_condition) {
+        if (! $delivery_boy_condition && ! $seller_condition) {
             if (\App\Utility\PayhereUtility::create_wallet_reference($request->identity_matrix) == false) {
                 return response()->json(['result' => false, 'message' => 'Identity matrix error', 'user' => null], 401);
             }
         }
 
         if ($user != null) {
-            if (!$user->banned) {
+            if (! $user->banned) {
                 if (Hash::check($request->password, $user->password)) {
-                    if($user->user_type=='seller' && $user->shop->registration_approval  == 0){
-                        return response()->json(['result' => false, 'message' => translate('Your seller account is under review. We will notify you once approved.'), 'user' => null], 401);
-                    }else{
+                    if ($user->user_type == 'seller' && $user->shop->registration_approval == 0) {
+                        return response()->json([
+                            'result' => false,
+                            'message' => translate('Your seller account is under review. We will notify you once approved.'),
+                            'user' => null,
+                        ], 401);
+                    } else {
                         $tempUserId = $request->has('temp_user_id') ? $request->temp_user_id : null;
-                        return $this->loginSuccess($user,'', $tempUserId);
+
+                        return $this->loginSuccess($user, '', $tempUserId);
                     }
 
                 } else {
-                    return response()->json(['result' => false, 'message' => translate('Unauthorized'), 'user' => null], 401);
+                    return response()->json(['result' => false, 'message' => translate('Unauthorized'), 'user' => null],
+                        401);
                 }
             } else {
-                return response()->json(['result' => false, 'message' => translate('User is banned'), 'user' => null], 401);
+                return response()->json(['result' => false, 'message' => translate('User is banned'), 'user' => null],
+                    401);
             }
         } else {
             return response()->json(['result' => false, 'message' => translate('User not found'), 'user' => null], 401);
@@ -231,17 +234,17 @@ class AuthController extends Controller
 
         return response()->json([
             'result' => true,
-            'message' => translate('Successfully logged out')
+            'message' => translate('Successfully logged out'),
         ]);
     }
 
     public function socialLogin(Request $request)
     {
-        if (!$request->provider) {
+        if (! $request->provider) {
             return response()->json([
                 'result' => false,
                 'message' => translate('User not found'),
-                'user' => null
+                'user' => null,
             ]);
         }
 
@@ -251,7 +254,7 @@ class AuthController extends Controller
                     'name',
                     'first_name',
                     'last_name',
-                    'email'
+                    'email',
                 ]);
                 break;
             case 'google':
@@ -269,7 +272,9 @@ class AuthController extends Controller
                 $social_user = null;
         }
         if ($social_user == null) {
-            return response()->json(['result' => false, 'message' => translate('No social provider matches'), 'user' => null]);
+            return response()->json([
+                'result' => false, 'message' => translate('No social provider matches'), 'user' => null,
+            ]);
         }
 
         if ($request->social_provider == 'twitter') {
@@ -279,7 +284,9 @@ class AuthController extends Controller
         }
 
         if ($social_user_details == null) {
-            return response()->json(['result' => false, 'message' => translate('No social account matches'), 'user' => null]);
+            return response()->json([
+                'result' => false, 'message' => translate('No social account matches'), 'user' => null,
+            ]);
         }
 
         $existingUserByProviderId = User::where('provider_id', $request->provider)->first();
@@ -288,11 +295,12 @@ class AuthController extends Controller
             $existingUserByProviderId->access_token = $social_user_details->token;
             if ($request->social_provider == 'apple') {
                 $existingUserByProviderId->refresh_token = $social_user_details->refreshToken;
-                if (!isset($social_user->user['is_private_email'])) {
+                if (! isset($social_user->user['is_private_email'])) {
                     $existingUserByProviderId->email = $social_user_details->email;
                 }
             }
             $existingUserByProviderId->save();
+
             return $this->loginSuccess($existingUserByProviderId);
         } else {
             $existing_or_new_user = User::firstOrNew(
@@ -302,7 +310,7 @@ class AuthController extends Controller
             // $existing_or_new_user->user_type = 'customer';
             $existing_or_new_user->provider_id = $social_user_details->id;
 
-            if (!$existing_or_new_user->exists) {
+            if (! $existing_or_new_user->exists) {
                 if ($request->social_provider == 'apple') {
                     if ($request->name) {
                         $existing_or_new_user->name = $request->name;
@@ -330,7 +338,7 @@ class AuthController extends Controller
         $isEmailVerificationEnabled = get_setting('email_verification');
 
         // User Create
-        $user = new User();
+        $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = addon_is_activated('otp_system') ? $request->phone : null;
@@ -346,38 +354,38 @@ class AuthController extends Controller
             $user->delete();
         }
 
-        if($success == 0){
+        if ($success == 0) {
             return response()->json([
                 'result' => false,
-                'message' => translate('Something went wrong!')
+                'message' => translate('Something went wrong!'),
             ]);
         }
 
-        if($isEmailVerificationEnabled == 1){
-            $user->notify(new AppEmailVerificationNotification());
+        if ($isEmailVerificationEnabled == 1) {
+            $user->notify(new AppEmailVerificationNotification);
         }
-        
+
         // User Address Create
-        $address = new Address();
-        $address->user_id       = $user->id;
-        $address->address       = $request->address;
-        $address->country_id    = $request->country_id;
-        $address->state_id      = $request->state_id;
-        $address->city_id       = $request->city_id;
-        $address->postal_code   = $request->postal_code;
-        $address->phone         = $request->phone;
-        $address->longitude     = $request->longitude;
-        $address->latitude      = $request->latitude;
+        $address = new Address;
+        $address->user_id = $user->id;
+        $address->address = $request->address;
+        $address->country_id = $request->country_id;
+        $address->state_id = $request->state_id;
+        $address->city_id = $request->city_id;
+        $address->postal_code = $request->postal_code;
+        $address->phone = $request->phone;
+        $address->longitude = $request->longitude;
+        $address->latitude = $request->latitude;
         $address->save();
 
         Cart::where('temp_user_id', $request->temp_user_id)
             ->update([
                 'user_id' => $user->id,
                 'temp_user_id' => null,
-                'address_id' => $address->id
+                'address_id' => $address->id,
             ]);
 
-        //create token
+        // create token
         $user->createToken('tokens')->plainTextToken;
 
         return $this->loginSuccess($user);
@@ -386,23 +394,23 @@ class AuthController extends Controller
     public function loginSuccess($user, $token = null, $tempUserId = null)
     {
 
-        if (!$token) {
+        if (! $token) {
             $token = $user->createToken('API Token')->plainTextToken;
         }
 
-        if($tempUserId != null){
+        if ($tempUserId != null) {
             Cart::where('temp_user_id', $tempUserId)
                 ->update([
                     'user_id' => $user->id,
-                    'temp_user_id' => null
+                    'temp_user_id' => null,
                 ]);
         }
 
-         if($user->user_type == 'seller'){
+        if ($user->user_type == 'seller') {
             \Log::channel('seller_login')->info('Seller Logged In', [
                 'user_id' => $user->id,
                 'email' => $user->email,
-                'time' => now()->toDateTimeString()
+                'time' => now()->toDateTimeString(),
             ]);
         }
 
@@ -418,13 +426,12 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'avatar' => $user->avatar,
-                'avatar_original' => uploaded_asset($user->avatar_original),
+                'avatar_original' => get_file_by_id($user->avatar_original),
                 'phone' => $user->phone,
-                'email_verified' => $user->email_verified_at != null
-            ]
+                'email_verified' => $user->email_verified_at != null,
+            ],
         ]);
     }
-
 
     protected function loginFailed()
     {
@@ -442,11 +449,10 @@ class AuthController extends Controller
                 'email' => '',
                 'avatar' => '',
                 'avatar_original' => '',
-                'phone' => ''
-            ]
+                'phone' => '',
+            ],
         ]);
     }
-
 
     public function account_deletion()
     {
@@ -460,15 +466,15 @@ class AuthController extends Controller
         User::destroy(auth()->user()->id);
 
         return response()->json([
-            "result" => true,
-            "message" => translate('Your account deletion successfully done')
+            'result' => true,
+            'message' => translate('Your account deletion successfully done'),
         ]);
     }
 
     public function getUserInfoByAccessToken(Request $request)
     {
         $token = PersonalAccessToken::findToken($request->access_token);
-        if (!$token) {
+        if (! $token) {
             return $this->loginFailed();
         }
         $user = $token->tokenable;

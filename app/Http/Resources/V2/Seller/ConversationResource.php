@@ -6,23 +6,23 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ConversationResource extends JsonResource
 {
-
     public function toArray($request)
     {
-        //dd(uploaded_asset($this->sender->avatar_original));
-        $image="";
-        $name="";
+        // dd(uploaded_asset($this->sender->avatar_original));
+        $image = '';
+        $name = '';
         if (auth()->user()->id == $this->sender_id) {
-            $image = uploaded_asset($this->receiver->avatar_original);
+            $image = get_file_by_id($this->receiver->avatar_original);
             $name = $this->receiver->name;
         } else {
-            $image = $this->sender ? uploaded_asset($this->sender->avatar_original) : '';
-            $name =  $this->sender ? $this->sender->name : '';
+            $image = $this->sender ? get_file_by_id($this->sender->avatar_original) : '';
+            $name = $this->sender ? $this->sender->name : '';
         }
+
         return [
-            'id'    => $this->id,
+            'id' => $this->id,
             'image' => $image,
-            'name'  => $name,
+            'name' => $name,
             'title' => $this->title,
         ];
     }

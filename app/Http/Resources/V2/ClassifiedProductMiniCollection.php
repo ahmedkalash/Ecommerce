@@ -11,19 +11,18 @@ class ClassifiedProductMiniCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
 
-
                 return [
                     'id' => $data->id,
                     'slug' => $data->slug,
                     'name' => $data->getTranslation('name'),
-                    'thumbnail_image' => uploaded_asset($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'condition' => $data->conditon,
                     'unit_price' => single_price($data->unit_price),
                     'category' => $data->category->getTranslation('name'),
                     'published' => $data->published == 1 ? true : false,
                     'status' => $data->status == 1 ? true : false,
                 ];
-            })
+            }),
         ];
     }
 
@@ -31,7 +30,7 @@ class ClassifiedProductMiniCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

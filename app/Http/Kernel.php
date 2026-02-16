@@ -2,18 +2,17 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AppLanguage;
+use App\Http\Middleware\CheckoutMiddleware;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsAppUserUnbanned;
+use App\Http\Middleware\IsCustomer;
 use App\Http\Middleware\isPreorder;
 use App\Http\Middleware\IsSeller;
-use App\Http\Middleware\IsCustomer;
-use App\Http\Middleware\IsUser;
-use App\Http\Middleware\CheckoutMiddleware;
 use App\Http\Middleware\IsUnbanned;
-use App\Http\Middleware\AppLanguage;
-use App\Http\Middleware\IsAppUserUnbanned;
+use App\Http\Middleware\IsUser;
 use App\Http\Middleware\PreventDatabaseAction;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-
 
 class Kernel extends HttpKernel
 {
@@ -40,7 +39,7 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            //\App\Http\Middleware\EncryptCookies::class,
+            // \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             // \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -49,7 +48,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\Language::class,
             \App\Http\Middleware\HttpsProtocol::class,
-            \App\Http\Middleware\CheckForMaintenanceMode::class
+            \App\Http\Middleware\CheckForMaintenanceMode::class,
         ],
 
         'api' => [
@@ -100,7 +99,7 @@ class Kernel extends HttpKernel
      *
      * This forces the listed middleware to always be in the given order.
      *
-     * @var array
+     * @var array<string>
      */
     protected $middlewarePriority = [
         \Illuminate\Session\Middleware\StartSession::class,

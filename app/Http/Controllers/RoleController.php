@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddPermissionRequest;
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-// use App\Models\Role;
-use App\Models\RoleTranslation;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -21,124 +26,128 @@ class RoleController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): View
     {
-        $roles = Role::where('id', '!=', 1)->paginate(10);
-        return view('backend.staff.staff_roles.index', compact('roles'));
+        $roles = Role::paginate(10);
 
-        // $roles = Role::paginate(10);
-        // return view('backend.staff.staff_roles.index', compact('roles'));
+        return view('backend.staff.staff_roles.index', compact('roles'));
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): View
     {
         return view('backend.staff.staff_roles.create');
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request): RedirectResponse
     {
-        // dd($request->permissions);
-        $role = Role::create(['name' => $request->name]);
-        $role->givePermissionTo($request->permissions);
+        try {
+            DB::beginTransaction();
 
-        $role_translation = RoleTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'role_id' => $role->id]);
-        $role_translation->name = $request->name;
-        $role_translation->save();
+            $role = Role::create(['name' => $request->name]);
+            $role->givePermissionTo($request->permissions);
 
-        flash(translate('New Role has been added successfully'))->success();
-        return redirect()->route('roles.index');
+            DB::commit();
+            flash(translate('New Role has been added successfully'))->success();
+
+            return back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Role creation failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        }
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id): never
     {
-        //
+        abort(404);
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit(int $id): View
     {
-        $lang = $request->lang;
         $role = Role::findOrFail($id);
-        return view('backend.staff.staff_roles.edit', compact('role', 'lang'));
+
+        return view('backend.staff.staff_roles.edit', compact('role'));
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRoleRequest $request, int $id): RedirectResponse
     {
-        $role = Role::findOrFail($id);
-        if ($request->lang == env("DEFAULT_LANGUAGE")) {
+        try {
+            DB::beginTransaction();
+
+            $role = Role::findOrFail($id);
             $role->name = $request->name;
+            $role->syncPermissions($request->permissions);
+            $role->save();
+
+            DB::commit();
+            flash(translate('Role has been updated successfully'))->success();
+
+            return back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Role update failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
         }
-        $role->syncPermissions($request->permissions);
-        $role->save();
-
-        // Role Translation
-        $role_translation = RoleTranslation::firstOrNew(['lang' => $request->lang, 'role_id' => $role->id]);
-        $role_translation->name = $request->name;
-        $role_translation->save();
-
-        flash(translate('Role has been updated successfully'))->success();
-        return back();
-        // return redirect()->route('roles.index');
     }
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
-        if(env('DEMO_MODE') == 'On'){
-            flash(translate('Data can not change in demo mode.'))->info();
+        try {
+            $role = Role::findOrFail($id);
+            $role->delete();
+
+            flash(translate('Role has been deleted successfully'))->success();
+
+            return back();
+        } catch (\Exception $e) {
+            Log::error('Role deletion failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
             return back();
         }
-
-        RoleTranslation::where('role_id', $id)->delete();
-        Role::destroy($id);
-        flash(translate('Role has been deleted successfully'))->success();
-        return redirect()->route('roles.index');
     }
 
-    public function add_permission(Request $request)
+    /**
+     * Add a new permission to the database.
+     */
+    public function add_permission(AddPermissionRequest $request): RedirectResponse
     {
-        $permission = Permission::create(['name' => $request->name, 'section' => $request->parent]);
-        return redirect()->route('roles.index');
-    }
+        try {
+            Permission::create([
+                'name' => $request->name,
+                'group' => $request->group,
+                'guard_name' => 'admin'
+            ]);
 
-    public function create_admin_permissions()
-    {
+            return back();
+        } catch (\Exception $e) {
+            Log::error('Permission creation failed: '.$e->getMessage(), $e->getTrace());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
+        }
     }
 }

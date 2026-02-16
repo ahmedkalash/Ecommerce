@@ -3,9 +3,6 @@
 namespace App\Http\Resources\V2;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use App\Http\Resources\ProductCollection;
-use App\Models\FlashDeal;
-use App\Models\Product;
 
 class FlashDealCollection extends ResourceCollection
 {
@@ -24,10 +21,10 @@ class FlashDealCollection extends ResourceCollection
                     'slug' => $data->slug,
                     'title' => $data->title,
                     'date' => (int) $data->end_date,
-                    'banner' => uploaded_asset($data->banner),
-                    'products' => new FlashDealProductCollection($data->flash_deal_products()->take(6)->get())
+                    'banner' => get_file_by_id($data->banner),
+                    'products' => new FlashDealProductCollection($data->flash_deal_products()->take(6)->get()),
                 ];
-            })
+            }),
         ];
     }
 
@@ -35,7 +32,7 @@ class FlashDealCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -8,6 +8,8 @@
 .github
 .clinerules
 .continue
+.docs/Active eCommerce CMS Documentation _  V-9.9.9.md
+.docs/Active eCommerce CMS Documentation _  V-9.9.9.pdf
 
 Homestead.json
 Homestead.yaml
@@ -18,16 +20,27 @@ updates.zip
 ecommerce.zip
 install.zip
 auth.json
+GEMINI.md
 _ide_helper_models.php
 _ide_helper.php
 
-/bootstrap/compiled.php
 /.z
 /.z/*
 /.vscode
 /.vagrant
 /.phpunit.cache
 /.fleet
+/.phpstorm.meta.php
+/.mcp.json
+/.boost.json
+/.CLAUDE.md
+/.junie/guidelines.md
+/.ai/mcp/mcp.json
+/.junie/mcp/mcp.json
+/.gemini/settings.json
+/.storage/logs/
+/.agent
+/.aiassistant
 /public/uploads.zip
 /public/all
 /public/public
@@ -43,5 +56,17 @@ _ide_helper.php
 /public/app-translations
 /public/build
 /public/hot
-/public/logs
-/.agent
+/public/logs/*
+/config/debugbar.php
+/config/ide-helper.php
+/config/ignition.php
+/config/tinker.php
+/bootstrap/compiled.php
+/boost.json
+/CLAUDE.md
+/storage/logs/laravel-2026-02-12.log
+/storage/logs/browser.log
+/storage/logs/seller_login.log
+/test_results.txt
+/database/seeders/media_source/*
+/public/livewire-tmp

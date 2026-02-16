@@ -21,7 +21,7 @@ class FollowSellerResource extends JsonResource
             'shop_url' => $this->shop->slug,
             'shop_rating' => $this->shop->rating,
             'shop_num_of_reviews' => $this->shop->num_of_reviews,
-            'shop_logo' => uploaded_asset($this->shop->logo),
+            'shop_logo' => get_file_by_id($this->shop->logo),
         ];
     }
 }

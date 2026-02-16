@@ -18,27 +18,21 @@ class AuctionProductDetailCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
 
-                //photos
-                $photo_paths = get_images_path($data->photos);
                 $photos = [];
-                if (!empty($photo_paths)) {
-                    for ($i = 0; $i < count($photo_paths); $i++) {
-                        if ($photo_paths[$i] != "") {
-                            $item = array();
-                            $item['variant'] = "";
-                            $item['path'] = $photo_paths[$i];
-                            $photos[] = $item;
-                        }
-                    }
+                foreach ($data->galleryMedia() as $mediaItem) {
+                    $photos[] = [
+                        'variant' => '',
+                        'path' => $mediaItem->getUrl(),
+                    ];
                 }
 
-                //branc
+                // branc
 
                 $brand = [
                     'id' => 0,
-                    'slug' => "",
-                    'name' => "",
-                    'logo' => "",
+                    'slug' => '',
+                    'name' => '',
+                    'logo' => '',
                 ];
 
                 if ($data->brand != null) {
@@ -46,46 +40,39 @@ class AuctionProductDetailCollection extends ResourceCollection
                         'id' => $data->brand->id,
                         'id' => $data->brand->slug,
                         'name' => $data->brand->getTranslation('name'),
-                        'logo' => uploaded_asset($data->brand->logo),
+                        'logo' => get_file_by_id($data->brand->logo),
                     ];
-                }
-                $unit = '';
-                if ($data->unit != null) {
-                    $unit = $data->getTranslation('unit');
                 }
                 // highest bids
                 $highest_bid = $data->bids->max('amount');
 
-
                 return [
-                    'id' => (int)$data->id,
+                    'id' => (int) $data->id,
                     'name' => $data->getTranslation('name'),
                     'added_by' => $data->added_by,
                     'seller_id' => $data->user->id,
                     'shop_id' => $data->added_by == 'admin' ? 0 : $data->user->shop->id,
                     'shop_slug' => $data->added_by == 'admin' ? '' : $data->user->shop->slug,
                     'shop_name' => $data->added_by == 'admin' ? translate('In House Product') : $data->user->shop->name,
-                    'shop_logo' => $data->added_by == 'admin' ? uploaded_asset(get_setting('header_logo')) : uploaded_asset($data->user->shop->logo) ?? "",
+                    'shop_logo' => $data->added_by == 'admin' ? get_file_by_id(get_setting('header_logo')) : get_file_by_id($data->user->shop->logo) ?? '',
                     'photos' => $photos,
-                    'thumbnail_image' => uploaded_asset($data->thumbnail_img),
+                    'thumbnail_image' => $data->thumbnail_img,
                     'tags' => explode(',', $data->tags),
-                    'rating' => (float)$data->rating,
-                    'rating_count' => (int)Review::where(['product_id' => $data->id])->count(),
+                    'rating' => (float) $data->rating,
+                    'rating_count' => (int) Review::where(['product_id' => $data->id])->count(),
                     'brand' => $brand,
                     // "auction_end_date" => $data->auction_end_date > strtotime('now') ? date('Y/m/d H:i:s', $data->auction_end_date) : 'Ended',
-                    "auction_end_date" => $data->auction_end_date > strtotime('now') ?  $data->auction_end_date  : 'Ended',
-                    "starting_bid" =>  single_price($data->starting_bid),
-                    'unit' => $unit,
+                    'auction_end_date' => $data->auction_end_date > strtotime('now') ? $data->auction_end_date : 'Ended',
+                    'starting_bid' => single_price($data->starting_bid),
                     'min_bid_price' => $highest_bid != null ? ($highest_bid + 1) : $data->starting_bid,
-                    'highest_bid' => $highest_bid != null ?  single_price($highest_bid) : '',
+                    'highest_bid' => $highest_bid != null ? single_price($highest_bid) : '',
                     'description' => str_replace('&nbsp;', ' ', strip_tags($data->getTranslation('description'))),
-                    'video_link' => $data->video_link != null ?  $data->video_link : "",
-                    'link' => route('product', $data->slug)
+                    'video_link' => $data->video_link != null ? $data->video_link : '',
+                    'link' => route('product', $data->slug),
                     // 'data' => $data
 
-
                 ];
-            })
+            }),
 
         ];
     }
@@ -94,7 +81,7 @@ class AuctionProductDetailCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

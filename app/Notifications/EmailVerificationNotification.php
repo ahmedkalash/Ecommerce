@@ -2,41 +2,11 @@
 
 namespace App\Notifications;
 
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class EmailVerificationNotification extends Notification
+class EmailVerificationNotification extends VerifyEmail implements ShouldQueue
 {
     use Queueable;
-
-
-    public function __construct()
-    {
-        
-    }
-
-    public function via($notifiable)
-    {
-        return ['mail'];
-    }
-
-    public function toMail($notifiable)
-    {
-        $notifiable->verification_code = encrypt($notifiable->id);
-        $notifiable->save();
-
-        $array['view'] = 'emails.verification';
-        $array['subject'] = translate('Email Verification');
-        $array['content'] = translate('Please click the button below to verify your email address.');
-        $array['link'] = route('email.verification.confirmation', $notifiable->verification_code);
-
-        return (new MailMessage)
-            ->view('emails.verification', ['array' => $array])
-            ->subject(translate('Email Verification - ') . env('APP_NAME'));
-    }
-
-    public function toArray($notifiable)
-    {
-    }
 }

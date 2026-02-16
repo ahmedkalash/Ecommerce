@@ -5,11 +5,12 @@
         <div class="card-header row gutters-5">
             <div class="text-center text-md-left">
                 <h5 class="mb-md-0 h5">{{ $ticket->subject }} #{{ $ticket->code }}</h5>
-               <div class="mt-2">
-                   <span> {{ $ticket->user->name }} </span>
-                   <span class="ml-2"> {{ $ticket->created_at }} </span>
-                   <span class="badge badge-inline badge-secondary ml-2"> {{ translate(ucfirst($ticket->status)) }} </span>
-               </div>
+                <div class="mt-2">
+                    <span> {{ $ticket->user->name }} </span>
+                    <span class="ml-2"> {{ $ticket->created_at }} </span>
+                    <span
+                        class="badge badge-inline badge-secondary ml-2"> {{ translate(ucfirst($ticket->status)) }} </span>
+                </div>
             </div>
         </div>
         <div class="card-body">
@@ -18,13 +19,16 @@
                 <input type="hidden" name="ticket_id" value="{{$ticket->id}}" required>
                 <input type="hidden" name="user_id" value="{{$ticket->user_id}}">
                 <div class="form-group">
-                    <textarea class="aiz-text-editor" name="reply" data-buttons='[["font", ["bold", "underline", "italic"]],["para", ["ul", "ol"]],["view", ["undo","redo"]]]' required></textarea>
+                    <textarea class="aiz-text-editor" name="reply"
+                              data-buttons='[["font", ["bold", "underline", "italic"]],["para", ["ul", "ol"]],["view", ["undo","redo"]]]'
+                              required></textarea>
                 </div>
                 <div class="form-group row">
                     <div class="col-md-12">
                         <div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
                             <div class="input-group-prepend">
-                                <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
+                                <div
+                                    class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}</div>
                             </div>
                             <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                             <input type="hidden" name="attachments" class="selected-files">
@@ -34,7 +38,8 @@
                     </div>
                 </div>
                 <div class="form-group mb-0 text-right">
-                    <button type="submit" class="btn btn-sm btn-primary" onclick="submit_reply('pending')">{{ translate('Send Reply') }}</button>
+                    <button type="submit" class="btn btn-sm btn-primary"
+                            onclick="submit_reply('pending')">{{ translate('Send Reply') }}</button>
                 </div>
             </form>
             <div class="pad-top">
@@ -45,7 +50,8 @@
                                 <a class="media-left" href="#">
                                     @if($ticketreply->user->avatar_original != null)
                                         <span class="avatar avatar-sm mr-3">
-                                            <img src="{{ uploaded_asset($ticketreply->user->avatar_original) }}" onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
+                                            <img src="{{ get_file_by_id($ticketreply->user->avatar_original) }}"
+                                                 onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                         </span>
                                     @else
                                         <span class="avatar avatar-sm mr-3">
@@ -64,10 +70,11 @@
                                 @php echo $ticketreply->reply; @endphp
                                 <br>
                                 @foreach ((explode(",",$ticketreply->files)) as $key => $file)
-                                    @php $file_detail = \App\Models\Upload::where('id', $file)->first(); @endphp
+                                    @php $file_detail = \Spatie\MediaLibrary\MediaCollections\Models\Media::find($file); @endphp
                                     @if($file_detail != null)
-                                        <a href="{{ uploaded_asset($file) }}" download="" class="badge badge-lg badge-inline badge-light mb-1">
-                                            <i class="las la-download text-muted">{{ $file_detail->file_original_name.'.'.$file_detail->extension }}</i>
+                                        <a href="{{ get_file_by_id($file) }}" download=""
+                                           class="badge badge-lg badge-inline badge-light mb-1">
+                                            <i class="las la-download text-muted">{{ $file_detail->name }}</i>
                                         </a>
                                         <br>
                                     @endif
@@ -80,7 +87,8 @@
                             <a class="media-left" href="#">
                                 @if($ticket->user->avatar_original != null)
                                     <span class="avatar avatar-sm mr-3">
-                                        <img src="{{ uploaded_asset($ticket->user->avatar_original) }}" onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
+                                        <img src="{{ get_file_by_id($ticket->user->avatar_original) }}"
+                                             onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                     </span>
                                 @else
                                     <span class="avatar avatar-sm mr-3">
@@ -99,10 +107,11 @@
                             @php echo $ticket->details; @endphp
                             <br>
                             @foreach ((explode(",",$ticket->files)) as $key => $file)
-                                @php $file_detail = \App\Models\Upload::where('id', $file)->first(); @endphp
+                                @php $file_detail = \Spatie\MediaLibrary\MediaCollections\Models\Media::find($file); @endphp
                                 @if($file_detail != null)
-                                    <a href="{{ uploaded_asset($file) }}" download="" class="badge badge-lg badge-inline badge-light mb-1">
-                                        <i class="las la-download text-muted">{{ $file_detail->file_original_name.'.'.$file_detail->extension }}</i>
+                                    <a href="{{ get_file_by_id($file) }}" download=""
+                                       class="badge badge-lg badge-inline badge-light mb-1">
+                                        <i class="las la-download text-muted">{{ $file_detail->name }}</i>
                                     </a>
                                     <br>
                                 @endif

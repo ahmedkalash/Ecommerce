@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Blog extends Model
+class Blog extends Model implements HasMedia
 {
-    use PreventDemoModeChanges;
+    use InteractsWithMedia, PreventDemoModeChanges, SoftDeletes;
 
-    use SoftDeletes;
-    
-    public function category() {
+    public function category()
+    {
         return $this->belongsTo(BlogCategory::class, 'category_id');
     }
-
 }

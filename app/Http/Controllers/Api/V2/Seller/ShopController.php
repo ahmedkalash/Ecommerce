@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\V2\Seller;
 
 use App\Http\Controllers\Api\V2\AuthController;
 use App\Http\Requests\SellerRegistrationRequest;
-use App\Http\Resources\V2\Seller\ProductCollection;
 use App\Http\Resources\V2\Seller\CommissionHistoryResource;
+use App\Http\Resources\V2\Seller\ProductCollection;
 use App\Http\Resources\V2\Seller\SellerPaymentResource;
 use App\Http\Resources\V2\ShopCollection;
 use App\Http\Resources\V2\ShopDetailsCollection;
@@ -18,11 +18,11 @@ use App\Models\Product;
 use App\Models\Shop;
 use App\Models\User;
 use App\Notifications\AppEmailVerificationNotification;
-use Illuminate\Http\Request;
 use App\Utility\SearchUtility;
 use Carbon\Carbon;
 use DB;
 use Hash;
+use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
@@ -30,14 +30,13 @@ class ShopController extends Controller
     {
         $shop_query = Shop::query();
 
-        if ($request->name != null && $request->name != "") {
-            $shop_query->where("name", 'like', "%{$request->name}%");
+        if ($request->name != null && $request->name != '') {
+            $shop_query->where('name', 'like', "%{$request->name}%");
             SearchUtility::store($request->name);
         }
+
         return new ShopCollection($shop_query->whereIn('user_id', verified_sellers_id())->paginate(10));
     }
-
-
 
     public function update(Request $request)
     {
@@ -49,19 +48,19 @@ class ShopController extends Controller
             if ($request->has('shipping_cost')) {
                 $shop->shipping_cost = $request->shipping_cost;
             }
-            $shop->name             = $request->name;
-            $shop->address          = $request->address;
-            $shop->phone            = $request->phone;
-            $shop->slug             = preg_replace('/\s+/', '-', $request->name) . '-' . $shop->id;
-            $shop->meta_title       = $request->meta_title;
+            $shop->name = $request->name;
+            $shop->address = $request->address;
+            $shop->phone = $request->phone;
+            $shop->slug = preg_replace('/\s+/', '-', $request->name).'-'.$shop->id;
+            $shop->meta_title = $request->meta_title;
             $shop->meta_description = $request->meta_description;
-            $shop->logo             = $request->logo;
+            $shop->logo = $request->logo;
         }
 
         if ($request->has('delivery_pickup_longitude') && $request->has('delivery_pickup_latitude')) {
 
-            $shop->delivery_pickup_longitude    = $request->delivery_pickup_longitude;
-            $shop->delivery_pickup_latitude     = $request->delivery_pickup_latitude;
+            $shop->delivery_pickup_longitude = $request->delivery_pickup_longitude;
+            $shop->delivery_pickup_latitude = $request->delivery_pickup_latitude;
         } elseif (
             $request->has('facebook') ||
             $request->has('google') ||
@@ -102,7 +101,6 @@ class ShopController extends Controller
         return $this->failed(translate($failedMessage));
     }
 
-
     public function sales_stat()
     {
         $data = Order::where('created_at', '>=', Carbon::now()->subDays(7))
@@ -114,12 +112,12 @@ class ShopController extends Controller
 
         $sales_array = [];
         for ($i = 1; $i < 8; $i++) {
-            $new_date = date("M-d", strtotime(($i - 1) . " days ago"));
+            $new_date = date('M-d', strtotime(($i - 1).' days ago'));
 
             $sales_array[$i]['date'] = $new_date;
             $sales_array[$i]['total'] = 0;
 
-            if (!empty($data)) {
+            if (! empty($data)) {
                 $key = array_search($new_date, array_column($data, 'date'));
                 if (is_numeric($key)) {
                     $sales_array[$i]['total'] = $data[$key]['total'];
@@ -137,8 +135,9 @@ class ShopController extends Controller
         foreach (Category::all() as $key => $category) {
             if (count($category->products->where('user_id', auth()->user()->id)) > 0) {
                 $category_wise_product['name'] = $category->getTranslation('name');
-                $category_wise_product['banner'] = uploaded_asset($category->banner);
-                $category_wise_product['cnt_product'] = count($category->products->where('user_id', auth()->user()->id));
+                $category_wise_product['banner'] = get_file_by_id($category->banner);
+                $category_wise_product['cnt_product'] = count($category->products->where('user_id',
+                    auth()->user()->id));
 
                 $new_array[] = $category_wise_product;
             }
@@ -149,7 +148,7 @@ class ShopController extends Controller
 
     public function top_12_products()
     {
-        $products = filter_products(Product::where('user_id',  auth()->user()->id)
+        $products = filter_products(Product::where('user_id', auth()->user()->id)
             ->orderBy('num_of_sale', 'desc'))
             ->limit(12)
             ->get();
@@ -171,7 +170,7 @@ class ShopController extends Controller
             'result' => true,
             'id' => $shop->id,
             'package_name' => $shop->seller_package->name,
-            'package_img' => uploaded_asset($shop->seller_package->logo)
+            'package_img' => get_file_by_id($shop->seller_package->logo),
 
         ]);
     }
@@ -180,7 +179,6 @@ class ShopController extends Controller
     {
         $user = auth()->user();
 
-
         return response()->json([
             'result' => true,
             'id' => $user->id,
@@ -188,8 +186,8 @@ class ShopController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'avatar' => $user->avatar,
-            'avatar_original' => uploaded_asset($user->avatar_original),
-            'phone' => $user->phone
+            'avatar_original' => get_file_by_id($user->avatar_original),
+            'phone' => $user->phone,
 
         ]);
     }
@@ -197,12 +195,15 @@ class ShopController extends Controller
     public function payment_histories()
     {
         $payments = Payment::where('seller_id', auth()->user()->id)->paginate(10);
+
         return SellerPaymentResource::collection($payments);
     }
 
     public function collection_histories()
     {
-        $commission_history = CommissionHistory::where('seller_id', auth()->user()->id)->orderBy('created_at', 'desc')->paginate(10);
+        $commission_history = CommissionHistory::where('seller_id', auth()->user()->id)->orderBy('created_at',
+            'desc')->paginate(10);
+
         return CommissionHistoryResource::collection($commission_history);
     }
 
@@ -211,7 +212,7 @@ class ShopController extends Controller
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->user_type = "seller";
+        $user->user_type = 'seller';
         $user->password = Hash::make($request->password);
         $user->verification_code = rand(100000, 999999);
 
@@ -220,7 +221,7 @@ class ShopController extends Controller
             $shop->user_id = $user->id;
             $shop->name = $request->shop_name;
             $shop->address = $request->address;
-            $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
+            $shop->slug = preg_replace('/\s+/', '-', str_replace('/', ' ', $request->shop_name));
             $shop->save();
 
             if (BusinessSetting::where('type', 'email_verification')->first()->value != 1) {
@@ -229,49 +230,51 @@ class ShopController extends Controller
             } else {
 
                 try {
-                    $user->notify(new AppEmailVerificationNotification());
+                    $user->notify(new AppEmailVerificationNotification);
                 } catch (\Exception $e) {
                     $shop->delete();
                     $user->delete();
+
                     return $this->failed(translate('Something Went Wrong!'));
                 }
             }
-            $authController = new AuthController();
+            $authController = new AuthController;
+
             return $authController->loginSuccess($user);
         }
 
         return $this->failed(translate('Something Went Wrong!'));
     }
 
-
     public function getVerifyForm()
     {
         $forms = BusinessSetting::where('type', 'verification_form')->first();
+
         return response()->json(json_decode($forms->value));
     }
 
     public function store_verify_info(Request $request)
     {
-        $data = array();
+        $data = [];
         $i = 0;
         foreach (json_decode(BusinessSetting::where('type', 'verification_form')->first()->value) as $key => $element) {
-            $item = array();
+            $item = [];
             if ($element->type == 'text') {
                 $item['type'] = 'text';
                 $item['label'] = $element->label;
-                $item['value'] = $request['element_' . $i];
+                $item['value'] = $request['element_'.$i];
             } elseif ($element->type == 'select' || $element->type == 'radio') {
                 $item['type'] = 'select';
                 $item['label'] = $element->label;
-                $item['value'] = $request['element_' . $i];
+                $item['value'] = $request['element_'.$i];
             } elseif ($element->type == 'multi_select') {
                 $item['type'] = 'multi_select';
                 $item['label'] = $element->label;
-                $item['value'] = json_encode($request['element_' . $i]);
+                $item['value'] = json_encode($request['element_'.$i]);
             } elseif ($element->type == 'file') {
                 $item['type'] = 'file';
                 $item['label'] = $element->label;
-                $item['value'] = $request['element_' . $i]->store('uploads/verification_form');
+                $item['value'] = $request['element_'.$i]->store('uploads/verification_form');
             }
             array_push($data, $item);
             $i++;

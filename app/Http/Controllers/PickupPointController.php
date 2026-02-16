@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\PickupPoint;
 use App\Models\PickupPointTranslation;
+use Illuminate\Http\Request;
 
 class PickupPointController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
-        $this->middleware(['permission:pickup_point_setup'])->only('index','create','edit','destroy');
+        $this->middleware(['permission:pickup_point_setup'])->only('index', 'create', 'edit', 'destroy');
     }
 
     /**
@@ -20,14 +21,15 @@ class PickupPointController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search =null;
+        $sort_search = null;
         $pickup_points = PickupPoint::orderBy('created_at', 'desc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $pickup_points = $pickup_points->where('name', 'like', '%'.$sort_search.'%');
         }
         $pickup_points = $pickup_points->paginate(10);
-        return view('backend.setup_configurations.pickup_point.index', compact('pickup_points','sort_search'));
+
+        return view('backend.setup_configurations.pickup_point.index', compact('pickup_points', 'sort_search'));
     }
 
     /**
@@ -43,7 +45,6 @@ class PickupPointController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -53,7 +54,7 @@ class PickupPointController extends Controller
         $pickup_point->address = $request->address;
         $pickup_point->phone = $request->phone;
         $pickup_point->pick_up_status = $request->pick_up_status;
-        $pickup_point->staff_id = $request->staff_id;
+        $pickup_point->user_id = $request->staff_id;
         if ($pickup_point->save()) {
 
             $pickup_point_translation = PickupPointTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'pickup_point_id' => $pickup_point->id]);
@@ -62,11 +63,11 @@ class PickupPointController extends Controller
             $pickup_point_translation->save();
 
             flash(translate('PicupPoint has been inserted successfully'))->success();
-            return redirect()->route('pick_up_points.index');
 
-        }
-        else{
+            return redirect()->route('pick_up_points.index');
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -90,29 +91,29 @@ class PickupPointController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $lang           = $request->lang;
-        $pickup_point   = PickupPoint::findOrFail($id);
-        return view('backend.setup_configurations.pickup_point.edit', compact('pickup_point','lang'));
+        $lang = $request->lang;
+        $pickup_point = PickupPoint::findOrFail($id);
+
+        return view('backend.setup_configurations.pickup_point.edit', compact('pickup_point', 'lang'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $pickup_point = PickupPoint::findOrFail($id);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $pickup_point->name = $request->name;
             $pickup_point->address = $request->address;
         }
 
         $pickup_point->phone = $request->phone;
         $pickup_point->pick_up_status = $request->pick_up_status;
-        $pickup_point->staff_id = $request->staff_id;
+        $pickup_point->user_id = $request->staff_id;
         if ($pickup_point->save()) {
 
             $pickup_point_translation = PickupPointTranslation::firstOrNew(['lang' => $request->lang,  'pickup_point_id' => $pickup_point->id]);
@@ -121,10 +122,11 @@ class PickupPointController extends Controller
             $pickup_point_translation->save();
 
             flash(translate('PicupPoint has been updated successfully'))->success();
+
             return redirect()->route('pick_up_points.index');
-        }
-        else{
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -140,12 +142,13 @@ class PickupPointController extends Controller
         $pickup_point = PickupPoint::findOrFail($id);
         $pickup_point->pickup_point_translations()->delete();
 
-        if(PickupPoint::destroy($id)){
+        if (PickupPoint::destroy($id)) {
             flash(translate('PicupPoint has been deleted successfully'))->success();
+
             return redirect()->route('pick_up_points.index');
-        }
-        else{
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }

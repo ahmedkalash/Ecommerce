@@ -2,10 +2,10 @@
     <!-- Tabs -->
     <div class="nav aiz-nav-tabs">
         <a href="#tab_default_1" data-toggle="tab"
-            class="mr-5 pb-2 fs-16 fw-700 text-reset active show">{{ translate('Description') }}</a>
+           class="mr-5 pb-2 fs-16 fw-700 text-reset active show">{{ translate('Description') }}</a>
         @if ($product->video_link != null)
             <a href="#tab_default_2" data-toggle="tab"
-                class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Video') }}</a>
+               class="mr-5 pb-2 fs-16 fw-700 text-reset">{{ translate('Video') }}</a>
         @endif
     </div>
 
@@ -26,10 +26,10 @@
                 <div class="embed-responsive embed-responsive-16by9">
                     @if ($product->video_provider == 'youtube' && isset(explode('=', $product->video_link)[1]))
                         <iframe class="embed-responsive-item"
-                            src="https://www.youtube.com/embed/{{ get_url_params($product->video_link, 'v') }}"></iframe>
+                                src="https://www.youtube.com/embed/{{ get_url_params($product->video_link, 'v') }}"></iframe>
                     @elseif ($product->video_provider == 'dailymotion' && isset(explode('video/', $product->video_link)[1]))
                         <iframe class="embed-responsive-item"
-                            src="https://www.dailymotion.com/embed/video/{{ explode('video/', $product->video_link)[1] }}"></iframe>
+                                src="https://www.dailymotion.com/embed/video/{{ explode('video/', $product->video_link)[1] }}"></iframe>
                     @elseif ($product->video_provider == 'vimeo' && isset(explode('vimeo.com/', $product->video_link)[1]))
                         <iframe
                             src="https://player.vimeo.com/video/{{ explode('vimeo.com/', $product->video_link)[1] }}"
@@ -39,12 +39,12 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Download -->
         <div class="tab-pane fade" id="tab_default_3">
             <div class="py-5 text-center ">
-                <a href="{{ uploaded_asset($product->pdf) }}"
-                    class="btn btn-primary">{{ translate('Download') }}</a>
+                <a href="{{ $product->pdf_url }}"
+                   class="btn btn-primary">{{ translate('Download') }}</a>
             </div>
         </div>
     </div>
