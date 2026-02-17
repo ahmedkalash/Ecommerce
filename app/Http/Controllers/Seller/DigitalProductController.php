@@ -28,8 +28,10 @@ class DigitalProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::where('user_id', Auth::user()->id)->where('digital', 1)->orderBy('created_at',
-            'desc')->paginate(10);
+        $products = Product::where('user_id', Auth::user()->id)->where('digital', 1)->orderBy(
+            'created_at',
+            'desc'
+        )->paginate(10);
 
         return view('seller.product.digitalproducts.index', compact('products'));
     }
@@ -74,7 +76,10 @@ class DigitalProductController extends Controller
 
         // Product Store
         $product = (new ProductService)->store($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type',
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type',
         ]));
 
         $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
@@ -84,25 +89,41 @@ class DigitalProductController extends Controller
 
         // Product Stock
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id',
+            'unit_price',
+            'current_stock',
+            'product_id',
+            'discount',
+            'discount_type',
+            'date_range',
+            'tax',
+            'tax_type',
         ]), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
 
         // Frequently Bought Products
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'description', 'product_id',
+            'lang',
+            'name',
+            'description',
+            'product_id',
         ]));
 
         if (get_setting('product_approve_by_admin') == 1) {
@@ -149,7 +170,10 @@ class DigitalProductController extends Controller
     {
         // Product Update
         $product = (new ProductService)->update($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type',
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type',
         ]), $product);
 
         // Product Stock
@@ -163,21 +187,34 @@ class DigitalProductController extends Controller
         $product->categories()->sync($request->category_ids);
 
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id',
+            'unit_price',
+            'current_stock',
+            'product_id',
+            'discount',
+            'discount_type',
+            'date_range',
+            'tax',
+            'tax_type',
         ]), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
             ProductTax::where('product_id', $product->id)->delete();
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // Product Translations
@@ -217,8 +254,10 @@ class DigitalProductController extends Controller
         if (Auth::user()->id == $product->user_id) {
             $upload = Media::findOrFail($product->file_name);
 
-            return response()->download($upload->getPath(),
-                config('app.name').'_'.$upload->name.'.'.$upload->extension);
+            return response()->download(
+                $upload->getPath(),
+                config('app.name').'_'.$upload->name.'.'.$upload->extension
+            );
         } else {
             abort(404);
         }

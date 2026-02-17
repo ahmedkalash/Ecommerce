@@ -98,9 +98,7 @@ class ProductService
             'slug' => $slug,
             'user_id' => $user_id,
             'added_by' => $added_by,
-            // 'category_id' => $collection['category_id'], // Removed
             'brand_id' => $collection['brand_id'],
-            'tags' => $collection['tags'],
             'description' => $collection['description'] ?? null,
             'shipping_type' => $collection['shipping_type'] ?? ShippingType::FLAT_RATE->value,
             'shipping_cost' => $shipping_cost,
@@ -113,6 +111,13 @@ class ProductService
         ];
 
         $product = Product::create($productData);
+
+        // Tags processing via Spatie Tags
+        if (isset($collection['tags'])) {
+            $tagNames = is_array($collection['tags']) ? $collection['tags'] : array_filter(explode(',',
+                $collection['tags']));
+            $product->attachTags($tagNames);
+        }
 
         // Sync Categories
         if (isset($collection['categories'])) {
@@ -183,9 +188,11 @@ class ProductService
             $product->name = $name;
         }
 
-        // Tags processing
+        // Tags processing via Spatie Tags
         if (isset($collection['tags'])) {
-            $product->tags = $this->formatTags($collection['tags']);
+            $tagNames = is_array($collection['tags']) ? $collection['tags'] : array_filter(explode(',',
+                $collection['tags']));
+            $product->syncTags($tagNames);
         }
 
         if (isset($collection['meta_title'])) {
@@ -468,12 +475,14 @@ class ProductService
                 }
             }
 
-            $products->update([
-                'discount' => $data['discount'],
-                'discount_type' => 'percent',
-                // 'discount_start_date' => $discount_start_date,
-                // 'discount_end_date' => $discount_end_date,
-            ]);
+            // Product level discount columns are removed.
+            // In a real scenario, we should update discounts on all stocks of these products.
+            foreach ($products->get() as $product) {
+                $product->stocks()->update([
+                    'discount' => $data['discount'],
+                    'discount_type' => 'percent',
+                ]);
+            }
 
             return 1;
         } catch (Exception $e) {

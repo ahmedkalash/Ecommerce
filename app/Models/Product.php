@@ -4,16 +4,55 @@ namespace App\Models;
 
 use App;
 use App\Models\Traits\Product\ProductRelationships;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\SchemalessAttributes\SchemalessAttributesTrait;
+use Spatie\Tags\HasTags;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, ProductRelationships;
+    use HasFactory, HasTags, InteractsWithMedia, ProductRelationships, SchemalessAttributesTrait;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'added_by',
+        'user_id',
+        'brand_id',
+        'description',
+        'published',
+        'approved',
+        'shipping_type',
+        'shipping_cost',
+        'est_shipping_days',
+        'meta_title',
+        'meta_description',
+        'slug',
+        'rating',
+        'barcode',
+        'digital',
+        'file_name',
+        'file_path',
+        'external_link',
+        'external_link_btn',
+        'wholesale_product',
+        'frequently_bought_selection_type',
+        'has_warranty',
+        'warranty_id',
+        'warranty_note_id',
+        'extra_attributes',
+    ];
+
+    protected $schemalessAttributes = [
+        'extra_attributes',
+    ];
+
+    public function scopeWithExtraAttributes(): Builder
+    {
+        return $this->extra_attributes->modelScope();
+    }
 
     protected $casts = [
         //

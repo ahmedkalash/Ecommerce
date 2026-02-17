@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use App\Services\ProductService;
-use Exception;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +11,8 @@ use Illuminate\Support\Facades\Log;
 class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
+
+    public $tags = [];
 
     /**
      * @param array{
@@ -46,23 +46,49 @@ class CreateProduct extends CreateRecord
      *
      * @throws \Throwable
      */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        // Store tags for later saving
+        $this->tags = $data['tags'] ?? [];
+
+        // Product model is unguarded, so we must manually remove relationship fields
+        // that shouldn't be saved as columns (especially since 'tags' column was removed).
+        $data = collect($data)->except(['categories', 'tags'])->toArray();
+
+        // Add required fields
+        $user = auth()->user();
+        $data['user_id'] = $user->id;
+        $data['added_by'] = $user->user_type == 'seller' ? 'seller' : 'admin';
+
+        return $data;
+    }
+
     protected function handleRecordCreation(array $data): Model
     {
-        return DB::transaction(function () use ($data) {
-            try {
-                /** @var ProductService $productService */
-                $productService = app(ProductService::class);
+        DB::beginTransaction();
 
-                return $productService->store($data);
-            } catch (Exception $e) {
-                Log::error('Product creation failed (Filament): '.$e->getMessage(), [
-                    'trace' => $e->getTraceAsString(),
-                    'data' => $data,
-                ]);
+        try {
+            $record = static::getModel()::create($data);
 
-                throw $e;
+            if (! empty($this->tags)) {
+                $record->syncTags($this->tags);
             }
-        });
+
+            DB::commit();
+
+            return $record;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Product creation failed: '.$e->getMessage(), [
+                'user_id' => auth()->id(),
+                'data' => $data,
+                'tags' => $this->tags,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 
     protected function getRedirectUrl(): string

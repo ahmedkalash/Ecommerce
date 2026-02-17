@@ -1,17 +1,3 @@
---
--- Truncate table before insert `attributes`
---
-
-TRUNCATE TABLE `attributes`;
---
--- Dumping data for table `attributes`
---
-
-INSERT INTO `attributes` (`id`, `name`, `created_at`, `updated_at`)
-VALUES (1, 'Size', '2020-02-24 05:55:07', '2020-02-24 05:55:07'),
-       (2, 'Fabric', '2020-02-24 05:55:13', '2020-02-24 05:55:13');
-
-
 -- Truncate table before insert `blogs`
 --
 

@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\SchemalessAttributes\SchemalessAttributesTrait;
 
 class ProductStock extends Model implements HasMedia
 {
-    use InteractsWithMedia;
+    use InteractsWithMedia, SchemalessAttributesTrait;
 
     protected $fillable = [
         'product_id',
@@ -16,11 +18,21 @@ class ProductStock extends Model implements HasMedia
         'sku',
         'price',
         'qty',
-        'video_link',
         'video_provider',
         'min_qty',
         'cash_on_delivery',
+        'todays_deal',
+        'extra_attributes',
     ];
+
+    protected $schemalessAttributes = [
+        'extra_attributes',
+    ];
+
+    public function scopeWithExtraAttributes(): Builder
+    {
+        return $this->extra_attributes->modelScope();
+    }
 
     public function product()
     {
@@ -39,7 +51,7 @@ class ProductStock extends Model implements HasMedia
         $this->addMediaCollection('short_video')
             ->singleFile();
 
-        $this->addMediaCollection('video_thumbnail')
+        $this->addMediaCollection('short_video_thumbnail')
             ->singleFile();
 
         $this->addMediaCollection('meta_img')

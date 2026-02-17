@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\Filament\Resources\ProductResource;
-use App\Services\ProductService;
-use Exception;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +16,7 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 
@@ -56,45 +54,44 @@ class EditProduct extends EditRecord
      *
      * @throws \Throwable
      */
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        return DB::transaction(function () use ($record, $data) {
-            try {
-                /** @var ProductService $productService */
-                $productService = app(ProductService::class);
+        // Store tags for later saving
+        $this->tags = $data['tags'] ?? [];
 
-                return $productService->update($data, $record);
-            } catch (Exception $e) {
-                Log::error('Product update failed (Filament): '.$e->getMessage(), [
-                    'product_id' => $record->id,
-                    'trace' => $e->getTraceAsString(),
-                    'data' => $data,
-                ]);
-
-                throw $e;
-            }
-        });
-    }
-
-    /**
-     * Mutate form data before filling the form on edit.
-     * Converts comma-separated tags string back to an array for the TagsInput component.
-     *
-     * @param  array{
-     *      tags?: string|string[],
-     *      [key: string]: mixed
-     *  }  $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        // Convert comma-separated tags to array for TagsInput
-        if (isset($data['tags']) && is_string($data['tags'])) {
-            $data['tags'] = array_filter(explode(',', $data['tags']));
-        }
-
-        // choice_options and stocks are handled by Filament via relationships/casts automatically.
+        // Product model is unguarded, so we must manually remove relationship fields
+        // that shouldn't be saved as columns (especially since 'tags' column was removed).
+        $data = collect($data)->except(['categories', 'tags'])->toArray();
 
         return $data;
+    }
+
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        DB::beginTransaction();
+
+        try {
+            $record->update($data);
+
+            if (! empty($this->tags)) {
+                $record->syncTags($this->tags);
+            }
+
+            DB::commit();
+
+            return $record;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Product update failed: '.$e->getMessage(), [
+                'user_id' => auth()->id(),
+                'product_id' => $record->getKey(),
+                'data' => $data,
+                'tags' => $this->tags,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 }

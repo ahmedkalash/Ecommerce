@@ -10,6 +10,7 @@ use CodeWithDennis\FilamentSelectTree\SelectTree;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -108,7 +109,7 @@ class ProductResource extends Resource
                                                     ->relationship('brand', 'name')
                                                     ->searchable()
                                                     ->preload(),
-                                                Forms\Components\TagsInput::make('tags')
+                                                SpatieTagsInput::make('tags')
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(1),
@@ -117,133 +118,164 @@ class ProductResource extends Resource
                             ])
                             ->columns(3),
 
-                        // ── Price & Stock Tab (Variations) ──
-                        Tabs\Tab::make('Variants')
+                        // ── Price, Stock & Variants Tab ──
+                        Tabs\Tab::make('Price & Stock')
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
                                 // This repeater manages ALL stocks (variants).
                                 Forms\Components\Repeater::make('stocks')
-                                    ->label('Product Variants')
+                                    ->label('Product Variants / Inventory')
                                     ->relationship()
+                                    ->itemLabel(fn (array $state): ?string => $state['variant'] ?? 'New Variant')
+                                    ->defaultItems(1)
+                                    ->minItems(1)
                                     ->schema([
-                                        Forms\Components\Group::make()
+                                        Forms\Components\Section::make('Variant Details')
+                                            ->compact()
                                             ->schema([
                                                 Forms\Components\TextInput::make('variant')
                                                     ->label('Variant Name')
-                                                    ->placeholder('e.g., Default, Red XL, 128GB')
+                                                    ->placeholder('e.g., Default, Large-Blue, Extra-Cotton')
                                                     ->default('Default')
                                                     ->required()
-                                                    ->distinct() // Ensure variant names are unique within the repeater
+                                                    ->distinct()
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('sku')
                                                     ->label('SKU')
-                                                    ->unique('product_stocks', 'sku', ignoreRecord: true), // Ensure SKU is unique in DB
+                                                    ->placeholder('Auto-generated if empty')
+                                                    ->unique('product_stocks', 'sku', ignoreRecord: true)
+                                                    ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('price')
-                                                    ->label('Price')
+                                                    ->label('Base Price')
                                                     ->numeric()
                                                     ->prefix('$')
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('qty')
-                                                    ->label('Quantity')
+                                                    ->label('Qty In Stock')
                                                     ->numeric()
                                                     ->default(0)
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('min_qty')
-                                                    ->label('Min Qty')
+                                                    ->label('Min Purchase Qty')
                                                     ->numeric()
                                                     ->default(1)
                                                     ->required(),
 
                                                 Forms\Components\Toggle::make('cash_on_delivery')
-                                                    ->label('Cash On Delivery')
+                                                    ->label('COD Available')
                                                     ->default(true)
-                                                    ->columnSpanFull(),
-                                            ])
-                                            ->columns(2),
+                                                    ->inline(false),
 
-                                        Forms\Components\Section::make('Media & Files')
-                                            ->schema([
-                                                Forms\Components\Grid::make(3)
+                                                Forms\Components\Toggle::make('todays_deal')
+                                                    ->label('Today\'s Deal')
+                                                    ->default(false),
+
+                                                Forms\Components\Repeater::make('extra_attributes.specifications')
+                                                    ->label('Variant Specific Attributes')
+                                                    ->helperText('Define technical specs or attributes for this specific version.')
                                                     ->schema([
-                                                        SpatieMediaLibraryFileUpload::make('thumbnail')
-                                                            ->collection('thumbnail')
-                                                            ->label('Variant Thumbnail')
-                                                            ->image()
-                                                            ->imageEditor(),
-
-                                                        SpatieMediaLibraryFileUpload::make('video_thumbnail')
-                                                            ->collection('video_thumbnail')
-                                                            ->label('Video Thumbnail')
-                                                            ->image()
-                                                            ->imageEditor(),
-
-                                                        SpatieMediaLibraryFileUpload::make('meta_img')
-                                                            ->collection('meta_img')
-                                                            ->label('Meta Image')
-                                                            ->image()
-                                                            ->imageEditor(),
-                                                    ]),
-
-                                                SpatieMediaLibraryFileUpload::make('gallery')
-                                                    ->collection('gallery')
-                                                    ->label('Variant Gallery')
-                                                    ->multiple()
-                                                    ->reorderable()
-                                                    ->image()
-                                                    ->imageEditor()
-                                                    ->panelLayout('grid')
+                                                        Forms\Components\TextInput::make('key')
+                                                            ->label('Key')
+                                                            ->placeholder('e.g., Material, Warranty')
+                                                            ->required()
+                                                            ->columnSpan(1),
+                                                        Forms\Components\RichEditor::make('value')
+                                                            ->label('Value')
+                                                            ->required()
+                                                            ->toolbarButtons([
+                                                                'bold',
+                                                                'italic',
+                                                                'link',
+                                                                'bulletList',
+                                                                'orderedList',
+                                                            ])
+                                                            ->extraInputAttributes(['style' => 'min-height: 100px;'])
+                                                            ->columnSpan(2),
+                                                    ])
+                                                    ->itemLabel(fn (array $state): ?string => $state['key'] ?? null)
+                                                    ->collapsible()
+                                                    ->columns(3)
                                                     ->columnSpanFull(),
 
-                                                Forms\Components\Grid::make(2)
+                                                Forms\Components\Section::make('Media & Files')
+                                                    ->collapsed()
                                                     ->schema([
-                                                        SpatieMediaLibraryFileUpload::make('short_video')
-                                                            ->collection('short_video')
-                                                            ->label('Short Video')
-                                                            ->acceptedFileTypes(['video/mp4', 'video/webm', 'video/ogg'])
-                                                            ->maxSize(50000), // 50MB limit
+                                                        // Gallery (First, Full Width)
+                                                        SpatieMediaLibraryFileUpload::make('gallery')
+                                                            ->collection('gallery')
+                                                            ->label('Variant Gallery')
+                                                            ->multiple()
+                                                            ->reorderable()
+                                                            ->image()
+                                                            ->imageEditor()
+                                                            ->columnSpanFull()
+                                                            ->panelLayout('grid') // Attempt to force grid layout if supported by theme, otherwise full width usually does it
+                                                            ->extraAttributes(['class' => 'gallery-grid']),
+                                                        // Hooks for custom CSS if needed
 
-                                                        SpatieMediaLibraryFileUpload::make('pdf')
-                                                            ->collection('pdf')
-                                                            ->label('PDF Specification')
-                                                            ->acceptedFileTypes(['application/pdf'])
-                                                            ->maxSize(10000), // 10MB limit
-                                                    ]),
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('thumbnail')
+                                                                    ->collection('thumbnail')
+                                                                    ->label('Variant Thumbnail')
+                                                                    ->image()
+                                                                    ->imageEditor(),
+                                                            ]),
 
-                                                SpatieMediaLibraryFileUpload::make('files')
-                                                    ->collection('files')
-                                                    ->label('Downloadable Files')
-                                                    ->multiple()
-                                                    ->columnSpanFull(),
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('pdf')
+                                                                    ->collection('pdf')
+                                                                    ->label('PDF Specification')
+                                                                    ->acceptedFileTypes(['application/pdf'])
+                                                                    ->maxSize(51200), // 50MB
 
-                                                Forms\Components\Grid::make(2)
-                                                    ->schema([
-                                                        Forms\Components\TextInput::make('video_link')
-                                                            ->label('External Video Link')
-                                                            ->placeholder('https://youtube.com/watch?v=...'),
+                                                                SpatieMediaLibraryFileUpload::make('files')
+                                                                    ->collection('files')
+                                                                    ->collection('files')
+                                                                    ->label('Downloadable Files')
+                                                                    ->multiple()
+                                                                    ->maxSize(51200), // 50MB
+                                                            ]),
 
-                                                        Forms\Components\Select::make('video_provider')
-                                                            ->label('Video Provider')
-                                                            ->options([
-                                                                'youtube' => 'Youtube',
-                                                                'dailymotion' => 'Dailymotion',
-                                                                'vimeo' => 'Vimeo',
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                Forms\Components\Select::make('video_provider')
+                                                                    ->options([
+                                                                        'youtube' => 'Youtube',
+                                                                        'dailymotion' => 'Dailymotion',
+                                                                        'vimeo' => 'Vimeo',
+                                                                    ])
+                                                                    ->label('Video Provider'),
+                                                                Forms\Components\TextInput::make('video_link')
+                                                                    ->label('Video Link'),
+                                                            ]),
+
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('short_video')
+                                                                    ->collection('short_video')
+                                                                    ->label('Short Video')
+                                                                    ->acceptedFileTypes([
+                                                                        'video/mp4', 'video/webm', 'video/ogg',
+                                                                    ])
+                                                                    ->maxSize(51200), // 50MB
+
+                                                                SpatieMediaLibraryFileUpload::make('short_video_thumbnail')
+                                                                    ->collection('short_video_thumbnail')
+                                                                    ->label('Short Video Thumbnail')
+                                                                    ->image(),
                                                             ]),
                                                     ]),
-                                            ])
-                                            ->collapsed()
-                                            ->columnSpanFull(),
+
+                                            ])->columns(4),
                                     ])
-                                    ->columns(2)
                                     ->reorderable(true)
-                                    ->addable(true)
-                                    ->deletable(true)
-                                    ->defaultItems(1)
-                                    ->minItems(1)
-                                    ->addActionLabel('Add Another Variant')
+                                    ->addActionLabel('Add Another Variant SKU')
                                     ->columnSpanFull(),
                             ]),
 
