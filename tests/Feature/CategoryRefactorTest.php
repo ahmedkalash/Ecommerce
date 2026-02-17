@@ -33,14 +33,11 @@ class CategoryRefactorTest extends TestCase
         // 2. Create Product
         // Product creation requires numerous fields based on ProductService/Validation?
         // We'll create minimal viable product directly using Model to bypass complex service validation for this unit test.
-        $product = Product::forceCreate([
+        $product = Product::factory()->create([
             'name' => 'Test Product',
             'slug' => 'test-product',
-            'user_id' => 1, // Assuming user 1 exists or use factory
-            'unit_price' => 100,
             'published' => 1,
-            'current_stock' => 10,
-            // 'category_id' => $cat1->id, // Should NOT be used
+            // 'unit_price' & 'current_stock' are removed from products table, handled via stocks
         ]);
 
         // 3. Attach Categories
@@ -68,11 +65,9 @@ class CategoryRefactorTest extends TestCase
         $cat1 = Category::create(['slug' => 'sync-1', 'digital' => 0]);
         $cat2 = Category::create(['slug' => 'sync-2', 'digital' => 0]);
 
-        $product = Product::forceCreate([
+        $product = Product::factory()->create([
             'name' => 'Sync Product',
             'slug' => 'sync-product',
-            'user_id' => 1,
-            'unit_price' => 50,
         ]);
 
         $product->categories()->sync([$cat1->id]);

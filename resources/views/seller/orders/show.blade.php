@@ -21,10 +21,12 @@
                         @if (($order->payment_type == 'cash_on_delivery' || (addon_is_activated('offline_payment') == 1 && $order->manual_payment == 1)) && $payment_status == 'unpaid')
                             <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity"
                                     id="update_payment_status">
-                                <option value="unpaid" @if ($payment_status == 'unpaid') selected @endif>
-                                    {{ translate('Unpaid') }}</option>
-                                <option value="paid" @if ($payment_status == 'paid') selected @endif>
-                                    {{ translate('Paid') }}</option>
+                                <option value="unpaid" @if ($payment_status=='unpaid' ) selected @endif>
+                                    {{ translate('Unpaid') }}
+                                </option>
+                                <option value="paid" @if ($payment_status=='paid' ) selected @endif>
+                                    {{ translate('Paid') }}
+                                </option>
                             </select>
                         @else
                             <input type="text" class="form-control" value="{{ translate($payment_status) }}" disabled>
@@ -35,18 +37,24 @@
                         @if ($delivery_status != 'delivered' && $delivery_status != 'cancelled')
                             <select class="form-control aiz-selectpicker" data-minimum-results-for-search="Infinity"
                                     id="update_delivery_status">
-                                <option value="pending" @if ($delivery_status == 'pending') selected @endif>
-                                    {{ translate('Pending') }}</option>
-                                <option value="confirmed" @if ($delivery_status == 'confirmed') selected @endif>
-                                    {{ translate('Confirmed') }}</option>
-                                <option value="picked_up" @if ($delivery_status == 'picked_up') selected @endif>
-                                    {{ translate('Picked Up') }}</option>
-                                <option value="on_the_way" @if ($delivery_status == 'on_the_way') selected @endif>
-                                    {{ translate('On The Way') }}</option>
-                                <option value="delivered" @if ($delivery_status == 'delivered') selected @endif>
-                                    {{ translate('Delivered') }}</option>
-                                <option value="cancelled" @if ($delivery_status == 'cancelled') selected @endif>
-                                    {{ translate('Cancel') }}</option>
+                                <option value="pending" @if ($delivery_status=='pending' ) selected @endif>
+                                    {{ translate('Pending') }}
+                                </option>
+                                <option value="confirmed" @if ($delivery_status=='confirmed' ) selected @endif>
+                                    {{ translate('Confirmed') }}
+                                </option>
+                                <option value="picked_up" @if ($delivery_status=='picked_up' ) selected @endif>
+                                    {{ translate('Picked Up') }}
+                                </option>
+                                <option value="on_the_way" @if ($delivery_status=='on_the_way' ) selected @endif>
+                                    {{ translate('On The Way') }}
+                                </option>
+                                <option value="delivered" @if ($delivery_status=='delivered' ) selected @endif>
+                                    {{ translate('Delivered') }}
+                                </option>
+                                <option value="cancelled" @if ($delivery_status=='cancelled' ) selected @endif>
+                                    {{ translate('Cancel') }}
+                                </option>
                             </select>
                         @else
                             <input type="text" class="form-control"
@@ -97,8 +105,8 @@
                         <br>
                         <a href="{{ get_file_by_id(json_decode($order->manual_payment_data)->photo) }}"
                            target="_blank"><img
-                                src="{{ get_file_by_id(json_decode($order->manual_payment_data)->photo) }}" alt=""
-                                height="100"></a>
+                                    src="{{ get_file_by_id(json_decode($order->manual_payment_data)->photo) }}" alt=""
+                                    height="100"></a>
                     @endif
                 </div>
                 <div class="col-md-4">
@@ -113,10 +121,10 @@
                             <td class="text-right">
                                 @if ($delivery_status == 'delivered')
                                     <span
-                                        class="badge badge-inline badge-success">{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}</span>
+                                            class="badge badge-inline badge-success">{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}</span>
                                 @else
                                     <span
-                                        class="badge badge-inline badge-info">{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}</span>
+                                            class="badge badge-inline badge-info">{{ translate(ucfirst(str_replace('_', ' ', $delivery_status))) }}</span>
                                 @endif
                             </td>
                         </tr>
@@ -133,7 +141,8 @@
                         <tr>
                             <td class="text-main text-bold">{{ translate('Payment method') }}</td>
                             <td class="text-right">
-                                {{ translate(ucfirst(str_replace('_', ' ', $order->payment_type))) }}</td>
+                                {{ translate(ucfirst(str_replace('_', ' ', $order->payment_type))) }}
+                            </td>
                         </tr>
 
                         <tr>
@@ -159,9 +168,11 @@
                                 {{ translate('Qty') }}
                             </th>
                             <th data-breakpoints="lg" class="min-col text-uppercase text-center">
-                                {{ translate('Price') }}</th>
+                                {{ translate('Price') }}
+                            </th>
                             <th data-breakpoints="lg" class="min-col text-uppercase text-right">
-                                {{ translate('Total') }}</th>
+                                {{ translate('Total') }}
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -169,11 +180,11 @@
                             <tr>
                                 <td>{{ $key + 1 }}</td>
                                 <td>
-                                    @if ($orderDetail->product != null && $orderDetail->product->auction_product == 0)
+                                    @if ($orderDetail->product != null && (!isset($orderDetail->product->auction_product) || $orderDetail->product->auction_product == 0))
                                         <a href="{{ route('product', $orderDetail->product->slug) }}"
                                            target="_blank"><img height="50"
                                                                 src="{{ $orderDetail->product->thumbnail_img }}"></a>
-                                    @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
+                                    @elseif ($orderDetail->product != null && isset($orderDetail->product->auction_product) && $orderDetail->product->auction_product == 1)
                                         <a href="{{ route('auction-product', $orderDetail->product->slug) }}"
                                            target="_blank"><img height="50"
                                                                 src="{{ $orderDetail->product->thumbnail_img }}"></a>
@@ -182,12 +193,12 @@
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($orderDetail->product != null && $orderDetail->product->auction_product == 0)
+                                    @if ($orderDetail->product != null && (!isset($orderDetail->product->auction_product) || $orderDetail->product->auction_product == 0))
                                         <strong><a href="{{ route('product', $orderDetail->product->slug) }}"
                                                    target="_blank"
                                                    class="text-muted">{{ $orderDetail->product->getTranslation('name') }}</a></strong>
                                         <small>{{ $orderDetail->variation }}</small>
-                                    @elseif ($orderDetail->product != null && $orderDetail->product->auction_product == 1)
+                                    @elseif ($orderDetail->product != null && isset($orderDetail->product->auction_product) && $orderDetail->product->auction_product == 1)
                                         <strong><a href="{{ route('auction-product', $orderDetail->product->slug) }}"
                                                    target="_blank"
                                                    class="text-muted">{{ $orderDetail->product->getTranslation('name') }}</a></strong>
@@ -217,7 +228,8 @@
                                 </td>
                                 <td class="text-center">{{ $orderDetail->quantity }}</td>
                                 <td class="text-center">
-                                    {{ single_price($orderDetail->price / $orderDetail->quantity) }}</td>
+                                    {{ single_price($orderDetail->price / $orderDetail->quantity) }}
+                                </td>
                                 <td class="text-center">{{ single_price($orderDetail->price) }}</td>
                             </tr>
                         @endforeach
@@ -283,32 +295,48 @@
 @section('script')
     <script type="text/javascript">
         $('#update_delivery_status').on('change', function () {
-            var order_id = {{ $order->id }};
+            var order_id = {
+            {
+                $order - > id
+            }
+        }
+            ;
             var status = $('#update_delivery_status').val();
-            $.post('{{ route('seller.orders.update_delivery_status') }}', {
-                _token: '{{ @csrf_token() }}',
-                order_id: order_id,
-                status: status
-            }, function (data) {
-                $('#order_details').modal('hide');
-                AIZ.plugins.notify('success', '{{ translate('Order status has been updated') }}');
-                location.reload().setTimeOut(500);
-            });
+            $.post('{{ route('
+            seller.orders.update_delivery_status ') }}', {
+                    _token: '{{ @csrf_token() }}',
+                    order_id: order_id,
+                    status: status
+                },
+                function (data) {
+                    $('#order_details').modal('hide');
+                    AIZ.plugins.notify('success', '{{ translate('
+                    Order status has been updated ') }}');
+                    location.reload().setTimeOut(500);
+                });
         });
 
         $('#update_payment_status').on('change', function () {
-            var order_id = {{ $order->id }};
+            var order_id = {
+            {
+                $order - > id
+            }
+        }
+            ;
             var status = $('#update_payment_status').val();
-            $.post('{{ route('seller.orders.update_payment_status') }}', {
-                _token: '{{ @csrf_token() }}',
-                order_id: order_id,
-                status: status
-            }, function (data) {
-                $('#order_details').modal('hide');
-                //console.log(data);
-                AIZ.plugins.notify('success', '{{ translate('Payment status has been updated') }}');
-                location.reload().setTimeOut(500);
-            });
+            $.post('{{ route('
+            seller.orders.update_payment_status ') }}', {
+                    _token: '{{ @csrf_token() }}',
+                    order_id: order_id,
+                    status: status
+                },
+                function (data) {
+                    $('#order_details').modal('hide');
+                    //console.log(data);
+                    AIZ.plugins.notify('success', '{{ translate('
+                    Payment status has been updated ') }}');
+                    location.reload().setTimeOut(500);
+                });
         });
     </script>
 @endsection

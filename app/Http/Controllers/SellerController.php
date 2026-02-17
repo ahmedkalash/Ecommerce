@@ -525,7 +525,14 @@ class SellerController extends Controller
         $shop->last_login = $this->getsellerLastLogin($shop->user_id);
         $addresses = $shop->user->addresses->where('set_default', 0);
         $default_shipping_address = $shop->user->addresses()->where('set_default', 1)->first();
-        $products = Product::where('user_id', $shop->user_id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
+        $products = Product::where('user_id', $shop->user_id)->where('digital', 0);
+        if (addon_is_activated('auction')) {
+            $products = $products->where('auction_product', 0);
+        }
+        if (addon_is_activated('wholesale')) {
+            $products = $products->where('wholesale_product', 0);
+        }
+        $products = $products->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->search;
             $products = $products->where('name', 'like', '%'.$search.'%');
@@ -543,16 +550,34 @@ class SellerController extends Controller
         $default_shipping_address = $shop->user->addresses()->where('set_default', 1)->first();
         $shop->last_login = $this->getsellerLastLogin($shop->user_id);
         $payments = Payment::where('seller_id', $shop->user_id)->orderBy('created_at', 'desc')->paginate(15);
-        $products = Product::where('user_id', $shop->user_id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc')->paginate(15);
+        $products = Product::where('user_id', $shop->user_id)->where('digital', 0);
+        if (addon_is_activated('auction')) {
+            $products = $products->where('auction_product', 0);
+        }
+        if (addon_is_activated('wholesale')) {
+            $products = $products->where('wholesale_product', 0);
+        }
+        $products = $products->orderBy('created_at', 'desc')->paginate(15);
         $type = 'SellerProfile';
         $unpaid_order_payment_notification = get_notification_type('complete_unpaid_order_payment', 'type');
         $orders = Order::where('seller_id', $shop->user_id)
             ->orderBy('id', 'desc')
             ->select('orders.id')
             ->distinct()->paginate(15);
-        $html = view('backend.sellers.profile.seller_'.$tab,
-            compact('products', 'shop', 'addresses', 'default_shipping_address', 'page', 'orders', 'type',
-                'unpaid_order_payment_notification', 'payments'))->render();
+        $html = view(
+            'backend.sellers.profile.seller_'.$tab,
+            compact(
+                'products',
+                'shop',
+                'addresses',
+                'default_shipping_address',
+                'page',
+                'orders',
+                'type',
+                'unpaid_order_payment_notification',
+                'payments'
+            )
+        )->render();
 
         return response()->json(['html' => $html]);
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -10,7 +11,7 @@ use Spatie\SchemalessAttributes\SchemalessAttributesTrait;
 
 class ProductStock extends Model implements HasMedia
 {
-    use InteractsWithMedia, SchemalessAttributesTrait;
+    use HasFactory, InteractsWithMedia, SchemalessAttributesTrait;
 
     protected $fillable = [
         'product_id',

@@ -37,6 +37,9 @@ class ProductStockServiceTest extends TestCase
                 if (! Schema::hasColumn('product_stocks', 'cash_on_delivery')) {
                     $table->tinyInteger('cash_on_delivery')->default(1);
                 }
+                if (! Schema::hasColumn('product_stocks', 'extra_attributes')) {
+                    $table->json('extra_attributes')->nullable();
+                }
             });
         }
     }
@@ -51,24 +54,20 @@ class ProductStockServiceTest extends TestCase
         $product = Product::factory()->create();
 
         $data = [
-            'stocks' => [
-                [
-                    'variant' => 'Red',
-                    'price' => 100,
-                    'qty' => 50,
-                    'sku' => 'TEST-RED',
-                    'min_qty' => 5, // New field
-                    'cash_on_delivery' => 0, // New field check
-                    // 'video_link' => '...',
-                ],
-                [
-                    'variant' => 'Blue',
-                    'price' => 100,
-                    'qty' => 20,
-                    'sku' => 'TEST-BLUE',
-                    'min_qty' => 1,
-                ],
-            ],
+            'colors_active' => '1',
+            'colors' => ['Red', 'Blue'],
+            // Red Variant Data
+            'price_Red' => 100,
+            'qty_Red' => 50,
+            'sku_Red' => 'TEST-RED',
+            'min_qty_Red' => 5,
+            'cash_on_delivery_Red' => 0,
+            // Blue Variant Data
+            'price_Blue' => 100,
+            'qty_Blue' => 20,
+            'sku_Blue' => 'TEST-BLUE',
+            'min_qty_Blue' => 1,
+            // 'cash_on_delivery_Blue' defaults to 1
         ];
 
         // Action

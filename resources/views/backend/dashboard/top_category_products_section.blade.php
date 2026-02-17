@@ -30,7 +30,7 @@
         @php
             $top_categories_product_limit++;
             if($top_categories_product_limit > 12)
-                break;
+            break;
         @endphp
     @endforeach
 </div>
@@ -42,8 +42,8 @@
     @endphp
     @foreach($top_categories_products as $key => $top_categories_product)
         <div
-            class="top_category_product_table top-products-table table-responsive c-scrollbar-light @if ($key == $top_categories2[0]) show @endif"
-            style="max-height: 215px; width: 100%;" id="top_category_product_table_{{ $key }}">
+                class="top_category_product_table top-products-table table-responsive c-scrollbar-light @if ($key == $top_categories2[0]) show @endif"
+                style="max-height: 215px; width: 100%;" id="top_category_product_table_{{ $key }}">
             <table class="table dashboard-table mb-0">
                 <thead>
                 <tr class="fs-11 fw-600 text-secondary">
@@ -57,8 +57,8 @@
                     @php
                         $product_img = $row->product_thumbnail_img ?? static_asset('assets/img/placeholder.jpg');
                         $product_url = route('product', $row->product_slug);
-                        if ($row->auction_product == 1) {
-                            $product_url = route('auction-product', $row->product_slug);
+                        if (isset($row->auction_product) && $row->auction_product == 1) {
+                        $product_url = route('auction-product', $row->product_slug);
                         }
                     @endphp
                     <tr>
@@ -94,7 +94,7 @@
         @php
             $top_categories_product_limit++;
             if($top_categories_product_limit > 12)
-                break;
+            break;
         @endphp
     @endforeach
 </div>

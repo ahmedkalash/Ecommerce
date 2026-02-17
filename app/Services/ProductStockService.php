@@ -102,24 +102,27 @@ class ProductStockService
                 $stock->price = (float) ($data['price_'.$str] ?? 0);
                 $stock->sku = $data['sku_'.$str] ?? null;
                 $stock->qty = (int) ($data['qty_'.$str] ?? 0);
-                $stock->image = $data['img_'.$str] ?? null;
+                $stock->extra_attributes->image = $data['img_'.$str] ?? null;
 
-                // Discount Handling
-                $stock->discount = (float) ($data['discount_'.$str] ?? 0);
-                $stock->discount_type = $data['discount_type_'.$str] ?? 'amount';
-                $stock->discount_start_date = isset($data['discount_start_date_'.$str]) ? (int) $data['discount_start_date_'.$str] : null;
-                $stock->discount_end_date = isset($data['discount_end_date_'.$str]) ? (int) $data['discount_end_date_'.$str] : null;
+                // Discount Handling (Stored in extra_attributes)
+                $stock->extra_attributes->discount = (float) ($data['discount_'.$str] ?? 0);
+                $stock->extra_attributes->discount_type = $data['discount_type_'.$str] ?? 'amount';
+                $stock->extra_attributes->discount_start_date = isset($data['discount_start_date_'.$str]) ? (int) $data['discount_start_date_'.$str] : null;
+                $stock->extra_attributes->discount_end_date = isset($data['discount_end_date_'.$str]) ? (int) $data['discount_end_date_'.$str] : null;
 
-                // Tax Handling
-                $stock->tax = (float) ($data['tax_'.$str] ?? 0);
-                $stock->tax_type = $data['tax_type_'.$str] ?? 'amount';
+                // Tax Handling (Stored in extra_attributes)
+                $stock->extra_attributes->tax = (float) ($data['tax_'.$str] ?? 0);
+                $stock->extra_attributes->tax_type = $data['tax_type_'.$str] ?? 'amount';
 
                 // Weight Handling
                 $stock->weight = (float) ($data['weight_'.$str] ?? 0);
 
+                // Min Qty & COD Handling
+                $stock->min_qty = (int) ($data['min_qty_'.$str] ?? 1);
+                $stock->cash_on_delivery = isset($data['cash_on_delivery_'.$str]) ? (int) $data['cash_on_delivery_'.$str] : 1;
+
                 // Schemaless Attributes assignment
-                // Assuming $stock uses SchemalessAttributesTrait
-                if (isset($stock->extra_attributes)) {
+                if (isset($extra_attributes)) {
                     foreach ($extra_attributes as $ek => $ev) {
                         $stock->extra_attributes->$ek = $ev;
                     }
@@ -134,27 +137,31 @@ class ProductStockService
             $stock->qty = (int) ($data['current_stock'] ?? 0);
 
             // Simple Product Discount Handling
-            $stock->discount = (float) ($data['discount'] ?? 0);
-            $stock->discount_type = $data['discount_type'] ?? 'amount';
+            $stock->extra_attributes->discount = (float) ($data['discount'] ?? 0);
+            $stock->extra_attributes->discount_type = $data['discount_type'] ?? 'amount';
 
             // Handle date_range string or separate start/end
             if (isset($data['date_range'])) {
                 $date_range = explode(' to ', $data['date_range']);
                 if (count($date_range) == 2) {
-                    $stock->discount_start_date = strtotime($date_range[0]);
-                    $stock->discount_end_date = strtotime($date_range[1]);
+                    $stock->extra_attributes->discount_start_date = strtotime($date_range[0]);
+                    $stock->extra_attributes->discount_end_date = strtotime($date_range[1]);
                 }
             } else {
-                $stock->discount_start_date = isset($data['discount_start_date']) ? (int) $data['discount_start_date'] : null;
-                $stock->discount_end_date = isset($data['discount_end_date']) ? (int) $data['discount_end_date'] : null;
+                $stock->extra_attributes->discount_start_date = isset($data['discount_start_date']) ? (int) $data['discount_start_date'] : null;
+                $stock->extra_attributes->discount_end_date = isset($data['discount_end_date']) ? (int) $data['discount_end_date'] : null;
             }
 
             // Simple Product Tax Handling
-            $stock->tax = (float) ($data['tax'] ?? 0);
-            $stock->tax_type = $data['tax_type'] ?? 'amount';
+            $stock->extra_attributes->tax = (float) ($data['tax'] ?? 0);
+            $stock->extra_attributes->tax_type = $data['tax_type'] ?? 'amount';
 
             // Weight Handling
             $stock->weight = (float) ($data['weight'] ?? 0);
+
+            // Min Qty & COD Handling
+            $stock->min_qty = (int) ($data['min_qty'] ?? 1);
+            $stock->cash_on_delivery = isset($data['cash_on_delivery']) ? (int) $data['cash_on_delivery'] : 1;
 
             $stock->save();
         }

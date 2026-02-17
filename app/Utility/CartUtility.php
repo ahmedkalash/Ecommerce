@@ -2,7 +2,6 @@
 
 namespace App\Utility;
 
-use App\Models\Cart;
 use Cookie;
 
 class CartUtility
@@ -31,7 +30,7 @@ class CartUtility
     public static function get_price($product, $product_stock, $quantity)
     {
         $price = $product_stock->price;
-        if ($product->auction_product == 1) {
+        if (addon_is_activated('auction') && $product->auction_product == 1) {
             $price = $product->bids->max('amount');
         }
 
@@ -105,8 +104,11 @@ class CartUtility
 
     public static function check_auction_in_cart($carts)
     {
+        if (! addon_is_activated('auction')) {
+            return false;
+        }
         foreach ($carts as $cart) {
-            if ($cart->product->auction_product == 1) {
+            if (isset($cart->product->auction_product) && $cart->product->auction_product == 1) {
                 return true;
             }
         }

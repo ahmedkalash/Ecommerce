@@ -150,7 +150,7 @@ if (! function_exists('filter_products')) {
     function filter_products($products)
     {
 
-        $products = $products->isApprovedPublished()->where('auction_product', 0);
+        $products = $products->isApprovedPublished();
 
         if (! addon_is_activated('wholesale')) {
             $products = $products->where('wholesale_product', 0);
@@ -173,7 +173,9 @@ if (! function_exists('get_cached_products')) {
     function get_cached_products($category_id = null)
     {
         return Cache::remember('products-category-'.$category_id, 86400, function () use ($category_id) {
-            return filter_products(Product::where('category_id', $category_id))->latest()->take(5)->get();
+            return filter_products(Product::whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id);
+            }))->latest()->take(5)->get();
         });
     }
 }
@@ -1727,8 +1729,14 @@ if (! function_exists('get_session_language')) {
     function get_session_language()
     {
         $language_query = Language::query();
+        $locale = Session::get('locale', Config::get('app.locale'));
+        $language = $language_query->where('code', $locale)->first();
 
-        return $language_query->where('code', Session::get('locale', Config::get('app.locale')))->first();
+        if (! $language) {
+            $language = $language_query->first(); // Fallback to first language
+        }
+
+        return $language;
     }
 }
 
@@ -1890,7 +1898,7 @@ if (! function_exists('get_all_auction_products')) {
     function get_auction_products($limit = null, $paginate = null)
     {
         $product_query = Product::query();
-        $products = $product_query->latest()->isApprovedPublished()->where('auction_product', 1);
+        $products = $product_query->latest()->isApprovedPublished();
         if (get_setting('seller_auction_product') == 0) {
             $products = $products->where('added_by', 'admin');
         }
@@ -1977,7 +1985,7 @@ if (! function_exists('getLastViewedProducts')) {
                         $q1->where('wholesale_product', 0);
                     })
                     ->when(! addon_is_activated('auction'), function ($q2) {
-                        $q2->where('auction_product', 0);
+                        // $q2->where('auction_product', 0); // Column removed
                     })
                     ->when(get_setting('vendor_system_activation') == 0, function ($q3) {
                         $q3->where('added_by', 'admin');
@@ -2114,10 +2122,11 @@ if (! function_exists('get_categories_by_products')) {
     function get_categories_by_products($user_id)
     {
         $product_query = Product::query();
-        $category_ids = $product_query->where(
-            'user_id',
-            $user_id
-        )->isApprovedPublished()->pluck('category_id')->toArray();
+        $category_ids = DB::table('product_categories')
+            ->whereIn('product_id', function ($q) use ($user_id) {
+                $q->select('id')->from('products')->where('user_id', $user_id)->where('approved', 1)->where('published',
+                    1);
+            })->distinct()->pluck('category_id')->toArray();
 
         $category_query = Category::query();
 
@@ -2727,7 +2736,7 @@ if (! function_exists('get_wishlists')) {
                         $q1->where('wholesale_product', 0);
                     })
                     ->when(! addon_is_activated('auction'), function ($q2) {
-                        $q2->where('auction_product', 0);
+                        // $q2->where('auction_product', 0); // Column removed
                     })
                     ->when(get_setting('vendor_system_activation') == 0, function ($q3) {
                         $q3->where('added_by', 'admin');

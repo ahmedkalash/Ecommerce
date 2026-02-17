@@ -93,7 +93,9 @@ class AdminController extends Controller
                 $category_ids = \App\Utility\CategoryUtility::children_ids($category->id);
                 $category_ids[] = $category->id;
 
-                $products = Product::with('stocks')->whereIn('category_id', $category_ids)->get();
+                $products = Product::with('stocks')->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('categories.id', $category_ids);
+                })->get();
                 $qty = 0;
                 $sale = 0;
                 foreach ($products as $key => $product) {
@@ -151,7 +153,8 @@ class AdminController extends Controller
         )
             ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
             ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('product_categories', 'products.id', '=', 'product_categories.product_id')
+            ->leftJoin('categories', 'product_categories.category_id', '=', 'categories.id')
             ->where('orders.delivery_status', 'delivered')
             ->groupBy('categories.id')
             ->orderBy('total', 'desc')
@@ -266,11 +269,11 @@ class AdminController extends Controller
 
     public function top_category_products_section(Request $request)
     {
-        $top_categories_products = DB::table(DB::raw('(SELECT products.id product_id, products.name product_name, products.slug product_slug, 0 as auction_product, products.category_id,
+        $top_categories_products = DB::table(DB::raw('(SELECT products.id product_id, products.name product_name, products.slug product_slug, 0 as auction_product, pc.category_id,
                                                         `products`.`thumbnail_img` as `product_thumbnail_img`, od.sales, od.total, od.created_at order_detail_created,
                                                         categories.name AS category_name,
                                                         `categories`.`cover_image`,
-                                                        ROW_NUMBER() OVER (PARTITION BY products.category_id ORDER BY od.sales DESC) rn
+                                                        ROW_NUMBER() OVER (PARTITION BY pc.category_id ORDER BY od.sales DESC) rn
                                                 from products
                                                 INNER JOIN (
                                                 SELECT product_id, SUM(quantity) sales, SUM(price + tax) AS total, created_at
@@ -279,7 +282,8 @@ class AdminController extends Controller
                                                 AND order_details.delivery_status = "delivered"
                                                 GROUP BY product_id
                                                 )  od ON od.product_id = products.id
-                                                LEFT JOIN categories ON products.category_id = categories.id
+                                                INNER JOIN product_categories pc ON pc.product_id = products.id
+                                                LEFT JOIN categories ON pc.category_id = categories.id
                                                 ) t'))
             ->select(DB::raw('category_id, category_name, cover_image, product_id, product_name, product_slug, auction_product, product_thumbnail_img, sales, total, order_detail_created'))
             ->where('rn', '<=', 3)
@@ -314,7 +318,8 @@ class AdminController extends Controller
         )
             ->leftJoin('order_details', 'orders.id', '=', 'order_details.order_id')
             ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('product_categories', 'products.id', '=', 'product_categories.product_id')
+            ->leftJoin('categories', 'product_categories.category_id', '=', 'categories.id')
             ->where('orders.delivery_status', '=', 'delivered')
             ->whereRaw('products.added_by = "admin"');
         if ($request->interval_type != 'all') {
@@ -408,7 +413,7 @@ class AdminController extends Controller
                 'products.id AS product_id',
                 'products.name',
                 'products.slug AS product_slug',
-                'products.auction_product',
+                '0 AS auction_product',
                 'products.thumbnail_img',
                 DB::raw('SUM(quantity) AS total_quantity, SUM(price * quantity) AS sale')
             )

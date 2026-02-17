@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -33,7 +32,6 @@ class ProductFactory extends Factory
             'name' => $name,
             'added_by' => 'admin',
             'user_id' => User::factory(),
-            'category_id' => Category::factory(),
             // Should match new pivot structure? If existing schema still has category_id, keep it.
             // 'brand_id' => Brand::factory(), // Optional
             'description' => fake()->paragraph(),

@@ -31,7 +31,6 @@ class ProductStockFactory extends Factory
             'sku' => $this->faker->unique()->ean8(),
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'qty' => $this->faker->numberBetween(0, 100),
-            'image' => null, // Deprecated but might be in base schema before migration, safe to null or omit if dropped
             // 'video_provider' => null, // Added in recent migration
             // 'video_link' => null, // Added in recent migration
         ];
