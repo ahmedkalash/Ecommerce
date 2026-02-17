@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Payment;
 
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\CustomerPackage;
-use App\Models\SellerPackage;
-use App\Models\CombinedOrder;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
-use App\Http\Controllers\CheckoutController;
+use App\Models\CombinedOrder;
+use App\Models\CustomerPackage;
 use App\Models\Order;
-use Session;
+use App\Models\SellerPackage;
 use Auth;
+use Illuminate\Http\Request;
+use Session;
 
 class AamarpayController extends Controller
 {
@@ -21,6 +21,7 @@ class AamarpayController extends Controller
     {
         if (Auth::user()->phone == null) {
             flash(translate('Please add phone number to your profile'))->warning();
+
             return redirect()->route('profile');
         }
 
@@ -57,39 +58,41 @@ class AamarpayController extends Controller
             }
         }
 
-        $fields = array(
-            'store_id' => env('AAMARPAY_STORE_ID'), //store id will be aamarpay,  contact integration@aamarpay.com for test/live id
-            'amount' => $amount, //transaction amount
-            'payment_type' => 'VISA', //no need to change
-            'currency' => 'BDT',  //currenct will be USD/BDT
-            'tran_id' => rand(1111111, 9999999), //transaction id must be unique from your end
-            'cus_name' => Auth::user()->name,  //customer name
-            'cus_email' => $email, //customer email address
-            'cus_add1' => '',  //customer address
-            'cus_add2' => '', //customer address
-            'cus_city' => '',  //customer city
-            'cus_state' => '',  //state
-            'cus_postcode' => '', //postcode or zipcode
-            'cus_country' => 'Bangladesh',  //country
-            'cus_phone' => Auth::user()->phone, //customer phone number
-            'cus_fax' => 'Not¬Applicable',  //fax
-            'ship_name' => '', //ship name
-            'ship_add1' => '',  //ship address
+        $fields = [
+            'store_id' => env('AAMARPAY_STORE_ID'),
+            // store id will be aamarpay,  contact integration@aamarpay.com for test/live id
+            'amount' => $amount, // transaction amount
+            'payment_type' => 'VISA', // no need to change
+            'currency' => 'BDT',  // currenct will be USD/BDT
+            'tran_id' => rand(1111111, 9999999), // transaction id must be unique from your end
+            'cus_name' => Auth::user()->name,  // customer name
+            'cus_email' => $email, // customer email address
+            'cus_add1' => '',  // customer address
+            'cus_add2' => '', // customer address
+            'cus_city' => '',  // customer city
+            'cus_state' => '',  // state
+            'cus_postcode' => '', // postcode or zipcode
+            'cus_country' => 'Bangladesh',  // country
+            'cus_phone' => Auth::user()->phone, // customer phone number
+            'cus_fax' => 'Not¬Applicable',  // fax
+            'ship_name' => '', // ship name
+            'ship_add1' => '',  // ship address
             'ship_add2' => '',
             'ship_city' => '',
             'ship_state' => '',
             'ship_postcode' => '',
             'ship_country' => 'Bangladesh',
-            'desc' => env('APP_NAME') . ' payment',
-            'success_url' => route('aamarpay.success'), //your success route
-            'fail_url' => route('aamarpay.fail'), //your fail route
-            'cancel_url' => route('cart'), //your cancel url
-            'opt_a' => Session::get('payment_type'),  //optional paramter
+            'desc' => env('APP_NAME').' payment',
+            'success_url' => route('aamarpay.success'), // your success route
+            'fail_url' => route('aamarpay.fail'), // your fail route
+            'cancel_url' => route('cart'), // your cancel url
+            'opt_a' => Session::get('payment_type'),  // optional paramter
             'opt_b' => Session::get('combined_order_id'),
             'opt_c' => json_encode(Session::get('payment_data')),
             'opt_d' => '',
-            'signature_key' => env('AAMARPAY_SIGNATURE_KEY') //signature key will provided aamarpay, contact integration@aamarpay.com for test/live signature key
-        );
+            'signature_key' => env('AAMARPAY_SIGNATURE_KEY'),
+            // signature key will provided aamarpay, contact integration@aamarpay.com for test/live signature key
+        ];
 
         $fields_string = http_build_query($fields);
 
@@ -106,7 +109,7 @@ class AamarpayController extends Controller
         $this->redirect_to_merchant($url_forward);
     }
 
-    function redirect_to_merchant($url)
+    public function redirect_to_merchant($url)
     {
         if (get_setting('aamarpay_sandbox') == 1) {
             $base_url = 'https://sandbox.aamarpay.com/';
@@ -114,7 +117,7 @@ class AamarpayController extends Controller
             $base_url = 'https://secure.aamarpay.com/';
         }
 
-?>
+        ?>
         <html xmlns="http://www.w3.org/1999/xhtml">
 
         <head>
@@ -127,7 +130,7 @@ class AamarpayController extends Controller
 
         <body onLoad="closethisasap();">
 
-            <form name="redirectpost" method="post" action="<?php echo $base_url . $url; ?>"></form>
+        <form name="redirectpost" method="post" action="<?php echo $base_url.$url; ?>"></form>
 
         </body>
 
@@ -135,7 +138,6 @@ class AamarpayController extends Controller
 <?php
         exit;
     }
-
 
     public function success(Request $request)
     {
@@ -157,6 +159,7 @@ class AamarpayController extends Controller
     public function fail(Request $request)
     {
         flash(translate('Payment failed'))->error();
+
         return redirect()->route('cart');
     }
 }

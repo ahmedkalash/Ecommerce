@@ -4,22 +4,23 @@ namespace App\Services\OTP;
 
 use App\Contracts\SendSms;
 
-class Sparrow implements SendSms {
+class Sparrow implements SendSms
+{
     public function send($to, $from, $text, $template_id)
     {
-        $url = "http://api.sparrowsms.com/v2/sms/";
-        
+        $url = 'http://api.sparrowsms.com/v2/sms/';
+
         if (strpos($to, '+977') !== false) {
             $to = substr($to, 4);
         }
 
-        $args = http_build_query(array(
-            "token" => env('SPARROW_TOKEN'),
-            "from" => env('MESSGAE_FROM'),
-            "to" => str_replace([' ','-'], "", $to),
-            "text" => $text
-        ));
-        # Make the call using API.
+        $args = http_build_query([
+            'token' => env('SPARROW_TOKEN'),
+            'from' => env('MESSGAE_FROM'),
+            'to' => str_replace([' ', '-'], '', $to),
+            'text' => $text,
+        ]);
+        // Make the call using API.
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -28,6 +29,7 @@ class Sparrow implements SendSms {
         // Response
         $response = curl_exec($ch);
         curl_close($ch);
+
         return $response;
     }
 }

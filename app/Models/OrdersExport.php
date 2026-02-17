@@ -4,10 +4,10 @@ namespace App\Models;
 
 use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class OrdersExport implements FromCollection, WithMapping, WithHeadings
+class OrdersExport implements FromCollection, WithHeadings, WithMapping
 {
     use PreventDemoModeChanges;
 
@@ -38,8 +38,8 @@ class OrdersExport implements FromCollection, WithMapping, WithHeadings
     }
 
     /**
-    * @var Order  $order
-    */
+     * @var Order
+     */
     public function map($order): array
     {
         return [

@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Models\ClubPoint;
 use App\Http\Resources\V2\RefundRequestCollection;
 use App\Models\OrderDetail;
 use App\Models\RefundRequest;
-use App\Models\User;
-use App\Models\Wallet;
 use Illuminate\Http\Request;
 
 class RefundRequestController extends Controller
 {
-
     public function get_list()
     {
         $refunds = RefundRequest::where('user_id', auth()->user()->id)->latest()->paginate(10);
@@ -38,9 +34,8 @@ class RefundRequestController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => translate('Request Sent')
+            'message' => translate('Request Sent'),
         ]);
-
 
     }
 }

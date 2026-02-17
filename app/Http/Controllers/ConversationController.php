@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Conversation;
+use App\Mail\ConversationMailManager;
 use App\Models\BusinessSetting;
+use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Product;
 use Auth;
+use Illuminate\Http\Request;
 use Mail;
-use App\Mail\ConversationMailManager;
 
 class ConversationController extends Controller
 {
@@ -29,9 +29,11 @@ class ConversationController extends Controller
     {
         if (BusinessSetting::where('type', 'conversation_system')->first()->value == 1) {
             $conversations = Conversation::where('sender_id', Auth::user()->id)->orWhere('receiver_id', Auth::user()->id)->orderBy('updated_at', 'desc')->paginate(8);
+
             return view('frontend.user.conversations.index', compact('conversations'));
         } else {
             flash(translate('Conversation is disabled at this moment'))->warning();
+
             return back();
         }
     }
@@ -45,9 +47,11 @@ class ConversationController extends Controller
     {
         if (BusinessSetting::where('type', 'conversation_system')->first()->value == 1) {
             $conversations = Conversation::orderBy('updated_at', 'desc')->get();
+
             return view('backend.support.conversations.index', compact('conversations'));
         } else {
             flash(translate('Conversation is disabled at this moment'))->warning();
+
             return back();
         }
     }
@@ -65,7 +69,6 @@ class ConversationController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -89,15 +92,16 @@ class ConversationController extends Controller
         }
 
         flash(translate('Message has been sent to seller'))->success();
+
         return back();
     }
 
     public function send_message_to_seller($conversation, $message, $user_type)
     {
         $array['view'] = 'emails.conversation';
-        $array['subject'] = translate('Sender').':- '. Auth::user()->name;
+        $array['subject'] = translate('Sender').':- '.Auth::user()->name;
         $array['from'] = env('MAIL_FROM_ADDRESS');
-        $array['content'] = translate('Hi! You recieved a message from ') . Auth::user()->name . '.';
+        $array['content'] = translate('Hi! You recieved a message from ').Auth::user()->name.'.';
         $array['sender'] = Auth::user()->name;
 
         if ($user_type == 'admin') {
@@ -111,7 +115,7 @@ class ConversationController extends Controller
         try {
             Mail::to($conversation->receiver->email)->queue(new ConversationMailManager($array));
         } catch (\Exception $e) {
-            //dd($e->getMessage());
+            // dd($e->getMessage());
         }
     }
 
@@ -130,9 +134,9 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
         }
         $conversation->save();
+
         return view('frontend.user.conversations.show', compact('conversation'));
     }
-
 
     /**
      * Display the specified resource.
@@ -150,6 +154,7 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
             $conversation->save();
         }
+
         return view('frontend.partials.messages', compact('conversation'));
     }
 
@@ -168,6 +173,7 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
         }
         $conversation->save();
+
         return view('backend.support.conversations.show', compact('conversation'));
     }
 
@@ -185,7 +191,6 @@ class ConversationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -207,6 +212,7 @@ class ConversationController extends Controller
 
         if (Conversation::destroy(decrypt($id))) {
             flash(translate('Conversation has been deleted successfully'))->success();
+
             return back();
         }
     }

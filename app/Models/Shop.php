@@ -2,25 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class Shop extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
+    protected $with = ['user'];
 
-  protected $with = ['user'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
-  public function user()
-  {
-    return $this->belongsTo(User::class);
-  }
-  
-  public function seller_package(){
-    return $this->belongsTo(SellerPackage::class);
-  }
-  public function followers(){
-    return $this->hasMany(FollowSeller::class);
-  }
+    public function seller_package()
+    {
+        return $this->belongsTo(SellerPackage::class);
+    }
+
+    public function followers()
+    {
+        return $this->hasMany(FollowSeller::class);
+    }
 }

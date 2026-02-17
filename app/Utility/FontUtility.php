@@ -11,7 +11,7 @@ class FontUtility
 {
     public static function get_font_family()
     {
-        $pdf_style_data = array();
+        $pdf_style_data = [];
         if (Session::has('currency_code')) {
             $currency_code = Session::get('currency_code');
         } else {
@@ -34,7 +34,7 @@ class FontUtility
             $language_code == 'bd'
         ) {
             // bengali font
-            $font_family = "freeserif";
+            $font_family = 'freeserif';
         } elseif (
             $currency_code == 'KHR' ||
             $language_code == 'kh'
@@ -60,7 +60,7 @@ class FontUtility
             $language_code == 'jo'
         ) {
             // middle east/arabic/Israeli font
-            $font_family = "xbriyaz";
+            $font_family = 'xbriyaz';
         } elseif ($currency_code == 'THB') {
             // thai font
             $font_family = "'Kanit','garuda'";
@@ -86,11 +86,12 @@ class FontUtility
             // general for all
             $font_family = "'Roboto','sans-serif'";
         }
-        
+
         $pdf_style_data['font_family'] = $font_family;
         $pdf_style_data['direction'] = $direction;
         $pdf_style_data['text_align'] = $text_align;
         $pdf_style_data['not_text_align'] = $not_text_align;
+
         return $pdf_style_data;
     }
 }

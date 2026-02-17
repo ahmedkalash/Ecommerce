@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers\Api\V2;
 
+use App\Http\Controllers\AffiliateController;
 use App\Models\Address;
-use Illuminate\Http\Request;
-use App\Models\Order;
 use App\Models\Cart;
-use App\Models\Product;
-use App\Models\OrderDetail;
+use App\Models\CombinedOrder;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
-use App\Models\BusinessSetting;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Product;
 use App\Models\User;
-use DB;
-use \App\Utility\NotificationUtility;
-use App\Models\CombinedOrder;
-use App\Http\Controllers\AffiliateController;
+use App\Utility\NotificationUtility;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -28,7 +26,7 @@ class OrderController extends Controller
                 $subtotal += cart_product_price($cartItem, $product, false, false) * $cartItem['quantity'];
             }
             if ($subtotal < get_setting('minimum_order_amount')) {
-                return $this->failed(translate("You order amount is less then the minimum order amount"));
+                return $this->failed(translate('You order amount is less then the minimum order amount'));
             }
         }
 
@@ -38,7 +36,7 @@ class OrderController extends Controller
             return response()->json([
                 'combined_order_id' => 0,
                 'result' => false,
-                'message' => translate('Cart is Empty')
+                'message' => translate('Cart is Empty'),
             ]);
         }
 
@@ -47,16 +45,16 @@ class OrderController extends Controller
         $address = Address::where('id', $cartItems->first()->address_id)->first();
         $shippingAddress = [];
         if ($address != null) {
-            $shippingAddress['name']        = $user->name;
-            $shippingAddress['email']       = $user->email;
-            $shippingAddress['address']     = $address->address. (isset($address->area) ? ', ' . $address->area->name : '');
-            $shippingAddress['country']     = $address->country->name;
-            $shippingAddress['state']       = $address->state->name;
-            $shippingAddress['city']        = $address->city->name;
+            $shippingAddress['name'] = $user->name;
+            $shippingAddress['email'] = $user->email;
+            $shippingAddress['address'] = $address->address.(isset($address->area) ? ', '.$address->area->name : '');
+            $shippingAddress['country'] = $address->country->name;
+            $shippingAddress['state'] = $address->state->name;
+            $shippingAddress['city'] = $address->city->name;
             $shippingAddress['postal_code'] = $address->postal_code;
-            $shippingAddress['phone']       = $address->phone;
+            $shippingAddress['phone'] = $address->phone;
             if ($address->latitude || $address->longitude) {
-                $shippingAddress['lat_lang'] = $address->latitude . ',' . $address->longitude;
+                $shippingAddress['lat_lang'] = $address->latitude.','.$address->longitude;
             }
         }
 
@@ -65,9 +63,9 @@ class OrderController extends Controller
         $combined_order->shipping_address = json_encode($shippingAddress);
         $combined_order->save();
 
-        $seller_products = array();
+        $seller_products = [];
         foreach ($cartItems as $cartItem) {
-            $product_ids = array();
+            $product_ids = [];
             $product = Product::find($cartItem['product_id']);
             if (isset($seller_products[$product->user_id])) {
                 $product_ids = $seller_products[$product->user_id];
@@ -86,7 +84,7 @@ class OrderController extends Controller
             $order->payment_type = $request->payment_type;
             $order->delivery_viewed = '0';
             $order->payment_status_viewed = '0';
-            $order->code = date('Ymd-His') . rand(10, 99);
+            $order->code = date('Ymd-His').rand(10, 99);
             $order->date = strtotime('now');
             if ($set_paid) {
                 $order->payment_status = 'paid';
@@ -101,7 +99,7 @@ class OrderController extends Controller
             $shipping = 0;
             $coupon_discount = 0;
 
-            //Order Details Storing
+            // Order Details Storing
             foreach ($seller_product as $cartItem) {
                 $product = Product::find($cartItem['product_id']);
 
@@ -115,10 +113,11 @@ class OrderController extends Controller
                 if ($product->digital != 1 && $cartItem['quantity'] > $product_stock->qty) {
                     $order->delete();
                     $combined_order->delete();
+
                     return response()->json([
                         'combined_order_id' => 0,
                         'result' => false,
-                        'message' => translate('The requested quantity is not available for ') . $product->name
+                        'message' => translate('The requested quantity is not available for ').$product->name,
                     ]);
                 } elseif ($product->digital != 1) {
                     $product_stock->qty -= $cartItem['quantity'];
@@ -138,7 +137,7 @@ class OrderController extends Controller
 
                 $shipping += $order_detail->shipping_cost;
 
-                //End of storing shipping cost
+                // End of storing shipping cost
                 if (addon_is_activated('club_point')) {
                     $order_detail->earn_point = $product->earn_point;
                 }
@@ -150,7 +149,7 @@ class OrderController extends Controller
                 $product->save();
 
                 $order->seller_id = $product->user_id;
-              
+
                 $order->shipping_type = $cartItem['shipping_type'];
                 if ($cartItem['shipping_type'] == 'pickup_point') {
                     $order->pickup_point_id = $cartItem['pickup_point'];
@@ -189,7 +188,8 @@ class OrderController extends Controller
 
             $combined_order->grand_total += $order->grand_total;
 
-            if (strpos($request->payment_type, "manual_payment_") !== false) { // if payment type like  manual_payment_1 or  manual_payment_25 etc)
+            if (strpos($request->payment_type,
+                'manual_payment_') !== false) { // if payment type like  manual_payment_1 or  manual_payment_25 etc)
 
                 $order->manual_payment = 1;
                 $order->save();
@@ -204,7 +204,8 @@ class OrderController extends Controller
         if (
             $request->payment_type == 'cash_on_delivery'
             || $request->payment_type == 'wallet'
-            || strpos($request->payment_type, "manual_payment_") !== false // if payment type like  manual_payment_1 or  manual_payment_25 etc
+            || strpos($request->payment_type,
+                'manual_payment_') !== false // if payment type like  manual_payment_1 or  manual_payment_25 etc
         ) {
             NotificationUtility::sendOrderPlacedNotification($order);
         }
@@ -212,7 +213,7 @@ class OrderController extends Controller
         return response()->json([
             'combined_order_id' => $combined_order->id,
             'result' => true,
-            'message' => translate('Your order has been placed successfully')
+            'message' => translate('Your order has been placed successfully'),
         ]);
     }
 
@@ -231,7 +232,7 @@ class OrderController extends Controller
 
             return $this->success(translate('Order has been canceled successfully'));
         } else {
-            return  $this->failed(translate('Something went wrong'));
+            return $this->failed(translate('Something went wrong'));
         }
     }
 }

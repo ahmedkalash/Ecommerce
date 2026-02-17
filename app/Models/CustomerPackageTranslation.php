@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class CustomerPackageTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-  protected $fillable = ['name', 'lang', 'customer_package_id'];
+    protected $fillable = ['name', 'lang', 'customer_package_id'];
 
-  public function customer_package(){
-   return $this->belongsTo(CustomerPackage::class);
-  }
+    public function customer_package()
+    {
+        return $this->belongsTo(CustomerPackage::class);
+    }
 }

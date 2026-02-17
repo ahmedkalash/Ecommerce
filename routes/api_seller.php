@@ -8,7 +8,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
 
     Route::middleware(['auth:sanctum'])->group(function () {
 
-        //Order Section
+        // Order Section
         Route::controller(OrderController::class)->group(function () {
             Route::get('orders', 'getOrderList');
             Route::get('orders/details/{id}', 'getOrderDetails');
@@ -19,7 +19,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             // Route::apiResource('shops', 'App\Http\Controllers\Api\V2\ShopController')->only('index');
         });
 
-        //Shop Section
+        // Shop Section
         Route::controller(ShopController::class)->group(function () {
             Route::get('payment-history', 'payment_histories');
             Route::get('commission-list', 'collection_histories');
@@ -35,19 +35,19 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::post('shop-verify-info-store', 'store_verify_info');
         });
 
-        //Refund Section
+        // Refund Section
         Route::controller(RefundController::class)->group(function () {
             Route::get('refunds', 'index');
             Route::post('refunds/approve', 'request_approval_vendor');
             Route::post('refunds/reject', 'reject_refund_request');
         });
-        //Withdraw Request Section
+        // Withdraw Request Section
         Route::controller(WithdrawRequestController::class)->group(function () {
             Route::get('withdraw-request', 'index');
             Route::post('withdraw-request/store', 'store');
         });
 
-        //Product Section
+        // Product Section
         Route::controller(ProductController::class)->group(function () {
             Route::get('products/all', 'index');
             Route::get('products/categories', 'getCategory');
@@ -69,8 +69,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
 
         });
 
-
-        //Product Query Section
+        // Product Query Section
         Route::controller(ProductQueryController::class)->group(function () {
             Route::get('products/queries', 'product_queries');
             Route::get('products/query-show/{id}', 'product_queries_show');
@@ -78,7 +77,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
         });
         // Digital Product Section
         Route::controller(DigitalProductController::class)->group(function () {
-            Route::get('digital-products', 'index'); 
+            Route::get('digital-products', 'index');
             Route::get('digital-products/categories', 'getCategory');
             Route::post('digital-products/store', 'store');
             Route::get('digital-products/edit/{id}', 'edit');
@@ -88,7 +87,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
 
         });
 
-        //Whole Sale Product Section
+        // Whole Sale Product Section
         Route::controller(WholesaleProductController::class)->group(function () {
             Route::get('wholesale-products', 'wholesale_products');
             Route::post('wholesale-product/create', 'product_store');
@@ -110,7 +109,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
 
         });
 
-        //Coupon Section
+        // Coupon Section
         Route::controller(CouponController::class)->group(function () {
             Route::get('coupon/all', 'index');
             Route::post('coupon/create', 'store');
@@ -120,21 +119,21 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::get('coupon/for-product', 'coupon_for_product');
         });
 
-        //Conversations 
+        // Conversations
         Route::controller(ConversationController::class)->group(function () {
             Route::get('conversations', 'index');
             Route::get('conversations/show/{id}', 'showMessages');
             Route::post('conversations/message/store', 'send_message_to_customer');
         });
 
-        //Seller Package 
+        // Seller Package
         Route::controller(SellerPackageController::class)->group(function () {
             Route::get('seller-packages-list', 'seller_packages_list');
             Route::post('seller-package/offline-payment', 'purchase_package_offline');
             Route::post('seller-package/free-package', 'purchase_free_package');
         });
 
-        //Seller File Upload 
+        // Seller File Upload
         Route::controller(SellerFileUploadController::class)->group(function () {
             Route::post('file/upload', 'upload');
             Route::get('file/all', 'index');
@@ -157,7 +156,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::post('pos/user-cart-data', 'getUserCartData');
             Route::get('pos/configuration', 'posConfiguration');
             Route::post('pos/configuration/update', 'posConfigurationUpdate');
-            
+
         });
 
     });

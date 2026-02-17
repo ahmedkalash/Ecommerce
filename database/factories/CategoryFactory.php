@@ -54,7 +54,7 @@ class CategoryFactory extends Factory
      */
     public function featured(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'featured' => 1,
         ]);
     }
@@ -64,7 +64,7 @@ class CategoryFactory extends Factory
      */
     public function top(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'top' => 1,
         ]);
     }
@@ -74,7 +74,7 @@ class CategoryFactory extends Factory
      */
     public function digital(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'digital' => 1,
         ]);
     }

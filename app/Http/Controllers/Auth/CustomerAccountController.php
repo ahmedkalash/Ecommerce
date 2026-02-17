@@ -40,7 +40,7 @@ class CustomerAccountController extends Controller
         $user = auth()->user();
 
         // Ensure user is authenticated
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('user.login');
         }
 
@@ -49,7 +49,7 @@ class CustomerAccountController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'password' => [translate('The provided password does not match our records.')],
             ]);
@@ -109,7 +109,7 @@ class CustomerAccountController extends Controller
     {
         $uploads = $user->uploads;
 
-        if (!$uploads || $uploads->isEmpty()) {
+        if (! $uploads || $uploads->isEmpty()) {
             return;
         }
 

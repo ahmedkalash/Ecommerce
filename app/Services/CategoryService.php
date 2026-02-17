@@ -48,7 +48,6 @@ class CategoryService
      *     meta_description?: string,
      *     refund_request_time?: int
      * } $data
-     * @param Category $category
      */
     public function update(array $data, Category $category): Category
     {
@@ -76,7 +75,7 @@ class CategoryService
     public function bulkDelete(\Illuminate\Support\Collection $records): void
     {
         DB::transaction(function () use ($records) {
-            $records->each(fn(Category $record) => $this->delete($record));
+            $records->each(fn (Category $record) => $this->delete($record));
         });
     }
 

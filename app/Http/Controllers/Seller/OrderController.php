@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Models\Order;
-use App\Models\ProductStock;
+use App\Models\OrdersExport;
 use App\Models\SmsTemplate;
 use App\Models\User;
+use App\Utility\EmailUtility;
 use App\Utility\NotificationUtility;
 use App\Utility\SmsUtility;
-use Illuminate\Http\Request;
-use App\Models\OrdersExport;
-use App\Utility\EmailUtility;
-use Maatwebsite\Excel\Facades\Excel;
 use Auth;
 use DB;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -43,7 +42,7 @@ class OrderController extends Controller
         }
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $orders = $orders->where('code', 'like', '%' . $sort_search . '%');
+            $orders = $orders->where('code', 'like', '%'.$sort_search.'%');
         }
 
         $orders = $orders->paginate(15);
@@ -67,20 +66,21 @@ class OrderController extends Controller
 
         $order->viewed = 1;
         $order->save();
+
         return view('seller.orders.show', compact('order', 'delivery_boys'));
     }
 
     // Update Delivery Status
     public function update_delivery_status(Request $request)
-    {   
+    {
         $authUser = Auth::user();
         $order = Order::findOrFail($request->order_id);
         $order->delivery_viewed = '0';
         $order->delivery_status = $request->status;
         $order->save();
 
-        if($request->status == 'delivered'){
-            $order->delivered_date = date("Y-m-d H:i:s");
+        if ($request->status == 'delivered') {
+            $order->delivered_date = date('Y-m-d H:i:s');
             $order->save();
         }
 
@@ -91,7 +91,7 @@ class OrderController extends Controller
         }
 
         // If the order is cancelled and the seller commission is calculated, deduct seller earning
-        if($request->status == 'cancelled' && $order->payment_status == 'paid' && $order->commission_calculated == 1){
+        if ($request->status == 'cancelled' && $order->payment_status == 'paid' && $order->commission_calculated == 1) {
             $sellerEarning = $order->commissionHistory->seller_earning;
             $shop = $order->shop;
             $shop->admin_to_pay -= $sellerEarning;
@@ -106,36 +106,35 @@ class OrderController extends Controller
                 product_restock($orderDetail);
             }
         }
-        
-        // Delivery Status change email notification to Admin, seller, Customer
-        EmailUtility::order_email($order, $request->status); 
 
+        // Delivery Status change email notification to Admin, seller, Customer
+        EmailUtility::order_email($order, $request->status);
 
         // Delivery Status change SMS notification
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'delivery_status_change')->first()->status == 1) {
             try {
                 SmsUtility::delivery_status_change(json_decode($order->shipping_address)->phone, $order);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
-        //Sends Web Notifications to user
+        // Sends Web Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
 
-        //Sends Firebase Notifications to user
+        // Sends Firebase Notifications to user
 
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
-            $request->title = "Order updated !";
-            $status = str_replace("_", "", $order->delivery_status);
+            $request->title = 'Order updated !';
+            $status = str_replace('_', '', $order->delivery_status);
             $request->text = " Your order {$order->code} has been {$status}";
 
-            $request->type = "order";
+            $request->type = 'order';
             $request->id = $order->id;
             $request->user_id = $order->user->id;
 
             NotificationUtility::sendFirebaseNotification($request);
         }
-
 
         if (addon_is_activated('delivery_boy')) {
             if ($authUser->user_type == 'delivery_boy') {
@@ -158,7 +157,7 @@ class OrderController extends Controller
             $orderDetail->payment_status = $request->status;
             $orderDetail->save();
         }
-        
+
         $status = 'paid';
         foreach ($order->orderDetails as $key => $orderDetail) {
             if ($orderDetail->payment_status != 'paid') {
@@ -168,31 +167,29 @@ class OrderController extends Controller
         $order->payment_status = $status;
         $order->save();
 
-
         if ($order->payment_status == 'paid' && $order->commission_calculated == 0) {
             calculateCommissionAffilationClubPoint($order);
         }
 
         // Payment Status change email notification to Admin, seller, Customer
-        if($request->status == 'paid'){
-            EmailUtility::order_email($order, $request->status);  
+        if ($request->status == 'paid') {
+            EmailUtility::order_email($order, $request->status);
         }
 
-        //Sends Firebase Notifications to Admin, seller, Customer
+        // Sends Firebase Notifications to Admin, seller, Customer
         NotificationUtility::sendNotification($order, $request->status);
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
-            $request->title = "Order updated !";
-            $status = str_replace("_", "", $order->payment_status);
+            $request->title = 'Order updated !';
+            $status = str_replace('_', '', $order->payment_status);
             $request->text = " Your order {$order->code} has been {$status}";
 
-            $request->type = "order";
+            $request->type = 'order';
             $request->id = $order->id;
             $request->user_id = $order->user->id;
 
             NotificationUtility::sendFirebaseNotification($request);
         }
-
 
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'payment_status_change')->first()->status == 1) {
             try {
@@ -201,15 +198,16 @@ class OrderController extends Controller
 
             }
         }
+
         return 1;
     }
 
     public function orderBulkExport(Request $request)
     {
-        if($request->id){
-          return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
+        if ($request->id) {
+            return Excel::download(new OrdersExport($request->id), 'orders.xlsx');
         }
+
         return back();
     }
-
 }

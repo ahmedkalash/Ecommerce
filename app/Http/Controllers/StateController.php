@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\State;
 use App\Models\Country;
+use App\Models\State;
+use Illuminate\Http\Request;
 
 class StateController extends Controller
 {
@@ -24,7 +24,7 @@ class StateController extends Controller
         $sort_country = $request->sort_country;
         $sort_state = $request->sort_state;
 
-        //$state_queries = State::query();
+        // $state_queries = State::query();
         $state_queries = State::whereHas('country', function ($q) {
             $q->where('status', 1);
         });
@@ -36,6 +36,7 @@ class StateController extends Controller
         }
 
         $states = $state_queries->orderBy('created_at', 'desc')->paginate(15);
+
         return view('backend.setup_configurations.states.index', compact('states', 'sort_country', 'sort_state'));
     }
 
@@ -52,19 +53,19 @@ class StateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
         $state = new State;
 
-        $state->name        = $request->name;
-        $state->country_id  = $request->country_id;
+        $state->name = $request->name;
+        $state->country_id = $request->country_id;
 
         $state->save();
 
         flash(translate('State has been inserted successfully'))->success();
+
         return back();
     }
 
@@ -87,7 +88,7 @@ class StateController extends Controller
      */
     public function edit($id)
     {
-        $state  = State::findOrFail($id);
+        $state = State::findOrFail($id);
         $countries = Country::where('status', 1)->get();
 
         return view('backend.setup_configurations.states.edit', compact('countries', 'state'));
@@ -96,7 +97,6 @@ class StateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -104,12 +104,13 @@ class StateController extends Controller
     {
         $state = State::findOrFail($id);
 
-        $state->name        = $request->name;
-        $state->country_id  = $request->country_id;
+        $state->name = $request->name;
+        $state->country_id = $request->country_id;
 
         $state->save();
 
         flash(translate('State has been updated successfully'))->success();
+
         return back();
     }
 
@@ -124,6 +125,7 @@ class StateController extends Controller
         State::destroy($id);
 
         flash(translate('State has been deleted successfully'))->success();
+
         return redirect()->route('states.index');
     }
 
@@ -133,14 +135,14 @@ class StateController extends Controller
         $state->status = $request->status;
         $state->save();
 
-        if (!$state->status) {
+        if (! $state->status) {
             foreach ($state->cities as $city) {
                 $city->status = 0;
                 $city->save();
                 foreach ($city->areas as $area) {
-                            $area->status = 0;
-                            $area->save();
-                        }
+                    $area->status = 0;
+                    $area->save();
+                }
             }
         }
 

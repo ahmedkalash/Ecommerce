@@ -15,9 +15,10 @@ class OrderItemResource extends JsonResource
     public function toArray($request)
     {
         $description = $this->quantity;
-        if($this->variation) {
-            $description = $this->quantity. ' x '. $this->variation;
+        if ($this->variation) {
+            $description = $this->quantity.' x '.$this->variation;
         }
+
         return [
             'name' => optional($this->product)->name,
             'description' => $description,
@@ -25,6 +26,5 @@ class OrderItemResource extends JsonResource
             'price' => format_price($this->price),
         ];
 
-    
     }
 }

@@ -21,14 +21,16 @@ class PurchaseHistoryCollection extends ResourceCollection
                     'code' => $data->code,
                     'user_id' => (int) $data->user_id,
                     'shipping_address' => json_decode($data->shipping_address),
-                    'payment_type' => ucwords(str_replace('_', ' ',translate( $data->payment_type))),
+                    'payment_type' => ucwords(str_replace('_', ' ', translate($data->payment_type))),
                     'pickup_point' => $pickup_point,
                     'shipping_type' => $data->shipping_type,
-                    'shipping_type_string' => $data->shipping_type != null ? ucwords(str_replace('_', ' ', translate($data->shipping_type))) : "",
+                    'shipping_type_string' => $data->shipping_type != null ? ucwords(str_replace('_', ' ',
+                        translate($data->shipping_type))) : '',
                     'payment_status' => $data->payment_status,
                     'payment_status_string' => ucwords(str_replace('_', ' ', translate($data->payment_status))),
                     'delivery_status' => $data->delivery_status,
-                    'delivery_status_string' => $data->delivery_status == translate('pending') ? translate("Order Placed") : ucwords(str_replace('_', ' ',  translate($data->delivery_status))),
+                    'delivery_status_string' => $data->delivery_status == translate('pending') ? translate('Order Placed') : ucwords(str_replace('_',
+                        ' ', translate($data->delivery_status))),
                     'grand_total' => format_price(convert_price($data->grand_total)),
                     'plane_grand_total' => $data->grand_total,
                     'coupon_discount' => format_price(convert_price($data->coupon_discount)),
@@ -39,10 +41,10 @@ class PurchaseHistoryCollection extends ResourceCollection
                     'cancel_request' => $data->cancel_request == 1,
                     'manually_payable' => $data->manual_payment && $data->manual_payment_data == null,
                     'links' => [
-                        'details' => ''
-                    ]
+                        'details' => '',
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -50,7 +52,7 @@ class PurchaseHistoryCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\MeasurementPoint;
 use App\Http\Requests\MeasurementPointRequest;
+use App\Models\MeasurementPoint;
 
 class MeasurementPointsController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_measurement_points'])->only('index');
         $this->middleware(['permission:edit_measurement_points'])->only('get_measurement_point');
@@ -23,6 +23,7 @@ class MeasurementPointsController extends Controller
     public function index()
     {
         $measurementPoints = MeasurementPoint::orderBy('created_at', 'desc')->paginate(15);
+
         return view('backend.product.measurementPoints.index', compact('measurementPoints'));
     }
 
@@ -35,10 +36,11 @@ class MeasurementPointsController extends Controller
     public function store(MeasurementPointRequest $request)
     {
         MeasurementPoint::create($request->only([
-            'name'
+            'name',
         ]));
 
         flash(translate('Measurement Point has been inserted successfully'))->success();
+
         return redirect()->route('measurement-points.index');
     }
 
@@ -63,10 +65,11 @@ class MeasurementPointsController extends Controller
     public function update(MeasurementPointRequest $request, MeasurementPoint $measurementPoint)
     {
         $measurementPoint->update($request->only([
-            'name'
+            'name',
         ]));
 
         flash(translate('Measurement Point has been updated successfully'))->success();
+
         return redirect()->route('measurement-points.index');
     }
 
@@ -80,6 +83,7 @@ class MeasurementPointsController extends Controller
     {
         MeasurementPoint::destroy($id);
         flash(translate('Measurement Point has been deleted successfully'))->success();
+
         return redirect()->route('measurement-points.index');
     }
 }

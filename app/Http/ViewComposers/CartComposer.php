@@ -5,11 +5,11 @@ namespace App\Http\ViewComposers;
 use App\Models\Cart;
 use Illuminate\View\View;
 
-class CartComposer {
+class CartComposer
+{
     /**
      * Bind data to the view.
      *
-     * @param  View  $view
      * @return void
      */
     public function compose(View $view)

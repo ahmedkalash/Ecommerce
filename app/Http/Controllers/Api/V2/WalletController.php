@@ -14,9 +14,10 @@ class WalletController extends Controller
     {
         $user = User::find(auth()->user()->id);
         $latest = Wallet::where('user_id', auth()->user()->id)->latest()->first();
+
         return response()->json([
             'balance' => single_price($user->balance),
-            'last_recharged' => $latest == null ? "Not Available" : $latest->created_at->diffForHumans(),
+            'last_recharged' => $latest == null ? 'Not Available' : $latest->created_at->diffForHumans(),
         ]);
     }
 
@@ -31,12 +32,12 @@ class WalletController extends Controller
         $user = User::find($request->user_id);
 
         if ($user->balance >= $request->amount) {
-            
-            $response =  $order->store($request, true);
+
+            $response = $order->store($request, true);
             $decoded_response = $response->original;
             if ($decoded_response['result'] == true) { // only decrease user balance with a success
                 $user->balance -= $request->amount;
-                $user->save();            
+                $user->save();
             }
 
             $combined_order = CombinedOrder::where('id', $decoded_response['combined_order_id'])->first();
@@ -44,14 +45,14 @@ class WalletController extends Controller
             foreach ($combined_order->orders as $key => $order) {
                 calculateCommissionAffilationClubPoint($order);
             }
-            
+
             return $response;
 
         } else {
             return response()->json([
                 'result' => false,
                 'combined_order_id' => 0,
-                'message' => translate('Insufficient wallet balance')
+                'message' => translate('Insufficient wallet balance'),
             ]);
         }
     }
@@ -67,10 +68,10 @@ class WalletController extends Controller
         $wallet->offline_payment = 1;
         $wallet->reciept = $request->photo;
         $wallet->save();
+
         return response()->json([
             'result' => true,
-            'message' => translate('Offline Recharge has been done. Please wait for response.')
+            'message' => translate('Offline Recharge has been done. Please wait for response.'),
         ]);
     }
-
 }

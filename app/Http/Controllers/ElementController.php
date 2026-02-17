@@ -6,8 +6,8 @@ use App\Models\Element;
 use App\Models\ElementStyle;
 use App\Models\ElementTranslation;
 use App\Models\ElementType;
-use Illuminate\Http\Request;
 use CoreComponentRepository;
+use Illuminate\Http\Request;
 
 class ElementController extends Controller
 {
@@ -25,6 +25,7 @@ class ElementController extends Controller
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
         $elements = Element::orderBy('created_at', 'desc')->paginate(15);
+
         return view('backend.website_settings.pages.element.index', compact('elements'));
     }
 
@@ -32,7 +33,7 @@ class ElementController extends Controller
 
     public function store(Request $request)
     {
-        $element = new Element();
+        $element = new Element;
         $element->name = $request->name;
         $element->save();
 
@@ -41,6 +42,7 @@ class ElementController extends Controller
         $element_translation->save();
 
         flash(translate('Element has been inserted successfully'))->success();
+
         return redirect()->route('elements.index');
     }
 
@@ -51,20 +53,21 @@ class ElementController extends Controller
 
         // echo '<pre>';print_r($data['all_attribute_values']);die;
 
-        return view("backend.website_settings.pages.element.element_type.index", $data);
+        return view('backend.website_settings.pages.element.element_type.index', $data);
     }
 
     public function edit(Request $request, $id)
     {
         $lang = $request->lang;
         $element = Element::findOrFail($id);
+
         return view('backend.website_settings.pages.element.edit', compact('element', 'lang'));
     }
 
     public function update(Request $request, $id)
     {
         $element = Element::findOrFail($id);
-        if ($request->lang == env("DEFAULT_LANGUAGE")) {
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $element->name = $request->name;
         }
         $element->save();
@@ -74,6 +77,7 @@ class ElementController extends Controller
         $element_translation->save();
 
         flash(translate('Element has been updated successfully'))->success();
+
         return back();
     }
 
@@ -87,24 +91,27 @@ class ElementController extends Controller
 
         Element::destroy($id);
         flash(translate('Element has been deleted successfully'))->success();
+
         return redirect()->route('elements.index');
     }
 
     public function store_element_type(Request $request)
     {
-        $element_type = new ElementType();
+        $element_type = new ElementType;
         $element_type->element_id = $request->element_id;
         $element_type->name = ucfirst($request->name);
         $element_type->save();
 
         flash(translate('Element type has been inserted successfully'))->success();
+
         return redirect()->route('elements.show', $request->element_id);
     }
 
     public function edit_element_type(Request $request, $id)
     {
         $element_type = ElementType::findOrFail($id);
-        return view("backend.website_settings.pages.element.element_type.edit", compact('element_type'));
+
+        return view('backend.website_settings.pages.element.element_type.edit', compact('element_type'));
     }
 
     public function update_element_type(Request $request, $id)
@@ -117,6 +124,7 @@ class ElementController extends Controller
         $element_type->save();
 
         flash(translate('Element Type has been updated successfully'))->success();
+
         return back();
     }
 
@@ -126,6 +134,7 @@ class ElementController extends Controller
         ElementType::destroy($id);
 
         flash(translate('Element Types has been deleted successfully'))->success();
+
         return redirect()->route('elements.show', $element_types->element_id);
     }
 
@@ -137,10 +146,10 @@ class ElementController extends Controller
         // Create key => value map for easy access in blade
         $style_values = $all_element_styles->pluck('value', 'name');
 
-        return view("backend.website_settings.pages.element.element_style.index", [
+        return view('backend.website_settings.pages.element.element_style.index', [
             'element_type' => $element_type,
             'all_element_styles' => $all_element_styles,
-            'style_values' => $style_values
+            'style_values' => $style_values,
         ]);
     }
 
@@ -161,7 +170,7 @@ class ElementController extends Controller
                 $element_style->value = $style_value;
             } else {
                 // Insert new
-                $element_style = new ElementStyle();
+                $element_style = new ElementStyle;
                 $element_style->element_type_id = $element_type_id;
                 $element_style->name = $style_key;
                 $element_style->value = $style_value;
@@ -171,6 +180,7 @@ class ElementController extends Controller
         }
 
         flash(translate('Element styles have been saved successfully'))->success();
+
         return redirect()->back();
     }
 
@@ -180,6 +190,7 @@ class ElementController extends Controller
         ElementStyle::destroy($id);
 
         flash(translate('Element styles has been deleted successfully'))->success();
+
         return redirect()->back();
     }
 }

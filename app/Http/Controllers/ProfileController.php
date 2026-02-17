@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
 use Hash;
+use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
@@ -31,7 +31,6 @@ class ProfileController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -64,7 +63,6 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -72,6 +70,7 @@ class ProfileController extends Controller
     {
         if (env('DEMO_MODE') == 'On') {
             flash(translate('Sorry! the action is not permitted in demo '))->error();
+
             return back();
         }
 
@@ -84,10 +83,12 @@ class ProfileController extends Controller
         $user->avatar_original = $request->avatar;
         if ($user->save()) {
             flash(translate('Your Profile has been updated successfully!'))->success();
+
             return back();
         }
 
         flash(translate('Sorry! Something went wrong.'))->error();
+
         return back();
     }
 

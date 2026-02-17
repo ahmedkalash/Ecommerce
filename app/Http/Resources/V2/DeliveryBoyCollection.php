@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\V2;
 
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class DeliveryBoyCollection extends ResourceCollection
@@ -17,7 +16,7 @@ class DeliveryBoyCollection extends ResourceCollection
                     'total_collection' => $data->total_collection,
                     'total_earning' => $data->total_earning,
                 ];
-            })
+            }),
         ];
     }
 
@@ -25,7 +24,7 @@ class DeliveryBoyCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

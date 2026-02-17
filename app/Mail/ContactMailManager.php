@@ -16,6 +16,7 @@ class ContactMailManager extends Mailable
      * @return void
      */
     public $array;
+
     public function __construct($array)
     {
         $this->array = $array;
@@ -29,13 +30,13 @@ class ContactMailManager extends Mailable
     public function build()
     {
         return $this->view('emails.contact')
-                    ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
-                    ->subject($this->array['subject'])
-                    ->with([
-                        'name' => $this->array['name'],
-                        'email' => $this->array['email'],
-                        'phone' => $this->array['phone'],
-                        'content' => $this->array['content']
-                    ]);
+            ->from(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'))
+            ->subject($this->array['subject'])
+            ->with([
+                'name' => $this->array['name'],
+                'email' => $this->array['email'],
+                'phone' => $this->array['phone'],
+                'content' => $this->array['content'],
+            ]);
     }
 }

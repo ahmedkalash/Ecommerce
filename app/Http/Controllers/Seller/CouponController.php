@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CouponRequest;
-use Illuminate\Http\Request;
 use App\Models\Coupon;
 use Auth;
+use Illuminate\Http\Request;
 
 class CouponController extends Controller
 {
@@ -17,7 +17,8 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::where('user_id', Auth::user()->id)->orderBy('id','desc')->get();
+        $coupons = Coupon::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+
         return view('seller.coupons.index', compact('coupons'));
     }
 
@@ -29,8 +30,7 @@ class CouponController extends Controller
     public function create()
     {
         return view('seller.coupons.create');
-    } 
-    
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -46,6 +46,7 @@ class CouponController extends Controller
         ]);
 
         flash(translate('Coupon has been saved successfully.'))->success();
+
         return redirect()->route('seller.coupon.index');
     }
 
@@ -69,6 +70,7 @@ class CouponController extends Controller
     public function edit($id)
     {
         $coupon = Coupon::findOrFail(decrypt($id));
+
         return view('seller.coupons.edit', compact('coupon'));
     }
 
@@ -82,8 +84,9 @@ class CouponController extends Controller
     public function update(CouponRequest $request, Coupon $coupon)
     {
         $coupon->update($request->validated());
-        
+
         flash(translate('Coupon has been updated successfully'))->success();
+
         return redirect()->route('seller.coupon.index');
     }
 
@@ -97,30 +100,32 @@ class CouponController extends Controller
     {
         Coupon::destroy($id);
         flash(translate('Coupon has been deleted successfully'))->success();
+
         return redirect()->route('seller.coupon.index');
     }
 
     public function get_coupon_form(Request $request)
     {
-        if($request->coupon_type == "product_base") {
+        if ($request->coupon_type == 'product_base') {
             $products = filter_products(\App\Models\Product::where('user_id', Auth::user()->id))->get();
+
             return view('partials.coupons.product_base_coupon', compact('products'));
-        }
-        elseif($request->coupon_type == "cart_base"){
+        } elseif ($request->coupon_type == 'cart_base') {
             return view('partials.coupons.cart_base_coupon');
         }
     }
 
     public function get_coupon_form_edit(Request $request)
     {
-        if($request->coupon_type == "product_base") {
+        if ($request->coupon_type == 'product_base') {
             $coupon = Coupon::findOrFail($request->id);
             $products = filter_products(\App\Models\Product::where('user_id', Auth::user()->id))->get();
-            return view('partials.coupons.product_base_coupon_edit',compact('coupon', 'products'));
-        }
-        elseif($request->coupon_type == "cart_base"){
+
+            return view('partials.coupons.product_base_coupon_edit', compact('coupon', 'products'));
+        } elseif ($request->coupon_type == 'cart_base') {
             $coupon = Coupon::findOrFail($request->id);
-            return view('partials.coupons.cart_base_coupon_edit',compact('coupon'));
+
+            return view('partials.coupons.cart_base_coupon_edit', compact('coupon'));
         }
     }
 }

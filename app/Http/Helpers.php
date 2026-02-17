@@ -172,7 +172,7 @@ if (! function_exists('filter_products')) {
 if (! function_exists('get_cached_products')) {
     function get_cached_products($category_id = null)
     {
-        return Cache::remember('products-category-' . $category_id, 86400, function () use ($category_id) {
+        return Cache::remember('products-category-'.$category_id, 86400, function () use ($category_id) {
             return filter_products(Product::where('category_id', $category_id))->latest()->take(5)->get();
         });
     }
@@ -256,24 +256,24 @@ if (! function_exists('format_price')) {
             $temp = number_format($price / 1000000000, get_setting('no_of_decimals'), '.', '');
 
             if ($temp >= 1) {
-                $fomated_price = $temp . 'B';
+                $fomated_price = $temp.'B';
             } else {
                 $temp = number_format($price / 1000000, get_setting('no_of_decimals'), '.', '');
                 if ($temp >= 1) {
-                    $fomated_price = $temp . 'M';
+                    $fomated_price = $temp.'M';
                 }
             }
         }
 
         if (get_setting('symbol_format') == 1) {
-            return currency_symbol() . $fomated_price;
+            return currency_symbol().$fomated_price;
         } elseif (get_setting('symbol_format') == 3) {
-            return currency_symbol() . ' ' . $fomated_price;
+            return currency_symbol().' '.$fomated_price;
         } elseif (get_setting('symbol_format') == 4) {
-            return $fomated_price . ' ' . currency_symbol();
+            return $fomated_price.' '.currency_symbol();
         }
 
-        return $fomated_price . currency_symbol();
+        return $fomated_price.currency_symbol();
     }
 }
 
@@ -553,10 +553,10 @@ if (! function_exists('home_price')) {
             if ($lowest_price == $highest_price) {
                 return format_price(convert_price($lowest_price));
             } else {
-                return format_price(convert_price($lowest_price)) . ' - ' . format_price(convert_price($highest_price));
+                return format_price(convert_price($lowest_price)).' - '.format_price(convert_price($highest_price));
             }
         } else {
-            return $lowest_price . ' - ' . $highest_price;
+            return $lowest_price.' - '.$highest_price;
         }
     }
 }
@@ -601,10 +601,10 @@ if (! function_exists('home_discounted_price')) {
             if ($lowest_price == $highest_price) {
                 return format_price(convert_price($lowest_price));
             } else {
-                return format_price(convert_price($lowest_price)) . ' - ' . format_price(convert_price($highest_price));
+                return format_price(convert_price($lowest_price)).' - '.format_price(convert_price($highest_price));
             }
         } else {
-            return $lowest_price . ' - ' . $highest_price;
+            return $lowest_price.' - '.$highest_price;
         }
     }
 }
@@ -787,7 +787,7 @@ function translate($key, $lang = null, $addslashes = false)
         if (env('DEMO_MODE') != 'On') {
             $app_translation = new AppTranslation;
             $app_translation->lang = 'en';
-            $app_translation->lang_key = $lang_key . '_ucf';
+            $app_translation->lang_key = $lang_key.'_ucf';
             $app_translation->lang_value = str_replace(["\r", "\n", "\r\n"], '', $key);
             $app_translation->save();
         }
@@ -804,7 +804,7 @@ function translate($key, $lang = null, $addslashes = false)
     }
 
     // return default lang if session lang not found
-    $translations_default = Cache::rememberForever('translations-' . env('DEFAULT_LANGUAGE', 'en'), function () {
+    $translations_default = Cache::rememberForever('translations-'.env('DEFAULT_LANGUAGE', 'en'), function () {
         return Translation::where('lang', env('DEFAULT_LANGUAGE', 'en'))->pluck('lang_value', 'lang_key')->toArray();
     });
     if (isset($translations_default[$lang_key])) {
@@ -1262,7 +1262,7 @@ if (! function_exists('getFileBaseURL')) {
     function getFileBaseURL()
     {
         if (config('filesystems.default') != 'local') {
-            return env(Str::upper(config('filesystems.default')) . '_URL') . '/';
+            return env(Str::upper(config('filesystems.default')).'_URL').'/';
         }
 
         return getBaseURL();
@@ -1358,7 +1358,7 @@ if (! function_exists('formatBytes')) {
         $bytes /= pow(1024, $pow);
         // $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }
 
@@ -1484,7 +1484,7 @@ if (! function_exists('seller_purchase_payment_done')) {
         $seller->product_upload_limit = $seller_package->product_upload_limit;
         $seller->package_invalid_at = date(
             'Y-m-d',
-            strtotime($seller->package_invalid_at . ' +' . $seller_package->duration . 'days')
+            strtotime($seller->package_invalid_at.' +'.$seller_package->duration.'days')
         );
         $seller->save();
 
@@ -2546,7 +2546,7 @@ if (! function_exists('offerUserWelcomeCoupon')) {
             $user_coupon->validation_days = $couponDetails->validation_days;
             $user_coupon->discount = $coupon->discount;
             $user_coupon->discount_type = $coupon->discount_type;
-            $user_coupon->expiry_date = strtotime(date('d-m-Y H:i:s') . ' +' . $couponDetails->validation_days . 'days');
+            $user_coupon->expiry_date = strtotime(date('d-m-Y H:i:s').' +'.$couponDetails->validation_days.'days');
             $user_coupon->save();
         }
     }
@@ -2648,11 +2648,11 @@ if (! function_exists('number_format_short')) {
         // Remove unecessary zeroes after decimal. "1.0" -> "1"; "1.00" -> "1"
         // Intentionally does not affect partials, eg "1.50" -> "1.50"
         if ($precision > 0) {
-            $dotzero = '.' . str_repeat('0', $precision);
+            $dotzero = '.'.str_repeat('0', $precision);
             $n_format = str_replace($dotzero, '', $n_format);
         }
 
-        return $n_format . $suffix;
+        return $n_format.$suffix;
     }
 }
 
@@ -3189,15 +3189,15 @@ if (! function_exists('get_element_style_value')) {
 function convertToEmbedUrl($url)
 {
     if (preg_match('/shorts\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     if (preg_match('/v=([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     if (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     return $url;

@@ -17,12 +17,12 @@ class DeliveryHistoryCollection extends ResourceCollection
                     'order_id' => $data->order_id,
                     'order_code' => $data->order->code,
                     'delivery_status' => $data->delivery_status,
-                    'earning' => format_price($data->earning) ,
+                    'earning' => format_price($data->earning),
                     'collection' => format_price($data->collection),
                     'payment_type' => $data->payment_type,
                     'date' => Carbon::createFromTimestamp($data->created_at)->format('d-m-Y'),
                 ];
-            })
+            }),
         ];
     }
 
@@ -30,7 +30,7 @@ class DeliveryHistoryCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

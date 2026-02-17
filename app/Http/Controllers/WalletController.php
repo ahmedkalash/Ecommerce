@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Wallet;
 use App\Utility\EmailUtility;
 use Auth;
+use Illuminate\Http\Request;
 use Session;
 
 class WalletController extends Controller
@@ -19,6 +19,7 @@ class WalletController extends Controller
     public function index()
     {
         $wallets = Wallet::where('user_id', Auth::user()->id)->latest()->paginate(10);
+
         return view('frontend.user.wallet.index', compact('wallets'));
     }
 
@@ -30,7 +31,8 @@ class WalletController extends Controller
         $request->session()->put('payment_type', 'wallet_payment');
         $request->session()->put('payment_data', $data);
 
-        $decorator = __NAMESPACE__ . '\\Payment\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $request->payment_option))) . "Controller";
+        $decorator = __NAMESPACE__.'\\Payment\\'.str_replace(' ', '',
+            ucwords(str_replace('_', ' ', $request->payment_option))).'Controller';
         if (class_exists($decorator)) {
             return (new $decorator)->pay($request);
         }
@@ -50,16 +52,18 @@ class WalletController extends Controller
         $wallet->save();
 
         // customer Account Opening Email to Admin
-        if ( $user != null && (get_email_template_data('wallet_recharge_email_to_customer', 'status') == 1)) {
+        if ($user != null && (get_email_template_data('wallet_recharge_email_to_customer', 'status') == 1)) {
             try {
                 EmailUtility::wallet_recharge_email('wallet_recharge_email_to_customer', $user, $payment_data['amount'], $payment_data['payment_method']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
 
         Session::forget('payment_data');
         Session::forget('payment_type');
 
         flash(translate('Recharge completed'))->success();
+
         return redirect()->route('wallet.index');
     }
 
@@ -75,25 +79,27 @@ class WalletController extends Controller
         $wallet->payment_method = $payment_data['payment_method'];
         $wallet->payment_details = $payment_details;
         $wallet->save();
-        
+
         // customer Account Opening Email to Admin
-        if ( $user != null && (get_email_template_data('wallet_recharge_email_to_customer', 'status') == 1)) {
+        if ($user != null && (get_email_template_data('wallet_recharge_email_to_customer', 'status') == 1)) {
             try {
                 EmailUtility::wallet_recharge_email('wallet_recharge_email_to_customer', $user, $payment_data['amount'], $payment_data['payment_method']);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+            }
         }
-        
+
         Session::forget('payment_data');
         Session::forget('payment_type');
         flash(translate('Recharge completed'))->success();
     }
 
-    public function wallet_payment_email_test(){
+    public function wallet_payment_email_test()
+    {
         $user = Auth::user();
         EmailUtility::wallet_recharge_email('wallet_recharge_email_to_customer', $user, 500, 'Votku');
         echo 'OK';
     }
-    
+
     public function offline_recharge(Request $request)
     {
         $wallet = new Wallet;
@@ -106,6 +112,7 @@ class WalletController extends Controller
         $wallet->reciept = $request->photo;
         $wallet->save();
         flash(translate('Offline Recharge has been done. Please wait for response.'))->success();
+
         return redirect()->route('wallet.index');
     }
 
@@ -117,7 +124,8 @@ class WalletController extends Controller
             $wallets = $wallets->where('approval', $request->type);
             $type = $request->type;
         }
-        $wallets = $wallets->orderBy('id','desc')->paginate(10);
+        $wallets = $wallets->orderBy('id', 'desc')->paginate(10);
+
         return view('manual_payment_methods.wallet_request', compact('wallets', 'type'));
     }
 
@@ -137,6 +145,7 @@ class WalletController extends Controller
         if ($wallet->save()) {
             return 1;
         }
+
         return 0;
     }
 }

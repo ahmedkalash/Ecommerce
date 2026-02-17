@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerPackageRequest;
-use Illuminate\Http\Request;
 use App\Models\CustomerPackage;
-use App\Models\CustomerPackageTranslation;
 use App\Models\CustomerPackagePayment;
+use App\Models\CustomerPackageTranslation;
 use Auth;
+use Illuminate\Http\Request;
 use Session;
-use App\Models\User;
-use Illuminate\Support\Facades\Validator;
 
 class CustomerPackageController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_classified_packages'])->only('index');
         $this->middleware(['permission:edit_classified_package'])->only('edit');
@@ -29,6 +28,7 @@ class CustomerPackageController extends Controller
     public function index()
     {
         $customer_packages = CustomerPackage::all();
+
         return view('backend.customer.customer_packages.index', compact('customer_packages'));
     }
 
@@ -45,13 +45,14 @@ class CustomerPackageController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(CustomerPackageRequest $request)
     {
         if ($request->amount == 0 && CustomerPackage::where('amount', 0)->first() != null) {
             flash(translate('You cannot Add more than one Free package'))->error();
+
             return back();
         }
 
@@ -67,15 +68,15 @@ class CustomerPackageController extends Controller
         $customer_package_translation->name = $request->name;
         $customer_package_translation->save();
 
-
         flash(translate('Package has been inserted successfully'))->success();
+
         return redirect()->route('customer_packages.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -86,21 +87,22 @@ class CustomerPackageController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit(Request $request, $id)
     {
         $lang = $request->lang;
         $customer_package = CustomerPackage::findOrFail($id);
+
         return view('backend.customer.customer_packages.edit', compact('customer_package', 'lang'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(CustomerPackageRequest $request, $id)
@@ -108,9 +110,10 @@ class CustomerPackageController extends Controller
         $customer_package = CustomerPackage::findOrFail($id);
         if ($request->amount == 0 && CustomerPackage::where('amount', 0)->where('id', '!=', $id)->first() != null) {
             flash(translate('You cannot Add more than one Free package'))->error();
+
             return back();
         }
-        if ($request->lang == env("DEFAULT_LANGUAGE")) {
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $customer_package->name = $request->name;
         }
         $customer_package->amount = $request->amount;
@@ -124,13 +127,14 @@ class CustomerPackageController extends Controller
         $customer_package_translation->save();
 
         flash(translate('Package has been updated successfully'))->success();
+
         return back();
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -142,6 +146,7 @@ class CustomerPackageController extends Controller
         CustomerPackage::destroy($id);
 
         flash(translate('Package has been deleted successfully'))->success();
+
         return redirect()->route('customer_packages.index');
     }
 
@@ -159,12 +164,15 @@ class CustomerPackageController extends Controller
             $user = Auth::user();
             if ($user->customer_package_id != null) {
                 flash(translate('You cannot purchase this package anymore.'))->warning();
+
                 return back();
             }
+
             return $this->purchase_payment_done(Session::get('payment_data'), null);
         }
 
-        $decorator = __NAMESPACE__ . '\\Payment\\' . str_replace(' ', '', ucwords(str_replace('_', ' ', $request->payment_option))) . "Controller";
+        $decorator = __NAMESPACE__.'\\Payment\\'.str_replace(' ', '',
+            ucwords(str_replace('_', ' ', $request->payment_option))).'Controller';
         if (class_exists($decorator)) {
             return (new $decorator)->pay($request);
         }
@@ -188,6 +196,7 @@ class CustomerPackageController extends Controller
         $customer_package_payment->save();
 
         flash(translate('Package purchasing successful'))->success();
+
         return redirect()->route('dashboard');
     }
 
@@ -210,7 +219,7 @@ class CustomerPackageController extends Controller
 
         flash(translate('Package purchasing successful'))->success();
     }
-    
+
     public function purchase_package_offline(Request $request)
     {
         $customer_package = CustomerPackage::findOrFail($request->package_id);
@@ -227,6 +236,7 @@ class CustomerPackageController extends Controller
         $customer_package_payment->save();
 
         flash(translate('Offline payment has been done. Please wait for response.'))->success();
+
         return redirect()->route('customer_products.index');
     }
 }

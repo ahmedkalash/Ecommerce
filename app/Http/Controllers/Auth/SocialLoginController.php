@@ -44,7 +44,7 @@ class SocialLoginController extends Controller
         if ($existingUserByProviderId) {
             $existingUserByProviderId->access_token = $user->token;
             $existingUserByProviderId->refresh_token = $user->refreshToken;
-            if (!isset($user->user['is_private_email'])) {
+            if (! isset($user->user['is_private_email'])) {
                 $existingUserByProviderId->email = $user->email;
             }
             $existingUserByProviderId->save();
@@ -59,7 +59,7 @@ class SocialLoginController extends Controller
             $existing_or_new_user->access_token = $user->token;
             $existing_or_new_user->refresh_token = $user->refreshToken;
             $existing_or_new_user->provider = 'apple';
-            if (!$existing_or_new_user->exists) {
+            if (! $existing_or_new_user->exists) {
                 $existing_or_new_user->name = 'Apple User';
                 if ($user->name) {
                     $existing_or_new_user->name = $user->name;

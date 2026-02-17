@@ -3,33 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppTranslation;
-use Illuminate\Http\Request;
 use App\Models\Language;
 use App\Models\Translation;
 use App\Models\User;
 use Cache;
-use Storage;
+use Illuminate\Http\Request;
 use Session;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Storage;
 
 class LanguageController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
-        $this->middleware(['permission:language_setup'])->only('index','create','edit','destroy');
+        $this->middleware(['permission:language_setup'])->only('index', 'create', 'edit', 'destroy');
     }
 
     public function changeLanguage(Request $request)
     {
-    	$request->session()->put('locale', $request->locale);
+        $request->session()->put('locale', $request->locale);
         $language = Language::where('code', $request->locale)->first();
         $request->session()->put('langcode', $language->app_lang_code);
-    	flash(translate('Language changed to ').$language->name)->success();
+        flash(translate('Language changed to ').$language->name)->success();
     }
 
     public function index(Request $request)
     {
         $languages = Language::paginate(10);
+
         return view('backend.setup_configurations.languages.index', compact('languages'));
     }
 
@@ -40,8 +42,9 @@ class LanguageController extends Controller
 
     public function store(Request $request)
     {
-        if(Language::where('code',$request->code)->first()){
+        if (Language::where('code', $request->code)->first()) {
             flash(translate('This code is already used for another language'))->error();
+
             return back();
         }
 
@@ -49,11 +52,12 @@ class LanguageController extends Controller
         $language->name = $request->name;
         $language->code = $request->code;
         $language->app_lang_code = $request->app_lang_code;
-        $language->save();   
+        $language->save();
 
         Cache::forget('app.languages');
 
         flash(translate('Language has been inserted successfully'))->success();
+
         return redirect()->route('languages.index');
     }
 
@@ -62,45 +66,51 @@ class LanguageController extends Controller
         $sort_search = null;
         $language = Language::findOrFail($id);
         $lang_keys = Translation::where('lang', 'en');
-        
-        if ($request->has('search')){
+
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $lang_keys = $lang_keys->where('lang_key', 'like', '%'.preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($sort_search))).'%');
         }
         $lang_keys = $lang_keys->paginate(50);
-        
-        return view('backend.setup_configurations.languages.language_view', compact('language','lang_keys','sort_search'));
+
+        return view('backend.setup_configurations.languages.language_view',
+            compact('language', 'lang_keys', 'sort_search'));
     }
 
     public function edit($id)
     {
         $language = Language::findOrFail($id);
+
         return view('backend.setup_configurations.languages.edit', compact('language'));
     }
 
     public function update(Request $request, $id)
     {
-        if(Language::where('code', $request->code)->where('id', '!=', $id)->first()){
+        if (Language::where('code', $request->code)->where('id', '!=', $id)->first()) {
             flash(translate('This code is already used for another language'))->error();
+
             return back();
         }
         $language = Language::findOrFail($id);
         if (env('DEFAULT_LANGUAGE') == $language->code && env('DEFAULT_LANGUAGE') != $request->code) {
             flash(translate('Default language code cannot be edited'))->error();
+
             return back();
         } elseif ($language->code == 'en' && $request->code != 'en') {
             flash(translate('English language code cannot be edited'))->error();
+
             return back();
         }
-        
+
         $language->name = $request->name;
         $language->code = $request->code;
-        $language->app_lang_code = $request->app_lang_code; 
+        $language->app_lang_code = $request->app_lang_code;
         $language->save();
-        
+
         Cache::forget('app.languages');
 
         flash(translate('Language has been updated successfully'))->success();
+
         return redirect()->route('languages.index');
     }
 
@@ -109,35 +119,38 @@ class LanguageController extends Controller
         $language = Language::findOrFail($request->id);
         foreach ($request->values as $key => $value) {
             $translation_def = Translation::where('lang_key', $key)->where('lang', $language->code)->latest()->first();
-            if($translation_def == null){
+            if ($translation_def == null) {
                 $translation_def = new Translation;
                 $translation_def->lang = $language->code;
                 $translation_def->lang_key = $key;
                 $translation_def->lang_value = $value;
                 $translation_def->save();
-            }
-            else {
+            } else {
                 $translation_def->lang_value = $value;
                 $translation_def->save();
             }
         }
         Cache::forget('translations-'.$language->code);
         flash(translate('Translations updated for').' '.$language->name)->success();
+
         return back();
     }
 
     public function update_status(Request $request)
     {
         $language = Language::findOrFail($request->id);
-        if($language->code == env('DEFAULT_LANGUAGE') && $request->status == 0) {
+        if ($language->code == env('DEFAULT_LANGUAGE') && $request->status == 0) {
             flash(translate('Default language cannot be inactive'))->error();
+
             return 1;
         }
         $language->status = $request->status;
-        if($language->save()){
+        if ($language->save()) {
             flash(translate('Status updated successfully'))->success();
+
             return 1;
         }
+
         return 0;
     }
 
@@ -145,10 +158,12 @@ class LanguageController extends Controller
     {
         $language = Language::findOrFail($request->id);
         $language->rtl = $request->status;
-        if($language->save()){
+        if ($language->save()) {
             flash(translate('RTL status updated successfully'))->success();
+
             return 1;
         }
+
         return 0;
     }
 
@@ -157,38 +172,39 @@ class LanguageController extends Controller
         $language = Language::findOrFail($id);
         if (env('DEFAULT_LANGUAGE') == $language->code) {
             flash(translate('Default language cannot be deleted'))->error();
-        } elseif($language->code == 'en') {
+        } elseif ($language->code == 'en') {
             flash(translate('English language cannot be deleted'))->error();
-        }
-        else {
-            if($language->code == Session::get('locale')){
+        } else {
+            if ($language->code == Session::get('locale')) {
                 Session::put('locale', env('DEFAULT_LANGUAGE'));
             }
             Language::destroy($id);
             flash(translate('Language has been deleted successfully'))->success();
         }
+
         return redirect()->route('languages.index');
     }
 
-
-    //App-Translation
-    public function importEnglishFile(Request $request){
+    // App-Translation
+    public function importEnglishFile(Request $request)
+    {
         $path = Storage::disk('local')->put('app-translations', $request->lang_file);
 
         $contents = file_get_contents(public_path($path));
-        
+
         try {
-            foreach(json_decode($contents) as $key => $value){
+            foreach (json_decode($contents) as $key => $value) {
                 AppTranslation::updateOrCreate(
                     ['lang' => 'en', 'lang_key' => $key],
                     ['lang_value' => $value]
                 );
             }
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
         }
 
         flash(translate('Translation keys has been imported successfully. Go to App Translation for more..'))->success();
+
         return back();
     }
 
@@ -197,15 +213,18 @@ class LanguageController extends Controller
         $sort_search = null;
         $language = Language::findOrFail($id);
         $lang_keys = AppTranslation::where('lang', 'en');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $lang_keys = $lang_keys->where('lang_key', 'like', '%'.$sort_search.'%');
         }
         $lang_keys = $lang_keys->paginate(50);
-        return view('backend.setup_configurations.languages.app_translation', compact('language','lang_keys','sort_search'));
+
+        return view('backend.setup_configurations.languages.app_translation',
+            compact('language', 'lang_keys', 'sort_search'));
     }
 
-    public function storeAppTranlsation(Request $request){
+    public function storeAppTranlsation(Request $request)
+    {
         $language = Language::findOrFail($request->id);
         foreach ($request->values as $key => $value) {
             AppTranslation::updateOrCreate(
@@ -214,27 +233,29 @@ class LanguageController extends Controller
             );
         }
         flash(translate('App Translations updated for ').$language->name)->success();
+
         return back();
     }
 
-      public function sycnTranslations($id)
+    public function sycnTranslations($id)
     {
         $language = Language::findOrFail($id);
         $values = Translation::where('lang', $language->code)->get();
-        //dd( $values->count());
+        // dd( $values->count());
         foreach ($values as $key => $value) {
             AppTranslation::updateOrCreate(
-                ['lang' => $language->app_lang_code, 'lang_key' => $value->lang_key . '_ucf'],
+                ['lang' => $language->app_lang_code, 'lang_key' => $value->lang_key.'_ucf'],
                 ['lang_value' => $value->lang_value]
             );
         }
-        flash(translate('App Translations Sycned for ') . $language->name)->success();
+        flash(translate('App Translations Sycned for ').$language->name)->success();
+
         return back();
     }
 
     public function googleTranslations(Request $request, $id)
     {
-       try {
+        try {
             $language = Language::findOrFail($id);
             $values = Translation::where('lang', 'en')->get();
             $targetLang = $language->app_lang_code;
@@ -244,11 +265,11 @@ class LanguageController extends Controller
                     ->where('lang_key', $value->lang_key)
                     ->first();
 
-                if (!$existing || empty($existing->lang_value)) {
-                    $tr = new GoogleTranslate();
+                if (! $existing || empty($existing->lang_value)) {
+                    $tr = new GoogleTranslate;
                     $translatedText = $tr->setSource('en')->setTarget($targetLang)->translate($value->lang_value);
 
-                    if (!$translatedText) {
+                    if (! $translatedText) {
                         throw new \Exception("Translation failed for key: {$value->lang_key}");
                     }
 
@@ -261,26 +282,27 @@ class LanguageController extends Controller
 
             return response()->json([
                 'result' => true,
-                'message' => translate('All translations completed using Google Translate for ') . $language->name
+                'message' => translate('All translations completed using Google Translate for ').$language->name,
             ], 200);
 
         } catch (\Throwable $e) {
             // Log error optionally: Log::error($e);
             return response()->json([
                 'result' => false,
-                'message' => translate('Something went wrong: ') . $e->getMessage()
+                'message' => translate('Something went wrong: ').$e->getMessage(),
             ], 200);
         }
 
     }
 
-    public function exportARBFile($id){
+    public function exportARBFile($id)
+    {
         $language = Language::findOrFail($id);
         try {
             // Write into the json file
             $filename = "app_{$language->app_lang_code}.arb";
             $contents = AppTranslation::where('lang', $language->app_lang_code)->pluck('lang_value', 'lang_key')->toJson();
-            
+
             return response()->streamDownload(function () use ($contents) {
                 echo $contents;
             }, $filename);
@@ -295,28 +317,29 @@ class LanguageController extends Controller
         $data['unique_identifier'] = $unique_identifier;
         $data['main_item'] = get_setting('item_name') ?? 'eCommerce';
         $request_data_json = json_encode($data);
-        
-        $gate = "https://activation.activeitzone.com/check_addon_activation";
 
-        $header = array(
-            'Content-Type:application/json'
-        );
+        $gate = 'https://activation.activeitzone.com/check_addon_activation';
+
+        $header = [
+            'Content-Type:application/json',
+        ];
 
         $stream = curl_init();
 
         curl_setopt($stream, CURLOPT_URL, $gate);
-        curl_setopt($stream,CURLOPT_HTTPHEADER, $header);
-        curl_setopt($stream,CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($stream,CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($stream,CURLOPT_POSTFIELDS, $request_data_json);
-        curl_setopt($stream,CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($stream, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($stream, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($stream, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($stream, CURLOPT_POSTFIELDS, $request_data_json);
+        curl_setopt($stream, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($stream, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
 
         $rn = curl_exec($stream);
         curl_close($stream);
-        if ($rn == "bad" && env('DEMO_MODE') != 'On') {
+        if ($rn == 'bad' && env('DEMO_MODE') != 'On') {
             $user = User::where('user_type', 'admin')->first();
             auth()->login($user);
+
             return redirect()->route('admin.dashboard');
         }
     }

@@ -7,7 +7,6 @@ use Cookie;
 
 class CartUtility
 {
-
     public static function create_cart_variant($product, $request)
     {
         $str = null;
@@ -16,15 +15,16 @@ class CartUtility
         }
 
         if (isset($product->choice_options) && count(json_decode($product->choice_options)) > 0) {
-            //Gets all the choice values of customer choice option and generate a string like Black-S-Cotton
+            // Gets all the choice values of customer choice option and generate a string like Black-S-Cotton
             foreach (json_decode($product->choice_options) as $key => $choice) {
                 if ($str != null) {
-                    $str .= '-' . str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
+                    $str .= '-'.str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
                 } else {
-                    $str .= str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
+                    $str .= str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
                 }
             }
         }
+
         return $str;
     }
 
@@ -45,6 +45,7 @@ class CartUtility
         }
 
         $price = self::discount_calculation($product, $price);
+
         return $price;
     }
 
@@ -67,6 +68,7 @@ class CartUtility
                 $price -= $product->discount;
             }
         }
+
         return $price;
     }
 

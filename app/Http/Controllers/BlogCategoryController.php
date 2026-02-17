@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\BlogCategory;
+use Illuminate\Http\Request;
 
 class BlogCategoryController extends Controller
 {
@@ -29,10 +28,11 @@ class BlogCategoryController extends Controller
 
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('category_name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('category_name', 'like', '%'.$sort_search.'%');
         }
 
         $categories = $categories->paginate(15);
+
         return view('backend.blog_system.category.index', compact('categories', 'sort_search'));
     }
 
@@ -44,13 +44,13 @@ class BlogCategoryController extends Controller
     public function create()
     {
         $all_categories = BlogCategory::all();
+
         return view('backend.blog_system.category.create', compact('all_categories'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -67,8 +67,8 @@ class BlogCategoryController extends Controller
 
         $category->save();
 
-
         flash(translate('Blog category has been created successfully'))->success();
+
         return redirect()->route('blog-category.index');
     }
 
@@ -94,13 +94,12 @@ class BlogCategoryController extends Controller
         $cateogry = BlogCategory::find($id);
         $all_categories = BlogCategory::all();
 
-        return view('backend.blog_system.category.edit',  compact('cateogry', 'all_categories'));
+        return view('backend.blog_system.category.edit', compact('cateogry', 'all_categories'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -117,8 +116,8 @@ class BlogCategoryController extends Controller
 
         $category->save();
 
-
         flash(translate('Blog category has been updated successfully'))->success();
+
         return redirect()->route('blog-category.index');
     }
 

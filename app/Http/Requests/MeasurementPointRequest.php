@@ -24,7 +24,7 @@ class MeasurementPointRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'max:191']
+            'name' => ['required', 'max:191'],
         ];
     }
 
@@ -37,7 +37,7 @@ class MeasurementPointRequest extends FormRequest
     {
         return [
             'name.required' => translate('Measurement Point name is required'),
-            'name.max'      => translate('Max 191 characters for Measurement Point name'),
+            'name.max' => translate('Max 191 characters for Measurement Point name'),
         ];
     }
 }

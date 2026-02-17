@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\CustomerPackagePayment;
 use App\Models\CustomerPackage;
+use App\Models\CustomerPackagePayment;
+use Illuminate\Http\Request;
 
 class CustomerPackagePaymentController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_offline_customer_package_payments'])->only('offline_payment_request');
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,25 +24,29 @@ class CustomerPackagePaymentController extends Controller
         //
     }
 
-    public function offline_payment_request(){
-        $package_payment_requests = CustomerPackagePayment::where('offline_payment',1)->orderBy('id', 'desc')->paginate(10);
+    public function offline_payment_request()
+    {
+        $package_payment_requests = CustomerPackagePayment::where('offline_payment', 1)->orderBy('id',
+            'desc')->paginate(10);
+
         return view('manual_payment_methods.customer_package_payment_request', compact('package_payment_requests'));
     }
 
     public function offline_payment_approval(Request $request)
     {
-        $package_payment    = CustomerPackagePayment::findOrFail($request->id);
-        $package_details    = CustomerPackage::findOrFail($package_payment->customer_package_id);
+        $package_payment = CustomerPackagePayment::findOrFail($request->id);
+        $package_details = CustomerPackage::findOrFail($package_payment->customer_package_id);
 
-        $package_payment->approval      = $request->status;
-        if($package_payment->save()){
-            $user                       = $package_payment->user;
-            $user->customer_package_id  = $package_payment->customer_package_id;
-            $user->remaining_uploads    = $user->remaining_uploads + $package_details->product_upload;
-            if($user->save()){
+        $package_payment->approval = $request->status;
+        if ($package_payment->save()) {
+            $user = $package_payment->user;
+            $user->customer_package_id = $package_payment->customer_package_id;
+            $user->remaining_uploads = $user->remaining_uploads + $package_details->product_upload;
+            if ($user->save()) {
                 return 1;
             }
         }
+
         return 0;
     }
 
@@ -57,7 +63,6 @@ class CustomerPackagePaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -90,7 +95,6 @@ class CustomerPackagePaymentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

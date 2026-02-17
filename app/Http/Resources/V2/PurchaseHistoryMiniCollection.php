@@ -19,14 +19,15 @@ class PurchaseHistoryMiniCollection extends ResourceCollection
                     'payment_status' => translate($data->payment_status),
                     'payment_status_string' => ucwords(str_replace('_', ' ', translate($data->payment_status))),
                     'delivery_status' => translate($data->delivery_status),
-                    'delivery_status_string' => $data->delivery_status == translate('pending') ? translate("Order Placed") : ucwords(str_replace('_', ' ',  translate($data->delivery_status))),
+                    'delivery_status_string' => $data->delivery_status == translate('pending') ? translate('Order Placed') : ucwords(str_replace('_',
+                        ' ', translate($data->delivery_status))),
                     'grand_total' => format_price(convert_price($data->grand_total)),
                     'date' => Carbon::createFromTimestamp($data->date)->format('d-m-Y'),
                     'links' => [
-                        'details' => ''
-                    ]
+                        'details' => '',
+                    ],
                 ];
-            })
+            }),
         ];
     }
 
@@ -34,7 +35,7 @@ class PurchaseHistoryMiniCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

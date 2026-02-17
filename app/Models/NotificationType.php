@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App;
+use Illuminate\Database\Eloquent\Model;
 
 class NotificationType extends Model
 {
@@ -11,6 +11,7 @@ class NotificationType extends Model
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $notificationTypeTtranslation = $this->notificationTypeTranslations->where('lang', $lang)->first();
+
         return $notificationTypeTtranslation != null ? $notificationTypeTtranslation->$field : $this->$field;
     }
 

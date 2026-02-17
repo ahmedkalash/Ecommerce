@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\CommissionHistory;
-use Illuminate\Http\Request;
-use App\Models\SellerWithdrawRequest;
 use App\Models\Payment;
+use App\Models\SellerWithdrawRequest;
 use App\Models\Shop;
 use App\Models\User;
-use Session;
-use Illuminate\Support\Facades\Notification;
 use App\Notifications\PayoutNotification;
 use App\Utility\EmailUtility;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use Session;
 
 class CommissionController extends Controller
 {
-    //redirect to payment controllers according to selected payment gateway for seller payment
+    // redirect to payment controllers according to selected payment gateway for seller payment
     public function pay_to_seller(Request $request)
     {
         $data['shop_id'] = $request->shop_id;
@@ -26,8 +26,7 @@ class CommissionController extends Controller
 
         if ($request->txn_code != null) {
             $data['txn_code'] = $request->txn_code;
-        }
-        else {
+        } else {
             $data['txn_code'] = null;
         }
 
@@ -36,11 +35,9 @@ class CommissionController extends Controller
 
         if ($request->payment_option == 'cash') {
             return $this->seller_payment_done($request->session()->get('payment_data'), null);
-        }
-        elseif ($request->payment_option == 'bank_payment') {
+        } elseif ($request->payment_option == 'bank_payment') {
             return $this->seller_payment_done($request->session()->get('payment_data'), null);
-        }
-        else {
+        } else {
             $payment_data = $request->session()->get('payment_data');
 
             $shop = Shop::findOrFail($payment_data['shop_id']);
@@ -56,12 +53,14 @@ class CommissionController extends Controller
             $payment->save();
 
             flash(translate('Payment completed'))->success();
+
             return redirect()->route('sellers.index');
         }
     }
 
-    //redirects to this method after successfull seller payment
-    public function seller_payment_done($payment_data, $payment_details){
+    // redirects to this method after successfull seller payment
+    public function seller_payment_done($payment_data, $payment_details)
+    {
         $shop = Shop::findOrFail($payment_data['shop_id']);
         $shop->admin_to_pay = $shop->admin_to_pay - $payment_data['amount'];
         $shop->save();
@@ -83,7 +82,7 @@ class CommissionController extends Controller
 
         // Seller Payout Notification to seller
         $users = User::findMany($shop->user->id);
-        $data = array();
+        $data = [];
         $data['user'] = $shop->user;
         $data['amount'] = $payment_data['amount'];
         $data['status'] = 'paid';
@@ -91,24 +90,27 @@ class CommissionController extends Controller
         Notification::send($users, new PayoutNotification($data));
 
         // Seller payout request email to admin & seller
-        $emailIdentifiers = ['seller_payout_email_to_admin','seller_payout_email_to_seller'];
-        EmailUtility::seller_payout($emailIdentifiers, $shop->user, $payment_data['amount'], ucwords(str_replace('_', ' ',$payment_data['payment_method'])));
+        $emailIdentifiers = ['seller_payout_email_to_admin', 'seller_payout_email_to_seller'];
+        EmailUtility::seller_payout($emailIdentifiers, $shop->user, $payment_data['amount'],
+            ucwords(str_replace('_', ' ', $payment_data['payment_method'])));
 
         Session::forget('payment_data');
         Session::forget('payment_type');
 
         if ($payment_data['payment_withdraw'] == 'withdraw_request') {
             flash(translate('Payment completed'))->success();
+
             return redirect()->route('withdraw_requests_all');
-        }
-        else {
+        } else {
             flash(translate('Payment completed'))->success();
+
             return redirect()->route('sellers.index');
         }
     }
 
-    //calculate seller commission after payment
-    public function calculateCommission($order){
+    // calculate seller commission after payment
+    public function calculateCommission($order)
+    {
         $seller = $order->shop;
         foreach ($order->orderDetails as $orderDetail) {
             $orderDetail->payment_status = 'paid';
@@ -118,19 +120,17 @@ class CommissionController extends Controller
                 $seller = $seller->fresh();
                 $commission_percentage = 0;
                 // getting commission percentage
-                if(get_setting('vendor_commission_activation')){
-                    if(get_setting('seller_commission_type') == 'fixed_rate'){
+                if (get_setting('vendor_commission_activation')) {
+                    if (get_setting('seller_commission_type') == 'fixed_rate') {
                         $commission_percentage = get_setting('vendor_commission');
-                    }
-                    elseif(get_setting('seller_commission_type') == 'seller_based'){
+                    } elseif (get_setting('seller_commission_type') == 'seller_based') {
                         $commission_percentage = $seller->commission_percentage;
-                    }
-                    elseif(get_setting('seller_commission_type') == 'category_based'){
+                    } elseif (get_setting('seller_commission_type') == 'category_based') {
                         $commission_percentage = $orderDetail->product->main_category->commision_rate;
                     }
                 }
                 // calculate commission
-                if($commission_percentage > 0){
+                if ($commission_percentage > 0) {
                     $admin_commission = ($orderDetail->price * $commission_percentage) / 100;
 
                     if (get_setting('product_manage_by_admin') == 1) {
@@ -156,7 +156,7 @@ class CommissionController extends Controller
             }
         }
 
-        if($seller != null && $order->payment_type != 'cash_on_delivery'){
+        if ($seller != null && $order->payment_type != 'cash_on_delivery') {
             $seller = $seller->fresh();
             $seller->admin_to_pay -= $order->coupon_discount;
             $seller->save();

@@ -2,23 +2,23 @@
 
 namespace App\Http\Controllers\Seller;
 
-use Illuminate\Http\Request;
-use App\Models\Category;
 use App\Models\Brand;
-use Auth;
+use App\Models\Category;
 use App\Models\ProductsImport;
-use PDF;
+use Auth;
 use Excel;
+use Illuminate\Http\Request;
+use PDF;
 
 class ProductBulkUploadController extends Controller
 {
     public function index()
     {
-        if(Auth::user()->shop->verification_status){
+        if (Auth::user()->shop->verification_status) {
             return view('seller.product.product_bulk_upload.index');
-        }
-        else{
+        } else {
             flash(translate('Your shop is not verified yet!'))->warning();
+
             return back();
         }
     }
@@ -27,7 +27,7 @@ class ProductBulkUploadController extends Controller
     {
         $categories = Category::all();
 
-        return PDF::loadView('backend.downloads.category',[
+        return PDF::loadView('backend.downloads.category', [
             'categories' => $categories,
         ], [], [])->download('category.pdf');
     }
@@ -36,19 +36,18 @@ class ProductBulkUploadController extends Controller
     {
         $brands = Brand::all();
 
-        return PDF::loadView('backend.downloads.brand',[
+        return PDF::loadView('backend.downloads.brand', [
             'brands' => $brands,
         ], [], [])->download('brands.pdf');
     }
 
     public function bulk_upload(Request $request)
     {
-        if($request->hasFile('bulk_file')){
+        if ($request->hasFile('bulk_file')) {
             $import = new ProductsImport;
             Excel::import($import, request()->file('bulk_file'));
         }
-        
+
         return back();
     }
-
 }

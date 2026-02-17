@@ -15,7 +15,7 @@ class EditCategory extends EditRecord
         return [
             Actions\ViewAction::make(),
             Actions\DeleteAction::make()
-                ->using(fn(\App\Models\Category $record) => app(\App\Services\CategoryService::class)->delete($record)),
+                ->using(fn (\App\Models\Category $record) => app(\App\Services\CategoryService::class)->delete($record)),
         ];
     }
 

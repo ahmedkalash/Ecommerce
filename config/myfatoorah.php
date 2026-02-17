@@ -16,5 +16,5 @@ return [
      * Country ISO Code
      * Accepted value: KWT, SAU, ARE, QAT, BHR, OMN, JOD, or EGY.
      */
-    'country_iso' => 'KWT'
+    'country_iso' => 'KWT',
 ];

@@ -1,7 +1,6 @@
 <?php
 
-
-//Admin
+// Admin
 
 // use App\Http\Controllers\Cybersource\CybersourceSettingController;
 

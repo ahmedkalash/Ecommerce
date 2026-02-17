@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 
 class PreorderConversationThread extends Model
 {
     use HasFactory,PreventDemoModeChanges;
+
     protected $fillable = ['preorder_product_id', 'sender_id', 'receiver_id'];
 
     public function preorderProduct()

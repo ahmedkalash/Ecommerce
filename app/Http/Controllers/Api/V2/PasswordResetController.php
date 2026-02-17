@@ -2,15 +2,11 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Notifications\AppEmailVerificationNotification;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\PasswordReset;
-use App\Notifications\PasswordResetRequest;
-use Illuminate\Support\Str;
 use App\Http\Controllers\OTPVerificationController;
-
+use App\Models\User;
+use App\Notifications\AppEmailVerificationNotification;
 use Hash;
+use Illuminate\Http\Request;
 
 class PasswordResetController extends Controller
 {
@@ -22,11 +18,10 @@ class PasswordResetController extends Controller
             $user = User::where('phone', $request->email_or_phone)->first();
         }
 
-
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'result' => false,
-                'message' => translate('User is not found')
+                'message' => translate('User is not found'),
             ], 404);
         }
 
@@ -35,12 +30,12 @@ class PasswordResetController extends Controller
             $user->save();
             if ($request->send_code_by == 'phone') {
 
-                $otpController = new OTPVerificationController();
+                $otpController = new OTPVerificationController;
                 $otpController->send_code($user);
             } else {
                 try {
 
-                    $user->notify(new AppEmailVerificationNotification());
+                    $user->notify(new AppEmailVerificationNotification);
                 } catch (\Exception $e) {
                 }
             }
@@ -48,7 +43,7 @@ class PasswordResetController extends Controller
 
         return response()->json([
             'result' => true,
-            'message' => translate('A code is sent')
+            'message' => translate('A code is sent'),
         ], 200);
     }
 
@@ -60,6 +55,7 @@ class PasswordResetController extends Controller
             $user->verification_code = null;
             $user->password = Hash::make($request->password);
             $user->save();
+
             return response()->json([
                 'result' => true,
                 'message' => translate('Your password is reset.Please login'),
@@ -81,11 +77,10 @@ class PasswordResetController extends Controller
             $user = User::where('phone', $request->email_or_phone)->first();
         }
 
-
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'result' => false,
-                'message' => translate('User is not found')
+                'message' => translate('User is not found'),
             ], 404);
         }
 
@@ -93,13 +88,11 @@ class PasswordResetController extends Controller
         $user->save();
 
         if ($request->verify_by == 'email') {
-            $user->notify(new AppEmailVerificationNotification());
+            $user->notify(new AppEmailVerificationNotification);
         } else {
-            $otpController = new OTPVerificationController();
+            $otpController = new OTPVerificationController;
             $otpController->send_code($user);
         }
-
-
 
         return response()->json([
             'result' => true,

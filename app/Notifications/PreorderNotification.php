@@ -6,11 +6,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PreorderNotification  extends Notification
+class PreorderNotification extends Notification
 {
     use Queueable;
-    
+
     public $data;
+
     public $className;
 
     /**
@@ -21,7 +22,7 @@ class PreorderNotification  extends Notification
     public function __construct($order_notification)
     {
         $this->data = $order_notification;
-        $this->className= PreorderNotification::class;
+        $this->className = PreorderNotification::class;
     }
 
     /**
@@ -44,9 +45,9 @@ class PreorderNotification  extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -60,9 +61,9 @@ class PreorderNotification  extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'preorder_id'      => $this->data['preorder_id'],
-                'order_code'      => $this->data['order_code']
-            ]
+                'preorder_id' => $this->data['preorder_id'],
+                'order_code' => $this->data['order_code'],
+            ],
         ];
     }
 }

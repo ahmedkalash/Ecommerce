@@ -14,10 +14,10 @@ class WalletCollection extends ResourceCollection
                 return [
                     'amount' => single_price(($data->amount)),
                     'payment_method' => ucwords(str_replace('_', ' ', $data->payment_method)),
-                    'approval_string' => $data->offline_payment ? ($data->approval == 1 ? "Approved" : "Pending") : "N/A",
+                    'approval_string' => $data->offline_payment ? ($data->approval == 1 ? 'Approved' : 'Pending') : 'N/A',
                     'date' => Carbon::createFromTimestamp(strtotime($data->created_at))->format('d-m-Y'),
                 ];
-            })
+            }),
         ];
     }
 
@@ -25,7 +25,7 @@ class WalletCollection extends ResourceCollection
     {
         return [
             'result' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

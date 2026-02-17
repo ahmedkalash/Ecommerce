@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
 use App\Models\CommissionHistory;
-use App\Models\Wallet;
-use App\Models\User;
+use App\Models\Product;
 use App\Models\Search;
 use App\Models\Shop;
+use App\Models\User;
+use App\Models\Wallet;
 use Auth;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -34,6 +34,7 @@ class ReportController extends Controller
             $products = $products->where('category_id', $sort_by);
         }
         $products = $products->paginate(15);
+
         return view('backend.reports.stock_report', compact('products', 'sort_by'));
     }
 
@@ -46,6 +47,7 @@ class ReportController extends Controller
             $products = $products->where('category_id', $sort_by);
         }
         $products = $products->paginate(15);
+
         return view('backend.reports.in_house_sale_report', compact('products', 'sort_by'));
     }
 
@@ -59,6 +61,7 @@ class ReportController extends Controller
             $sellers = $sellers->where('verification_status', $sort_by);
         }
         $sellers = $sellers->paginate(10);
+
         return view('backend.reports.seller_sale_report', compact('sellers', 'sort_by'));
     }
 
@@ -71,12 +74,14 @@ class ReportController extends Controller
             $products = $products->where('category_id', $sort_by);
         }
         $products = $products->paginate(10);
+
         return view('backend.reports.wish_report', compact('products', 'sort_by'));
     }
 
     public function user_search_report(Request $request)
     {
         $searches = Search::orderBy('count', 'desc')->paginate(10);
+
         return view('backend.reports.user_search_report', compact('searches'));
     }
 
@@ -96,7 +101,7 @@ class ReportController extends Controller
 
         if ($request->date_range) {
             $date_range = $request->date_range;
-            $date_range1 = explode(" / ", $request->date_range);
+            $date_range1 = explode(' / ', $request->date_range);
             $commission_history = $commission_history->where('created_at', '>=', $date_range1[0]);
             $commission_history = $commission_history->where('created_at', '<=', $date_range1[1]);
         }
@@ -109,6 +114,7 @@ class ReportController extends Controller
         if (Auth::user()->user_type == 'seller') {
             return view('seller.reports.commission_history_report', compact('commission_history', 'seller_id', 'date_range'));
         }
+
         return view('backend.reports.commission_history_report', compact('commission_history', 'seller_id', 'date_range'));
     }
 
@@ -129,7 +135,7 @@ class ReportController extends Controller
 
         if ($request->date_range) {
             $date_range = $request->date_range;
-            $date_range1 = explode(" / ", $request->date_range);
+            $date_range1 = explode(' / ', $request->date_range);
             $wallet_history = $wallet_history->where('created_at', '>=', $date_range1[0]);
             $wallet_history = $wallet_history->where('created_at', '<=', $date_range1[1]);
         }
@@ -141,5 +147,4 @@ class ReportController extends Controller
 
         return view('backend.reports.wallet_history_report', compact('wallets', 'users_with_wallet', 'user_id', 'date_range'));
     }
-
 }

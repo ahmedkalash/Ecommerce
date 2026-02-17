@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ElementStyle;
-use Illuminate\Http\Request;
 use App\Models\BusinessSetting;
 use App\Models\Category;
 use App\Models\Country;
@@ -13,10 +11,10 @@ use App\Models\Product;
 use App\Models\Zone;
 use Artisan;
 use CoreComponentRepository;
+use DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
-use Str;
-use DB;
 use ZipArchive;
 
 class BusinessSettingsController extends Controller
@@ -46,6 +44,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.general_settings');
     }
 
@@ -53,6 +52,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.activation');
     }
 
@@ -60,6 +60,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.social_login');
     }
 
@@ -67,6 +68,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.smtp_settings');
     }
 
@@ -74,6 +76,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.google_configuration.google_analytics');
     }
 
@@ -81,6 +84,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.google_configuration.google_recaptcha');
     }
 
@@ -88,6 +92,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.google_configuration.google_map');
     }
 
@@ -95,6 +100,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.google_configuration.google_firebase');
     }
 
@@ -102,6 +108,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.whatsapp_chat');
     }
 
@@ -109,6 +116,7 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.facebook_configuration.facebook_comment');
     }
 
@@ -117,6 +125,7 @@ class BusinessSettingsController extends Controller
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
         $payment_methods = PaymentMethod::whereNull('addon_identifier')->get();
+
         return view('backend.setup_configurations.payment_method.index', compact('payment_methods'));
     }
 
@@ -124,12 +133,13 @@ class BusinessSettingsController extends Controller
     {
         CoreComponentRepository::instantiateShopRepository();
         CoreComponentRepository::initializeCache();
+
         return view('backend.setup_configurations.file_system');
     }
 
     /**
      * Update the API key's for payment methods.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function payment_method_update(Request $request)
@@ -138,9 +148,9 @@ class BusinessSettingsController extends Controller
             $this->overWriteEnvFile($type, $request[$type]);
         }
 
-        $business_settings = BusinessSetting::where('type', $request->payment_method . '_sandbox')->first();
+        $business_settings = BusinessSetting::where('type', $request->payment_method.'_sandbox')->first();
         if ($business_settings != null) {
-            if ($request->has($request->payment_method . '_sandbox')) {
+            if ($request->has($request->payment_method.'_sandbox')) {
                 $business_settings->value = 1;
                 $business_settings->save();
             } else {
@@ -156,7 +166,7 @@ class BusinessSettingsController extends Controller
                 $phonepeVersion->value = $request->phonepe_version;
                 $phonepeVersion->save();
             } else {
-                $newSetting = new BusinessSetting();
+                $newSetting = new BusinessSetting;
                 $newSetting->type = 'phonepe_version';
                 $newSetting->value = $request->phonepe_version;
                 $newSetting->save();
@@ -165,13 +175,14 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
     /**
      * Update the API key's for GOOGLE analytics.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function google_analytics_update(Request $request)
@@ -192,7 +203,8 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
@@ -214,7 +226,8 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
@@ -236,7 +249,8 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
@@ -254,14 +268,14 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
-
     /**
      * Update the API key's for GOOGLE analytics.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function whatsappChatUpdate(Request $request)
@@ -273,7 +287,7 @@ class BusinessSettingsController extends Controller
             'whatsapp_chat' => BusinessSetting::where('type', 'whatsapp_chat')->first(),
             'whatsapp_order' => BusinessSetting::where('type', 'whatsapp_order')->first(),
             'whatsapp_order_seller_prods' => BusinessSetting::where('type', 'whatsapp_order_seller_prods')->first(),
-            'order_messege_template' => BusinessSetting::where('type', 'order_messege_template')->first()
+            'order_messege_template' => BusinessSetting::where('type', 'order_messege_template')->first(),
         ];
 
         foreach ($settings as $key => $setting) {
@@ -285,7 +299,8 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
@@ -296,7 +311,7 @@ class BusinessSettingsController extends Controller
         }
 
         $business_settings = BusinessSetting::where('type', 'facebook_comment')->first();
-        if (!$business_settings) {
+        if (! $business_settings) {
             $business_settings = new BusinessSetting;
             $business_settings->type = 'facebook_comment';
         }
@@ -310,7 +325,8 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
@@ -332,13 +348,14 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
     /**
      * Update the API key's for other methods.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function env_key_update(Request $request)
@@ -347,14 +364,16 @@ class BusinessSettingsController extends Controller
             $this->overWriteEnvFile($type, $request[$type]);
         }
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
+
         return back();
     }
 
     /**
      * overWrite the Env File values.
-     * @param  String type
-     * @param  String value
+     *
+     * @param  string type
+     * @param  string value
      * @return \Illuminate\Http\Response
      */
     public function overWriteEnvFile($type, $val)
@@ -362,15 +381,15 @@ class BusinessSettingsController extends Controller
         if (env('DEMO_MODE') != 'On') {
             $path = base_path('.env');
             if (file_exists($path)) {
-                $val = '"' . trim($val) . '"';
+                $val = '"'.trim($val).'"';
                 if (is_numeric(strpos(file_get_contents($path), $type)) && strpos(file_get_contents($path), $type) >= 0) {
                     file_put_contents($path, str_replace(
-                        $type . '="' . env($type) . '"',
-                        $type . '=' . $val,
+                        $type.'="'.env($type).'"',
+                        $type.'='.$val,
                         file_get_contents($path)
                     ));
                 } else {
-                    file_put_contents($path, file_get_contents($path) . "\r\n" . $type . '=' . $val);
+                    file_put_contents($path, file_get_contents($path)."\r\n".$type.'='.$val);
                 }
             }
         }
@@ -383,19 +402,19 @@ class BusinessSettingsController extends Controller
 
     /**
      * Update sell verification form.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function seller_verification_form_update(Request $request)
     {
-        $form = array();
+        $form = [];
         $select_types = ['select', 'multi_select', 'radio'];
         $j = 0;
         for ($i = 0; $i < count($request->type); $i++) {
             $item['type'] = $request->type[$i];
             $item['label'] = $request->label[$i];
             if (in_array($request->type[$i], $select_types)) {
-                $item['options'] = json_encode($request['options_' . $request->option[$j]]);
+                $item['options'] = json_encode($request['options_'.$request->option[$j]]);
                 $j++;
             }
             array_push($form, $item);
@@ -405,14 +424,15 @@ class BusinessSettingsController extends Controller
         if ($business_settings->save()) {
             Artisan::call('cache:clear');
 
-            flash(translate("Verification form updated successfully"))->success();
+            flash(translate('Verification form updated successfully'))->success();
+
             return back();
         }
     }
 
     public function update(Request $request)
     {
-       // dd($request->all());
+        // dd($request->all());
         $types = $request->types ?? [];
         $resetRefundData = in_array('refund_type', $types);
 
@@ -437,11 +457,11 @@ class BusinessSettingsController extends Controller
                         $business_settings->value = json_encode($request[$type]);
                     } else {
                         $business_settings->value = $request[$type];
-                        if ($type == "seller_commission_type"  && $request[$type] == "category_based") {
+                        if ($type == 'seller_commission_type' && $request[$type] == 'category_based') {
                             $business_settings2 = BusinessSetting::where('type', 'category_wise_commission')->first();
                             $business_settings2->value = 1;
                             $business_settings2->save();
-                        } elseif ($type == "seller_commission_type" && ($request[$type] == "seller_based" || $request[$type] == "fixed_rate")) {
+                        } elseif ($type == 'seller_commission_type' && ($request[$type] == 'seller_based' || $request[$type] == 'fixed_rate')) {
                             $business_settings2 = BusinessSetting::where('type', 'category_wise_commission')->first();
                             $business_settings2->value = 0;
                             $business_settings2->save();
@@ -463,7 +483,6 @@ class BusinessSettingsController extends Controller
             }
         }
 
-        
         if ($resetRefundData) {
             Product::query()->update([
                 'refundable' => 0,
@@ -477,14 +496,14 @@ class BusinessSettingsController extends Controller
         }
         Artisan::call('cache:clear');
 
-        flash(translate("Settings updated successfully"))->success();
+        flash(translate('Settings updated successfully'))->success();
         // If the request from a tabs with tab input
         if ($request->has('tab')) {
-            return Redirect::to(URL::previous() . "#" . $request->tab);
+            return Redirect::to(URL::previous().'#'.$request->tab);
         }
+
         return redirect()->back();
     }
-
 
     public function updateActivationSettings(Request $request)
     {
@@ -515,6 +534,7 @@ class BusinessSettingsController extends Controller
         }
 
         Artisan::call('cache:clear');
+
         return 1;
     }
 
@@ -525,6 +545,7 @@ class BusinessSettingsController extends Controller
         $payment_method->save();
 
         Artisan::call('cache:clear');
+
         return 1;
     }
 
@@ -533,13 +554,13 @@ class BusinessSettingsController extends Controller
         if ($request->type == 'FORCE_HTTPS' && $request->value == '1') {
             $this->overWriteEnvFile($request->type, 'On');
 
-            if (strpos(env('APP_URL'), 'http:') !== FALSE) {
-                $this->overWriteEnvFile('APP_URL', str_replace("http:", "https:", env('APP_URL')));
+            if (strpos(env('APP_URL'), 'http:') !== false) {
+                $this->overWriteEnvFile('APP_URL', str_replace('http:', 'https:', env('APP_URL')));
             }
         } elseif ($request->type == 'FORCE_HTTPS' && $request->value == '0') {
             $this->overWriteEnvFile($request->type, 'Off');
-            if (strpos(env('APP_URL'), 'https:') !== FALSE) {
-                $this->overWriteEnvFile('APP_URL', str_replace("https:", "http:", env('APP_URL')));
+            if (strpos(env('APP_URL'), 'https:') !== false) {
+                $this->overWriteEnvFile('APP_URL', str_replace('https:', 'http:', env('APP_URL')));
             }
         } elseif ($request->type == 'FILESYSTEM_DRIVER') {
             $this->overWriteEnvFile($request->type, $request->value);
@@ -556,16 +577,16 @@ class BusinessSettingsController extends Controller
     public function shipping_configuration(Request $request)
     {
         $countries = Country::where('status', 1)->get();
+
         return view('backend.setup_configurations.shipping_configuration.index', compact('countries'));
     }
 
     public function shipping_method(Request $request)
     {
         $countries = Country::where('status', 1)->get();
+
         return view('backend.setup_configurations.shipping_configuration.shipping_method', compact('countries'));
     }
-
-
 
     public function shipping_configuration_update(Request $request)
     {
@@ -580,6 +601,7 @@ class BusinessSettingsController extends Controller
 
             if ($hasInvalidCountries) {
                 flash(translate('Your active shipping countries are assigned to inactive or undefined shipping zones. Please review your zone setup before enabling carrier-wise shipping.'))->error();
+
                 return back();
             }
         }
@@ -590,6 +612,7 @@ class BusinessSettingsController extends Controller
 
         Artisan::call('cache:clear');
         flash(translate('Shipping Method updated successfully'))->success();
+
         return back();
     }
 
@@ -633,20 +656,20 @@ class BusinessSettingsController extends Controller
     //     return back();
     // }
 
-
     public function import_data(Request $request)
     {
-        if (env("DEMO_MODE") == "On") {
+        if (env('DEMO_MODE') == 'On') {
             flash(translate('Demo data import will not work in demo site'))->error();
+
             return back();
         }
 
         if (! AddonController::isLocalhostDomain()) {
 
-            $check_domain_verification =  AddonController::checkVerification('item', $request->purchase_key);
-            $check_domain_activation =  AddonController::checkActivation('item', $request->purchase_key);
+            $check_domain_verification = AddonController::checkVerification('item', $request->purchase_key);
+            $check_domain_activation = AddonController::checkActivation('item', $request->purchase_key);
 
-            if (!$check_domain_verification || !$check_domain_activation) {
+            if (! $check_domain_verification || ! $check_domain_activation) {
                 return translate('Please activate your domain at first');
             }
         }
@@ -660,14 +683,15 @@ class BusinessSettingsController extends Controller
         $zip->open(base_path('public/uploads.zip'));
         $zip->extractTo('public/uploads/all/');
         flash(translate('Demo data uploaded successfully'))->success();
+
         return redirect()->back();
     }
 
     public function stateBasedShippingSettings(Request $request)
     {
         $business_settings = BusinessSetting::where('type', 'has_state')->first();
-        if (!$business_settings) {
-            $business_settings = new BusinessSetting();
+        if (! $business_settings) {
+            $business_settings = new BusinessSetting;
             $business_settings->type = 'has_state';
         }
 
@@ -676,15 +700,16 @@ class BusinessSettingsController extends Controller
         $business_settings->save();
 
         Artisan::call('cache:clear');
-            return $request->has_state ? 1 : 0;
-       
+
+        return $request->has_state ? 1 : 0;
+
     }
 
     public function select_header(Request $request)
     {
         $business_settings = BusinessSetting::where('type', 'header_element')->first();
-        if (!$business_settings) {
-            $business_settings = new BusinessSetting();
+        if (! $business_settings) {
+            $business_settings = new BusinessSetting;
             $business_settings->type = 'header_element';
         }
 
@@ -693,18 +718,19 @@ class BusinessSettingsController extends Controller
         $selectedElementType = ElementType::find($request->header_element);
         foreach ($selectedElementType->element_styles as $style) {
             $businessSetting = BusinessSetting::where('type', $style->name)->first();
-            if (!$businessSetting) {
-                $businessSetting = new BusinessSetting();
+            if (! $businessSetting) {
+                $businessSetting = new BusinessSetting;
                 $businessSetting->type = $style->name;
                 $businessSetting->value = $style->value;
                 $businessSetting->save();
-            }else{
+            } else {
                 $businessSetting->value = $style->value;
                 $businessSetting->save();
             }
         }
         Artisan::call('cache:clear');
         flash(translate('Header layout updated successfully'))->success();
+
         return redirect()->back();
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class Element extends Model
 {
@@ -16,6 +16,7 @@ class Element extends Model
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $element_translation = $this->element_translations->where('lang', $lang)->first();
+
         return $element_translation != null ? $element_translation->$field : $this->$field;
     }
 

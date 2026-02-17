@@ -4,24 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Addon;
 use App\Models\Cart;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Shop;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Shop;
+use App\Models\User;
 use App\Models\Wishlist;
-use Illuminate\Support\Facades\Hash;
 use App\Notifications\ShopVerificationNotification;
 use App\Services\PreorderService;
 use App\Utility\EmailUtility;
 use Cache;
 use Carbon\Carbon;
 use File;
-use Illuminate\Support\Facades\Log as FacadesLog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
-use Log;
 
 class SellerController extends Controller
 {
@@ -50,7 +48,7 @@ class SellerController extends Controller
     {
         $sort_search = $request->search ?? null;
         $approved = $request->approved_status ?? null;
-        $verification_status =  $request->verification_status ?? null;
+        $verification_status = $request->verification_status ?? null;
 
         $shops = Shop::where('registration_approval', 1)->whereIn('user_id', function ($query) {
             $query->select('id')
@@ -62,9 +60,9 @@ class SellerController extends Controller
             $user_ids = User::where('user_type', 'seller');
             if ($sort_search != null) {
                 $user_ids = $user_ids->where(function ($user) use ($sort_search) {
-                    $user->where('name', 'like', '%' . $sort_search . '%')
-                        ->orWhere('email', 'like', '%' . $sort_search . '%')
-                        ->orWhere('phone', 'like', '%' . $sort_search . '%');
+                    $user->where('name', 'like', '%'.$sort_search.'%')
+                        ->orWhere('email', 'like', '%'.$sort_search.'%')
+                        ->orWhere('phone', 'like', '%'.$sort_search.'%');
                 });
             }
             if ($verification_status != null) {
@@ -79,6 +77,7 @@ class SellerController extends Controller
             $shops = $shops->where('verification_status', $approved);
         }
         $shops = $shops->paginate(15);
+
         return view('backend.sellers.index', compact('shops', 'sort_search', 'approved', 'verification_status'));
     }
 
@@ -95,7 +94,6 @@ class SellerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -118,25 +116,25 @@ class SellerController extends Controller
             ]
         );
 
-
         if (User::where('email', $request->email)->first() != null) {
             flash(translate('Email already exists!'))->error();
+
             return back();
         }
         $password = substr(hash('sha512', rand()), 0, 8);
 
-        $user           = new User;
-        $user->name     = $request->name;
-        $user->email    = $request->email;
-        $user->user_type = "seller";
+        $user = new User;
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->user_type = 'seller';
         $user->password = Hash::make($password);
 
         if ($user->save()) {
-            $shop           = new Shop;
-            $shop->user_id  = $user->id;
-            $shop->name     = $request->shop_name;
-            $shop->address  = $request->address;
-            $shop->slug     = 'demo-shop-' . $user->id;
+            $shop = new Shop;
+            $shop->user_id = $user->id;
+            $shop->name = $request->shop_name;
+            $shop->address = $request->address;
+            $shop->slug = 'demo-shop-'.$user->id;
             $shop->save();
 
             try {
@@ -145,6 +143,7 @@ class SellerController extends Controller
                 $shop->delete();
                 $user->delete();
                 flash(translate('Registration failed. Please try again later.'))->error();
+
                 return back();
             }
 
@@ -165,9 +164,11 @@ class SellerController extends Controller
             }
 
             flash(translate('Seller has been added successfully'))->success();
+
             return back();
         }
         flash(translate('Something went wrong'))->error();
+
         return back();
     }
 
@@ -191,13 +192,13 @@ class SellerController extends Controller
     public function edit($id)
     {
         $shop = Shop::findOrFail(decrypt($id));
+
         return view('backend.sellers.edit', compact('shop'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -213,11 +214,13 @@ class SellerController extends Controller
         if ($user->save()) {
             if ($shop->save()) {
                 flash(translate('Seller has been updated successfully'))->success();
+
                 return redirect()->route('sellers.index');
             }
         }
 
         flash(translate('Something went wrong'))->error();
+
         return back();
     }
 
@@ -268,9 +271,11 @@ class SellerController extends Controller
 
         if (Shop::destroy($id)) {
             flash(translate('Seller has been deleted successfully'))->success();
+
             return redirect()->route('sellers.index');
         } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -289,6 +294,7 @@ class SellerController extends Controller
     public function show_verification_request($id)
     {
         $shop = Shop::findOrFail($id);
+
         return view('backend.sellers.verification', compact('shop'));
     }
 
@@ -300,13 +306,14 @@ class SellerController extends Controller
         Cache::forget('verified_sellers_id');
 
         $users = User::findMany([$shop->user->id]);
-        $data = array();
+        $data = [];
         $data['shop'] = $shop;
         $data['status'] = 'approved';
         $data['notification_type_id'] = get_notification_type('shop_verify_request_approved', 'type')->id;
         Notification::send($users, new ShopVerificationNotification($data));
 
         flash(translate('Seller has been approved successfully'))->success();
+
         return back();
     }
 
@@ -319,26 +326,28 @@ class SellerController extends Controller
         Cache::forget('verified_sellers_id');
 
         $users = User::findMany([$shop->user->id]);
-        $data = array();
+        $data = [];
         $data['shop'] = $shop;
         $data['status'] = 'rejected';
         $data['notification_type_id'] = get_notification_type('shop_verify_request_rejected', 'type')->id;
         Notification::send($users, new ShopVerificationNotification($data));
 
         flash(translate('Seller verification request has been rejected successfully'))->success();
+
         return back();
     }
-
 
     public function payment_modal(Request $request)
     {
         $shop = shop::findOrFail($request->id);
+
         return view('backend.sellers.payment_modal', compact('shop'));
     }
 
     public function verification_info_modal(Request $request)
     {
         $shop = Shop::findOrFail($request->id);
+
         return view('backend.sellers.verification_info_modal', compact('shop'));
     }
 
@@ -351,7 +360,7 @@ class SellerController extends Controller
 
         $status = $request->status == 1 ? 'approved' : 'rejected';
         $users = User::findMany([$shop->user->id]);
-        $data = array();
+        $data = [];
         $data['shop'] = $shop;
         $data['status'] = $status;
         $data['notification_type_id'] = $status == 'approved' ?
@@ -359,13 +368,14 @@ class SellerController extends Controller
             get_notification_type('shop_verify_request_rejected', 'type')->id;
 
         Notification::send($users, new ShopVerificationNotification($data));
+
         return 1;
     }
 
     public function login($id)
     {
         $shop = Shop::findOrFail(decrypt($id));
-        $user  = $shop->user;
+        $user = $shop->user;
         auth()->login($user, true);
 
         return redirect()->route('seller.dashboard');
@@ -388,6 +398,7 @@ class SellerController extends Controller
         }
         $shop->save();
         $shop->user->save();
+
         return back();
     }
 
@@ -396,7 +407,7 @@ class SellerController extends Controller
     {
         $sort_search = $request->search ?? null;
         $approved = $request->approved_status ?? null;
-        $verification_status =  $request->verification_status ?? null;
+        $verification_status = $request->verification_status ?? null;
 
         $shops = Shop::whereIn('user_id', function ($query) {
             $query->select('id')
@@ -408,9 +419,9 @@ class SellerController extends Controller
             $user_ids = User::where('user_type', 'seller');
             if ($sort_search != null) {
                 $user_ids = $user_ids->where(function ($user) use ($sort_search) {
-                    $user->where('name', 'like', '%' . $sort_search . '%')
-                        ->orWhere('email', 'like', '%' . $sort_search . '%')
-                        ->orWhere('phone', 'like', '%' . $sort_search . '%');
+                    $user->where('name', 'like', '%'.$sort_search.'%')
+                        ->orWhere('email', 'like', '%'.$sort_search.'%')
+                        ->orWhere('phone', 'like', '%'.$sort_search.'%');
                 });
             }
             if ($verification_status != null) {
@@ -425,15 +436,14 @@ class SellerController extends Controller
             $shops = $shops->where('verification_status', $approved);
         }
         $shops = $shops->paginate(15);
+
         return view('backend.sellers.seller_based_commission.set_commission', compact('shops', 'sort_search', 'approved', 'verification_status'));
     }
-
-
 
     public function setSellerBasedCommission(Request $request)
     {
         if ($request->seller_ids != null) {
-            foreach (explode(",", $request->seller_ids) as $shop) {
+            foreach (explode(',', $request->seller_ids) as $shop) {
                 $shop = Shop::where('id', $shop)->first();
                 $shop->commission_percentage = $request->commission_percentage;
                 $shop->save();
@@ -442,6 +452,7 @@ class SellerController extends Controller
         } else {
             flash(translate('Something went wrong!.'))->warning();
         }
+
         return back();
     }
 
@@ -465,6 +476,7 @@ class SellerController extends Controller
         $shop->custom_followers = $request->custom_followers;
         $shop->save();
         flash(translate('Seller custom follower has been updated successfully.'))->success();
+
         return back();
     }
 
@@ -476,9 +488,9 @@ class SellerController extends Controller
         if ($sort_search != null) {
             $user_ids = User::where('user_type', 'seller')
                 ->where(function ($query) use ($sort_search) {
-                    $query->where('name', 'like', '%' . $sort_search . '%')
-                        ->orWhere('email', 'like', '%' . $sort_search . '%')
-                        ->orWhere('phone', 'like', '%' . $sort_search . '%');
+                    $query->where('name', 'like', '%'.$sort_search.'%')
+                        ->orWhere('email', 'like', '%'.$sort_search.'%')
+                        ->orWhere('phone', 'like', '%'.$sort_search.'%');
                 })
                 ->pluck('id')
                 ->toArray();
@@ -499,8 +511,10 @@ class SellerController extends Controller
                 EmailUtility::seller_shop_approval_email('seller_shop_approval_email', $shop);
             } catch (\Exception $e) {
             }
+
             return 1;
         }
+
         return 0;
     }
 
@@ -514,9 +528,10 @@ class SellerController extends Controller
         $products = Product::where('user_id', $shop->user_id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->search;
-            $products = $products->where('name', 'like', '%' . $search . '%');
+            $products = $products->where('name', 'like', '%'.$search.'%');
         }
         $products = $products->paginate(2);
+
         return view('backend.sellers.profile.index', compact('shop', 'addresses', 'default_shipping_address', 'products'));
     }
 
@@ -535,7 +550,10 @@ class SellerController extends Controller
             ->orderBy('id', 'desc')
             ->select('orders.id')
             ->distinct()->paginate(15);
-        $html = view('backend.sellers.profile.seller_' . $tab, compact('products', 'shop', 'addresses', 'default_shipping_address', 'page', 'orders', 'type', 'unpaid_order_payment_notification', 'payments'))->render();
+        $html = view('backend.sellers.profile.seller_'.$tab,
+            compact('products', 'shop', 'addresses', 'default_shipping_address', 'page', 'orders', 'type',
+                'unpaid_order_payment_notification', 'payments'))->render();
+
         return response()->json(['html' => $html]);
     }
 
@@ -548,7 +566,7 @@ class SellerController extends Controller
             $lines = array_reverse(File::lines($logFile)->toArray());
 
             foreach ($lines as $line) {
-                if (str_contains($line, '"user_id":' . $user_id)) {
+                if (str_contains($line, '"user_id":'.$user_id)) {
 
                     $jsonStart = strpos($line, '{');
                     if ($jsonStart !== false) {
@@ -560,8 +578,10 @@ class SellerController extends Controller
                     }
                 }
             }
+
             return $lastLoginTime;
         }
+
         return null;
     }
 
@@ -599,9 +619,11 @@ class SellerController extends Controller
             $shop->verification_info = json_encode($verificationInfo);
             $shop->save();
             flash(translate('Verification file deleted successfully'))->success();
+
             return back();
         } catch (\Exception $e) {
             flash(translate('Failed to delete verification file. Please try again later.'))->error();
+
             return back();
         }
     }

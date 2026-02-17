@@ -8,7 +8,7 @@ class SearchUtility
 {
     public static function store($query)
     {
-        if ($query != null && $query != "") {
+        if ($query != null && $query != '') {
 
             $search = Search::where('query', $query)->first();
             if ($search != null) {

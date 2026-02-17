@@ -2,11 +2,10 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Rule;
 
 class NotificationTypeRequest extends FormRequest
 {
@@ -28,8 +27,8 @@ class NotificationTypeRequest extends FormRequest
     public function rules()
     {
         $rules = [];
-        $rules['name']          = 'required|max:100';
-        $rules['default_text']  = 'required';
+        $rules['name'] = 'required|max:100';
+        $rules['default_text'] = 'required';
 
         return $rules;
     }
@@ -42,14 +41,15 @@ class NotificationTypeRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'             => translate('Notification Type is required'),
-            'name.max'                  => translate('Name should be Max 100 character'),
-            'default_text.required'     => translate('Default Text is required')
+            'name.required' => translate('Notification Type is required'),
+            'name.max' => translate('Name should be Max 100 character'),
+            'default_text.required' => translate('Default Text is required'),
         ];
     }
 
     /**
      * Get the error messages for the defined validation rules.*
+     *
      * @return array
      */
     public function failedValidation(Validator $validator)
@@ -57,7 +57,7 @@ class NotificationTypeRequest extends FormRequest
         if ($this->expectsJson()) {
             throw new HttpResponseException(response()->json([
                 'message' => $validator->errors()->all(),
-                'result' => false
+                'result' => false,
             ], 422));
         } else {
             throw (new ValidationException($validator))

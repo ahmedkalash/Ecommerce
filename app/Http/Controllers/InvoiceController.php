@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Currency;
 use App\Models\Language;
 use App\Models\Order;
-use Session;
-use PDF;
 use Config;
+use PDF;
+use Session;
 
 class InvoiceController extends Controller
 {
-    //download invoice
+    // download invoice
     public function invoice_download($id)
     {
         if (Session::has('currency_code')) {
@@ -62,7 +62,7 @@ class InvoiceController extends Controller
             $language_code == 'jo'
         ) {
             // middle east/arabic/Israeli font
-            $font_family = "xbriyaz";
+            $font_family = 'xbriyaz';
         } elseif ($currency_code == 'THB') {
             // thai font
             $font_family = "'Kanit','sans-serif'";
@@ -91,7 +91,7 @@ class InvoiceController extends Controller
             $font_family = "'Roboto','sans-serif'";
         } else {
             // general for all
-            $font_family = "freeserif";
+            $font_family = 'freeserif';
         }
 
         // $config = ['instanceConfigurator' => function($mpdf) {
@@ -102,16 +102,18 @@ class InvoiceController extends Controller
         $config = [];
 
         $order = Order::findOrFail($id);
-        if (in_array(auth()->user()->user_type, ['admin','staff']) || in_array(auth()->id(), [$order->user_id, $order->seller_id])) {
+        if (in_array(auth()->user()->user_type, ['admin', 'staff']) || in_array(auth()->id(),
+            [$order->user_id, $order->seller_id])) {
             return PDF::loadView('backend.invoices.invoice', [
                 'order' => $order,
                 'font_family' => $font_family,
                 'direction' => $direction,
                 'text_align' => $text_align,
-                'not_text_align' => $not_text_align
-            ], [], $config)->download('order-' . $order->code . '.pdf');
+                'not_text_align' => $not_text_align,
+            ], [], $config)->download('order-'.$order->code.'.pdf');
         }
-        flash(translate("You do not have the right permission to access this invoice."))->error();
+        flash(translate('You do not have the right permission to access this invoice.'))->error();
+
         return redirect()->route('home');
     }
 
@@ -130,8 +132,7 @@ class InvoiceController extends Controller
             'font_family' => "'Roboto', sans-serif", // or reuse your logic
             'direction' => $direction,
             'text_align' => $text_align,
-            'not_text_align' => $not_text_align
+            'not_text_align' => $not_text_align,
         ]);
     }
-
 }

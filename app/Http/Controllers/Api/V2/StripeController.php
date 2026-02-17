@@ -2,16 +2,10 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Models\CustomerPackage;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CustomerPackageController;
-use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
 use App\Models\Currency;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Stripe\Exception\CardException;
-use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
 class StripeController extends Controller
@@ -24,11 +18,10 @@ class StripeController extends Controller
         $data['user_id'] = $request->user_id;
         $data['package_id'] = 0;
 
-
-        if(isset($request->package_id)) {
+        if (isset($request->package_id)) {
             $data['package_id'] = $request->package_id;
         }
-        
+
         return view('frontend.payment.stripe_app', $data);
     }
 
@@ -50,7 +43,7 @@ class StripeController extends Controller
             $amount = round($request->amount * 100);
         }
 
-        $data = array();
+        $data = [];
         $data['payment_type'] = $request->payment_type;
         $data['combined_order_id'] = $request->combined_order_id;
         $data['order_id'] = $request->order_id;
@@ -67,17 +60,17 @@ class StripeController extends Controller
                     'price_data' => [
                         'currency' => Currency::findOrFail(get_setting('system_default_currency'))->code,
                         'product_data' => [
-                            'name' => "Payment"
+                            'name' => 'Payment',
                         ],
                         'unit_amount' => $amount,
                     ],
                     'quantity' => 1,
-                ]
+                ],
             ],
             'mode' => 'payment',
             'client_reference_id' => json_encode($data),
             // 'success_url' => route('api.stripe.success', $data),
-            'success_url' => env('APP_URL') . "/api/v2/stripe/success?session_id={CHECKOUT_SESSION_ID}",
+            'success_url' => env('APP_URL').'/api/v2/stripe/success?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('api.stripe.cancel'),
         ]);
 
@@ -87,13 +80,13 @@ class StripeController extends Controller
     public function payment_success(Request $request)
     {
         $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET'));
-        
+
         try {
             $session = $stripe->checkout->sessions->retrieve($request->session_id);
-            
+
             $decoded_reference_data = json_decode($session->client_reference_id);
-            
-            $payment = ["status" => "Success"];
+
+            $payment = ['status' => 'Success'];
 
             $payment_type = $decoded_reference_data->payment_type;
 
@@ -109,16 +102,15 @@ class StripeController extends Controller
                 customer_purchase_payment_done($decoded_reference_data->user_id, $decoded_reference_data->package_id, 'Stripe', json_encode($payment));
             }
 
-            return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
-
+            return response()->json(['result' => true, 'message' => translate('Payment is successful')]);
 
         } catch (\Exception $e) {
-            return response()->json(['result' => false, 'message' => translate("Payment is failed")]);
+            return response()->json(['result' => false, 'message' => translate('Payment is failed')]);
         }
     }
 
     public function cancel(Request $request)
     {
-        return response()->json(['result' => false, 'message' => translate("Payment is cancelled")]);
+        return response()->json(['result' => false, 'message' => translate('Payment is cancelled')]);
     }
 }

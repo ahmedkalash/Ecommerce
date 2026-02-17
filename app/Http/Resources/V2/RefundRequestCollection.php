@@ -11,20 +11,21 @@ class RefundRequestCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
                 $refund_label = '';
-                if($data->refund_status == 1) {
+                if ($data->refund_status == 1) {
                     $refund_label = 'Approved';
-                } elseif($data->refund_status == 2) {
+                } elseif ($data->refund_status == 2) {
                     $refund_label = 'Rejected';
-                }else {
+                } else {
                     $refund_label = 'PENDING';
                 }
 
                 return [
-                    'id' => (int)$data->id,
-                    'user_id' => (int)$data->user_id,
-                    'order_code' =>  $data->order == null ? translate("Order not found") : $data->order->code,
-                    'product_name' => $data->orderDetail != null && $data->orderDetail->product != null ? $data->orderDetail->product->getTranslation('name', 'en') : "",
-                    'product_price' => $data->orderDetail != null ? single_price($data->orderDetail->price) : "",
+                    'id' => (int) $data->id,
+                    'user_id' => (int) $data->user_id,
+                    'order_code' => $data->order == null ? translate('Order not found') : $data->order->code,
+                    'product_name' => $data->orderDetail != null && $data->orderDetail->product != null ? $data->orderDetail->product->getTranslation('name',
+                        'en') : '',
+                    'product_price' => $data->orderDetail != null ? single_price($data->orderDetail->price) : '',
                     'refund_status' => (int) $data->refund_status,
                     'refund_label' => $refund_label,
                     'seller_approval' => $data->seller_approval,
@@ -32,7 +33,7 @@ class RefundRequestCollection extends ResourceCollection
                     'reason' => $data->reason,
                     'date' => date('d-m-Y', strtotime($data->created_at)),
                 ];
-            })
+            }),
         ];
     }
 
@@ -40,7 +41,7 @@ class RefundRequestCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

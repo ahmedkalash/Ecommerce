@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Brand;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Illuminate\Support\Str;
-use App\Traits\PreventDemoModeChanges;
 
-//class ProductsImport implements ToModel, WithHeadingRow, WithValidation
-class BrandsImport implements ToCollection, WithHeadingRow, ToModel
+// class ProductsImport implements ToModel, WithHeadingRow, WithValidation
+class BrandsImport implements ToCollection, ToModel, WithHeadingRow
 {
     use PreventDemoModeChanges;
 
@@ -30,12 +29,12 @@ class BrandsImport implements ToCollection, WithHeadingRow, ToModel
         }
 
         flash(translate('Brands imported successfully'))->success();
-        
+
     }
 
     public function model(array $row)
     {
-        ++$this->rows;
+        $this->rows++;
     }
 
     public function downloadLogo($url)
@@ -49,6 +48,7 @@ class BrandsImport implements ToCollection, WithHeadingRow, ToModel
             return $upload->id;
         } catch (\Exception $e) {
         }
+
         return null;
     }
 }

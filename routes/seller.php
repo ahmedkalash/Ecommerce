@@ -3,7 +3,7 @@
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Seller\DashboardController;
 
-//Upload
+// Upload
 Route::group(['prefix' => 'seller', 'middleware' => ['seller', 'verified', 'user', 'prevent-back-history'], 'as' => 'seller.'], function () {
     Route::controller(AizUploadController::class)->group(function () {
         Route::any('/uploads', 'index')->name('uploaded-files.index');
@@ -42,13 +42,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
     });
 
-
-
     // Product Bulk Upload
     Route::controller(ProductBulkUploadController::class)->group(function () {
         Route::get('/product-bulk-upload/index', 'index')->name('product_bulk_upload.index');
         Route::post('/product-bulk-upload/store', 'bulk_upload')->name('bulk_product_upload');
-        Route::group(['prefix' => 'bulk-upload/download'], function() {
+        Route::group(['prefix' => 'bulk-upload/download'], function () {
             Route::get('/category', 'pdf_download_category')->name('pdf.download_category');
             Route::get('/brand', 'pdf_download_brand')->name('pdf.download_brand');
         });
@@ -72,7 +70,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('note/delete/{note}', 'destroy')->name('note.delete');
     });
 
-    //Coupon
+    // Coupon
     Route::resource('coupon', CouponController::class);
     Route::controller(CouponController::class)->group(function () {
         Route::post('/coupon/get_form', 'get_coupon_form')->name('coupon.get_coupon_form');
@@ -80,7 +78,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
     });
 
-    //Order
+    // Order
     Route::resource('orders', OrderController::class);
     Route::controller(OrderController::class)->group(function () {
         Route::post('/orders/update_delivery_status', 'update_delivery_status')->name('orders.update_delivery_status');
@@ -93,15 +91,15 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(InvoiceController::class)->group(function () {
         Route::get('/invoice/{order_id}', 'invoice_download')->name('invoice.download');
     });
-    
-    //Review
+
+    // Review
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/product-reviews', 'index')->name('product-reviews');
         Route::get('/product/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
-        
+
     });
 
-    //Shop
+    // Shop
     Route::controller(ShopController::class)->group(function () {
         Route::get('/shop', 'index')->name('shop.index');
         Route::post('/shop/update', 'update')->name('shop.update');
@@ -111,7 +109,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/category-wise-commission', 'categoriesWiseCommission')->name('categories-wise-commission');
     });
 
-    //Payments
+    // Payments
     Route::resource('payments', PaymentController::class);
 
     // Profile Settings
@@ -141,7 +139,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/commission-history', 'index')->name('commission-history.index');
     });
 
-    //Conversations
+    // Conversations
     Route::controller(ConversationController::class)->group(function () {
         Route::get('/conversations', 'index')->name('conversations.index');
         Route::get('/conversations/show/{id}', 'show')->name('conversations.show');
@@ -173,4 +171,3 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     });
 
 });
-

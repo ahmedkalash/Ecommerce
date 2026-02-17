@@ -3,10 +3,9 @@
 namespace App\Http\Middleware;
 
 use App;
-use Config;
+use Carbon\Carbon;
 use Closure;
 use Session;
-use Carbon\Carbon;
 
 class Language
 {
@@ -14,16 +13,14 @@ class Language
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if(Session::has('locale')){
+        if (Session::has('locale')) {
             $locale = Session::get('locale');
-        }
-        else{
-            $locale = env('DEFAULT_LANGUAGE','en');
+        } else {
+            $locale = env('DEFAULT_LANGUAGE', 'en');
         }
 
         App::setLocale($locale);

@@ -14,8 +14,7 @@
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\Seller\PosController as SellerPosController;
 
-Route::controller(PosController::class)->group(function () {
-});
+Route::controller(PosController::class)->group(function () {});
 
 // Admin
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin']], function () {

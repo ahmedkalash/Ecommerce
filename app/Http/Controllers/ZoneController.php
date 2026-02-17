@@ -6,7 +6,6 @@ use App\Http\Requests\ZoneRequest;
 use App\Models\Country;
 use App\Models\Zone;
 
-
 class ZoneController extends Controller
 {
     public function __construct()
@@ -18,16 +17,16 @@ class ZoneController extends Controller
     public function index()
     {
         $zones = Zone::latest()->paginate(10);
+
         return view('backend.setup_configurations.zones.index', compact('zones'));
     }
-
 
     public function create()
     {
         $countries = Country::where('status', 1)->where('zone_id', 0)->get();
+
         return view('backend.setup_configurations.zones.create', compact('countries'));
     }
-
 
     public function store(ZoneRequest $request)
     {
@@ -38,6 +37,7 @@ class ZoneController extends Controller
         }
 
         flash(translate('Zone has been created successfully'))->success();
+
         return redirect()->route('zones.index');
     }
 
@@ -49,9 +49,9 @@ class ZoneController extends Controller
                     ->orWhere('zone_id', $zone->id);
             })
             ->get();
+
         return view('backend.setup_configurations.zones.edit', compact('countries', 'zone'));
     }
-
 
     public function update(ZoneRequest $request, Zone $zone)
     {
@@ -63,6 +63,7 @@ class ZoneController extends Controller
         }
 
         flash(translate('Zone has been update successfully'))->success();
+
         return back();
     }
 
@@ -81,6 +82,7 @@ class ZoneController extends Controller
         Zone::destroy($id);
 
         flash(translate('Zone has been deleted successfully'))->success();
+
         return redirect()->route('zones.index');
     }
 }

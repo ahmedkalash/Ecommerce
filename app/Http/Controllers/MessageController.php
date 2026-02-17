@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Message;
 use Auth;
+use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
@@ -31,7 +31,6 @@ class MessageController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -44,15 +43,14 @@ class MessageController extends Controller
         $message->save();
         $conversation = $message->conversation;
         if ($conversation->sender_id == $authUser->id) {
-            $conversation->sender_viewed ="1";
-            $conversation->receiver_viewed ="0";
-        }
-        elseif($conversation->receiver_id == $authUser->id || $authUser == 'staff') {
-            $conversation->sender_viewed ="0";
-            $conversation->receiver_viewed ="1";
+            $conversation->sender_viewed = '1';
+            $conversation->receiver_viewed = '0';
+        } elseif ($conversation->receiver_id == $authUser->id || $authUser == 'staff') {
+            $conversation->sender_viewed = '0';
+            $conversation->receiver_viewed = '1';
         }
         $conversation->save();
-        
+
         return back();
     }
 
@@ -81,7 +79,6 @@ class MessageController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

@@ -47,7 +47,8 @@ abstract class AuthTestCase extends TestCase
     protected function mockRecaptcha(): void
     {
         $this->app->bind(Recaptcha::class, function () {
-            return new class implements ValidationRule {
+            return new class implements ValidationRule
+            {
                 public function validate(string $attribute, mixed $value, Closure $fail): void
                 {
                     // The reCAPTCHA verification will always pass in the unit test;

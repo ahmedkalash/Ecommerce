@@ -9,15 +9,15 @@ class CitiesCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
-                    'id'      =>(int) $data->id,
+                    'id' => (int) $data->id,
                     'state_id' => (int) $data->state_id,
                     'country_id' => (int) $data->country_id,
                     'name' => $data->name,
                     'cost' => $data->cost,
                 ];
-            })
+            }),
         ];
     }
 
@@ -25,7 +25,7 @@ class CitiesCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

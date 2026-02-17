@@ -11,7 +11,6 @@ class RecaptchaService
      * Get the validation rules for Google Recaptcha based on the specific action or context.
      *
      * @param  RecaptchaAction|null  $action  The context action enum
-     * @return array
      */
     public static function validationRules(?RecaptchaAction $action = null): array
     {

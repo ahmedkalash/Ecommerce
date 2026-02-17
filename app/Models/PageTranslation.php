@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class PageTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-  protected $fillable = ['page_id', 'title', 'content', 'lang'];
+    protected $fillable = ['page_id', 'title', 'content', 'lang'];
 
-  public function page(){
-    return $this->belongsTo(Page::class);
-  }
+    public function page()
+    {
+        return $this->belongsTo(Page::class);
+    }
 }

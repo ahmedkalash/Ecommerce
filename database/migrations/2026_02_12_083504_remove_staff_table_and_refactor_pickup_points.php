@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -12,7 +13,7 @@ return new class extends Migration {
     {
         // Add user_id to pickup_points
         Schema::table('pickup_points', function (Blueprint $table) {
-            if (!Schema::hasColumn('pickup_points', 'user_id')) {
+            if (! Schema::hasColumn('pickup_points', 'user_id')) {
                 $table->unsignedBigInteger('user_id')->nullable()->after('id');
             }
         });

@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Payment;
 
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use net\authorize\api\contract\v1 as AnetAPI;
-use net\authorize\api\controller as AnetController;
-use App\Models\CombinedOrder;
-use App\Models\CustomerPackage;
-use App\Models\SellerPackage;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
-use App\Http\Controllers\CheckoutController;
+use App\Models\CombinedOrder;
+use App\Models\CustomerPackage;
 use App\Models\Order;
+use App\Models\SellerPackage;
 use Auth;
+use Illuminate\Http\Request;
+use net\authorize\api\contract\v1 as AnetAPI;
+use net\authorize\api\controller as AnetController;
 use Session;
 
 class AuthorizenetController extends Controller
@@ -26,7 +26,7 @@ class AuthorizenetController extends Controller
      */
     public function __construct()
     {
-        //$this->middleware('auth'); // later enable it when needed user login while payment
+        // $this->middleware('auth'); // later enable it when needed user login while payment
     }
 
     // start page form after start
@@ -52,32 +52,28 @@ class AuthorizenetController extends Controller
             $database_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
             $first_order = $database_order->orders->first();
 
-            $invoiceNumber = time() . $database_order->id;
+            $invoiceNumber = time().$database_order->id;
             $lastName = json_decode($first_order->shipping_address)->name;
             $address = json_decode($first_order->shipping_address)->address;
             $amount = $database_order->orders->sum('grand_total');
             $city = json_decode($first_order->shipping_address)->city;
             $zip = json_decode($first_order->shipping_address)->postal_code;
             $country = json_decode($first_order->shipping_address)->country;
-        }
-        elseif ($paymentType == 'order_re_payment') {
+        } elseif ($paymentType == 'order_re_payment') {
             $order = Order::findOrFail($paymentData['order_id']);
             $amount = $order->grand_total;
             $lastName = $user->name;
-            $invoiceNumber = time() . $order->id;
-        }
-        elseif ($paymentType == 'wallet_payment') {
+            $invoiceNumber = time().$order->id;
+        } elseif ($paymentType == 'wallet_payment') {
             $invoiceNumber = rand(10000, 99999);
             $amount = $paymentData['amount'];
             $lastName = $user->name;
-        }
-        elseif ($paymentType == 'customer_package_payment') {
+        } elseif ($paymentType == 'customer_package_payment') {
             $invoiceNumber = rand(10000, 99999);
             $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
             $amount = $customer_package->amount;
             $lastName = $user->name;
-        }
-        elseif ($paymentType == 'seller_package_payment') {
+        } elseif ($paymentType == 'seller_package_payment') {
             $invoiceNumber = rand(10000, 99999);
             $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
             $amount = $seller_package->amount;
@@ -86,32 +82,32 @@ class AuthorizenetController extends Controller
 
         /* Create a merchantAuthenticationType object with authentication details
           retrieved from the constants file */
-        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
+        $merchantAuthentication = new AnetAPI\MerchantAuthenticationType;
         $merchantAuthentication->setName(env('MERCHANT_LOGIN_ID'));
         $merchantAuthentication->setTransactionKey(env('MERCHANT_TRANSACTION_KEY'));
 
         // Set the transaction's refId
-        $refId = 'ref' . time();
+        $refId = 'ref'.time();
         $cardNumber = preg_replace('/\s+/', '', $input['cardNumber']);
 
         // Create the payment data for a credit card
-        $creditCard = new AnetAPI\CreditCardType();
+        $creditCard = new AnetAPI\CreditCardType;
         $creditCard->setCardNumber($cardNumber);
-        $creditCard->setExpirationDate($input['expiration-year'] . "-" . $input['expiration-month']);
+        $creditCard->setExpirationDate($input['expiration-year'].'-'.$input['expiration-month']);
         $creditCard->setCardCode($input['cvv']);
 
         // Add the payment data to a paymentType object
-        $paymentOne = new AnetAPI\PaymentType();
+        $paymentOne = new AnetAPI\PaymentType;
         $paymentOne->setCreditCard($creditCard);
 
         // Create order information
-        $order = new AnetAPI\OrderType();
+        $order = new AnetAPI\OrderType;
         $order->setInvoiceNumber($invoiceNumber);
         //        $order->setDescription("Golf Shirts");
 
         // Set the customer's Bill To address
-        $customerAddress = new AnetAPI\CustomerAddressType();
-        $customerAddress->setFirstName("");
+        $customerAddress = new AnetAPI\CustomerAddressType;
+        $customerAddress->setFirstName('');
         $customerAddress->setLastName($lastName);
         $customerAddress->setAddress($address);
         $customerAddress->setCity($city);
@@ -119,13 +115,13 @@ class AuthorizenetController extends Controller
         $customerAddress->setCountry($country);
 
         // Set the customer's identifying information
-        $customerData = new AnetAPI\CustomerDataType();
+        $customerData = new AnetAPI\CustomerDataType;
         $customerData->setId($user->id);
         $customerData->setEmail($user->email);
 
         // Create a TransactionRequestType object and add the previous objects to it
-        $transactionRequestType = new AnetAPI\TransactionRequestType();
-        $transactionRequestType->setTransactionType("authCaptureTransaction");
+        $transactionRequestType = new AnetAPI\TransactionRequestType;
+        $transactionRequestType->setTransactionType('authCaptureTransaction');
         $transactionRequestType->setAmount($amount);
         $transactionRequestType->setPayment($paymentOne);
         $transactionRequestType->setOrder($order);
@@ -134,7 +130,7 @@ class AuthorizenetController extends Controller
         $transactionRequestType->setCustomer($customerData);
 
         // Assemble the complete transaction request
-        $requests = new AnetAPI\CreateTransactionRequest();
+        $requests = new AnetAPI\CreateTransactionRequest;
         $requests->setMerchantAuthentication($merchantAuthentication);
         $requests->setRefId($refId);
         $requests->setTransactionRequest($transactionRequestType);
@@ -150,7 +146,7 @@ class AuthorizenetController extends Controller
         // dd($response);
         if ($response != null) {
             // Check to see if the API request was successfully received and acted upon
-            if ($response->getMessages()->getResultCode() == "Ok") {
+            if ($response->getMessages()->getResultCode() == 'Ok') {
                 // Since the API request was successful, look for a transaction response
                 // and parse it to display the results of authorizing the card
                 $tresponse = $response->getTransactionResponse();
@@ -162,16 +158,16 @@ class AuthorizenetController extends Controller
                     // echo " Auth Code: " . $tresponse->getAuthCode() . "\n";
                     // echo " Description: " . $tresponse->getMessages()[0]->getDescription() . "\n";
                     $payment_detalis = json_encode(
-                        array(
+                        [
                             'transId' => $tresponse->getTransId(),
                             'authCode' => $tresponse->getAuthCode(),
                             'accountType' => $tresponse->getAccountType(),
                             'accountNumber' => $tresponse->getAccountNumber(),
                             'refId' => $response->getRefId(),
-                        )
+                        ]
                     );
-                    $message_text = $tresponse->getMessages()[0]->getDescription() . ", Transaction ID: " . $tresponse->getTransId();
-                    $msg_type = "success_msg";
+                    $message_text = $tresponse->getMessages()[0]->getDescription().', Transaction ID: '.$tresponse->getTransId();
+                    $msg_type = 'success_msg';
 
                     if ($paymentType == 'cart_payment') {
                         return (new CheckoutController)->checkout_done(Session::get('combined_order_id'), $payment_detalis);
@@ -186,40 +182,41 @@ class AuthorizenetController extends Controller
                     }
                 } else {
                     $message_text = 'There were some issue with the payment. Please try again later.';
-                    $msg_type = "error_msg";
+                    $msg_type = 'error_msg';
 
                     if ($tresponse->getErrors() != null) {
                         $message_text = $tresponse->getErrors()[0]->getErrorText();
-                        $msg_type = "error_msg";
+                        $msg_type = 'error_msg';
                     }
                 }
                 // Or, print errors if the API request wasn't successful
             } else {
                 $message_text = 'There were some issue with the payment. Please try again later.';
-                $msg_type = "error_msg";
+                $msg_type = 'error_msg';
 
                 $tresponse = $response->getTransactionResponse();
 
                 if ($tresponse != null && $tresponse->getErrors() != null) {
                     $message_text = $tresponse->getErrors()[0]->getErrorText();
-                    $msg_type = "error_msg";
+                    $msg_type = 'error_msg';
                 } else {
                     $message_text = $response->getMessages()->getMessage()[0]->getText();
-                    $msg_type = "error_msg";
+                    $msg_type = 'error_msg';
                 }
             }
         } else {
-            $message_text = "No response returned";
-            $msg_type = "error_msg";
+            $message_text = 'No response returned';
+            $msg_type = 'error_msg';
         }
 
         Session::forget('combined_order_id');
         flash(translate($message_text))->success();
+
         return redirect()->route('home');
     }
 
     public function cardType()
     {
-        return (new AnetAPI\CreditCardType())->cardType();
+        return (new AnetAPI\CreditCardType)->cardType();
     }
 }

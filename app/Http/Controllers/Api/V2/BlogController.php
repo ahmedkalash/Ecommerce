@@ -13,21 +13,21 @@ class BlogController extends Controller
     public function blog_list(Request $request)
     {
 
-        $selected_categories = array();
+        $selected_categories = [];
         $search = null;
         $blogs = Blog::query();
 
         if ($request->has('search')) {
-            $search = $request->search;;
+            $search = $request->search;
             $blogs->where(function ($q) use ($search) {
                 foreach (explode(' ', trim($search)) as $word) {
-                    $q->where('title', 'like', '%' . $word . '%')
-                        ->orWhere('short_description', 'like', '%' . $word . '%');
+                    $q->where('title', 'like', '%'.$word.'%')
+                        ->orWhere('short_description', 'like', '%'.$word.'%');
                 }
             });
 
-            $case1 = $search . '%';
-            $case2 = '%' . $search . '%';
+            $case1 = $search.'%';
+            $case2 = '%'.$search.'%';
 
             $blogs->orderByRaw("CASE 
                 WHEN title LIKE '$case1' THEN 1 
@@ -46,12 +46,13 @@ class BlogController extends Controller
         $blogs = $blogs->where('status', 1)->orderBy('created_at', 'desc')->paginate(12);
 
         $recent_blogs = Blog::where('status', 1)->orderBy('created_at', 'desc')->limit(9)->get();
+
         return response()->json([
             'result' => true,
             'blogs' => new BlogCollection($blogs),
             'selected_categories' => $selected_categories,
             'search' => $search,
-            'recent_blogs' => $recent_blogs
+            'recent_blogs' => $recent_blogs,
         ]);
     }
 
@@ -59,6 +60,7 @@ class BlogController extends Controller
     {
         $blog = Blog::where('slug', $slug)->first();
         $recent_blogs = Blog::where('status', 1)->orderBy('created_at', 'desc')->limit(9)->get();
+
         return response()->json([
             'result' => true,
             'blog' => $blog,

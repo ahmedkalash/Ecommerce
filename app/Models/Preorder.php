@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 
 class Preorder extends Model
 {
@@ -17,12 +17,14 @@ class Preorder extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function preorder_product(){
-        return $this->belongsTo(PreorderProduct::class,'product_id');
+    public function preorder_product()
+    {
+        return $this->belongsTo(PreorderProduct::class, 'product_id');
     }
-    
-    public function address(){
-        return $this->belongsTo(Address::class)->with(['country','state','city']);
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class)->with(['country', 'state', 'city']);
     }
 
     public function shop()
@@ -35,4 +37,3 @@ class Preorder extends Model
         return $this->hasOne(PreorderCommissionHistory::class);
     }
 }
-

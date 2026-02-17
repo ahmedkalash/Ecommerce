@@ -26,14 +26,14 @@ class ZoneRequest extends FormRequest
         return [
             'name' => ['required'],
             'status' => ['required'],
-            'country_id' => ['required']
+            'country_id' => ['required'],
         ];
     }
 
     public function prepareForValidation()
     {
         $this->merge([
-            'status'    => 1
+            'status' => 1,
         ]);
     }
 }

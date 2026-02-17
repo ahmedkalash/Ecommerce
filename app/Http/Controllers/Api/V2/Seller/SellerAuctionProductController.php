@@ -10,10 +10,10 @@ use App\Http\Resources\V2\Seller\AuctionProductDetailsResource;
 use App\Http\Resources\V2\Seller\OrderCollection;
 use App\Models\AuctionProductBid;
 use App\Models\Order;
-use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Services\AuctionService;
 use Auth;
+use Illuminate\Http\Request;
 
 class SellerAuctionProductController extends Controller
 {
@@ -21,30 +21,32 @@ class SellerAuctionProductController extends Controller
     {
         $products = [];
         if (get_setting('seller_auction_product') == 0) {
-            $products =    [];
+            $products = [];
         } else {
 
             $products = Product::where('auction_product', 1)->where('user_id', Auth::user()->id)->orderBy('created_at', 'desc');
         }
+
         return new AuctionProductCollection($products->paginate(10));
     }
 
     public function store(ProductRequest $request)
     {
         if (addon_is_activated('seller_subscription')) {
-            if (!seller_package_validity_check(auth()->user()->id)) {
+            if (! seller_package_validity_check(auth()->user()->id)) {
                 return $this->failed(translate('Please upgrade your package.'));
             }
         }
 
         (new AuctionService)->store($request);
+
         return $this->success(translate('Auction Product has been inserted successfully'));
     }
 
     public function edit(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $product->lang =  $request->lang == null ? env("DEFAULT_LANGUAGE") : $request->lang;
+        $product->lang = $request->lang == null ? env('DEFAULT_LANGUAGE') : $request->lang;
 
         return new AuctionProductDetailsResource($product);
     }
@@ -52,12 +54,14 @@ class SellerAuctionProductController extends Controller
     public function update(ProductRequest $request, $id)
     {
         (new AuctionService)->update($request, $id);
+
         return $this->success(translate('Auction Product has been updated successfully'));
     }
 
     public function destroy($id)
     {
         (new AuctionService)->destroy($id);
+
         return $this->success(translate('Auction Product has been deleted successfully'));
     }
 
@@ -69,6 +73,7 @@ class SellerAuctionProductController extends Controller
     public function bidDestroy($id)
     {
         AuctionProductBid::destroy($id);
+
         return $this->success(translate('Bid deleted successfully'));
     }
 
@@ -78,7 +83,7 @@ class SellerAuctionProductController extends Controller
             ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
             ->where('orders.seller_id', auth()->user()->id)
             ->where('products.auction_product', '1')
-            ->select("orders.*")
+            ->select('orders.*')
             ->orderBy('code', 'desc');
 
         if ($request->payment_status != null) {
@@ -89,8 +94,9 @@ class SellerAuctionProductController extends Controller
         }
 
         if ($request->has('search')) {
-            $orders = $orders->where('code', 'like', '%' . $request->search . '%');
+            $orders = $orders->where('code', 'like', '%'.$request->search.'%');
         }
+
         return new OrderCollection($orders->paginate(15));
     }
 }

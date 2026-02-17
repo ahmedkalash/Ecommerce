@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use Illuminate\Http\Request;
-use App\Models\Language;
 use App\Http\Resources\V2\LanguageCollection;
-use Cache;
+use App\Models\Language;
+use Illuminate\Http\Request;
 
 class LanguageController extends Controller
 {

@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\RecaptchaAction;
 use App\Mail\ContactMailManager;
 use App\Models\Contact;
-use App\Models\User;
 use App\Rules\Recaptcha;
 use App\Services\RecaptchaService;
-use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Mail;
 
@@ -24,18 +22,21 @@ class ContactController extends Controller
     public function index()
     {
         $contacts = Contact::orderBy('id', 'desc')->paginate(20);
+
         return view('backend.support.contact.contacts', compact('contacts'));
     }
 
     public function query_modal(Request $request)
     {
         $contact = Contact::findOrFail($request->id);
+
         return view('backend.support.contact.query_modal', compact('contact'));
     }
 
     public function reply_modal(Request $request)
     {
         $contact = Contact::findOrFail($request->id);
+
         return view('backend.support.contact.reply_modal', compact('contact'));
     }
 
@@ -47,7 +48,7 @@ class ContactController extends Controller
         $array['name'] = $admin->name;
         $array['email'] = $admin->email;
         $array['phone'] = $admin->phone;
-        $array['content'] = str_replace("\n", "<br>", $request->reply);
+        $array['content'] = str_replace("\n", '<br>', $request->reply);
         $array['subject'] = translate('Query Contact Reply');
         $array['from'] = $admin->email;
 
@@ -58,9 +59,11 @@ class ContactController extends Controller
             ]);
         } catch (\Exception $e) {
             flash(translate('Something Went wrong'))->error();
+
             return back();
         }
         flash(translate('Reply has been sent successfully'))->success();
+
         return back();
     }
 
@@ -75,7 +78,7 @@ class ContactController extends Controller
         $array['name'] = $request->name;
         $array['email'] = $request->email;
         $array['phone'] = $request->phone;
-        $array['content'] = str_replace("\n", "<br>", $request->content);
+        $array['content'] = str_replace("\n", '<br>', $request->content);
         $array['subject'] = translate('Query Contact');
         $array['from'] = $request->email;
 
@@ -89,9 +92,11 @@ class ContactController extends Controller
             ]);
         } catch (\Exception $e) {
             flash(translate('Something Went wrong'))->error();
+
             return back();
         }
         flash(translate('Query has been sent successfully'))->success();
+
         return back();
     }
 }

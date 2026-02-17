@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class CustomAlertController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_custom_alerts'])->only('index');
         $this->middleware(['permission:add_custom_alerts'])->only('create');
@@ -25,11 +26,12 @@ class CustomAlertController extends Controller
     {
         $sort_search = null;
         $custom_alerts = CustomAlert::orderBy('id', 'asc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $custom_alerts = $custom_alerts->where('description', 'like', '%'.$sort_search.'%');
         }
         $custom_alerts = $custom_alerts->paginate(15);
+
         return view('backend.marketing.custom_alert.index', compact('custom_alerts', 'sort_search'));
     }
 
@@ -53,6 +55,7 @@ class CustomAlertController extends Controller
     {
         CustomAlert::create($request->except('_token'));
         flash(translate('Custom Alert has been inserted successfully'))->success();
+
         return redirect()->route('custom-alerts.index');
     }
 
@@ -87,8 +90,9 @@ class CustomAlertController extends Controller
      */
     public function update(CustomAlertRequest $request, CustomAlert $custom_alert)
     {
-        $custom_alert->update($request->except(['_token','_method']));
+        $custom_alert->update($request->except(['_token', '_method']));
         flash(translate('Custom Alert has been updated successfully'))->success();
+
         return redirect()->route('custom-alerts.index');
     }
 
@@ -102,26 +106,30 @@ class CustomAlertController extends Controller
     {
         if ($id == 1) {
             flash(translate('This Custom Alert cannot be deleted'))->error();
+
             return redirect()->route('custom-alerts.index');
         }
         CustomAlert::destroy($id);
         flash(translate('Custom Alert has been deleted successfully'))->success();
+
         return redirect()->route('custom-alerts.index');
     }
-    
+
     public function bulk_custom_alerts_delete(Request $request)
     {
         CustomAlert::whereIn('id', $request->id)->delete();
+
         return 1;
     }
-    
+
     public function update_status(Request $request)
     {
         $custom_alert = CustomAlert::findOrFail($request->id);
         $custom_alert->status = $request->status;
-        if($custom_alert->save()){
+        if ($custom_alert->save()) {
             return 1;
         }
+
         return 0;
     }
 }

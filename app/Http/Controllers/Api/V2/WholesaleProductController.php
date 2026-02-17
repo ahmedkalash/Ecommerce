@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\V2\WholesaleProductCollection;
 use App\Http\Resources\V2\Seller\WholesaleProductDetailsCollection;
-use Illuminate\Http\Request;
-use CoreComponentRepository;
+use App\Http\Resources\V2\WholesaleProductCollection;
 use App\Models\Product;
+use CoreComponentRepository;
+use Illuminate\Http\Request;
 
 class WholesaleProductController extends Controller
 {
@@ -22,14 +22,14 @@ class WholesaleProductController extends Controller
         }
 
         if ($request->type != null) {
-            $var = explode(",", $request->type);
+            $var = explode(',', $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
         }
         if ($request->search != null) {
             $products = $products
-                ->where('name', 'like', '%' . $request->search . '%');
+                ->where('name', 'like', '%'.$request->search.'%');
         }
 
         $products = $products->paginate(15);
@@ -39,9 +39,11 @@ class WholesaleProductController extends Controller
             'products' => new WholesaleProductCollection($products),
         ], 200);
     }
+
     public function wholesale_product_details(Request $request, $id)
     {
-        $product =  Product::find($id);
+        $product = Product::find($id);
+
         return new WholesaleProductDetailsCollection($product);
     }
 }

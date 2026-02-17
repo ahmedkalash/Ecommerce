@@ -4,24 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\Area;
 use App\Models\AreaTranslation;
-use Illuminate\Http\Request;
 use App\Models\City;
-use App\Models\CityTranslation;
 use App\Models\Country;
 use App\Models\State;
+use Illuminate\Http\Request;
 
 class AreaController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
-        $this->middleware(['permission:manage_shipping_cities'])->only('index','create','destroy');
+        $this->middleware(['permission:manage_shipping_cities'])->only('index', 'create', 'destroy');
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-   public function index(Request $request)
+    public function index(Request $request)
     {
         $sort_area = $request->sort_area;
         $sort_city = $request->sort_city;
@@ -30,7 +31,7 @@ class AreaController extends Controller
 
         $area_queries = Area::whereHas('city', function ($q) {
             $q->where('status', 1);
-             });
+        });
 
         if ($sort_country) {
             $area_queries->whereHas('city.country', function ($q) use ($sort_country) {
@@ -43,7 +44,6 @@ class AreaController extends Controller
                 $q->where('state_id', $sort_state);
             });
         }
-        
 
         if ($sort_city) {
             $area_queries->where('city_id', $sort_city);
@@ -54,7 +54,7 @@ class AreaController extends Controller
         }
 
         $areas = $area_queries->orderBy('created_at', 'desc')->paginate(15);
-        $cities = $sort_state? City::where('state_id', $sort_state)->get(): collect();
+        $cities = $sort_state ? City::where('state_id', $sort_state)->get() : collect();
         $states = State::where('status', 1)
             ->whereHas('cities', function ($query) {
                 $query->where('status', 1);
@@ -65,25 +65,22 @@ class AreaController extends Controller
                 $query->where('status', 1);
             })
             ->get();
+
         return view('backend.setup_configurations.areas.index', compact(
             'areas', 'cities', 'states', 'countries', 'sort_city', 'sort_state', 'sort_area', 'sort_country'
         ));
     }
-
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -109,16 +106,16 @@ class AreaController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $lang  = $request->lang;
-        $area  = Area::findOrFail($id);
+        $lang = $request->lang;
+        $area = Area::findOrFail($id);
         $states = State::where('status', 1)->whereHas('cities', function ($query) {
-                $query->where('status', 1);
-            })->get();
+            $query->where('status', 1);
+        })->get();
         $countries = Country::where('status', 1)->whereHas('cities', function ($query) {
-                $query->where('status', 1);
-            })->get();
+            $query->where('status', 1);
+        })->get();
 
-        if(get_setting('has_state') == 1) {
+        if (get_setting('has_state') == 1) {
             $cities = City::where('state_id', $area->city->state_id ?? null)
                 ->where('status', 1)
                 ->get();
@@ -131,19 +128,16 @@ class AreaController extends Controller
         return view('backend.setup_configurations.areas.edit', compact('area', 'lang', 'states', 'cities', 'countries'));
     }
 
-
-
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-       $area = Area::findOrFail($id);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
+        $area = Area::findOrFail($id);
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $area->name = $request->name;
         }
 
@@ -157,6 +151,7 @@ class AreaController extends Controller
         $area_translation->save();
 
         flash(translate('Area has been updated successfully'))->success();
+
         return back();
     }
 
@@ -173,10 +168,12 @@ class AreaController extends Controller
         Area::destroy($id);
 
         flash(translate('Area has been deleted successfully'))->success();
+
         return redirect()->route('areas.index');
     }
 
-    public function updateStatus(Request $request){
+    public function updateStatus(Request $request)
+    {
         $area = Area::findOrFail($request->id);
         $area->status = $request->status;
         $area->save();

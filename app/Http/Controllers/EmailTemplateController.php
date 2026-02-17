@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class EmailTemplateController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:manage_email_templates'])->only('index', 'edit', 'update');
     }
@@ -26,16 +27,17 @@ class EmailTemplateController extends Controller
 
         // If email templated for addons, check addons are insatalled and activated.
         $emailTemplates->where(function ($query) use ($addons) {
-                $query->whereAddon(null)
-                    ->orWhere(function ($query) use ($addons) {
-                        $query->whereIn('addon', $addons);
-                    });
+            $query->whereAddon(null)
+                ->orWhere(function ($query) use ($addons) {
+                    $query->whereIn('addon', $addons);
+                });
         });
 
-        if ($email_template_sort_search != null){
-            $notificationTypes = $emailTemplates->where('email_type', 'like', '%' . $email_template_sort_search . '%');
+        if ($email_template_sort_search != null) {
+            $notificationTypes = $emailTemplates->where('email_type', 'like', '%'.$email_template_sort_search.'%');
         }
         $emailTemplates = $emailTemplates->paginate(10);
+
         return view('backend.setup_configurations.email_templates.index', compact('emailTemplates', 'email_template_sort_search', 'emailReceiver'));
     }
 
@@ -52,7 +54,6 @@ class EmailTemplateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -79,14 +80,14 @@ class EmailTemplateController extends Controller
      */
     public function edit($id)
     {
-        $emailTemplate  = EmailTemplate::findOrFail($id);
+        $emailTemplate = EmailTemplate::findOrFail($id);
+
         return view('backend.setup_configurations.email_templates.edit', compact('emailTemplate'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -98,13 +99,16 @@ class EmailTemplateController extends Controller
         $emailTemplate->save();
 
         flash(translate('Email Template has been updated successfully'))->success();
+
         return back();
     }
 
-    public function updateStatus(Request $request) {
+    public function updateStatus(Request $request)
+    {
         $emailTemplate = EmailTemplate::findOrFail($request->id);
         $emailTemplate->status = $request->status;
         $emailTemplate->save();
+
         return 1;
     }
 

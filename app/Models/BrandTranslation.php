@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class BrandTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-  protected $fillable = ['name', 'lang', 'brand_id'];
+    protected $fillable = ['name', 'lang', 'brand_id'];
 
-  public function brand(){
-    return $this->belongsTo(Brand::class);
-  }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 }

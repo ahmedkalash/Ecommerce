@@ -11,8 +11,8 @@ use Illuminate\Http\Request;
 
 class NotificationTypeController extends Controller
 {
-
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_notification_types'])->only('index');
         $this->middleware(['permission:edit_notification_types'])->only('edit');
@@ -27,10 +27,11 @@ class NotificationTypeController extends Controller
     public function index(Request $request)
     {
         // Notification Types
-        $addons = Addon::where('activated', 1)->where('unique_identifier','!=', 'preorder')->pluck('unique_identifier')->toArray();
-        
+        $addons = Addon::where('activated', 1)->where('unique_identifier', '!=',
+            'preorder')->pluck('unique_identifier')->toArray();
+
         $notification_type_sort_search = (isset($request->notification_type_sort_search) && $request->notification_type_sort_search) ? $request->notification_type_sort_search : null;
-        $notificationUserType = $request->notification_user_type == null ? 'customer' :  $request->notification_user_type;
+        $notificationUserType = $request->notification_user_type == null ? 'customer' : $request->notification_user_type;
 
         $notificationTypes = NotificationType::where('user_type', $notificationUserType);
 
@@ -42,13 +43,14 @@ class NotificationTypeController extends Controller
                 });
         });
 
-        if ($notification_type_sort_search != null){
-            $notificationTypes = $notificationTypes->where('name', 'like', '%' . $notification_type_sort_search . '%')
+        if ($notification_type_sort_search != null) {
+            $notificationTypes = $notificationTypes->where('name', 'like', '%'.$notification_type_sort_search.'%')
                 ->orWhereHas('notificationTypeTranslations', function ($q) use ($notification_type_sort_search) {
-                    $q->where('name', 'like', '%' . $notification_type_sort_search . '%');
+                    $q->where('name', 'like', '%'.$notification_type_sort_search.'%');
                 });
         }
         $notificationTypes = $notificationTypes->orderByRaw("FIELD(type , 'custom') ASC")->paginate(10);
+
         return view('backend.notification.notification_types.index', compact('notificationTypes', 'notification_type_sort_search', 'notificationUserType'));
 
     }
@@ -60,7 +62,7 @@ class NotificationTypeController extends Controller
      */
     public function create()
     {
-        // 
+        //
     }
 
     /**
@@ -71,13 +73,14 @@ class NotificationTypeController extends Controller
      */
     public function store(NotificationTypeRequest $request)
     {
-        $notificationType = new NotificationType();
+        $notificationType = new NotificationType;
         $notificationType->type = 'custom';
         $notificationType->name = $request->name;
         $notificationType->image = $request->image;
-        $notificationType->default_text = str_replace( array( '\'', '"', ',', ';','{', '}','\r', '\n' ), '', $request->default_text);
+        $notificationType->default_text = str_replace(['\'', '"', ',', ';', '{', '}', '\r', '\n'], '',
+            $request->default_text);
 
-        if($notificationType->save()){
+        if ($notificationType->save()) {
 
             $notificationTypeTranslation = NotificationTypeTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'notification_type_id' => $notificationType->id]);
             $notificationTypeTranslation->name = $request->name;
@@ -85,9 +88,11 @@ class NotificationTypeController extends Controller
             $notificationTypeTranslation->save();
 
             flash(translate('New Notification Type has been added successfully'))->success();
+
             return back();
         }
         flash(translate('Something went wrong!'))->error();
+
         return back();
     }
 
@@ -110,9 +115,10 @@ class NotificationTypeController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $lang   = $request->lang;
-        $notificationType  = NotificationType::findOrFail($id);
-        return view('backend.notification.notification_types.edit', compact('notificationType','lang'));
+        $lang = $request->lang;
+        $notificationType = NotificationType::findOrFail($id);
+
+        return view('backend.notification.notification_types.edit', compact('notificationType', 'lang'));
     }
 
     /**
@@ -126,8 +132,8 @@ class NotificationTypeController extends Controller
     {
         $notificationType = NotificationType::findOrFail($id);
         $notificationType->image = $request->image;
-        $default_text = str_replace( array( '\'', '"', ',', ';','{', '}','\r', '\n' ), '', $request->default_text);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
+        $default_text = str_replace(['\'', '"', ',', ';', '{', '}', '\r', '\n'], '', $request->default_text);
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $notificationType->name = $request->name;
             $notificationType->default_text = $default_text;
         }
@@ -139,6 +145,7 @@ class NotificationTypeController extends Controller
         $notificationTypeTranslation->save();
 
         flash(translate('Notification Type has been updated successfully'))->success();
+
         return back();
     }
 
@@ -152,36 +159,42 @@ class NotificationTypeController extends Controller
     {
         $notificationType = NotificationType::findOrFail($id);
         $notificationType->notificationTypeTranslations()->delete();
-        DB::table('notifications')->where('notification_type_id',$notificationType->id)->delete();
+        DB::table('notifications')->where('notification_type_id', $notificationType->id)->delete();
 
         if (NotificationType::destroy($id)) {
             flash(translate('Notification Type has been deleted successfully'))->success();
         } else {
             flash(translate('Something went wrong'))->error();
         }
+
         return back();
     }
 
-    public function updateStatus(Request $request) {
+    public function updateStatus(Request $request)
+    {
         $notificationType = NotificationType::findOrFail($request->id);
         $notificationType->status = $request->status;
         $notificationType->save();
+
         return 1;
     }
 
-    public function bulkDelete(Request $request){
-        if($request->notification_type_ids != null){
-            foreach($request->notification_type_ids as $notification_type_id){
+    public function bulkDelete(Request $request)
+    {
+        if ($request->notification_type_ids != null) {
+            foreach ($request->notification_type_ids as $notification_type_id) {
                 $notificationType = NotificationType::findOrFail($notification_type_id);
                 $notificationType->notificationTypeTranslations()->delete();
                 $notificationType->delete();
-                DB::table('notifications')->where('notification_type_id',$notificationType->id)->delete();
+                DB::table('notifications')->where('notification_type_id', $notificationType->id)->delete();
             }
         }
+
         return 1;
     }
 
-    public function getDefaulText(Request $request){
-        return NotificationType::where('id',$request->id)->first()->getTranslation('default_text');
+    public function getDefaulText(Request $request)
+    {
+        return NotificationType::where('id', $request->id)->first()->getTranslation('default_text');
     }
 }

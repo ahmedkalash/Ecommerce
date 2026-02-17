@@ -9,16 +9,16 @@ class CurrencyCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
                     'name' => $data->name,
                     'code' => $data->code,
                     'symbol' => $data->symbol,
-                    'exchange_rate' => (double) $data->exchange_rate,
-                    'is_default' => get_setting('system_default_currency')==$data->id?true:false
+                    'exchange_rate' => (float) $data->exchange_rate,
+                    'is_default' => get_setting('system_default_currency') == $data->id ? true : false,
                 ];
-            })
+            }),
         ];
     }
 
@@ -26,7 +26,7 @@ class CurrencyCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Country;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 
 class CountryController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:shipping_country_setting'])->only('index');
     }
@@ -22,7 +22,7 @@ class CountryController extends Controller
     {
         $sort_country = $request->sort_country;
         $country_queries = Country::query();
-        if($request->sort_country) {
+        if ($request->sort_country) {
             $country_queries->where('name', 'like', "%$sort_country%");
         }
         $countries = $country_queries->orderBy('status', 'desc')->paginate(15);
@@ -43,7 +43,6 @@ class CountryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -76,7 +75,6 @@ class CountryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -96,13 +94,14 @@ class CountryController extends Controller
         //
     }
 
-    public function updateStatus(Request $request){
+    public function updateStatus(Request $request)
+    {
         $country = Country::findOrFail($request->id);
         $country->status = $request->status;
-        if($country->save()){
+        if ($country->save()) {
             if ($request->status == 0) {
-                if (get_setting('has_state') == 1){
-                   $states = $country->states;
+                if (get_setting('has_state') == 1) {
+                    $states = $country->states;
                     foreach ($states as $state) {
                         $state->status = 0;
                         $state->save();
@@ -115,21 +114,22 @@ class CountryController extends Controller
                             }
                         }
                     }
-                }else{
+                } else {
                     foreach ($country->cities as $city) {
-                            $city->status = 0;
-                            $city->save();
-                            foreach ($city->areas as $area) {
-                                $area->status = 0;
-                                $area->save();
-                            }
+                        $city->status = 0;
+                        $city->save();
+                        foreach ($city->areas as $area) {
+                            $area->status = 0;
+                            $area->save();
                         }
+                    }
                 }
-                
+
             }
 
             return 1;
         }
+
         return 0;
     }
 }

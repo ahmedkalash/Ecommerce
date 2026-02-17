@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
         // Define the gate for accessing the admin panel
         // This centralizes the logic used in IsAdmin middleware
         Gate::define('access-admin-panel', function ($user) {
-            return in_array($user->user_type, ['admin', 'staff']) && !$user->banned;
+            return in_array($user->user_type, ['admin', 'staff']) && ! $user->banned;
         });
     }
 }

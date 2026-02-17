@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
 use App\Models\Wishlist;
+use Auth;
+use Illuminate\Http\Request;
 
 class WishlistController extends Controller
 {
@@ -16,6 +16,7 @@ class WishlistController extends Controller
     public function index()
     {
         $wishlists = get_wishlists()->paginate(15);
+
         return view('frontend.user.view_wishlist', compact('wishlists'));
     }
 
@@ -32,36 +33,36 @@ class WishlistController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             $wishlist = Wishlist::where('user_id', Auth::user()->id)->where('product_id', $request->id)->first();
-            if($wishlist == null){
+            if ($wishlist == null) {
                 $wishlist = new Wishlist;
                 $wishlist->user_id = Auth::user()->id;
                 $wishlist->product_id = $request->id;
                 $wishlist->save();
             }
-            if(get_setting('header_element') ==5){
+            if (get_setting('header_element') == 5) {
                 return view('frontend.partials.wishlistText');
-            }else{
+            } else {
                 return view('frontend.partials.wishlist');
             }
         }
+
         return 0;
     }
 
     public function remove(Request $request)
     {
         $wishlist = Wishlist::findOrFail($request->id);
-        if($wishlist!=null){
-            if(Wishlist::destroy($request->id)){
-                if(get_setting('header_element') ==5){
+        if ($wishlist != null) {
+            if (Wishlist::destroy($request->id)) {
+                if (get_setting('header_element') == 5) {
                     return view('frontend.partials.wishlistText');
-                }else{
+                } else {
                     return view('frontend.partials.wishlist');
                 }
             }
@@ -93,7 +94,6 @@ class WishlistController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

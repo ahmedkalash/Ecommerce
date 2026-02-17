@@ -25,9 +25,11 @@ class AttributeValueRequest extends FormRequest
     public function rules()
     {
         return [
-            'attribute_id'  => 'required',
-            'value'         => ['required', 'max:255', Rule::unique('attribute_values')->ignore($this->attribute_value)],
-            'color_code'    => ['required_if:type,color','max:255', Rule::unique('attribute_values')->ignore($this->attribute_value)],
+            'attribute_id' => 'required',
+            'value' => ['required', 'max:255', Rule::unique('attribute_values')->ignore($this->attribute_value)],
+            'color_code' => [
+                'required_if:type,color', 'max:255', Rule::unique('attribute_values')->ignore($this->attribute_value),
+            ],
         ];
     }
 
@@ -39,10 +41,10 @@ class AttributeValueRequest extends FormRequest
     public function messages()
     {
         return [
-            'attribute_id.required'             => translate('Attribute is required'),
-            'value.required'                    => translate('Attribute value is required'),
-            'value.max'                         => translate('Max 255 characters for attribute value'),
-            'color_code.required_if:type'       => translate('Color code is required'),
+            'attribute_id.required' => translate('Attribute is required'),
+            'value.required' => translate('Attribute value is required'),
+            'value.max' => translate('Max 255 characters for attribute value'),
+            'color_code.required_if:type' => translate('Color code is required'),
         ];
     }
 }

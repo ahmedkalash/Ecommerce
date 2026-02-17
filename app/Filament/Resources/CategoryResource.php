@@ -166,7 +166,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->description(fn(Category $record): string => $record->slug ?? ''),
+                    ->description(fn (Category $record): string => $record->slug ?? ''),
                 Tables\Columns\TextColumn::make('parentCategory.name')
                     ->label('Parent')
                     ->sortable()
@@ -207,12 +207,13 @@ class CategoryResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    ->using(fn(Category $record) => app(\App\Services\CategoryService::class)->delete($record)),
+                    ->using(fn (Category $record) => app(\App\Services\CategoryService::class)->delete($record)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->action(fn(\Illuminate\Support\Collection $records) => app(\App\Services\CategoryService::class)->bulkDelete($records)),
+                        ->action(fn (\Illuminate\Support\Collection $records
+                        ) => app(\App\Services\CategoryService::class)->bulkDelete($records)),
                 ]),
             ])
             ->defaultSort('name', 'asc');

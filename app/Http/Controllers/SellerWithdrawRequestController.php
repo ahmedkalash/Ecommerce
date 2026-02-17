@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\SellerWithdrawRequest;
 use App\Models\User;
 use Auth;
+use Illuminate\Http\Request;
 
 class SellerWithdrawRequestController extends Controller
 {
@@ -14,15 +14,16 @@ class SellerWithdrawRequestController extends Controller
         // Staff Permission Check
         $this->middleware(['permission:view_seller_payout_requests'])->only('index');
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-
     public function index()
     {
         $seller_withdraw_requests = SellerWithdrawRequest::latest()->paginate(15);
+
         return view('backend.sellers.seller_withdraw_requests.index', compact('seller_withdraw_requests'));
     }
 
@@ -39,7 +40,6 @@ class SellerWithdrawRequestController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -52,9 +52,11 @@ class SellerWithdrawRequestController extends Controller
         $seller_withdraw_request->viewed = '0';
         if ($seller_withdraw_request->save()) {
             flash(translate('Request has been sent successfully'))->success();
+
             return redirect()->route('withdraw_requests.index');
         } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -84,7 +86,6 @@ class SellerWithdrawRequestController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -108,6 +109,7 @@ class SellerWithdrawRequestController extends Controller
     {
         $user = User::findOrFail($request->id);
         $seller_withdraw_request = SellerWithdrawRequest::where('id', $request->seller_withdraw_request_id)->first();
+
         return view('backend.sellers.seller_withdraw_requests.payment_modal', compact('user', 'seller_withdraw_request'));
     }
 

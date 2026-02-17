@@ -8,7 +8,8 @@ class NotificationTypeTranslation extends Model
 {
     protected $fillable = ['notification_type_id', 'name', 'default_text', 'lang'];
 
-    public function notificationType(){
+    public function notificationType()
+    {
         return $this->belongsTo(NotificationType::class);
     }
 }

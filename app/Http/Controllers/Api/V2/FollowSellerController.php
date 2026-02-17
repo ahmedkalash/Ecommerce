@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\FollowSellerResource;
 use App\Models\FollowSeller;
-use Illuminate\Http\Request;
 
 class FollowSellerController extends Controller
 {
@@ -37,9 +36,10 @@ class FollowSellerController extends Controller
             if ($followed_seller == null) {
                 FollowSeller::insert([
                     'user_id' => auth()->user()->id,
-                    'shop_id' => $shop_id
+                    'shop_id' => $shop_id,
                 ]);
             }
+
             return $this->success(translate('Seller follow is successfull'));
         }
 
@@ -62,7 +62,7 @@ class FollowSellerController extends Controller
         if ($followed_seller != null) {
             return $this->success(translate('This seller is followed'));
         }
+
         return $this->failed(translate('This seller is unfollowed'));
     }
-    
 }

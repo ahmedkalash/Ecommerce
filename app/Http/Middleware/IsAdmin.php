@@ -19,7 +19,7 @@ class IsAdmin
         // Strictly use admin guard only
         $user = Auth::guard('admin')->user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('admin.login');
         }
 
@@ -35,7 +35,7 @@ class IsAdmin
         //    - Session tampering/hijacking attacks
         //
         // This is defense-in-depth: Global scope protects query layer, this protects request layer.
-        if (!in_array($user->user_type, ['admin', 'staff'])) {
+        if (! in_array($user->user_type, ['admin', 'staff'])) {
             abort(403, 'Unauthorized action.');
         }
 

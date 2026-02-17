@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class SellerWithdrawRequest extends Model
 {
@@ -13,6 +13,7 @@ class SellerWithdrawRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function shop()
     {
         return $this->belongsTo(Shop::class);

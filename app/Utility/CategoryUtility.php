@@ -6,11 +6,11 @@ use App\Models\Category;
 
 class CategoryUtility
 {
-    /*when with trashed is true id will get even the deleted items*/
+    /* when with trashed is true id will get even the deleted items */
     public static function get_immediate_children($id, $with_trashed = false, $as_array = false)
     {
         $children = $with_trashed ? Category::where('parent_id', $id)->orderBy('name', 'asc')->get() : Category::where('parent_id', $id)->orderBy('name', 'asc')->get();
-        $children = $as_array && !is_null($children) ? $children->toArray() : $children;
+        $children = $as_array && ! is_null($children) ? $children->toArray() : $children;
 
         return $children;
     }
@@ -20,7 +20,7 @@ class CategoryUtility
 
         $children = CategoryUtility::get_immediate_children($id, $with_trashed, true);
 
-        return !empty($children) ? array_column($children, 'id') : array();
+        return ! empty($children) ? array_column($children, 'id') : [];
     }
 
     public static function get_immediate_children_count($id, $with_trashed = false)
@@ -28,12 +28,12 @@ class CategoryUtility
         return $with_trashed ? Category::where('parent_id', $id)->count() : Category::where('parent_id', $id)->count();
     }
 
-    /*when with trashed is true id will get even the deleted items*/
-    public static function flat_children($id, $with_trashed = false, $container = array())
+    /* when with trashed is true id will get even the deleted items */
+    public static function flat_children($id, $with_trashed = false, $container = [])
     {
         $children = CategoryUtility::get_immediate_children($id, $with_trashed, true);
 
-        if (!empty($children)) {
+        if (! empty($children)) {
             foreach ($children as $child) {
 
                 $container[] = $child;
@@ -44,12 +44,12 @@ class CategoryUtility
         return $container;
     }
 
-    /*when with trashed is true id will get even the deleted items*/
+    /* when with trashed is true id will get even the deleted items */
     public static function children_ids($id, $with_trashed = false)
     {
         $children = CategoryUtility::flat_children($id, $with_trashed = false);
 
-        return !empty($children) ? array_column($children, 'id') : array();
+        return ! empty($children) ? array_column($children, 'id') : [];
     }
 
     public static function category_tree_ids($category, $category_ids)
@@ -61,6 +61,7 @@ class CategoryUtility
                 $category_ids = static::category_tree_ids($category, $category_ids);
             }
         }
+
         return $category_ids;
     }
 
@@ -83,31 +84,22 @@ class CategoryUtility
     /**
      * @deprecated Level logic removed
      */
-    public static function move_level_up($id)
-    {
-        return;
-    }
+    public static function move_level_up($id) {}
 
     /**
      * @deprecated Level logic removed
      */
-    public static function move_level_down($id)
-    {
-        return;
-    }
+    public static function move_level_down($id) {}
 
     /**
      * @deprecated Level logic removed
      */
-    public static function update_child_level($id)
-    {
-        return;
-    }
+    public static function update_child_level($id) {}
 
     public static function delete_category($id)
     {
         $category = Category::where('id', $id)->first();
-        if (!is_null($category)) {
+        if (! is_null($category)) {
             CategoryUtility::move_children_to_parent($category->id);
             $category->delete();
         }

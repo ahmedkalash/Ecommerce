@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class Tax extends Model
 {
     use PreventDemoModeChanges;
 
-    public function product_taxes() {
+    public function product_taxes()
+    {
         return $this->hasMany(ProductTax::class);
     }
 }

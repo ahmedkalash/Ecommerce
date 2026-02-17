@@ -15,9 +15,9 @@ class ColorCollection extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'                =>(int) $this->id,
-            'name'              =>$this->name,
-            'code'              => $this->code
+            'id' => (int) $this->id,
+            'name' => $this->name,
+            'code' => $this->code,
         ];
     }
 }

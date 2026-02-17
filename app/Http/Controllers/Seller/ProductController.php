@@ -60,7 +60,7 @@ class ProductController extends Controller
         $products = Product::where('user_id', Auth::user()->id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->search;
-            $products = $products->where('name', 'like', '%' . $search . '%');
+            $products = $products->where('name', 'like', '%'.$search.'%');
         }
         $products = $products->paginate(10);
 
@@ -262,7 +262,7 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 $data = [];
                 foreach ($request[$name] as $key => $item) {
                     array_push($data, $item);
@@ -295,7 +295,7 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 $data = [];
                 foreach ($request[$name] as $key => $item) {
                     array_push($data, $item);
@@ -316,7 +316,7 @@ class ProductController extends Controller
         $html = '';
 
         foreach ($all_attribute_values as $row) {
-            $html .= '<option value="' . $row->value . '">' . $row->value . '</option>';
+            $html .= '<option value="'.$row->value.'">'.$row->value.'</option>';
         }
 
         echo json_encode($html);
@@ -433,7 +433,7 @@ class ProductController extends Controller
             ->orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
 

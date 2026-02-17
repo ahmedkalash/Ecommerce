@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class CityTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-  protected $fillable = ['name', 'lang', 'city_id'];
+    protected $fillable = ['name', 'lang', 'city_id'];
 
-  public function city(){
-    return $this->belongsTo(City::class);
-  }
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
 }

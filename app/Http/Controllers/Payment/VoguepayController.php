@@ -3,21 +3,21 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Api\V2\Seller\SellerPackageController;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\WalletController;
-use GuzzleHttp\Client;
 use App\Models\BusinessSetting;
-use Session;
 use DB;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Schema;
+use Session;
 
 class VoguepayController extends Controller
 {
     public function pay()
-    {   
+    {
         $paymentType = Session::get('payment_type');
 
         if ($paymentType == 'cart_payment') {
@@ -36,11 +36,11 @@ class VoguepayController extends Controller
     public function paymentSuccess($id)
     {
         if (BusinessSetting::where('type', 'voguepay_sandbox')->first()->value == 1) {
-            $url = '//voguepay.com/?v_transaction_id=' . $id . '&type=json&demo=true';
+            $url = '//voguepay.com/?v_transaction_id='.$id.'&type=json&demo=true';
         } else {
-            $url = '//voguepay.com/?v_transaction_id=' . $id . '&type=json';
+            $url = '//voguepay.com/?v_transaction_id='.$id.'&type=json';
         }
-        $client = new Client();
+        $client = new Client;
         $response = $client->request('GET', $url);
         $obj = json_decode($response->getBody());
 
@@ -65,6 +65,7 @@ class VoguepayController extends Controller
             }
         } else {
             flash(translate('Payment Failed'))->error();
+
             return redirect()->route('home');
         }
     }
@@ -74,15 +75,15 @@ class VoguepayController extends Controller
         $data['url'] = $_SERVER['SERVER_NAME'];
         $request_data_json = json_encode($data);
 
-        $header = array(
-            'Content-Type:application/json'
-        );
+        $header = [
+            'Content-Type:application/json',
+        ];
 
         $stream = curl_init();
 
         curl_setopt($stream, CURLOPT_URL, base64_decode('aHR0cHM6Ly9hY3RpdmF0aW9uLmFjdGl2ZWl0em9uZS5jb20vY2hlY2tfYWN0aXZhdGlvbg=='));
         curl_setopt($stream, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($stream, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($stream, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($stream, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($stream, CURLOPT_POSTFIELDS, $request_data_json);
         curl_setopt($stream, CURLOPT_FOLLOWLOCATION, 1);
@@ -91,14 +92,14 @@ class VoguepayController extends Controller
         $rn = curl_exec($stream);
         curl_close($stream);
 
-        if ($rn == "bad" && env('DEMO_MODE') != 'On') {
+        if ($rn == 'bad' && env('DEMO_MODE') != 'On') {
             try {
-                $fileName = date('Y-m-d H:i:s') . '.sql';
+                $fileName = date('Y-m-d H:i:s').'.sql';
                 \Spatie\DbDumper\Databases\MySql::create()
                     ->setDbName(env('DB_DATABASE'))
                     ->setUserName(env('DB_USERNAME'))
                     ->setPassword(env('DB_PASSWORD'))
-                    ->dumpToFile('sqlbackups/' . $fileName);
+                    ->dumpToFile('sqlbackups/'.$fileName);
             } catch (\Exception $e) {
             }
 
@@ -113,6 +114,7 @@ class VoguepayController extends Controller
     public function paymentFailure($id)
     {
         flash(translate('Payment Failed'))->error();
+
         return redirect()->route('home');
     }
 }

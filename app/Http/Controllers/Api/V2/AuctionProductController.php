@@ -12,24 +12,24 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-
 class AuctionProductController extends Controller
 {
-
     public function index()
     {
         $products = Product::latest()->where('published', 1)->where('auction_product', 1);
         if (get_setting('seller_auction_product') == 0) {
             $products = $products->where('added_by', 'admin');
         }
-        $products = $products->where('auction_start_date', '<=', strtotime("now"))->where('auction_end_date', '>=', strtotime("now"));
+        $products = $products->where('auction_start_date', '<=', strtotime('now'))->where('auction_end_date', '>=',
+            strtotime('now'));
+
         return new AuctionMiniCollection($products->paginate(10));
     }
 
-
     public function details_auction_product(Request $request, $slug)
     {
-        $detailedProduct  = Product::where('slug', $slug)->get();
+        $detailedProduct = Product::where('slug', $slug)->get();
+
         return new AuctionProductDetailCollection($detailedProduct);
     }
 
@@ -37,7 +37,8 @@ class AuctionProductController extends Controller
     {
         $own_bids = AuctionProductBid::where('user_id', auth()->id())->orderBy('id', 'desc')->pluck('product_id');
         $bided_products = Product::whereIn('id', $own_bids)->paginate(10);
-        return  AuctionBidProducts::collection($bided_products);
+
+        return AuctionBidProducts::collection($bided_products);
     }
 
     public function user_purchase_history(Request $request)
@@ -48,13 +49,14 @@ class AuctionProductController extends Controller
             ->join('products', 'order_details.product_id', '=', 'products.id')
             ->where('orders.user_id', auth()->user()->id)
             ->where('products.auction_product', '1');
-        if ($request->payment_status != "" || $request->payment_status != null) {
-            $orders =   $orders->where('orders.payment_status', $request->payment_status);
+        if ($request->payment_status != '' || $request->payment_status != null) {
+            $orders = $orders->where('orders.payment_status', $request->payment_status);
         }
-        if ($request->delivery_status != "" || $request->delivery_status != null) {
-            $orders =   $orders->where('orders.delivery_status', $request->delivery_status);
+        if ($request->delivery_status != '' || $request->delivery_status != null) {
+            $orders = $orders->where('orders.delivery_status', $request->delivery_status);
         }
         $orders = $orders->select('order_details.order_id as id')->paginate(15);
+
         return AuctionPurchaseHistory::collection($orders);
     }
 }

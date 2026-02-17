@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Payment;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
@@ -19,7 +19,8 @@ use Session;
 
 class TapController extends Controller
 {
-    public function pay(){
+    public function pay()
+    {
 
         $amount = 0;
         $currency_code = Session::has('currency_code') ? Session::get('currency_code') : Currency::findOrFail(get_setting('system_default_currency'))->code;
@@ -43,13 +44,13 @@ class TapController extends Controller
             }
         }
 
-        $requestbody = array(
+        $requestbody = [
             'amount' => $amount,
             'currency' => $currency_code,
             'threeDSecure' => true,
-            "save_card" => false,
-            "customer_initiated" => true,
-            'description' => str_replace("_", " ", $paymentType),
+            'save_card' => false,
+            'customer_initiated' => true,
+            'description' => str_replace('_', ' ', $paymentType),
             'customer' => [
                 'first_name' => Auth::user()->name,
                 'email' => Auth::user()->email != null ? Auth::user()->email : 'test@test.com',
@@ -58,30 +59,30 @@ class TapController extends Controller
             //     'id' => env('TAP_MERCHANT_ID')
             // ],
             'source' => [
-                'id' => 'src_all'
+                'id' => 'src_all',
             ],
             'post' => [
-                'url' => null
+                'url' => null,
             ],
             'redirect' => [
-                'url' => route('tap.callback')
-            ]
-        );
+                'url' => route('tap.callback'),
+            ],
+        ];
 
         $requestbodyJson = json_encode($requestbody);
 
-        $header = array(
-            "Authorization: Bearer ".env('TAP_SECRET_KEY'),
-            "accept: application/json",
-            "content-type: application/json"
-        );
+        $header = [
+            'Authorization: Bearer '.env('TAP_SECRET_KEY'),
+            'accept: application/json',
+            'content-type: application/json',
+        ];
 
-        $url = curl_init("https://api.tap.company/v2/charges/");
+        $url = curl_init('https://api.tap.company/v2/charges/');
         curl_setopt($url, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($url, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($url, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($url, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($url, CURLOPT_POSTFIELDS, $requestbodyJson);
-        curl_setopt($url, CURLOPT_ENCODING, "");
+        curl_setopt($url, CURLOPT_ENCODING, '');
         curl_setopt($url, CURLOPT_MAXREDIRS, 10);
         curl_setopt($url, CURLOPT_TIMEOUT, 30);
         curl_setopt($url, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
@@ -91,28 +92,31 @@ class TapController extends Controller
 
         if (isset($response->errors)) {
             flash($response->errors[0]->description)->warning();
+
             return redirect()->route('home');
         } else {
             if ($response->status == 'INITIATED') {
                 return Redirect::to($response->transaction->url);
             }
             flash(translate('Payment failed'))->error();
+
             return redirect()->route('home');
         }
     }
 
-    public function callback(Request $request){
+    public function callback(Request $request)
+    {
 
-        $header = array(
-            "Authorization: Bearer ".env('TAP_SECRET_KEY'),
-            "accept: application/json"
-        );
+        $header = [
+            'Authorization: Bearer '.env('TAP_SECRET_KEY'),
+            'accept: application/json',
+        ];
 
-        $url = curl_init("https://api.tap.company/v2/charges/".$request['tap_id']);
+        $url = curl_init('https://api.tap.company/v2/charges/'.$request['tap_id']);
         curl_setopt($url, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($url, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($url, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($url, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($url, CURLOPT_ENCODING, "");
+        curl_setopt($url, CURLOPT_ENCODING, '');
         curl_setopt($url, CURLOPT_MAXREDIRS, 10);
         curl_setopt($url, CURLOPT_TIMEOUT, 30);
         curl_setopt($url, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
@@ -122,6 +126,7 @@ class TapController extends Controller
 
         if (isset($response->errors)) {
             flash($response->errors[0]->description)->warning();
+
             return redirect()->route('home');
         } else {
             if ($response->status == 'CAPTURED') {
@@ -129,22 +134,19 @@ class TapController extends Controller
                 $paymentData = Session::get('payment_data');
                 if ($payment_type == 'cart_payment') {
                     return (new CheckoutController)->checkout_done(Session::get('combined_order_id'), json_encode($response));
-                }
-                else if ($payment_type == 'order_re_payment') {
+                } elseif ($payment_type == 'order_re_payment') {
                     return (new CheckoutController)->orderRePaymentDone($paymentData, json_encode($response));
-                }
-                else if ($payment_type == 'wallet_payment') {
+                } elseif ($payment_type == 'wallet_payment') {
                     return (new WalletController)->wallet_payment_done($paymentData, json_encode($response));
-                }
-                else if ($payment_type == 'customer_package_payment') {
+                } elseif ($payment_type == 'customer_package_payment') {
                     return (new CustomerPackageController)->purchase_payment_done($paymentData, json_encode($response));
-                }
-                else if ($payment_type == 'seller_package_payment') {
+                } elseif ($payment_type == 'seller_package_payment') {
                     return (new SellerPackageController)->purchase_payment_done($paymentData, json_encode($response));
                 }
             }
 
             flash(translate('Payment failed'))->error();
+
             return redirect()->route('home');
         }
     }

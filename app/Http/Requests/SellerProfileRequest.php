@@ -23,17 +23,18 @@ class SellerProfileRequest extends FormRequest
      */
     public function rules()
     {
-        $newPasswordRule        = 'sometimes';
-        $confirmPasswordRule    = 'sometimes';
+        $newPasswordRule = 'sometimes';
+        $confirmPasswordRule = 'sometimes';
         if ($this->request->get('new_password') != null && $this->request->get('confirm_password') != null) {
-            $newPasswordRule       = ['min:6'];
-            $newPasswordRule       = ['min:6'];
+            $newPasswordRule = ['min:6'];
+            $newPasswordRule = ['min:6'];
         }
+
         return [
-            'name'              => ['required', 'max:191'],
-            'new_password'      => $newPasswordRule,
-            'confirm_password'  => $confirmPasswordRule,
-            'phone'             => ['required','string','max:20'],
+            'name' => ['required', 'max:191'],
+            'new_password' => $newPasswordRule,
+            'confirm_password' => $confirmPasswordRule,
+            'phone' => ['required', 'string', 'max:20'],
         ];
     }
 
@@ -45,9 +46,9 @@ class SellerProfileRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'         => translate('Name is required'),
-            'new_password.min'      => translate('Minimum 6 characters'),
-            'confirm_password.min'  => translate('Minimum 6 characters'),
+            'name.required' => translate('Name is required'),
+            'new_password.min' => translate('Minimum 6 characters'),
+            'confirm_password.min' => translate('Minimum 6 characters'),
         ];
     }
 }

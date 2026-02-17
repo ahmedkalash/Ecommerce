@@ -44,7 +44,7 @@ class BrandFactory extends Factory
      */
     public function top(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'top' => 1,
         ]);
     }

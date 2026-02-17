@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 
 class PreorderWholesale extends Model
 {

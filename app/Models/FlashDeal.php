@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class FlashDeal extends Model
 {
@@ -12,14 +12,17 @@ class FlashDeal extends Model
 
     protected $with = ['flash_deal_translations'];
 
-    public function getTranslation($field = '', $lang = false){
+    public function getTranslation($field = '', $lang = false)
+    {
         $lang = $lang == false ? App::getLocale() : $lang;
         $flash_deal_translation = $this->flash_deal_translations->where('lang', $lang)->first();
+
         return $flash_deal_translation != null ? $flash_deal_translation->$field : $this->$field;
     }
 
-    public function flash_deal_translations(){
-      return $this->hasMany(FlashDealTranslation::class);
+    public function flash_deal_translations()
+    {
+        return $this->hasMany(FlashDealTranslation::class);
     }
 
     public function flash_deal_products()

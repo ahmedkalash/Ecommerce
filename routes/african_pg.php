@@ -6,9 +6,9 @@ use App\Http\Controllers\Payment\MpesaController;
 use App\Http\Controllers\Payment\PayfastController;
 
 Route::controller(AfricanPaymentGatewayController::class)->group(function () {
-  Route::get('/african/credentials_index', 'credentials_index')->name('african_credentials.index');
+    Route::get('/african/credentials_index', 'credentials_index')->name('african_credentials.index');
 });
-//Mpesa
+// Mpesa
 
 Route::prefix('lnmo')->group(function () {
     Route::controller(MpesaController::class)->group(function () {
@@ -23,33 +23,39 @@ Route::prefix('lnmo')->group(function () {
     });
 });
 
-//Mpesa End
+// Mpesa End
 
 // RaveController start
 Route::get('/rave/callback', [FlutterwaveController::class, 'callback'])->name('flutterwave.callback');
 
 // RaveController end
 
-//Payfast routes <starts>
+// Payfast routes <starts>
 Route::controller(PayfastController::class)->group(function () {
-  Route::any('/payfast/checkout/notify', 'checkout_notify')->name('payfast.checkout.notify');
-  Route::any('/payfast/checkout/return', 'checkout_return')->name('payfast.checkout.return');
-  Route::any('/payfast/checkout/cancel', 'checkout_cancel')->name('payfast.checkout.cancel');
+    Route::any('/payfast/checkout/notify', 'checkout_notify')->name('payfast.checkout.notify');
+    Route::any('/payfast/checkout/return', 'checkout_return')->name('payfast.checkout.return');
+    Route::any('/payfast/checkout/cancel', 'checkout_cancel')->name('payfast.checkout.cancel');
 
-  Route::any('/payfast/order_re_payment/notify', 'order_re_payment_notify')->name('payfast.order_re_payment.notify');
-  Route::any('/payfast/order_re_payment/return', 'order_re_payment_return')->name('payfast.order_re_payment.return');
-  Route::any('/payfast/order_re_payment/cancel', 'order_re_payment_cancel')->name('payfast.order_re_payment.cancel');
+    Route::any('/payfast/order_re_payment/notify', 'order_re_payment_notify')->name('payfast.order_re_payment.notify');
+    Route::any('/payfast/order_re_payment/return', 'order_re_payment_return')->name('payfast.order_re_payment.return');
+    Route::any('/payfast/order_re_payment/cancel', 'order_re_payment_cancel')->name('payfast.order_re_payment.cancel');
 
-  Route::any('/payfast/wallet/notify', 'wallet_notify')->name('payfast.wallet.notify');
-  Route::any('/payfast/wallet/return', 'wallet_return')->name('payfast.wallet.return');
-  Route::any('/payfast/wallet/cancel', 'wallet_cancel')->name('payfast.wallet.cancel');
+    Route::any('/payfast/wallet/notify', 'wallet_notify')->name('payfast.wallet.notify');
+    Route::any('/payfast/wallet/return', 'wallet_return')->name('payfast.wallet.return');
+    Route::any('/payfast/wallet/cancel', 'wallet_cancel')->name('payfast.wallet.cancel');
 
-  Route::any('/payfast/seller_package_payment/notify', 'seller_package_notify')->name('payfast.seller_package_payment.notify');
-  Route::any('/payfast/seller_package_payment/return', 'seller_package_payment_return')->name('payfast.seller_package_payment.return');
-  Route::any('/payfast/seller_package_payment/cancel', 'seller_package_payment_cancel')->name('payfast.seller_package_payment.cancel');
+    Route::any('/payfast/seller_package_payment/notify',
+        'seller_package_notify')->name('payfast.seller_package_payment.notify');
+    Route::any('/payfast/seller_package_payment/return',
+        'seller_package_payment_return')->name('payfast.seller_package_payment.return');
+    Route::any('/payfast/seller_package_payment/cancel',
+        'seller_package_payment_cancel')->name('payfast.seller_package_payment.cancel');
 
-  Route::any('/payfast/customer_package_payment/notify', 'customer_package_notify')->name('payfast.customer_package_payment.notify');
-  Route::any('/payfast/customer_package_payment/return', 'customer_package_return')->name('payfast.customer_package_payment.return');
-  Route::any('/payfast/customer_package_payment/cancel', 'customer_package_cancel')->name('payfast.customer_package_payment.cancel');
+    Route::any('/payfast/customer_package_payment/notify',
+        'customer_package_notify')->name('payfast.customer_package_payment.notify');
+    Route::any('/payfast/customer_package_payment/return',
+        'customer_package_return')->name('payfast.customer_package_payment.return');
+    Route::any('/payfast/customer_package_payment/cancel',
+        'customer_package_cancel')->name('payfast.customer_package_payment.cancel');
 });
-//Payfast routes <ends>
+// Payfast routes <ends>

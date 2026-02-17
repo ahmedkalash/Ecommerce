@@ -21,7 +21,7 @@ class CouponController extends Controller
                 $sum = Cart::where('user_id', auth()->user()->id)->active()->sum('price');
                 if ($sum > $couponDetails->min_buy) {
                     if ($coupon->discount_type == 'percent') {
-                        $couponDiscount =  ($sum * $coupon->discount) / 100;
+                        $couponDiscount = ($sum * $coupon->discount) / 100;
                         if ($couponDiscount > $couponDetails->max_discount) {
                             $couponDiscount = $couponDetails->max_discount;
                         }
@@ -31,12 +31,12 @@ class CouponController extends Controller
                     if ($this->isCouponAlreadyApplied(auth()->user()->id, $coupon->id)) {
                         return response()->json([
                             'success' => false,
-                            'message' => translate('The coupon is already applied. Please try another coupon')
+                            'message' => translate('The coupon is already applied. Please try another coupon'),
                         ]);
                     } else {
                         return response()->json([
                             'success' => true,
-                            'discount' => (float) $couponDiscount
+                            'discount' => (float) $couponDiscount,
                         ]);
                     }
                 }
@@ -57,20 +57,20 @@ class CouponController extends Controller
                 if ($this->isCouponAlreadyApplied(auth()->user()->id, $coupon->id)) {
                     return response()->json([
                         'success' => false,
-                        'message' => translate('The coupon is already applied. Please try another coupon')
+                        'message' => translate('The coupon is already applied. Please try another coupon'),
                     ]);
                 } else {
                     return response()->json([
                         'success' => true,
                         'discount' => (float) $couponDiscount,
-                        'message' => translate('Coupon code applied successfully')
+                        'message' => translate('Coupon code applied successfully'),
                     ]);
                 }
             }
         } else {
             return response()->json([
                 'success' => false,
-                'message' => translate('The coupon is invalid')
+                'message' => translate('The coupon is invalid'),
             ]);
         }
     }
@@ -80,27 +80,28 @@ class CouponController extends Controller
         return CouponUsage::where(['user_id' => $userId, 'coupon_id' => $couponId])->count() > 0;
     }
 
-
     public function couponList()
     {
         $coupons = Coupon::where('start_date', '<=', strtotime(date('d-m-Y')))->where('end_date', '>=', strtotime(date('d-m-Y')))->paginate(10);
+
         return new CouponCollection($coupons);
     }
 
     public function getCouponProducts($id)
     {
         $coupon = Coupon::where('id', $id)->first();
-        if($coupon->type == 'product_base'){
+        if ($coupon->type == 'product_base') {
             $products = json_decode($coupon->details);
             $coupon_products = [];
-            foreach($products as $product) {
+            foreach ($products as $product) {
                 array_push($coupon_products, $product->product_id);
             }
             $products = get_multiple_products($coupon_products);
+
             return new ProductMiniCollection($products);
 
         }
+
         return $this->failed(translate('Something went wrong'));
     }
-
 }

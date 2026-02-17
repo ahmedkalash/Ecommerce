@@ -24,9 +24,9 @@ class CouponCollection extends ResourceCollection
 
                 if ($data->type == 'product_base') {
                     $products = json_decode($data->details);
-                    foreach ($products as  $key => $product) {
-                        array_push($coupon_products_details, (object)[
-                            'product_id' =>  $product->product_id,
+                    foreach ($products as $key => $product) {
+                        array_push($coupon_products_details, (object) [
+                            'product_id' => $product->product_id,
                             // 'thumbnail_img' => uploaded_asset($product->thumbnail_img),
                         ]);
                     }
@@ -34,15 +34,15 @@ class CouponCollection extends ResourceCollection
 
                     $order_discount_details = json_decode($data->details);
                     $arr['min_buy'] = single_price(intval($order_discount_details->min_buy));
-                    $arr['max_discount'] =  $order_discount_details->max_discount;
+                    $arr['max_discount'] = $order_discount_details->max_discount;
                     $order_discount_details = $arr;
                 }
 
-                $shop_name = $user_type == 'admin' ? get_setting('website_name') : ( $shop->name ?? '');
+                $shop_name = $user_type == 'admin' ? get_setting('website_name') : ($shop->name ?? '');
 
                 if ($user_type == 'admin' || ($shop != null && $shop->verification_status)) {
                     return [
-                        'id' => (int)$data->id,
+                        'id' => (int) $data->id,
                         'user_type' => $user_type,
                         'shop_id' => $shop->id ?? '',
                         'shop_name' => translate($shop_name),
@@ -57,16 +57,15 @@ class CouponCollection extends ResourceCollection
                         'end_date' => $data->end_date,
                     ];
                 }
-            })
+            }),
         ];
     }
-
 
     public function with($request)
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }
