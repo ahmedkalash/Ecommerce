@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\SpecialPriceType;
 use App\Filament\Enums\NavigationGroups;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use App\Services\PricingResolverService;
 use App\Services\ProductService;
 use CodeWithDennis\FilamentSelectTree\SelectTree;
 use Exception;
@@ -175,6 +177,33 @@ class ProductResource extends Resource
                                                     ->label('Today\'s Deal')
                                                     ->default(false),
 
+                                                Forms\Components\Section::make('Special Price')
+                                                    ->collapsed()
+                                                    ->schema([
+                                                        Forms\Components\Select::make('special_price_type')
+                                                            ->label('Discount Type')
+                                                            ->options(SpecialPriceType::class)
+                                                            ->nullable()
+                                                            ->live(),
+                                                        Forms\Components\TextInput::make('special_price')
+                                                            ->label('Discount Value')
+                                                            ->numeric()
+                                                            ->requiredWith('special_price_type')
+                                                            ->rules(['nullable', 'numeric', 'min:0'])
+                                                            ->helperText(fn (Forms\Get $get) => match ($get('special_price_type')) {
+                                                                'discount_percent' => 'Percentage off (0–100)',
+                                                                'fixed_price' => 'Exact final price the customer pays',
+                                                                default => 'Select a discount type first',
+                                                            }),
+                                                        Forms\Components\DateTimePicker::make('special_price_start')
+                                                            ->label('Start Date')
+                                                            ->requiredWith('special_price_type'),
+                                                        Forms\Components\DateTimePicker::make('special_price_end')
+                                                            ->label('End Date')
+                                                            ->requiredWith('special_price_type')
+                                                            ->afterOrEqual('special_price_start'),
+                                                    ])->columns(2),
+
                                                 Forms\Components\Repeater::make('extra_attributes.specifications')
                                                     ->label('Variant Specific Attributes')
                                                     ->helperText('Define technical specs or attributes for this specific version.')
@@ -197,6 +226,7 @@ class ProductResource extends Resource
                                                             ->extraInputAttributes(['style' => 'min-height: 100px;'])
                                                             ->columnSpan(2),
                                                     ])
+                                                    ->addActionLabel('Add another Attribute')
                                                     ->itemLabel(fn (array $state): ?string => $state['key'] ?? null)
                                                     ->collapsible()
                                                     ->columns(3)
@@ -365,6 +395,17 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('total_qty')
                     ->label('Qty')
                     ->state(fn (Product $record) => $record->stocks_sum_qty ?? $record->stocks->sum('qty'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('effective_min_price')
+                    ->label('Effective Min')
+                    ->state(function (Product $record) {
+                        $resolver = app(PricingResolverService::class);
+
+                        return $record->stocks
+                            ->map(fn ($s) => $resolver->resolve($s)->finalPrice)
+                            ->min();
+                    })
+                    ->money()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
                     ->boolean()

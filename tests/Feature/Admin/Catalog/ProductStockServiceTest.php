@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
+use App\DataTransferObjects\ProductStockData;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\ProductStockService;
@@ -54,24 +55,29 @@ class ProductStockServiceTest extends TestCase
         $product = Product::factory()->create();
 
         $data = [
-            'colors_active' => '1',
-            'colors' => ['Red', 'Blue'],
-            // Red Variant Data
-            'price_Red' => 100,
-            'qty_Red' => 50,
-            'sku_Red' => 'TEST-RED',
-            'min_qty_Red' => 5,
-            'cash_on_delivery_Red' => 0,
-            // Blue Variant Data
-            'price_Blue' => 100,
-            'qty_Blue' => 20,
-            'sku_Blue' => 'TEST-BLUE',
-            'min_qty_Blue' => 1,
-            // 'cash_on_delivery_Blue' defaults to 1
+            'stocks' => [
+                [
+                    'variant' => 'Red',
+                    'price' => 100,
+                    'qty' => 50,
+                    'sku' => 'TEST-RED',
+                    'min_qty' => 5,
+                    'cash_on_delivery' => 0,
+                ],
+                [
+                    'variant' => 'Blue',
+                    'price' => 100,
+                    'qty' => 20,
+                    'sku' => 'TEST-BLUE',
+                    'min_qty' => 1,
+                    'cash_on_delivery' => 1,
+                ],
+            ],
         ];
 
         // Action
-        $this->productStockService->store($data, $product);
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $this->productStockService->store($product, ...$stocks);
 
         // Assertion
         $this->assertDatabaseHas('product_stocks', [
@@ -98,34 +104,21 @@ class ProductStockServiceTest extends TestCase
 
         $product = Product::factory()->create();
 
-        // Simulate 3 attributes: Color, Size, Type
         $data = [
-            'colors_active' => '1',
-            'colors' => ['Red', 'Blue'], // Attribute 1 (Colors)
-            'choice_no' => [1, 2], // Attribute IDs from choice_options
-            'choice_options_1' => ['Small', 'Large'], // Attribute 2 (Size)
-            'choice_options_2' => ['Cotton', 'Silk'], // Attribute 3 (Type)
-
-            // Expected Combinations:
-            // Red-Small-Cotton
-            // Red-Small-Silk
-            // Red-Large-Cotton
-            // Red-Large-Silk
-            // Blue-Small-Cotton
-            // ... (Total 2 * 2 * 2 = 8 variants)
-
-            // For brevity, we verify a few specific keys that the service expects
-            'price_Red-Small-Cotton' => 50,
-            'qty_Red-Small-Cotton' => 10,
-            'sku_Red-Small-Cotton' => 'R-S-C',
-            'extra_attributes_Red-Small-Cotton' => json_encode(['specs' => 'test']),
-
-            'price_Blue-Large-Silk' => 80,
-            'qty_Blue-Large-Silk' => 5,
-            'sku_Blue-Large-Silk' => 'B-L-S',
+            'stocks' => [
+                ['variant' => 'Red-Small-Cotton', 'price' => 50, 'qty' => 10, 'sku' => 'R-S-C'],
+                ['variant' => 'Red-Small-Silk', 'price' => 55],
+                ['variant' => 'Red-Large-Cotton', 'price' => 60],
+                ['variant' => 'Red-Large-Silk', 'price' => 65],
+                ['variant' => 'Blue-Small-Cotton', 'price' => 70],
+                ['variant' => 'Blue-Small-Silk', 'price' => 75],
+                ['variant' => 'Blue-Large-Cotton', 'price' => 80],
+                ['variant' => 'Blue-Large-Silk', 'price' => 85, 'qty' => 5, 'sku' => 'B-L-S'],
+            ],
         ];
 
-        $this->productStockService->store($data, $product);
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $this->productStockService->store($product, ...$stocks);
 
         // Assert 8 variants created
         $this->assertCount(8, $product->stocks);
@@ -141,8 +134,49 @@ class ProductStockServiceTest extends TestCase
         $this->assertDatabaseHas('product_stocks', [
             'product_id' => $product->id,
             'variant' => 'Blue-Large-Silk',
-            'price' => 80,
+            'price' => 85,
             'sku' => 'B-L-S',
+        ]);
+    }
+
+    /** @test */
+    public function it_stores_product_stocks_with_special_price()
+    {
+        $user = User::factory()->create(['user_type' => 'admin']);
+        $this->actingAs($user);
+
+        $product = Product::factory()->create();
+
+        $startDate = now()->addDays(1)->startOfSecond();
+        $endDate = now()->addDays(7)->startOfSecond();
+
+        $data = [
+            'stocks' => [
+                [
+                    'variant' => 'Red',
+                    'price' => 100,
+                    'qty' => 50,
+                    'sku' => 'SPEC-RED',
+                    'special_price_type' => 'discount_percent',
+                    'special_price' => 20,
+                    'special_price_start' => $startDate->toDateTimeString(),
+                    'special_price_end' => $endDate->toDateTimeString(),
+                ],
+            ],
+        ];
+
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $this->productStockService->store($product, ...$stocks);
+
+        $this->assertDatabaseHas('product_stocks', [
+            'product_id' => $product->id,
+            'variant' => 'Red',
+            'price' => 100,
+            'sku' => 'SPEC-RED',
+            'special_price' => 20,
+            'special_price_type' => 'discount_percent',
+            'special_price_start' => $startDate->toDateTimeString(),
+            'special_price_end' => $endDate->toDateTimeString(),
         ]);
     }
 }

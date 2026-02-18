@@ -202,4 +202,50 @@ class ProductCreationTest extends TestCase
             $this->assertDatabaseMissing('products', ['id' => $product->id]);
         }
     }
+
+    /** @test */
+    public function admin_can_create_product_with_special_price()
+    {
+        $brand = Brand::factory()->create();
+        $category = Category::factory()->create();
+
+        $component = Livewire::actingAs($this->admin)
+            ->test(ProductResource\Pages\CreateProduct::class);
+
+        $stocks = $component->get('data.stocks');
+        $uuid = array_key_first($stocks);
+
+        $startDate = now()->addDay()->startOfSecond();
+        $endDate = now()->addWeek()->startOfSecond();
+
+        $component->fillForm([
+            'name' => 'Discounted Product',
+            'slug' => 'discounted-product',
+            'brand_id' => $brand->id,
+            'categories' => [$category->id],
+            'stocks' => [
+                $uuid => [
+                    'variant' => 'D',
+                    'price' => 100,
+                    'qty' => 50,
+                    'min_qty' => 1,
+                    'special_price_type' => 'discount_percent',
+                    'special_price' => 10,
+                    'special_price_start' => $startDate->toDateTimeString(),
+                    'special_price_end' => $endDate->toDateTimeString(),
+                    'extra_attributes' => ['specifications' => []],
+                ],
+            ],
+        ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('product_stocks', [
+            'price' => 100,
+            'special_price' => 10,
+            'special_price_type' => 'discount_percent',
+            'special_price_start' => $startDate->toDateTimeString(),
+            'special_price_end' => $endDate->toDateTimeString(),
+        ]);
+    }
 }

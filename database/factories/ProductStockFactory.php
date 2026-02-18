@@ -2,12 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Enums\SpecialPriceType;
 use App\Models\Product;
 use App\Models\ProductStock;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProductStock>
+ * @extends Factory<ProductStock>
  */
 class ProductStockFactory extends Factory
 {
@@ -27,12 +29,57 @@ class ProductStockFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'variant' => $this->faker->unique()->word, // Or use a generated variant name
+            'variant' => $this->faker->unique()->word,
             'sku' => $this->faker->unique()->ean8(),
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'qty' => $this->faker->numberBetween(0, 100),
-            // 'video_provider' => null, // Added in recent migration
-            // 'video_link' => null, // Added in recent migration
         ];
+    }
+
+    /**
+     * State: variant with an active special price.
+     */
+    public function withSpecialPrice(
+        float $value = 10.00,
+        SpecialPriceType $type = SpecialPriceType::DiscountPercent,
+        ?Carbon $start = null,
+        ?Carbon $end = null,
+    ): static {
+        return $this->state([
+            'special_price' => $value,
+            'special_price_type' => $type,
+            'special_price_start' => $start ?? now()->subDay(),
+            'special_price_end' => $end ?? now()->addWeek(),
+        ]);
+    }
+
+    /**
+     * State: variant with an expired special price.
+     */
+    public function withExpiredSpecialPrice(
+        float $value = 10.00,
+        SpecialPriceType $type = SpecialPriceType::DiscountPercent,
+    ): static {
+        return $this->state([
+            'special_price' => $value,
+            'special_price_type' => $type,
+            'special_price_start' => now()->subMonth(),
+            'special_price_end' => now()->subWeek(),
+        ]);
+    }
+
+    /**
+     * State: variant with a future special price.
+     */
+    public function withFutureSpecialPrice(
+        float $value = 10.00,
+        SpecialPriceType $type = SpecialPriceType::DiscountPercent,
+    ): static {
+        return $this->state([
+            'special_price' => $value,
+            'special_price_type' => $type,
+            'special_price_start' => now()->addWeek(),
+            'special_price_end' => now()->addMonth(),
+        ]);
     }
 }

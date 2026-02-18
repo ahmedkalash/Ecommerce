@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V2\Seller;
 
+use App\DataTransferObjects\ProductData;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\V2\Seller\AttributeCollection;
 use App\Http\Resources\V2\Seller\BrandCollection;
@@ -17,7 +18,6 @@ use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\ProductTax;
 use App\Models\ProductTranslation;
 use App\Models\Review;
@@ -114,36 +114,36 @@ class ProductController extends Controller
             return $this->failed(translate('Unauthenticated User.'));
         }
 
-        $request->merge(['added_by' => 'seller']);
-        $product = $this->productService->store($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
-        ]));
-        $request->merge(['product_id' => $product->id]);
+        // Create Product via Service with DTO
+        $product = $this->productService->store(ProductData::fromArray($request->all()));
 
-        // /Product categories
-        $product->categories()->attach($request->category_ids);
+        $request->merge(['product_id' => $product->id]);
 
         // VAT & Tax
         if ($request->tax_id) {
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
 
-        // Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
-        ]), $product);
-
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'description', 'product_id',
+            'lang',
+            'name',
+            'description',
+            'product_id',
         ]));
 
         return $this->success(translate('Product has been inserted successfully'));
@@ -168,29 +168,18 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
-        // Product
-        $product = $this->productService->update($request->except([
-            '_token', 'sku', 'choice', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type',
-        ]), $product);
+        // Update Product via Service with DTO
+        $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
 
-        // Product Stock
-        foreach ($product->stocks as $key => $stock) {
-            $stock->delete();
-        }
         $request->merge(['product_id' => $product->id]);
-
-        // Product categories
-        $product->categories()->sync($request->category_ids);
-
-        // Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active', 'colors', 'choice_no', 'unit_price', 'sku', 'current_stock', 'product_id',
-        ]), $product);
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         $this->frequentlyBoughtProductService->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id',
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id',
         ]));
 
         // VAT & Tax
@@ -198,17 +187,22 @@ class ProductController extends Controller
             ProductTax::where('product_id', $product->id)->delete();
             $request->merge(['product_id' => $product->id]);
             $this->productTaxService->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id',
             ]));
         }
 
         // Product Translations
         ProductTranslation::updateOrCreate(
             $request->only([
-                'lang', 'product_id',
+                'lang',
+                'product_id',
             ]),
             $request->only([
-                'name', 'description',
+                'name',
+                'description',
             ])
         );
 
@@ -268,22 +262,11 @@ class ProductController extends Controller
             }
         }
 
-        // Product
-        $product_new = (new ProductService)->product_duplicate_store($product);
+        // Duplicate Product and its relationships via Service
+        $product_new = $this->productService->duplicate($product);
 
-        // Store in Product Stock Table
-        (new ProductStockService)->product_duplicate_store($product->stocks, $product_new);
-
-        // Store in Product Tax Table
-        (new ProductTaxService)->product_duplicate_store($product->taxes, $product_new);
-
-        // Product Categories
-        foreach ($product_new->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
-            ]);
-        }
+        // VAT & Tax Duplication
+        $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->product_duplicate_store($product->frequently_bought_products, $product_new);

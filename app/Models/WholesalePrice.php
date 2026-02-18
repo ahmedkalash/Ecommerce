@@ -2,11 +2,19 @@
 
 namespace App\Models;
 
-use App\Traits\PreventDemoModeChanges;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class WholesalePrice extends Model
 {
-    use HasFactory, PreventDemoModeChanges;
+    protected $fillable = [
+        'product_stock_id',
+        'min_qty',
+        'max_qty',
+        'price',
+    ];
+
+    public function productStock()
+    {
+        return $this->belongsTo(ProductStock::class);
+    }
 }

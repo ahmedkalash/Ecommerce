@@ -20,6 +20,8 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\Warranty;
 use App\Models\Wishlist;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 trait ProductRelationships
 {
@@ -48,7 +50,10 @@ trait ProductRelationships
         return $this->belongsTo(Brand::class);
     }
 
-    public function user()
+    /**
+     * @return BelongsTo<User>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
@@ -68,12 +73,18 @@ trait ProductRelationships
         return $this->hasMany(ProductQuery::class);
     }
 
-    public function wishlists()
+    /**
+     * @return HasMany<Wishlist>
+     */
+    public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
     }
 
-    public function stocks()
+    /**
+     * @return HasMany<ProductStock>
+     */
+    public function stocks(): HasMany
     {
         return $this->hasMany(ProductStock::class);
     }

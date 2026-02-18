@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Seller;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\DataTransferObjects\ProductData;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
@@ -17,9 +17,9 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
-use Artisan;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
 class ProductController extends Controller
@@ -86,29 +86,10 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        if (addon_is_activated('seller_subscription')) {
-            if (! seller_package_validity_check()) {
-                flash(translate('Please upgrade your package.'))->warning();
+        // Create Product via Service with DTO
+        $product = $this->productService->store(ProductData::fromArray($request->all()));
 
-                return redirect()->route('seller.products');
-            }
-        }
-
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]));
         $request->merge(['product_id' => $product->id]);
-
-        // /Product categories
-        $product->categories()->attach($request->category_ids);
 
         // VAT & Tax
         if ($request->tax_id) {
@@ -119,10 +100,6 @@ class ProductController extends Controller
                 'product_id',
             ]));
         }
-
-        // Product Stock
-        // Pass complete request data so Service can extract what it needs (including video_link, etc.)
-        $this->productStockService->store($request->all(), $product);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
@@ -183,27 +160,10 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
-        // Product
-        $product = $this->productService->update($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]), $product);
+        // Update Product via Service with DTO
+        $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
 
         $request->merge(['product_id' => $product->id]);
-
-        // Product categories
-        $product->categories()->sync($request->category_ids);
-
-        // Product Stock
-        // Note: productStockService->store handles logic to update/create
-        $this->productStockService->store($request->all(), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
@@ -368,22 +328,11 @@ class ProductController extends Controller
             }
         }
 
-        // Product
-        $product_new = $this->productService->product_duplicate_store($product);
+        // Duplicate Product and its relationships via Service
+        $product_new = $this->productService->duplicate($product);
 
-        // Product Stock
-        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
-
-        // VAT & Tax
+        // VAT & Tax Duplication (Still needed if not in ProductService::duplicate)
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
-
-        // Product Categories
-        foreach ($product->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
-            ]);
-        }
 
         flash(translate('Product has been duplicated successfully'))->success();
 

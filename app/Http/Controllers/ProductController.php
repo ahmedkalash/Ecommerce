@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\DataTransferObjects\ProductData;
 use App\Enums\UserType;
 use App\Http\Requests\ProductRequest;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
 use App\Models\User;
 use App\Models\Wishlist;
@@ -18,11 +18,9 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
-use Artisan;
-use Cache;
-use Carbon\Carbon;
-use CoreComponentRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 
 // use App\Models\AttributeValue;
@@ -81,8 +79,10 @@ class ProductController extends Controller
                 });
         }
 
-        $products = $products->where('digital', 0)->with(['stocks', 'categories'])->orderBy('created_at',
-            'desc')->paginate(15);
+        $products = $products->where('digital', 0)->with(['stocks', 'categories'])->orderBy(
+            'created_at',
+            'desc'
+        )->paginate(15);
 
         return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'sort_search'));
     }
@@ -237,7 +237,7 @@ class ProductController extends Controller
         try {
             \DB::beginTransaction();
 
-            $product = $this->productService->store($request->all()); // Pass all data including dynamic keys
+            $product = $this->productService->store(ProductData::fromArray($request->all()));
             $request->merge(['product_id' => $product->id]);
 
             // Product categories
@@ -375,7 +375,7 @@ class ProductController extends Controller
             // Product Update (Pass full request data so Service can handle Stocks)
             // Note: Service expects 'categories' array key, but Request has 'category_ids'.
             // So Service won't sync categories, we do it below.
-            $product = $this->productService->update($request->all(), $product);
+            $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
 
             $request->merge(['product_id' => $product->id]);
 
@@ -510,22 +510,11 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        // Product
-        $product_new = $this->productService->product_duplicate_store($product);
+        // Duplicate Product and its relationships via Service
+        $product_new = $this->productService->duplicate($product);
 
-        // Product Stock
-        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
-
-        // VAT & Tax
+        // VAT & Tax Duplication
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
-
-        // Product Categories
-        foreach ($product->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
-            ]);
-        }
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->product_duplicate_store(
