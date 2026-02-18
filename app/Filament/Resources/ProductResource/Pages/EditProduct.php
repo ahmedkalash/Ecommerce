@@ -23,23 +23,43 @@ class EditProduct extends EditRecord
         ];
     }
 
+    /**
+     * Hydrate relationship data into the form.
+     *
+     * Since we don't use ->relationship() on categories or stocks,
+     * Filament won't auto-load them. We manually inject them here.
+     *
+     * @param  array<string, mixed>  $data  Model attributes from Filament.
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['category_ids'] = $this->record->categories->pluck('id')->toArray();
+        $data['stocks'] = $this->record->stocks->map(fn ($stock) => $stock->toArray())->toArray();
+
+        return $data;
+    }
+
+    /**
+     * Route update through ProductService (Service-First pattern).
+     *
+     * The caller owns DB::transaction and error handling.
+     * The service owns pure business logic only.
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return DB::transaction(function () use ($record, $data) {
             try {
-                // Map Filament raw data to ProductData DTO
-                $productData = ProductData::fromArray($data);
+                app(ProductService::class)->update(
+                    ProductData::fromArray($data),
+                    $record
+                );
 
-                // Use ProductService for update
-                $service = app(ProductService::class);
-                $service->update($productData, $record);
-
-                return $record;
+                return $record->fresh();
             } catch (\Throwable $e) {
-                Log::error('Product update failed (Filament): '.$e->getMessage(), [
+                Log::error('Product update failed', [
                     'product_id' => $record->id,
                     'user_id' => auth()->id(),
-                    'data' => $data,
                     'trace' => $e->getTraceAsString(),
                 ]);
 
@@ -50,6 +70,6 @@ class EditProduct extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return $this->getResource()::getUrl('index');
+        return $this->getResource()::getUrl('edit', ['record' => $this->record]);
     }
 }

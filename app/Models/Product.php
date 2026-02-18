@@ -24,6 +24,12 @@ class Product extends Model implements HasMedia
         'description',
         'published',
         'approved',
+        'featured',
+        'seller_featured',
+        'todays_deal',
+        'cash_on_delivery',
+        'unit',
+        'min_qty',
         'shipping_type',
         'shipping_cost',
         'est_shipping_days',
@@ -55,7 +61,18 @@ class Product extends Model implements HasMedia
     }
 
     protected $casts = [
-        //
+        'published' => 'boolean',
+        'approved' => 'boolean',
+        'featured' => 'boolean',
+        'seller_featured' => 'boolean',
+        'todays_deal' => 'boolean',
+        'cash_on_delivery' => 'boolean',
+        'digital' => 'boolean',
+        'wholesale_product' => 'boolean',
+        'has_warranty' => 'boolean',
+        'shipping_cost' => 'float',
+        'est_shipping_days' => 'integer',
+        'min_qty' => 'integer',
     ];
 
     protected $with = [

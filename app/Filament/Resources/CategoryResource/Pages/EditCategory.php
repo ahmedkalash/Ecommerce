@@ -37,4 +37,9 @@ class EditCategory extends EditRecord
     {
         return app(\App\Services\CategoryService::class)->update($data, $record);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('edit', ['record' => $this->record]);
+    }
 }

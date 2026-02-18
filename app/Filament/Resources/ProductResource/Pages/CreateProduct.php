@@ -14,24 +14,35 @@ class CreateProduct extends CreateRecord
 {
     protected static string $resource = ProductResource::class;
 
+    /**
+     * Inject server-side defaults before creation.
+     *
+     * @param  array<string, mixed>  $data  Raw form data from Filament.
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['user_id'] = auth()->id();
+        $data['added_by'] = 'admin';
+
+        return $data;
+    }
+
+    /**
+     * Route creation through ProductService (Service-First pattern).
+     *
+     * The caller owns DB::transaction and error handling.
+     * The service owns pure business logic only.
+     */
     protected function handleRecordCreation(array $data): Model
     {
         return DB::transaction(function () use ($data) {
             try {
-                // Map Filament raw data to ProductData DTO
-                $productData = ProductData::fromArray($data);
-
-                // Use ProductService for creation to ensure all business logic is applied
-                $service = app(ProductService::class);
-                $record = $service->store($productData);
-
-                // Handle Media (Filament Spatie Media Library component handles this
-                // but we must ensure it's synced if the service didn't)
-                // Actually, Filament's SpatieMediaLibraryFileUpload handles it after save.
-
-                return $record;
+                return app(ProductService::class)->store(
+                    ProductData::fromArray($data)
+                );
             } catch (\Throwable $e) {
-                Log::error('Product creation failed (Filament): '.$e->getMessage(), [
+                Log::error('Product creation failed', [
                     'user_id' => auth()->id(),
                     'data' => $data,
                     'trace' => $e->getTraceAsString(),
