@@ -8,8 +8,18 @@ use Carbon\Carbon;
 readonly class ProductStockData
 {
     /**
-     * @param  array<string, mixed>  $extra_attributes
-     * @param  WholesalePriceData[]  $wholesale_prices
+     * @param  string  $variant  Variant name/combination (e.g., "Red-XL")
+     * @param  float  $price  Unit price for this specific variant
+     * @param  int  $qty  Current stock quantity
+     * @param  string|null  $sku  Unique Stock Keeping Unit
+     * @param  int  $min_qty  Minimum order quantity
+     * @param  bool  $cash_on_delivery  Whether Cash-on-Delivery is supported
+     * @param  bool  $todays_deal  Whether this variant is part of Today's Deal
+     * @param  float|null  $special_price  Discounted value or fixed price
+     * @param  SpecialPriceType|null  $special_price_type  The strategy for special pricing
+     * @param  \Carbon\Carbon|null  $special_price_start  Start date of special price
+     * @param  \Carbon\Carbon|null  $special_price_end  End date of special price
+     * @param  array<string, mixed>  $extra_attributes  Miscellaneous metadata
      */
     public function __construct(
         public string $variant,
@@ -23,12 +33,29 @@ readonly class ProductStockData
         public ?SpecialPriceType $special_price_type = null,
         public ?Carbon $special_price_start = null,
         public ?Carbon $special_price_end = null,
-        public array $wholesale_prices = [],
         public array $extra_attributes = [],
     ) {}
 
     /**
-     * @param  array<string, mixed>  $data
+     * Create a ProductStockData instance from a raw associative array.
+     *
+     * Handles type-casting and parsing for all fields, including
+     * special price dates (timestamps or date strings) and enum values.
+     *
+     * @param  array{
+     *     variant?: string,
+     *     price?: float|string,
+     *     qty?: int|string,
+     *     sku?: string|null,
+     *     min_qty?: int|string,
+     *     cash_on_delivery?: bool|string,
+     *     todays_deal?: bool|string,
+     *     special_price?: float|string|null,
+     *     special_price_type?: string|SpecialPriceType|null,
+     *     special_price_start?: string|int|\Carbon\Carbon|null,
+     *     special_price_end?: string|int|\Carbon\Carbon|null,
+     *     extra_attributes?: array<string, mixed>|string,
+     * }  $data  Raw input data (e.g., from request or legacy import)
      */
     public static function fromArray(array $data): self
     {
@@ -44,7 +71,6 @@ readonly class ProductStockData
             special_price_type: self::parseSpecialPriceType($data['special_price_type'] ?? null),
             special_price_start: self::parseDate($data['special_price_start'] ?? null),
             special_price_end: self::parseDate($data['special_price_end'] ?? null),
-            wholesale_prices: self::parseWholesalePrices($data['wholesale_prices'] ?? []),
             extra_attributes: self::parseExtraAttributes($data['extra_attributes'] ?? []),
         );
     }
@@ -92,19 +118,6 @@ readonly class ProductStockData
         } catch (\Exception) {
             return null;
         }
-    }
-
-    /**
-     * @return WholesalePriceData[]
-     */
-    private static function parseWholesalePrices(iterable $prices): array
-    {
-        $data = [];
-        foreach ($prices as $price) {
-            $data[] = WholesalePriceData::fromArray((array) $price);
-        }
-
-        return $data;
     }
 
     private static function parseExtraAttributes(mixed $extra): array

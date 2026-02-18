@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class ProductService
 {
+    /**
+     * @param  MediaService  $mediaService  Service for handling product media.
+     * @param  ProductStockService  $productStockService  Service for managing variant stocks.
+     */
     public function __construct(
         protected MediaService $mediaService,
         protected ProductStockService $productStockService
@@ -52,6 +56,9 @@ class ProductService
 
     /**
      * Update an existing product.
+     *
+     * @param  ProductData  $data  The updated product data.
+     * @param  Product  $product  The product model instance.
      */
     public function update(ProductData $data, Product $product): Product
     {
@@ -75,9 +82,7 @@ class ProductService
 
         $product->categories()->sync($data->category_ids);
 
-        if (! empty($data->tags)) {
-            $product->syncTags($data->tags);
-        }
+        $product->syncTags($data->tags ?? []);
 
         // Stocks Update
         $this->productStockService->store($product, ...$data->stocks);
@@ -102,6 +107,12 @@ class ProductService
         return (bool) $product->delete();
     }
 
+    /**
+     * Duplicate a product and its related variants.
+     *
+     * @param  Product  $product  The source product to duplicate.
+     * @return Product The newly created duplicate product.
+     */
     public function duplicate(Product $product): Product
     {
         $new_product = $product->replicate();
@@ -110,7 +121,11 @@ class ProductService
 
         // Duplicate relationships
         $new_product->categories()->sync($product->categories->pluck('id'));
-        $new_product->syncTags($product->tags->pluck('name'));
+
+        // Sync tags if they exist
+        if (method_exists($product, 'tags')) {
+            $new_product->syncTags($product->tags->pluck('name'));
+        }
 
         // Duplicate Stocks
         $this->productStockService->product_duplicate_store($product->stocks, $new_product);
@@ -118,6 +133,13 @@ class ProductService
         return $new_product;
     }
 
+    /**
+     * Ensure the generated slug is unique in the products table.
+     *
+     * @param  string  $slug  The slug to check.
+     * @param  int|null  $ignoreId  Optional ID to ignore (during updates).
+     * @return string A unique slug.
+     */
     protected function ensureUniqueSlug(string $slug, ?int $ignoreId = null): string
     {
         $originalSlug = $slug;

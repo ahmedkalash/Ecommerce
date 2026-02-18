@@ -17,7 +17,5 @@ readonly class PriceResult
         public float $discountAmount,
         public bool $isSpecialActive = false,
         public ?SpecialPriceType $specialPriceType = null,
-        public bool $isFlashDealActive = false,
-        public bool $isWholesaleApplied = false,
     ) {}
 }

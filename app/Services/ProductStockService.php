@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\DataTransferObjects\ProductStockData;
+use App\Exceptions\Redirectingexception;
 use App\Models\Product;
+use App\Models\ProductStock;
 
 /**
  * Handles the persistence of product variants (stocks).
@@ -14,6 +16,12 @@ class ProductStockService
 {
     /**
      * Store or update product stocks for a given product.
+     *
+     * Synchronizes the database variants with the provided DTO list,
+     * removing any variants that are no longer present in the input.
+     *
+     * @param  Product  $product  The product model.
+     * @param  ProductStockData  ...$stocks  Variadic list of variant DTOs.
      */
     public function store(Product $product, ProductStockData ...$stocks): void
     {
@@ -38,9 +46,6 @@ class ProductStockService
             );
 
             $processedIds[] = $stock->id;
-
-            // Handle Wholesale Prices
-            $this->saveWholesalePrices($stock, $stockData->wholesale_prices);
         }
 
         // Cleanup: Remove any variants that weren't present in the provided DTO list.
@@ -48,28 +53,14 @@ class ProductStockService
     }
 
     /**
-     * Save wholesale prices for a specific stock.
-     *
-     * @param  \App\Models\ProductStock  $stock
-     * @param  \App\DataTransferObjects\WholesalePriceData[]  $wholesalePrices
-     */
-    protected function saveWholesalePrices($stock, array $wholesalePrices): void
-    {
-        $stock->wholesalePrices()->delete();
-
-        foreach ($wholesalePrices as $priceData) {
-            $stock->wholesalePrices()->create([
-                'min_qty' => $priceData->min_qty,
-                'max_qty' => $priceData->max_qty,
-                'price' => $priceData->price,
-            ]);
-        }
-    }
-
-    /**
      * Replicates stocks for a duplicate product.
      *
-     * @param  iterable<\App\Models\ProductStock>  $stocks
+     * Iterates through existing stocks and replicates them for the new product.
+     *
+     * @param  iterable<ProductStock>  $stocks  The collection of stocks to duplicate.
+     * @param  Product  $new_product  The target product for the duplicated stocks.
+     *
+     * @throws Redirectingexception
      */
     public function product_duplicate_store(iterable $stocks, Product $new_product): void
     {
@@ -77,13 +68,6 @@ class ProductStockService
             $new_stock = $stock->replicate();
             $new_stock->product_id = $new_product->id;
             $new_stock->save();
-
-            // Replicate Wholesale Prices
-            foreach ($stock->wholesalePrices as $wholesalePrice) {
-                $new_wholesalePrice = $wholesalePrice->replicate();
-                $new_wholesalePrice->product_stock_id = $new_stock->id;
-                $new_wholesalePrice->save();
-            }
         }
     }
 }
