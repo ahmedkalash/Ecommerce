@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin\Catalog;
 
 use App\Models\CustomerProduct;
 use App\Models\Product;

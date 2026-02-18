@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Admin\Catalog;
 
 use App\Models\Product;
 use App\Models\User;
@@ -88,5 +88,61 @@ class ProductStockServiceTest extends TestCase
         ]);
 
         $this->assertCount(2, $product->stocks);
+    }
+
+    /** @test */
+    public function it_handles_complex_variant_combinations()
+    {
+        $user = User::factory()->create(['user_type' => 'admin']);
+        $this->actingAs($user);
+
+        $product = Product::factory()->create();
+
+        // Simulate 3 attributes: Color, Size, Type
+        $data = [
+            'colors_active' => '1',
+            'colors' => ['Red', 'Blue'], // Attribute 1 (Colors)
+            'choice_no' => [1, 2], // Attribute IDs from choice_options
+            'choice_options_1' => ['Small', 'Large'], // Attribute 2 (Size)
+            'choice_options_2' => ['Cotton', 'Silk'], // Attribute 3 (Type)
+
+            // Expected Combinations:
+            // Red-Small-Cotton
+            // Red-Small-Silk
+            // Red-Large-Cotton
+            // Red-Large-Silk
+            // Blue-Small-Cotton
+            // ... (Total 2 * 2 * 2 = 8 variants)
+
+            // For brevity, we verify a few specific keys that the service expects
+            'price_Red-Small-Cotton' => 50,
+            'qty_Red-Small-Cotton' => 10,
+            'sku_Red-Small-Cotton' => 'R-S-C',
+            'extra_attributes_Red-Small-Cotton' => json_encode(['specs' => 'test']),
+
+            'price_Blue-Large-Silk' => 80,
+            'qty_Blue-Large-Silk' => 5,
+            'sku_Blue-Large-Silk' => 'B-L-S',
+        ];
+
+        $this->productStockService->store($data, $product);
+
+        // Assert 8 variants created
+        $this->assertCount(8, $product->stocks);
+
+        // Assert specific variant data
+        $this->assertDatabaseHas('product_stocks', [
+            'product_id' => $product->id,
+            'variant' => 'Red-Small-Cotton',
+            'price' => 50,
+            'sku' => 'R-S-C',
+        ]);
+
+        $this->assertDatabaseHas('product_stocks', [
+            'product_id' => $product->id,
+            'variant' => 'Blue-Large-Silk',
+            'price' => 80,
+            'sku' => 'B-L-S',
+        ]);
     }
 }

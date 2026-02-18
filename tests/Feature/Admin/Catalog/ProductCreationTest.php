@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Admin;
+namespace Tests\Feature\Admin\Catalog;
 
 use App\Filament\Resources\ProductResource;
 use App\Models\Brand;
@@ -175,5 +175,31 @@ class ProductCreationTest extends TestCase
             // We will asserts that validation error occurs if we were to submit.
             ->call('create')
             ->assertHasFormErrors(); // Broad assertion, refining to specific field if possible
+    }
+
+    /** @test */
+    public function admin_can_delete_a_product()
+    {
+        $product = Product::factory()->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(ProductResource\Pages\ListProducts::class)
+            ->callTableAction('delete', $product);
+
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
+
+    /** @test */
+    public function admin_can_bulk_delete_products()
+    {
+        $products = Product::factory()->count(3)->create();
+
+        Livewire::actingAs($this->admin)
+            ->test(ProductResource\Pages\ListProducts::class)
+            ->callTableBulkAction('delete', $products);
+
+        foreach ($products as $product) {
+            $this->assertDatabaseMissing('products', ['id' => $product->id]);
+        }
     }
 }

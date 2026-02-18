@@ -17,6 +17,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -261,7 +262,9 @@ class ProductResource extends Resource
                                                                     ->collection('short_video')
                                                                     ->label('Short Video')
                                                                     ->acceptedFileTypes([
-                                                                        'video/mp4', 'video/webm', 'video/ogg',
+                                                                        'video/mp4',
+                                                                        'video/webm',
+                                                                        'video/ogg',
                                                                     ])
                                                                     ->maxSize(51200), // 50MB
 
@@ -351,17 +354,17 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('min_price')
                     ->label('Min Price')
-                    ->state(fn (Product $record) => $record->stocks->min('price')) // Calculate min price from stocks
+                    ->state(fn (Product $record) => $record->stocks_min_price ?? $record->stocks->min('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('max_price')
                     ->label('Max Price')
-                    ->state(fn (Product $record) => $record->stocks->max('price')) // Calculate min price from stocks
+                    ->state(fn (Product $record) => $record->stocks_max_price ?? $record->stocks->max('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_qty')
                     ->label('Qty')
-                    ->state(fn (Product $record) => $record->stocks->sum('qty')) // Calculate total qty
+                    ->state(fn (Product $record) => $record->stocks_sum_qty ?? $record->stocks->sum('qty'))
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
                     ->boolean()
@@ -432,5 +435,13 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withMin('stocks', 'price')
+            ->withMax('stocks', 'price')
+            ->withSum('stocks', 'qty');
     }
 }

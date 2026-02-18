@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Admin;
 
 use App\Enums\UserType;
 use App\Models\Admin;

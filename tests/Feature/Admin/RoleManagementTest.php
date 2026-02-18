@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Admin;
 
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
