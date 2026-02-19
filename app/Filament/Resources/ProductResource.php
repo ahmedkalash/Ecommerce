@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class ProductResource extends Resource
 {
@@ -99,6 +100,8 @@ class ProductResource extends Resource
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
+//                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    ->dehydrated()
                                                     ->label('Categories')
                                                     ->enableBranchNode()
                                                     ->expandSelected()
@@ -113,6 +116,8 @@ class ProductResource extends Resource
                                                     ->searchable()
                                                     ->preload(),
                                                 SpatieTagsInput::make('tags')
+//                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    ->dehydrated()
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(1),
@@ -128,13 +133,11 @@ class ProductResource extends Resource
                                 // This repeater manages ALL stocks (variants).
                                 Forms\Components\Repeater::make('stocks')
                                     ->label('Product Variants / Inventory')
-                                    ->relationship()
                                     ->itemLabel(fn (array $state): ?string => $state['variant'] ?? 'New Variant')
                                     ->defaultItems(1)
                                     ->minItems(1)
                                     ->schema([
                                         Forms\Components\Section::make('Variant Details')
-                                            ->compact()
                                             ->schema([
                                                 Forms\Components\TextInput::make('variant')
                                                     ->label('Variant Name')
@@ -146,8 +149,19 @@ class ProductResource extends Resource
 
                                                 Forms\Components\TextInput::make('sku')
                                                     ->label('SKU')
-                                                    ->placeholder('Auto-generated if empty')
-                                                    ->unique('product_stocks', 'sku', ignoreRecord: true)
+                                                    ->placeholder(fn (?Product $record
+                                                    ): string => $record?->sku ?: 'Auto-generated if empty')->unique(
+                                                        table: 'product_stocks',
+                                                        column: 'sku',
+                                                        modifyRuleUsing: function (Unique $rule, ?Product $record) {
+                                                            // If we are editing an existing product, ignore its associated stock row.
+                                                            if ($record) {
+                                                                return $rule->whereNot('product_id', $record->id);
+                                                            }
+
+                                                            return $rule;
+                                                        }
+                                                    )
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('price')
@@ -175,34 +189,8 @@ class ProductResource extends Resource
 
                                                 Forms\Components\Toggle::make('todays_deal')
                                                     ->label('Today\'s Deal')
-                                                    ->default(false),
-
-                                                Forms\Components\Section::make('Special Price')
-                                                    ->collapsed()
-                                                    ->schema([
-                                                        Forms\Components\Select::make('special_price_type')
-                                                            ->label('Discount Type')
-                                                            ->options(SpecialPriceType::class)
-                                                            ->nullable()
-                                                            ->live(),
-                                                        Forms\Components\TextInput::make('special_price')
-                                                            ->label('Discount Value')
-                                                            ->numeric()
-                                                            ->requiredWith('special_price_type')
-                                                            ->rules(['nullable', 'numeric', 'min:0'])
-                                                            ->helperText(fn (Forms\Get $get) => match ($get('special_price_type')) {
-                                                                'discount_percent' => 'Percentage off (0–100)',
-                                                                'fixed_price' => 'Exact final price the customer pays',
-                                                                default => 'Select a discount type first',
-                                                            }),
-                                                        Forms\Components\DateTimePicker::make('special_price_start')
-                                                            ->label('Start Date')
-                                                            ->requiredWith('special_price_type'),
-                                                        Forms\Components\DateTimePicker::make('special_price_end')
-                                                            ->label('End Date')
-                                                            ->requiredWith('special_price_type')
-                                                            ->afterOrEqual('special_price_start'),
-                                                    ])->columns(2),
+                                                    ->default(true)
+                                                    ->inline(false),
 
                                                 Forms\Components\Repeater::make('extra_attributes.specifications')
                                                     ->label('Variant Specific Attributes')
@@ -231,6 +219,34 @@ class ProductResource extends Resource
                                                     ->collapsible()
                                                     ->columns(3)
                                                     ->columnSpanFull(),
+
+                                                Forms\Components\Section::make('Special Price')
+                                                    ->collapsed()
+                                                    ->schema([
+                                                        Forms\Components\Select::make('special_price_type')
+                                                            ->label('Discount Type')
+                                                            ->options(SpecialPriceType::class)
+                                                            ->nullable()
+                                                            ->live(),
+                                                        Forms\Components\TextInput::make('special_price')
+                                                            ->label('Discount Value')
+                                                            ->numeric()
+                                                            ->requiredWith('special_price_type')
+                                                            ->rules(['nullable', 'numeric', 'min:0'])
+                                                            ->helperText(fn (Forms\Get $get
+                                                            ) => match ($get('special_price_type')) {
+                                                                'discount_percent' => 'Percentage off (0–100)',
+                                                                'fixed_price' => 'Exact final price the customer pays',
+                                                                default => 'Select a discount type first',
+                                                            }),
+                                                        Forms\Components\DateTimePicker::make('special_price_start')
+                                                            ->label('Start Date')
+                                                            ->requiredWith('special_price_type'),
+                                                        Forms\Components\DateTimePicker::make('special_price_end')
+                                                            ->label('End Date')
+                                                            ->requiredWith('special_price_type')
+                                                            ->afterOrEqual('special_price_start'),
+                                                    ])->columns(2),
 
                                                 Forms\Components\Section::make('Media & Files')
                                                     ->collapsed()
@@ -307,8 +323,8 @@ class ProductResource extends Resource
 
                                             ])->columns(4),
                                     ])
-                                    ->reorderable(true)
-                                    ->addActionLabel('Add Another Variant SKU')
+                                    ->reorderable()
+                                    ->addActionLabel('Add Another Variant')
                                     ->columnSpanFull(),
                             ]),
 

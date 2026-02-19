@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\DataTransferObjects\ProductData;
 use App\Filament\Resources\ProductResource;
+use App\Models\Product;
 use App\Services\ProductService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -18,36 +19,36 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
+            Actions\CreateAction::make()->label('Create New'),
         ];
     }
 
     /**
-     * Hydrate relationship data into the form.
-     *
-     * Since we don't use ->relationship() on categories or stocks,
-     * Filament won't auto-load them. We manually inject them here.
-     *
-     * @param  array<string, mixed>  $data  Model attributes from Filament.
-     * @return array<string, mixed>
+     * Hydrate data into the form.
      */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['category_ids'] = $this->record->categories->pluck('id')->toArray();
-        $data['stocks'] = $this->record->stocks->map(fn ($stock) => $stock->toArray())->toArray();
+        $data['stocks'] = $this->record->stocks->toArray();
 
         return $data;
     }
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $data;
+    }
+
     /**
-     * Route update through ProductService (Service-First pattern).
+     * Route updates through ProductService (Service-First pattern).
      *
-     * The caller owns DB::transaction and error handling.
-     * The service owns pure business logic only.
+     * The service handles pure business logic; this caller owns
+     * the transaction, error handling, and logging.
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        /** @var Product $record */
+
         return DB::transaction(function () use ($record, $data) {
             try {
                 app(ProductService::class)->update(

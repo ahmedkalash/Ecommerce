@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProductResource\Pages;
 
 use App\DataTransferObjects\ProductData;
+use App\Enums\UserType;
 use App\Filament\Resources\ProductResource;
 use App\Services\ProductService;
 use Filament\Resources\Pages\CreateRecord;
@@ -15,15 +16,12 @@ class CreateProduct extends CreateRecord
     protected static string $resource = ProductResource::class;
 
     /**
-     * Inject server-side defaults before creation.
-     *
-     * @param  array<string, mixed>  $data  Raw form data from Filament.
-     * @return array<string, mixed>
+     * Inject server-side defaults before the record is created.
      */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = auth()->id();
-        $data['added_by'] = 'admin';
+        $data['added_by'] = UserType::ADMIN->value;
 
         return $data;
     }
@@ -31,8 +29,10 @@ class CreateProduct extends CreateRecord
     /**
      * Route creation through ProductService (Service-First pattern).
      *
-     * The caller owns DB::transaction and error handling.
-     * The service owns pure business logic only.
+     * The service handles pure business logic; this caller owns
+     * the transaction, error handling, and logging.
+     *
+     * @throws \Throwable
      */
     protected function handleRecordCreation(array $data): Model
     {
@@ -45,7 +45,7 @@ class CreateProduct extends CreateRecord
                 Log::error('Product creation failed', [
                     'user_id' => auth()->id(),
                     'data' => $data,
-                    'trace' => $e->getTraceAsString(),
+                    'trace' => $e->getTrace(),
                 ]);
 
                 throw $e;

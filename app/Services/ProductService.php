@@ -6,19 +6,20 @@ use App\DataTransferObjects\ProductData;
 use App\Models\Product;
 use Illuminate\Support\Str;
 
+/**
+ * Handles core product business logic: create, update, delete, duplicate.
+ *
+ * This service contains pure business logic only.
+ * DB transactions, error handling, and logging are the caller's responsibility.
+ */
 class ProductService
 {
-    /**
-     * @param  MediaService  $mediaService  Service for handling product media.
-     * @param  ProductStockService  $productStockService  Service for managing variant stocks.
-     */
     public function __construct(
-        protected MediaService $mediaService,
         protected ProductStockService $productStockService
     ) {}
 
     /**
-     * Create a new product in the database.
+     * Create a new product with all relationships.
      */
     public function store(ProductData $data): Product
     {
@@ -31,6 +32,7 @@ class ProductService
             'description' => $data->description,
             'published' => $data->published,
             'approved' => $data->approved,
+            'featured' => $data->featured,
             'shipping_type' => $data->shipping_type,
             'shipping_cost' => $data->shipping_cost,
             'est_shipping_days' => $data->est_shipping_days,
@@ -42,23 +44,19 @@ class ProductService
             'extra_attributes' => $data->extra_attributes,
         ]);
 
-        $product->categories()->sync($data->category_ids);
+        $product->categories()->sync($data->categories);
 
         if (! empty($data->tags)) {
             $product->attachTags($data->tags);
         }
 
-        // Sync Variants and Stocks
         $this->productStockService->store($product, ...$data->stocks);
 
         return $product;
     }
 
     /**
-     * Update an existing product.
-     *
-     * @param  ProductData  $data  The updated product data.
-     * @param  Product  $product  The product model instance.
+     * Update an existing product and sync all relationships.
      */
     public function update(ProductData $data, Product $product): Product
     {
@@ -69,6 +67,7 @@ class ProductService
             'description' => $data->description,
             'published' => $data->published,
             'approved' => $data->approved,
+            'featured' => $data->featured,
             'shipping_type' => $data->shipping_type,
             'shipping_cost' => $data->shipping_cost,
             'est_shipping_days' => $data->est_shipping_days,
@@ -80,18 +79,16 @@ class ProductService
             'extra_attributes' => $data->extra_attributes,
         ]);
 
-        $product->categories()->sync($data->category_ids);
-
+        $product->categories()->sync($data->categories);
         $product->syncTags($data->tags ?? []);
 
-        // Stocks Update
         $this->productStockService->store($product, ...$data->stocks);
 
         return $product;
     }
 
     /**
-     * Delete a product and its related data.
+     * Delete a product and all related data.
      */
     public function destroy(int $id): bool
     {
@@ -109,36 +106,26 @@ class ProductService
 
     /**
      * Duplicate a product and its related variants.
-     *
-     * @param  Product  $product  The source product to duplicate.
-     * @return Product The newly created duplicate product.
      */
     public function duplicate(Product $product): Product
     {
-        $new_product = $product->replicate();
-        $new_product->slug = $this->ensureUniqueSlug($product->slug);
-        $new_product->save();
+        $newProduct = $product->replicate();
+        $newProduct->slug = $this->ensureUniqueSlug($product->slug);
+        $newProduct->save();
 
-        // Duplicate relationships
-        $new_product->categories()->sync($product->categories->pluck('id'));
+        $newProduct->categories()->sync($product->categories->pluck('id'));
 
-        // Sync tags if they exist
         if (method_exists($product, 'tags')) {
-            $new_product->syncTags($product->tags->pluck('name'));
+            $newProduct->syncTags($product->tags->pluck('name'));
         }
 
-        // Duplicate Stocks
-        $this->productStockService->product_duplicate_store($product->stocks, $new_product);
+        $this->productStockService->product_duplicate_store($product->stocks, $newProduct);
 
-        return $new_product;
+        return $newProduct;
     }
 
     /**
      * Ensure the generated slug is unique in the products table.
-     *
-     * @param  string  $slug  The slug to check.
-     * @param  int|null  $ignoreId  Optional ID to ignore (during updates).
-     * @return string A unique slug.
      */
     protected function ensureUniqueSlug(string $slug, ?int $ignoreId = null): string
     {

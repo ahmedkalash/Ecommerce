@@ -4,6 +4,7 @@ namespace App\DataTransferObjects;
 
 use App\Enums\ShippingType;
 use App\Enums\UserType;
+use App\Enums\VideoProvider;
 use Illuminate\Support\Str;
 
 readonly class ProductData
@@ -11,7 +12,7 @@ readonly class ProductData
     /**
      * @param  string  $name  Product name
      * @param  string|null  $slug  Unique slug (auto-generated if null)
-     * @param  int[]  $category_ids  List of associated category IDs
+     * @param  int[]  $categories  List of associated category IDs
      * @param  int|null  $brand_id  Associated brand ID
      * @param  string|null  $unit  Unit of measurement (e.g., "kg", "pcs")
      * @param  float  $min_qty  Minimum purchase quantity
@@ -42,7 +43,7 @@ readonly class ProductData
     public function __construct(
         public string $name,
         public ?string $slug = null,
-        public array $category_ids = [],
+        public array $categories = [],
         public ?int $brand_id = null,
         public ?string $unit = null,
         public float $min_qty = 1,
@@ -82,32 +83,24 @@ readonly class ProductData
     public static function fromArray(array $data): self
     {
         $stocks = [];
-        if (isset($data['stocks']) && is_array($data['stocks'])) {
+        if (isset($data['stocks'])) {
             foreach ($data['stocks'] as $stock) {
-                $stocks[] = ProductStockData::fromArray((array) $stock);
+                $stocks[] = ProductStockData::fromArray($stock);
             }
-        } elseif (isset($data['unit_price'])) {
-            $stocks[] = ProductStockData::fromArray([
-                'variant' => 'Default',
-                'price' => $data['unit_price'],
-                'qty' => $data['current_stock'] ?? 0,
-                'sku' => $data['sku'] ?? null,
-                'min_qty' => $data['min_qty'] ?? 1,
-            ]);
         }
 
         return new self(
             name: $data['name'],
             slug: $data['slug'] ?? Str::slug($data['name']),
-            category_ids: (array) ($data['category_ids'] ?? []),
-            brand_id: isset($data['brand_id']) ? (int) $data['brand_id'] : null,
+            categories: (array) ($data['categories'] ?? []),
+            brand_id: $data['brand_id'] ?? null,
             unit: $data['unit'] ?? null,
             min_qty: (float) ($data['min_qty'] ?? 1),
             tags: is_array($data['tags'] ?? null) ? $data['tags'] : null,
             description: $data['description'] ?? null,
             thumbnail_img: $data['thumbnail_img'] ?? null,
             photos: is_array($data['photos'] ?? null) ? $data['photos'] : null,
-            video_provider: $data['video_provider'] ?? 'youtube',
+            video_provider: $data['video_provider'] ?? VideoProvider::YOUTUBE->value,
             video_link: $data['video_link'] ?? null,
             stocks: $stocks,
             published: (bool) ($data['published'] ?? true),
@@ -117,7 +110,7 @@ readonly class ProductData
             refundable: (bool) ($data['refundable'] ?? true),
             user_id: isset($data['user_id']) ? (int) $data['user_id'] : null,
             added_by: $data['added_by'] ?? 'admin',
-            shipping_type: $data['shipping_type'] ?? 'flat_rate',
+            shipping_type: $data['shipping_type'] ?? ShippingType::FLAT_RATE->value,
             shipping_cost: (float) ($data['shipping_cost'] ?? 0),
             est_shipping_days: (int) ($data['est_shipping_days'] ?? 0),
             meta_title: $data['meta_title'] ?? null,
