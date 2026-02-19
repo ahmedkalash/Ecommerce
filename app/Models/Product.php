@@ -25,9 +25,7 @@ class Product extends Model implements HasMedia
         'published',
         'approved',
         'featured',
-        'featured',
-        'todays_deal',
-        'cash_on_delivery',
+        // 'seller_featured', 'todays_deal', 'cash_on_delivery', 'unit', 'min_qty' removed
         'shipping_type',
         'shipping_cost',
         'est_shipping_days',
