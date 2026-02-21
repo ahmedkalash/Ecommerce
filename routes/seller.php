@@ -71,12 +71,12 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     });
 
     // Coupon
-    Route::resource('coupon', CouponController::class);
-    Route::controller(CouponController::class)->group(function () {
-        Route::post('/coupon/get_form', 'get_coupon_form')->name('coupon.get_coupon_form');
-        Route::post('/coupon/get_form_edit', 'get_coupon_form_edit')->name('coupon.get_coupon_form_edit');
-        Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
-    });
+    // Route::resource('coupon', CouponController::class);
+    // Route::controller(CouponController::class)->group(function () {
+    //     Route::post('/coupon/get_form', 'get_coupon_form')->name('coupon.get_coupon_form');
+    //     Route::post('/coupon/get_form_edit', 'get_coupon_form_edit')->name('coupon.get_coupon_form_edit');
+    //     Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
+    // });
 
     // Order
     Route::resource('orders', OrderController::class);
@@ -96,7 +96,6 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/product-reviews', 'index')->name('product-reviews');
         Route::get('/product/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
-
     });
 
     // Shop
@@ -167,7 +166,5 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/all-notification', 'index')->name('all-notification');
         Route::post('/notifications/bulk-delete', 'bulkDelete')->name('notifications.bulk_delete');
         Route::get('/notification/read-and-redirect/{id}', 'readAndRedirect')->name('notification.read-and-redirect');
-
     });
-
 });

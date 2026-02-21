@@ -17,7 +17,6 @@ use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\CountryController;
-use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CustomAlertController;
 use App\Http\Controllers\CustomerController;
@@ -57,6 +56,8 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+
+// use App\Http\Controllers\CouponController;
 
 // use App\Http\Controllers\AttributeController;
 // use App\Http\Controllers\Cybersource\CybersourceSettingController;
@@ -572,15 +573,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prev
     });
 
     // Coupons
-    Route::resource('coupon', CouponController::class);
-    Route::controller(CouponController::class)->group(function () {
-        Route::post('/coupon/update-status', 'updateStatus')->name('coupon.update_status');
-        Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
+    // Route::resource('coupon', CouponController::class);
+    // Route::controller(CouponController::class)->group(function () {
+    //     Route::post('/coupon/update-status', 'updateStatus')->name('coupon.update_status');
+    //     Route::get('/coupon/destroy/{id}', 'destroy')->name('coupon.destroy');
 
-        // Coupon Form
-        Route::post('/coupon/get_form', 'get_coupon_form')->name('coupon.get_coupon_form');
-        Route::post('/coupon/get_form_edit', 'get_coupon_form_edit')->name('coupon.get_coupon_form_edit');
-    });
+    //     // Coupon Form
+    //     Route::post('/coupon/get_form', 'get_coupon_form')->name('coupon.get_coupon_form');
+    //     Route::post('/coupon/get_form_edit', 'get_coupon_form_edit')->name('coupon.get_coupon_form_edit');
+    // });
 
     // Reviews
     Route::controller(ReviewController::class)->group(function () {

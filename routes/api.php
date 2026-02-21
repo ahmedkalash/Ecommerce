@@ -81,10 +81,10 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         Route::post('coupon-remove', 'remove_coupon_code');
     });
 
-    Route::controller(CouponController::class)->group(function () {
-        Route::get('coupon-list', 'couponList');
-        Route::get('coupon-products/{id}', 'getCouponProducts');
-    });
+    // Route::controller(CouponController::class)->group(function () {
+    //     Route::get('coupon-list', 'couponList');
+    //     Route::get('coupon-products/{id}', 'getCouponProducts');
+    // });
 
     Route::controller(ShippingController::class)->group(function () {
         Route::post('delivery-info', 'getDeliveryInfo');

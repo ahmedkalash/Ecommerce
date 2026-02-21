@@ -66,7 +66,6 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
 
             Route::get('products/reviews', 'product_reviews');
             Route::post('product/search', 'productSearch');
-
         });
 
         // Product Query Section
@@ -84,7 +83,6 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::post('digital-products/update/{product}', 'update');
             Route::get('digital-products/destroy/{id}', 'destroy');
             Route::get('digital-products/download/{id}', 'download');
-
         });
 
         // Whole Sale Product Section
@@ -106,18 +104,17 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::get('auction-product-bids/edit/{id}', 'productBids');
             Route::get('/auction-product-bids/destroy/{id}', 'bidDestroy');
             Route::get('auction-products/orders', 'getAuctionOrderList');
-
         });
 
         // Coupon Section
-        Route::controller(CouponController::class)->group(function () {
-            Route::get('coupon/all', 'index');
-            Route::post('coupon/create', 'store');
-            Route::get('coupon/edit/{id}', 'edit');
-            Route::get('coupon/delete/{id}', 'destroy');
-            Route::post('coupon/update/{coupon}', 'update');
-            Route::get('coupon/for-product', 'coupon_for_product');
-        });
+        // Route::controller(CouponController::class)->group(function () {
+        //     Route::get('coupon/all', 'index');
+        //     Route::post('coupon/create', 'store');
+        //     Route::get('coupon/edit/{id}', 'edit');
+        //     Route::get('coupon/delete/{id}', 'destroy');
+        //     Route::post('coupon/update/{coupon}', 'update');
+        //     Route::get('coupon/for-product', 'coupon_for_product');
+        // });
 
         // Conversations
         Route::controller(ConversationController::class)->group(function () {
@@ -156,9 +153,7 @@ Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], functi
             Route::post('pos/user-cart-data', 'getUserCartData');
             Route::get('pos/configuration', 'posConfiguration');
             Route::post('pos/configuration/update', 'posConfigurationUpdate');
-
         });
-
     });
 
     // Route::post('shops/create', [ShopController::class, 'store']);
