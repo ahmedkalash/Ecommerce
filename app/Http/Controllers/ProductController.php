@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
-use App\DataTransferObjects\ProductData;
+use App\DTOs\ProductData;
 use App\Enums\UserType;
 use App\Http\Requests\ProductRequest;
 use App\Models\Cart;

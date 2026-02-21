@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
-use App\DataTransferObjects\PriceResult;
+use App\DTOs\PriceResult;
 use App\Enums\SpecialPriceType;
 use App\Models\ProductStock;
 use App\Services\PricingResolverService;

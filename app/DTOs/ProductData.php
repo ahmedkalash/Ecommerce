@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTransferObjects;
+namespace App\DTOs;
 
 use App\Enums\ShippingType;
 use App\Enums\UserType;

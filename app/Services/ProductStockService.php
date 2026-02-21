@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\ProductStockData;
+use App\DTOs\ProductStockData;
 use App\Exceptions\Redirectingexception;
 use App\Models\Product;
 use App\Models\ProductStock;

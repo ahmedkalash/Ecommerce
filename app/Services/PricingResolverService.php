@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\PriceResult;
+use App\DTOs\PriceResult;
 use App\Enums\SpecialPriceType;
 use App\Models\ProductStock;
 

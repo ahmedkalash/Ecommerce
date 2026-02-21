@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-use App\DataTransferObjects\ProductData;
+use App\DTOs\ProductData;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;

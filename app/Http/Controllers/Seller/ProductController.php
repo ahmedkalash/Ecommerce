@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
-use App\DataTransferObjects\ProductData;
+use App\DTOs\ProductData;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
 use App\Models\Category;

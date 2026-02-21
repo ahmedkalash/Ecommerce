@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V2\Seller;
 
-use App\DataTransferObjects\ProductData;
+use App\DTOs\ProductData;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\V2\Seller\AttributeCollection;
 use App\Http\Resources\V2\Seller\BrandCollection;

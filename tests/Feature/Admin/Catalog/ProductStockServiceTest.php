@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
-use App\DataTransferObjects\ProductStockData;
+use App\DTOs\ProductStockData;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\ProductStockService;

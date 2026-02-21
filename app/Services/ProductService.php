@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\ProductData;
+use App\DTOs\ProductData;
 use App\Models\Product;
 use Illuminate\Support\Str;
 
