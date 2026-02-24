@@ -67,6 +67,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroups::SHOP_MANAGEMENT,
                 NavigationGroups::USER_MANAGEMENT,
                 NavigationGroups::SETTINGS,
+            ])
+            ->plugins([
+                //
             ]);
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -13,7 +12,7 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class Category extends Model implements HasMedia
 {
-    use HasFactory, HasRecursiveRelationships, InteractsWithMedia, PreventDemoModeChanges;
+    use HasFactory, HasRecursiveRelationships, InteractsWithMedia;
 
     protected $guarded = [];
 

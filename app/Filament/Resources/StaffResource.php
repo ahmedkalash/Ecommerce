@@ -25,7 +25,7 @@ class StaffResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('staff.Staffs_Admins');
+        return 'Staffs/Admins';
     }
 
     public static function form(Form $form): Form
@@ -62,9 +62,8 @@ class StaffResource extends Resource
 
                 Select::make('roles')
                     ->multiple()
-                    ->required()
                     ->preload()
-                    ->options(Role::all()->pluck('name', 'id'))
+                    ->options(fn () => Role::all()->pluck('name', 'id'))
                     ->searchable(),
                 // DONT use relationship() per project rules. Let DTO and Service handle it.
             ]);
@@ -97,6 +96,8 @@ class StaffResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
