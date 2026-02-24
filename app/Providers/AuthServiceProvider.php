@@ -50,6 +50,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         // Dynamic Gate to bypass the need for individual Policy classes
         Gate::before(function (User $user, $ability, $models) {
+            // Ignored standard Laravel abilities or custom gates that shouldn't be verified against Spatie
+            $ignoredAbilities = ['access-admin-panel'];
+            if (in_array($ability, $ignoredAbilities)) {
+                return null; // Fall through to explicitly defined gates
+            }
+
             // Get the model class or instance
             $model = $models[0] ?? null;
             $modelName = class_basename($model);
@@ -81,13 +87,17 @@ class AuthServiceProvider extends ServiceProvider
             }
 
             // If we are here, at least one of them exists. Let's check if the user has either.
-            if ($primaryExists && method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($permissionName,
-                'admin')) {
+            if ($primaryExists && method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo(
+                $permissionName,
+                'admin'
+            )) {
                 return true;
             }
 
-            if ($fallbackExists && method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo($ability,
-                'admin')) {
+            if ($fallbackExists && method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo(
+                $ability,
+                'admin'
+            )) {
                 return true;
             }
 

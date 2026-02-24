@@ -100,7 +100,7 @@ class ProductResource extends Resource
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
-//                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    //                                                    ->saveRelationshipsUsing(fn () => null)
                                                     ->dehydrated()
                                                     ->label('Categories')
                                                     ->enableBranchNode()
@@ -116,7 +116,7 @@ class ProductResource extends Resource
                                                     ->searchable()
                                                     ->preload(),
                                                 SpatieTagsInput::make('tags')
-//                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    //                                                    ->saveRelationshipsUsing(fn () => null)
                                                     ->dehydrated()
                                                     ->columnSpanFull(),
                                             ])
@@ -149,7 +149,8 @@ class ProductResource extends Resource
 
                                                 Forms\Components\TextInput::make('sku')
                                                     ->label('SKU')
-                                                    ->placeholder(fn (?Product $record
+                                                    ->placeholder(fn (
+                                                        ?Product $record
                                                     ): string => $record?->sku ?: 'Auto-generated if empty')->unique(
                                                         table: 'product_stocks',
                                                         column: 'sku',
@@ -195,6 +196,7 @@ class ProductResource extends Resource
                                                 Forms\Components\Repeater::make('extra_attributes.specifications')
                                                     ->label('Variant Specific Attributes')
                                                     ->helperText('Define technical specs or attributes for this specific version.')
+                                                    ->defaultItems(0)
                                                     ->schema([
                                                         Forms\Components\TextInput::make('key')
                                                             ->label('Key')
@@ -233,7 +235,8 @@ class ProductResource extends Resource
                                                             ->numeric()
                                                             ->requiredWith('special_price_type')
                                                             ->rules(['nullable', 'numeric', 'min:0'])
-                                                            ->helperText(fn (Forms\Get $get
+                                                            ->helperText(fn (
+                                                                Forms\Get $get
                                                             ) => match ($get('special_price_type')) {
                                                                 'discount_percent' => 'Percentage off (0–100)',
                                                                 'fixed_price' => 'Exact final price the customer pays',

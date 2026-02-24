@@ -107,10 +107,17 @@ class AdminAccessTest extends TestCase
     }
 
     /** @test */
-    public function unauthenticated_user_is_redirected_to_admin_login(): void
+    public function unauthenticated_user_is_redirected_to_admin_login()
     {
         $response = $this->get('/admin');
 
+        $response->assertRedirect(route('admin.login'));
+    }
+
+    /** @test */
+    public function unauthenticated_user_cannot_access_filament_resource_pages()
+    {
+        $response = $this->get('/admin/roles');
         $response->assertRedirect(route('admin.login'));
     }
 }
