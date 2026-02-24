@@ -24,28 +24,21 @@ class EditRole extends EditRecord
         ];
     }
 
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['permissions'] = $this->record->permissions->pluck('id')->toArray();
-
-        return $data;
-    }
-
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         try {
-            return DB::transaction(function () use ($record) {
+            return DB::transaction(function () use ($record, $data) {
                 /** @var Role $record */
-                app(RoleService::class)->update(RoleDTO::fromArray($this->data), $record);
+                app(RoleService::class)->update(RoleDTO::fromArray($data), $record);
 
                 return $record->fresh();
             });
         } catch (\Exception $e) {
-            Log::error('Failed to update role member: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Failed to update role: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             Notification::make()
                 ->title('Error updating role')
-                ->body('An error occurred while updating the role member. Please try again.')
+                ->body('An error occurred while updating the role. Please try again.')
                 ->danger()
                 ->send();
 

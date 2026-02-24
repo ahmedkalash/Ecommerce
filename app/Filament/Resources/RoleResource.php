@@ -8,7 +8,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleResource extends Resource
@@ -43,7 +42,7 @@ class RoleResource extends Resource
                             ->required()
                             ->maxLength(255),
 
-                        Forms\Components\select::make('guard_name')
+                        Forms\Components\Select::make('guard_name')
                             ->label('Guard Name')
                             ->default('admin')
                             ->nullable()
@@ -54,16 +53,9 @@ class RoleResource extends Resource
 
                         Forms\Components\Select::make('permissions')
                             ->multiple()
-                            ->options(function () {
-                                $groups = config('permissions.permissions', []);
-
-                                return array_map(function ($permissionNames) {
-                                    return Permission::whereIn('name', $permissionNames)
-                                        ->get()
-                                        ->pluck('name', 'id')
-                                        ->toArray();
-                                }, $groups);
-                            })
+                            ->relationship('permissions', 'name')
+                            ->saveRelationshipsUsing(fn () => null)
+                            ->dehydrated()
                             ->preload()
                             ->searchable()
                             ->label('Permissions')

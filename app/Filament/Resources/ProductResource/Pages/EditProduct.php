@@ -48,7 +48,6 @@ class EditProduct extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         /** @var Product $record */
-
         return DB::transaction(function () use ($record, $data) {
             try {
                 app(ProductService::class)->update(

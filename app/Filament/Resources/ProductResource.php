@@ -100,7 +100,7 @@ class ProductResource extends Resource
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
-                                                    //                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    ->saveRelationshipsUsing(fn () => null)
                                                     ->dehydrated()
                                                     ->label('Categories')
                                                     ->enableBranchNode()
@@ -116,7 +116,6 @@ class ProductResource extends Resource
                                                     ->searchable()
                                                     ->preload(),
                                                 SpatieTagsInput::make('tags')
-                                                    //                                                    ->saveRelationshipsUsing(fn () => null)
                                                     ->dehydrated()
                                                     ->columnSpanFull(),
                                             ])
@@ -338,7 +337,7 @@ class ProductResource extends Resource
                                 Forms\Components\TextInput::make('meta_title')
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('meta_description')
-                                    ->maxLength(255)
+                                    ->maxLength(65000)
                                     ->rows(3),
                                 SpatieMediaLibraryFileUpload::make('meta_img')
                                     ->collection('meta')
