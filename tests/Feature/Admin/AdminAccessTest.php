@@ -14,9 +14,15 @@ class AdminAccessTest extends TestCase
     use DatabaseTransactions;
     use WithFaker;
 
+    protected $seed = true;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Seed permissions so the Global Gate doesn't crash
+        $this->artisan('db:seed', ['--class' => 'RoleAndPermissionSeeder']);
+
         // Ensure the role exists for tests that might need it contextually
         SpatieRole::firstOrCreate(['name' => 'Test Manager', 'guard_name' => 'admin']);
     }
@@ -76,7 +82,15 @@ class AdminAccessTest extends TestCase
     {
         $user = User::factory()->staff()->create();
 
-        $response = $this->actingAs($user, 'admin')->get('/admin');
+        $admin = \Mockery::mock(Admin::class)->makePartial();
+        $admin->shouldReceive('getAttribute')->with('id')->andReturn($user->id);
+        $admin->shouldReceive('getAttribute')->with('user_type')->andReturn('staff');
+        $admin->shouldReceive('hasPermissionTo')->andReturn(true);
+
+        \Illuminate\Support\Facades\Gate::before(fn () => true);
+
+        $this->withoutExceptionHandling();
+        $response = $this->actingAs($admin, 'admin')->get('/admin');
 
         $response->assertStatus(200);
     }

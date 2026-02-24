@@ -16,36 +16,39 @@ class AssignSuperAdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdminName = config('permissions.super_admin_role_name', Roles::SUPER_ADMIN->value);
-        $guardName = 'admin';
+        $superAdminName = Roles::SUPER_ADMIN->value;
 
-        $superAdminRole = Role::where('name', $superAdminName)->where('guard_name', $guardName)->first();
-
-        if ($superAdminRole) {
+        if ($superAdminRole = Role::where('name', $superAdminName)->where('guard_name', 'admin')->first()) {
             $email = 'Ahmedkalash513@gmail.com';
-            Admin::upsert(
-                [
-                    [
-                        'id' => 1,
-                        'name' => 'Ahmed Kalash',
-                        'email' => $email,
-                        'password' => Hash::make($email),
-                        'user_type' => UserType::ADMIN->value,
-                        'email_verified_at' => now(),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ],
-                ],
-                ['id'],
-                ['name', 'email', 'password', 'user_type', 'updated_at']
-            );
+            $this->createSuperAdmin($email, $email);
 
             if ($admin = Admin::find(1)) {
                 $admin->assignRole($superAdminRole);
+
                 $this->command?->info("Role '{$superAdminName}' assigned to Admin ID 1, Email: $email, Password: \"$email\".");
             }
         } else {
             $this->command?->warn("Super Admin role '{$superAdminName}' not found. Please run RoleAndPermissionSeeder first.");
         }
+    }
+
+    private function createSuperAdmin(string $email, string $password): void
+    {
+        Admin::upsert(
+            [
+                [
+                    'id' => 1,
+                    'name' => 'Ahmed Kalash',
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'user_type' => UserType::ADMIN->value,
+                    'email_verified_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            ],
+            ['id'],
+            ['name', 'email', 'password', 'user_type', 'updated_at']
+        );
     }
 }

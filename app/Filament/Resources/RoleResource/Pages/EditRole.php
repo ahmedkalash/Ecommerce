@@ -24,6 +24,13 @@ class EditRole extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['permissions'] = $this->record->permissions->pluck('id')->toArray();
+
+        return $data;
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         try {
