@@ -27,7 +27,6 @@ use App\Http\Controllers\DynamicPopupController;
 use App\Http\Controllers\ElementController;
 use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\FlashDealController;
-use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MeasurementPointsController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NoteController;
@@ -56,6 +55,8 @@ use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
+
+// use App\Http\Controllers\LanguageController; // Replaced by kenepa/translation-manager
 
 // use App\Http\Controllers\CouponController;
 
@@ -400,25 +401,21 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prev
         Route::post('tax-status', 'change_tax_status')->name('taxes.tax-status');
     });
 
-    // Language
-    Route::resource('/languages', LanguageController::class);
-    Route::controller(LanguageController::class)->group(function () {
-        Route::post('/languages/{id}/update', 'update')->name('languages.update');
-        Route::get('/languages/destroy/{id}', 'destroy')->name('languages.destroy');
-        Route::post('/languages/update_rtl_status', 'update_rtl_status')->name('languages.update_rtl_status');
-        Route::post('/languages/update-status', 'update_status')->name('languages.update-status');
-        Route::post('/languages/key_value_store', 'key_value_store')->name('languages.key_value_store');
-        Route::get('/languages/translations/google/{id}', 'googleTranslations')->name('translations.google');
-        // App Trasnlation
-        Route::post('/languages/app-translations/import', 'importEnglishFile')->name('app-translations.import');
-        Route::get('/languages/app-translations/show/{id}', 'showAppTranlsationView')->name('app-translations.show');
-        Route::post(
-            '/languages/app-translations/key_value_store',
-            'storeAppTranlsation'
-        )->name('app-translations.store');
-        Route::get('/languages/app-translations/export/{id}', 'exportARBFile')->name('app-translations.export');
-        Route::get('/languages/app-translations/sync/{id}', 'sycnTranslations')->name('app-translations.sync');
-    });
+    // Language — Replaced by kenepa/translation-manager Filament plugin
+    // Route::resource('/languages', LanguageController::class);
+    // Route::controller(LanguageController::class)->group(function () {
+    //     Route::post('/languages/{id}/update', 'update')->name('languages.update');
+    //     Route::get('/languages/destroy/{id}', 'destroy')->name('languages.destroy');
+    //     Route::post('/languages/update_rtl_status', 'update_rtl_status')->name('languages.update_rtl_status');
+    //     Route::post('/languages/update-status', 'update_status')->name('languages.update-status');
+    //     Route::post('/languages/key_value_store', 'key_value_store')->name('languages.key_value_store');
+    //     Route::get('/languages/translations/google/{id}', 'googleTranslations')->name('translations.google');
+    //     Route::post('/languages/app-translations/import', 'importEnglishFile')->name('app-translations.import');
+    //     Route::get('/languages/app-translations/show/{id}', 'showAppTranlsationView')->name('app-translations.show');
+    //     Route::post('/languages/app-translations/key_value_store', 'storeAppTranlsation')->name('app-translations.store');
+    //     Route::get('/languages/app-translations/export/{id}', 'exportARBFile')->name('app-translations.export');
+    //     Route::get('/languages/app-translations/sync/{id}', 'sycnTranslations')->name('app-translations.sync');
+    // });
 
     // website setting
     Route::group(['prefix' => 'website'], function () {

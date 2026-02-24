@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V2\Seller;
 
 use Route;
 
-Route::group(['prefix' => 'v2/seller', 'middleware' => ['app_language']], function () {
+Route::group(['prefix' => 'v2/seller', 'middleware' => [\App\Http\Middleware\AppLocale::class]], function () {
 
     Route::middleware(['auth:sanctum'])->group(function () {
 

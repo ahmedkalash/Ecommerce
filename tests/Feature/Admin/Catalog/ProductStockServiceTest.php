@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
-use App\DTOs\ProductStockData;
+use App\DTOs\ProductStockDTO;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\ProductStockService;
@@ -76,7 +76,7 @@ class ProductStockServiceTest extends TestCase
         ];
 
         // Action
-        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockDTO::fromArray($s))->toArray();
         $this->productStockService->store($product, ...$stocks);
 
         // Assertion
@@ -117,7 +117,7 @@ class ProductStockServiceTest extends TestCase
             ],
         ];
 
-        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockDTO::fromArray($s))->toArray();
         $this->productStockService->store($product, ...$stocks);
 
         // Assert 8 variants created
@@ -165,7 +165,7 @@ class ProductStockServiceTest extends TestCase
             ],
         ];
 
-        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockData::fromArray($s))->toArray();
+        $stocks = collect($data['stocks'])->map(fn ($s) => ProductStockDTO::fromArray($s))->toArray();
         $this->productStockService->store($product, ...$stocks);
 
         $this->assertDatabaseHas('product_stocks', [

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
 use App\Models\Category;
@@ -87,7 +87,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         // Create Product via Service with DTO
-        $product = $this->productService->store(ProductData::fromArray($request->all()));
+        $product = $this->productService->store(ProductDTO::fromArray($request->all()));
 
         $request->merge(['product_id' => $product->id]);
 
@@ -161,7 +161,7 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         // Update Product via Service with DTO
-        $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
+        $product = $this->productService->update(ProductDTO::fromArray($request->all()), $product);
 
         $request->merge(['product_id' => $product->id]);
 

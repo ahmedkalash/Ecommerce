@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
-use App\DTOs\PriceResult;
+use App\DTOs\PriceResultDTO;
 use App\Enums\SpecialPriceType;
 use App\Models\ProductStock;
 use App\Services\PricingResolverService;
@@ -29,7 +29,7 @@ class PricingResolverServiceTest extends TestCase
 
         $result = $this->resolver->resolve($stock);
 
-        $this->assertInstanceOf(PriceResult::class, $result);
+        $this->assertInstanceOf(PriceResultDTO::class, $result);
     }
 
     public function test_no_special_price_returns_base_price(): void

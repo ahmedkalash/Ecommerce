@@ -7,7 +7,7 @@ use App\Enums\UserType;
 use App\Enums\VideoProvider;
 use Illuminate\Support\Str;
 
-readonly class ProductData
+readonly class ProductDTO
 {
     /**
      * @param  string  $name  Product name
@@ -22,7 +22,7 @@ readonly class ProductData
      * @param  string[]|null  $photos  Gallery image paths
      * @param  string|null  $video_provider  Video source (youtube, dailymotion, vimeo)
      * @param  string|null  $video_link  Full URL to the video
-     * @param  ProductStockData[]  $stocks  Variant definitions and stock levels
+     * @param  ProductStockDTO[]  $stocks  Variant definitions and stock levels
      * @param  bool  $published  Display status on the website
      * @param  bool  $approved  Admin approval status
      * @param  bool  $featured  Global featured flag
@@ -73,7 +73,7 @@ readonly class ProductData
     ) {}
 
     /**
-     * Create a ProductData instance from a raw associative array.
+     * Create a ProductDTO instance from a raw associative array.
      *
      * Supports both the modern `stocks[]` format and a legacy fallback
      * that maps `unit_price` / `current_stock` into a single "Default" variant.
@@ -85,7 +85,7 @@ readonly class ProductData
         $stocks = [];
         if (isset($data['stocks'])) {
             foreach ($data['stocks'] as $stock) {
-                $stocks[] = ProductStockData::fromArray($stock);
+                $stocks[] = ProductStockDTO::fromArray($stock);
             }
         }
 

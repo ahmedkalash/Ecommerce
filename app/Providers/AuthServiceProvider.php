@@ -51,7 +51,7 @@ class AuthServiceProvider extends ServiceProvider
         // Dynamic Gate to bypass the need for individual Policy classes
         Gate::before(function (User $user, $ability, $models) {
             // Ignored standard Laravel abilities or custom gates that shouldn't be verified against Spatie
-            $ignoredAbilities = ['access-admin-panel'];
+            $ignoredAbilities = ['access-admin-panel', 'use-translation-manager'];
             if (in_array($ability, $ignoredAbilities)) {
                 return null; // Fall through to explicitly defined gates
             }
@@ -111,6 +111,11 @@ class AuthServiceProvider extends ServiceProvider
         // Define the gate for accessing the admin panel
         // This centralizes the logic used in IsAdmin middleware
         Gate::define('access-admin-panel', function ($user) {
+            return in_array($user->user_type, ['admin', 'staff']) && ! $user->banned;
+        });
+
+        // Gate required by kenepa/translation-manager Filament plugin
+        Gate::define('use-translation-manager', function ($user) {
             return in_array($user->user_type, ['admin', 'staff']) && ! $user->banned;
         });
     }

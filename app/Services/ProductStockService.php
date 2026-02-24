@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTOs\ProductStockData;
+use App\DTOs\ProductStockDTO;
 use App\Exceptions\Redirectingexception;
 use App\Models\Product;
 use App\Models\ProductStock;
@@ -21,9 +21,9 @@ class ProductStockService
      * removing any variants that are no longer present in the input.
      *
      * @param  Product  $product  The product model.
-     * @param  ProductStockData  ...$stocks  Variadic list of variant DTOs.
+     * @param  ProductStockDTO  ...$stocks  Variadic list of variant DTOs.
      */
-    public function store(Product $product, ProductStockData ...$stocks): void
+    public function store(Product $product, ProductStockDTO ...$stocks): void
     {
         $processedIds = [];
 

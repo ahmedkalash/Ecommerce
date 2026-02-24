@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Enums\UserType;
 use App\Http\Requests\ProductRequest;
 use App\Models\Cart;
@@ -237,7 +237,7 @@ class ProductController extends Controller
         try {
             \DB::beginTransaction();
 
-            $product = $this->productService->store(ProductData::fromArray($request->all()));
+            $product = $this->productService->store(ProductDTO::fromArray($request->all()));
             $request->merge(['product_id' => $product->id]);
 
             // Product categories
@@ -375,7 +375,7 @@ class ProductController extends Controller
             // Product Update (Pass full request data so Service can handle Stocks)
             // Note: Service expects 'categories' array key, but Request has 'category_ids'.
             // So Service won't sync categories, we do it below.
-            $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
+            $product = $this->productService->update(ProductDTO::fromArray($request->all()), $product);
 
             $request->merge(['product_id' => $product->id]);
 

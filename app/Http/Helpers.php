@@ -7,7 +7,6 @@ use App\Http\Controllers\CommissionController;
 use App\Http\Resources\V2\CarrierCollection;
 use App\Models\AffiliateConfig;
 use App\Models\AffiliateOption;
-use App\Models\AppTranslation;
 use App\Models\Area;
 use App\Models\Attribute;
 use App\Models\AuctionProductBid;
@@ -54,7 +53,6 @@ use App\Models\SellerPackage;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
 use App\Models\Tax;
-use App\Models\Translation;
 use App\Models\User;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
@@ -767,58 +765,38 @@ if (! function_exists('renderStarRating')) {
     }
 }
 
-function translate($key, $lang = null, $addslashes = false)
+/**
+ * Translate a UI label string via Laravel's __() backed by spatie/laravel-translation-loader (DB).
+ *
+ * All legacy keys live under the 'ui' group, so __('ui.add_to_cart') is resolved.
+ * The wrapper accepts the same human-readable string the old system used (e.g. "Add to cart")
+ * and normalises it to a snake_case key before lookup.
+ *
+ * @param  string  $key  Human-readable string or pre-normalised key
+ * @param  string|null  $lang  Force a specific locale (null = current app locale)
+ * @param  bool  $addslashes  Escape the result with addslashes()
+ */
+function translate(string $key, ?string $lang = null, bool $addslashes = false): string
 {
-    if ($lang == null) {
-        $lang = App::getLocale();
+    // Normalise to the same snake_case format used by the legacy system
+    $langKey = preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($key)));
+
+    // Temporarily switch locale if a specific language was requested
+    if ($lang !== null) {
+        $previousLocale = app()->getLocale();
+        app()->setLocale($lang);
+        $value = __("ui.{$langKey}");
+        app()->setLocale($previousLocale);
+    } else {
+        $value = __("ui.{$langKey}");
     }
 
-    $lang_key = preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($key)));
-
-    $translations_en = Cache::rememberForever('translations-en', function () {
-        return Translation::where('lang', 'en')->pluck('lang_value', 'lang_key')->toArray();
-    });
-
-    if (! isset($translations_en[$lang_key])) {
-        $translation_def = new Translation;
-        $translation_def->lang = 'en';
-        $translation_def->lang_key = $lang_key;
-        $translation_def->lang_value = str_replace(["\r", "\n", "\r\n"], '', $key);
-        $translation_def->save();
-
-        if (env('DEMO_MODE') != 'On') {
-            $app_translation = new AppTranslation;
-            $app_translation->lang = 'en';
-            $app_translation->lang_key = $lang_key.'_ucf';
-            $app_translation->lang_value = str_replace(["\r", "\n", "\r\n"], '', $key);
-            $app_translation->save();
-        }
-
-        Cache::forget('translations-en');
+    // If __() returns the dotted key itself (not found), fall back to the raw human-readable string
+    if ($value === "ui.{$langKey}") {
+        $value = $key;
     }
 
-    // return user session lang
-    $translation_locale = Cache::rememberForever("translations-{$lang}", function () use ($lang) {
-        return Translation::where('lang', $lang)->pluck('lang_value', 'lang_key')->toArray();
-    });
-    if (isset($translation_locale[$lang_key])) {
-        return $addslashes ? addslashes(trim($translation_locale[$lang_key])) : trim($translation_locale[$lang_key]);
-    }
-
-    // return default lang if session lang not found
-    $translations_default = Cache::rememberForever('translations-'.env('DEFAULT_LANGUAGE', 'en'), function () {
-        return Translation::where('lang', env('DEFAULT_LANGUAGE', 'en'))->pluck('lang_value', 'lang_key')->toArray();
-    });
-    if (isset($translations_default[$lang_key])) {
-        return $addslashes ? addslashes(trim($translations_default[$lang_key])) : trim($translations_default[$lang_key]);
-    }
-
-    // fallback to en lang
-    if (! isset($translations_en[$lang_key])) {
-        return trim($key);
-    }
-
-    return $addslashes ? addslashes(trim($translations_en[$lang_key])) : trim($translations_en[$lang_key]);
+    return $addslashes ? addslashes(trim($value)) : trim($value);
 }
 
 function remove_invalid_charcaters($str)
@@ -828,49 +806,10 @@ function remove_invalid_charcaters($str)
     return str_ireplace(['"'], '\"', $str);
 }
 
-if (! function_exists('translation_tables')) {
-    function translation_tables($uniqueIdentifier)
-    {
-        $noTableAddons = ['african_pg', 'paytm', 'pos_system'];
-        if (! in_array($uniqueIdentifier, $noTableAddons)) {
-            $addons = [];
-            $addons['affiliate'] = [
-                'affiliate_options',
-                'affiliate_configs',
-                'affiliate_users',
-                'affiliate_payments',
-                'affiliate_withdraw_requests',
-                'affiliate_logs',
-                'affiliate_stats',
-            ];
-            $addons['auction'] = ['auction_product_bids'];
-            $addons['club_point'] = ['club_points', 'club_point_details'];
-            $addons['delivery_boy'] = [
-                'delivery_boys',
-                'delivery_histories',
-                'delivery_boy_payments',
-                'delivery_boy_collections',
-            ];
-            $addons['offline_payment'] = ['manual_payment_methods'];
-            $addons['otp_system'] = ['otp_configurations', 'sms_templates'];
-            $addons['refund_request'] = ['refund_requests'];
-            $addons['seller_subscription'] = [
-                'seller_packages',
-                'seller_package_translations',
-                'seller_package_payments',
-            ];
-            $addons['wholesale'] = ['wholesale_prices'];
-
-            foreach ($addons as $key => $addon_tables) {
-                if ($key == $uniqueIdentifier) {
-                    foreach ($addon_tables as $table) {
-                        Schema::dropIfExists($table);
-                    }
-                }
-            }
-        }
-    }
-}
+// Legacy: translation_tables() — commented out, replaced by kenepa/translation-manager
+// if (! function_exists('translation_tables')) {
+//     function translation_tables($uniqueIdentifier) { ... }
+// }
 
 function getShippingCost($carts, $index, $shipping_info = '', $carrier = '')
 {
@@ -2124,8 +2063,10 @@ if (! function_exists('get_categories_by_products')) {
         $product_query = Product::query();
         $category_ids = DB::table('product_categories')
             ->whereIn('product_id', function ($q) use ($user_id) {
-                $q->select('id')->from('products')->where('user_id', $user_id)->where('approved', 1)->where('published',
-                    1);
+                $q->select('id')->from('products')->where('user_id', $user_id)->where('approved', 1)->where(
+                    'published',
+                    1
+                );
             })->distinct()->pluck('category_id')->toArray();
 
         $category_query = Category::query();

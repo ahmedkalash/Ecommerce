@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTOs\PriceResult;
+use App\DTOs\PriceResultDTO;
 use App\Enums\SpecialPriceType;
 use App\Models\ProductStock;
 
@@ -18,11 +18,11 @@ class PricingResolverService
     /**
      * Resolve the final price for a variant, applying any active special price.
      */
-    public function resolve(ProductStock $variant): PriceResult
+    public function resolve(ProductStock $variant): PriceResultDTO
     {
         $basePrice = (float) $variant->price;
         if (! $this->isSpecialPriceActive($variant)) {
-            return new PriceResult(
+            return new PriceResultDTO(
                 basePrice: $basePrice,
                 finalPrice: $basePrice,
                 discountAmount: 0,
@@ -33,7 +33,7 @@ class PricingResolverService
 
         $finalPrice = round($this->calculateSpecialPrice($variant), 2);
 
-        return new PriceResult(
+        return new PriceResultDTO(
             basePrice: $basePrice,
             finalPrice: $finalPrice,
             discountAmount: round($basePrice - $finalPrice, 2),

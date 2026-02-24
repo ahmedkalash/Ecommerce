@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Middleware\EnsureSystemKey;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function () {
+Route::group(['prefix' => 'v2/auth', 'middleware' => [\App\Http\Middleware\AppLocale::class]], function () {
 
     Route::post('info', [AuthController::class, 'getUserInfoByAccessToken']);
     Route::controller(AuthController::class)->group(function () {
@@ -30,7 +30,7 @@ Route::group(['prefix' => 'v2/auth', 'middleware' => ['app_language']], function
     });
 });
 
-Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
+Route::group(['prefix' => 'v2', 'middleware' => [\App\Http\Middleware\AppLocale::class]], function () {
 
     // auth controller
     Route::post('guest-user-account-create', [AuthController::class, 'guestUserAccountCreate']);
@@ -223,7 +223,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     });
 
     Route::get('get-search-suggestions', [SearchSuggestionController::class, 'getList']);
-    Route::get('languages', [LanguageController::class, 'getList']);
+    // Route::get('languages', [LanguageController::class, 'getList']); // Replaced by kenepa/translation-manager
 
     Route::controller(CustomerProductController::class)->group(function () {
         Route::get('classified/all', 'all');

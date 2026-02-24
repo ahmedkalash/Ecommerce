@@ -5,7 +5,7 @@ namespace App\DTOs;
 use App\Enums\SpecialPriceType;
 use Carbon\Carbon;
 
-readonly class ProductStockData
+readonly class ProductStockDTO
 {
     /**
      * @param  string  $variant  Variant name/combination (e.g., "Red-XL")
@@ -37,7 +37,7 @@ readonly class ProductStockData
     ) {}
 
     /**
-     * Create a ProductStockData instance from a raw associative array.
+     * Create a ProductStockDTO instance from a raw associative array.
      *
      * Handles type-casting and parsing for all fields, including
      * special price dates (timestamps or date strings) and enum values.

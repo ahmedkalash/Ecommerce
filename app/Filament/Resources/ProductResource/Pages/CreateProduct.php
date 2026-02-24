@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Enums\UserType;
 use App\Filament\Resources\ProductResource;
 use App\Services\ProductService;
@@ -39,7 +39,7 @@ class CreateProduct extends CreateRecord
         return DB::transaction(function () use ($data) {
             try {
                 return app(ProductService::class)->store(
-                    ProductData::fromArray($data)
+                    ProductDTO::fromArray($data)
                 );
             } catch (\Throwable $e) {
                 Log::error('Product creation failed', [

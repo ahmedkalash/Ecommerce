@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Filament\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\ProductService;
@@ -51,7 +51,7 @@ class EditProduct extends EditRecord
         return DB::transaction(function () use ($record, $data) {
             try {
                 app(ProductService::class)->update(
-                    ProductData::fromArray($data),
+                    ProductDTO::fromArray($data),
                     $record
                 );
 

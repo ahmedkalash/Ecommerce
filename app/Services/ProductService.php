@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Models\Product;
 use Illuminate\Support\Str;
 
@@ -21,7 +21,7 @@ class ProductService
     /**
      * Create a new product with all relationships.
      */
-    public function store(ProductData $data): Product
+    public function store(ProductDTO $data): Product
     {
         $product = Product::create([
             'name' => $data->name,
@@ -58,7 +58,7 @@ class ProductService
     /**
      * Update an existing product and sync all relationships.
      */
-    public function update(ProductData $data, Product $product): Product
+    public function update(ProductDTO $data, Product $product): Product
     {
         $product->update([
             'name' => $data->name,

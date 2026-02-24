@@ -9,7 +9,7 @@ use App\Enums\SpecialPriceType;
  *
  * Returned by PricingResolverService::resolve().
  */
-readonly class PriceResult
+readonly class PriceResultDTO
 {
     public function __construct(
         public float $basePrice,

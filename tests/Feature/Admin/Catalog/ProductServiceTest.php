@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\Catalog;
 
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -39,7 +39,7 @@ class ProductServiceTest extends TestCase
 
         $category = Category::factory()->create();
 
-        $data = ProductData::fromArray([
+        $data = ProductDTO::fromArray([
             'name' => 'Test Product Creation',
             'category_ids' => [$category->id],
             'description' => '<p>Test Description</p>',
@@ -64,7 +64,7 @@ class ProductServiceTest extends TestCase
 
         $product = Product::factory()->create();
 
-        $updateData = ProductData::fromArray([
+        $updateData = ProductDTO::fromArray([
             'name' => 'Updated Product Name',
             'description' => '<p>Updated Description</p>',
             'stocks' => [],

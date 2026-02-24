@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V2\Seller;
 
-use App\DTOs\ProductData;
+use App\DTOs\ProductDTO;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\V2\Seller\AttributeCollection;
 use App\Http\Resources\V2\Seller\BrandCollection;
@@ -115,7 +115,7 @@ class ProductController extends Controller
         }
 
         // Create Product via Service with DTO
-        $product = $this->productService->store(ProductData::fromArray($request->all()));
+        $product = $this->productService->store(ProductDTO::fromArray($request->all()));
 
         $request->merge(['product_id' => $product->id]);
 
@@ -169,7 +169,7 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         // Update Product via Service with DTO
-        $product = $this->productService->update(ProductData::fromArray($request->all()), $product);
+        $product = $this->productService->update(ProductDTO::fromArray($request->all()), $product);
 
         $request->merge(['product_id' => $product->id]);
 

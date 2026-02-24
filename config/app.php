@@ -100,7 +100,7 @@ return [
     |
     */
 
-    'locale' => env('DEFAULT_LANGUAGE', 'en'),
+    'locale' => env('DEFAULT_LANGUAGE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -114,6 +114,22 @@ return [
     */
 
     'fallback_locale' => 'en',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Supported Locales
+    |--------------------------------------------------------------------------
+    |
+    | Full locale definitions for the application. Each key is a locale code
+    | (language_REGION). The language part is used for translations, while
+    | the region is stored for future features (currency, date format, etc.).
+    |
+    */
+
+    'supported_locales' => [
+        'en_US' => ['language' => 'en', 'region' => 'US', 'name' => 'English (US)', 'dir' => 'ltr'],
+        'ar_SA' => ['language' => 'ar', 'region' => 'SA', 'name' => 'العربية (السعودية)', 'dir' => 'rtl'],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -167,7 +183,7 @@ return [
         Illuminate\Redis\RedisServiceProvider::class,
         Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
         Illuminate\Session\SessionServiceProvider::class,
-        Illuminate\Translation\TranslationServiceProvider::class,
+        Spatie\TranslationLoader\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         KingFlamez\Rave\RaveServiceProvider::class,
