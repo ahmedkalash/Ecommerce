@@ -21,11 +21,24 @@ class StaffResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = NavigationGroups::USER_MANAGEMENT;
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroups::USER_MANAGEMENT->getLocalizedLabel();
+    }
 
     public static function getModelLabel(): string
     {
-        return 'Staffs/Admins';
+        return __('admin/resources.staff.singular');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin/resources.staff.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin/navigation.staff');
     }
 
     public static function form(Form $form): Form
@@ -33,20 +46,24 @@ class StaffResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
+                    ->label(__('admin/resources.general.name'))
                     ->required()
                     ->maxLength(255),
 
                 TextInput::make('email')
+                    ->label(__('admin/resources.general.email'))
                     ->email()
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
 
                 TextInput::make('phone')
+                    ->label(__('admin/resources.general.phone'))
                     ->tel()
                     ->maxLength(255),
 
                 Select::make('user_type')
+                    ->label(__('admin/resources.staff.user_type'))
                     ->options([
                         UserType::ADMIN->value => 'admin',
                         UserType::STAFF->value => 'staff',
@@ -55,12 +72,14 @@ class StaffResource extends Resource
                     ->default(UserType::STAFF->value),
 
                 TextInput::make('password')
+                    ->label(__('admin/resources.general.password'))
                     ->password()
                     ->dehydrated(fn ($state) => filled($state))
                     ->required(fn (string $context): bool => $context === 'create')
                     ->maxLength(255),
 
                 Select::make('roles')
+                    ->label(__('admin/resources.staff.roles'))
                     ->multiple()
                     ->preload()
                     ->options(fn () => Role::all()->pluck('name', 'id'))
@@ -74,10 +93,13 @@ class StaffResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->label(__('admin/resources.general.name'))
                     ->searchable(),
                 TextColumn::make('email')
+                    ->label(__('admin/resources.general.email'))
                     ->searchable(),
                 TextColumn::make('user_type')
+                    ->label(__('admin/resources.staff.user_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         UserType::ADMIN->value => 'danger',
@@ -85,8 +107,10 @@ class StaffResource extends Resource
                         default => 'gray',
                     }),
                 TextColumn::make('roles.name')
+                    ->label(__('admin/resources.staff.roles'))
                     ->badge(),
                 TextColumn::make('created_at')
+                    ->label(__('admin/resources.general.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -95,9 +119,9 @@ class StaffResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make()->label(__('admin/actions.general.edit')),
+                Tables\Actions\DeleteAction::make()->label(__('admin/actions.general.delete')),
+                Tables\Actions\ViewAction::make()->label(__('admin/actions.general.view')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

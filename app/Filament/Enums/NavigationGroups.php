@@ -2,13 +2,31 @@
 
 namespace App\Filament\Enums;
 
-class NavigationGroups
+/**
+ * Enum representing Filament navigation groups with localised labels.
+ *
+ * Use `NavigationGroups::CATALOG->getLocalizedLabel()` wherever you need
+ * a translated group name (e.g. in AdminPanelProvider::navigationGroups()).
+ */
+enum NavigationGroups: string
 {
-    public const CATALOG = 'Catalog';
+    case CATALOG = 'Catalog';
+    case SHOP_MANAGEMENT = 'Shop Management';
+    case USER_MANAGEMENT = 'User Management';
+    case SETTINGS = 'Settings';
 
-    public const SHOP_MANAGEMENT = 'Shop Management';
-
-    public const USER_MANAGEMENT = 'User Management';
-
-    public const SETTINGS = 'Settings';
+    /**
+     * Return the translated navigation group label.
+     *
+     * Falls back to the enum value (English) when the translation key is missing.
+     */
+    public function getLocalizedLabel(): string
+    {
+        return match ($this) {
+            self::CATALOG => __('admin/navigation.catalog'),
+            self::SHOP_MANAGEMENT => __('admin/navigation.shop_management'),
+            self::USER_MANAGEMENT => __('admin/navigation.user_management'),
+            self::SETTINGS => __('admin/navigation.settings'),
+        };
+    }
 }

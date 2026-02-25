@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -55,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\AppLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -64,10 +66,14 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroups::CATALOG,
-                NavigationGroups::SHOP_MANAGEMENT,
-                NavigationGroups::USER_MANAGEMENT,
-                NavigationGroups::SETTINGS,
+                NavigationGroup::make(NavigationGroups::CATALOG->value)
+                    ->label(fn () => NavigationGroups::CATALOG->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::SHOP_MANAGEMENT->value)
+                    ->label(fn () => NavigationGroups::SHOP_MANAGEMENT->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::USER_MANAGEMENT->value)
+                    ->label(fn () => NavigationGroups::USER_MANAGEMENT->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::SETTINGS->value)
+                    ->label(fn () => NavigationGroups::SETTINGS->getLocalizedLabel()),
             ])
             ->plugins([
                 TranslationManagerPlugin::make(),

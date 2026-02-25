@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Enums\NavigationGroups;
 use App\Filament\Resources\RoleResource\Pages;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,16 +19,24 @@ class RoleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationGroup = 'User Management';
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroups::USER_MANAGEMENT->getLocalizedLabel();
+    }
 
     public static function getModelLabel(): string
     {
-        return __('Role');
+        return __('admin/resources.role.singular');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Roles');
+        return __('admin/resources.role.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin/navigation.roles');
     }
 
     public static function form(Form $form): Form
@@ -37,13 +46,13 @@ class RoleResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Role Name')
+                            ->label(__('admin/resources.role.name'))
                             ->unique(ignoreRecord: true)
                             ->required()
                             ->maxLength(255),
 
                         Forms\Components\Select::make('guard_name')
-                            ->label('Guard Name')
+                            ->label(__('admin/resources.role.guard_name'))
                             ->default('admin')
                             ->nullable()
                             ->options([
@@ -58,7 +67,7 @@ class RoleResource extends Resource
                             ->dehydrated()
                             ->preload()
                             ->searchable()
-                            ->label('Permissions')
+                            ->label(__('admin/resources.role.permissions'))
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
@@ -71,19 +80,19 @@ class RoleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->badge()
-                    ->label('Role')
+                    ->label(__('admin/resources.role.col_role'))
                     ->colors(['primary'])
                     ->searchable(),
                 Tables\Columns\TextColumn::make('guard_name')
                     ->badge()
-                    ->label('Guard'),
+                    ->label(__('admin/resources.role.col_guard')),
                 Tables\Columns\TextColumn::make('permissions_count')
                     ->badge()
-                    ->label('Permissions')
+                    ->label(__('admin/resources.role.col_permissions'))
                     ->counts('permissions')
                     ->colors(['success']),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Updated At')
+                    ->label(__('admin/resources.general.updated_at'))
                     ->dateTime()
                     ->sortable(),
             ])
@@ -91,8 +100,8 @@ class RoleResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label(__('admin/actions.general.edit')),
+                Tables\Actions\DeleteAction::make()->label(__('admin/actions.general.delete')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -141,6 +141,21 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'Name',
+        'email' => 'Email Address',
+        'password' => 'Password',
+        'password_confirmation' => 'Password Confirmation',
+        'phone' => 'Phone Number',
+        'address' => 'Address',
+        'city' => 'City',
+        'country' => 'Country',
+        'message' => 'Message',
+        'file' => 'File',
+        'image' => 'Image',
+        'date' => 'Date',
+        'title' => 'Title',
+        'description' => 'Description',
+    ],
 
 ];

@@ -32,9 +32,27 @@ class ProductResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = NavigationGroups::CATALOG;
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroups::CATALOG->getLocalizedLabel();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin/resources.product.singular');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin/resources.product.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin/navigation.products');
+    }
 
     public static function form(Form $form): Form
     {
@@ -43,14 +61,15 @@ class ProductResource extends Resource
                 Tabs::make('ProductTabs')
                     ->tabs([
                         // ── General Tab ──
-                        Tabs\Tab::make('General')
+                        Tabs\Tab::make(__('admin/resources.product.tab_general'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        Forms\Components\Section::make('Product Information')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_information'))
                                             ->schema([
                                                 Forms\Components\TextInput::make('name')
+                                                    ->label(__('admin/resources.general.name'))
                                                     ->required()
                                                     ->maxLength(200)
                                                     ->live(onBlur: true)
@@ -61,10 +80,12 @@ class ProductResource extends Resource
                                                         $set('slug', Str::slug($state));
                                                     }),
                                                 Forms\Components\TextInput::make('slug')
+                                                    ->label(__('admin/resources.general.slug'))
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->unique(Product::class, 'slug', ignoreRecord: true),
                                                 Forms\Components\RichEditor::make('description')
+                                                    ->label(__('admin/resources.general.description'))
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(2),
@@ -74,35 +95,35 @@ class ProductResource extends Resource
 
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        Forms\Components\Section::make('Visibility & Status')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_visibility'))
                                             ->schema([
                                                 Forms\Components\Toggle::make('published')
                                                     ->required()
-                                                    ->label('Published')
+                                                    ->label(__('admin/resources.product.published'))
                                                     ->default(true),
                                                 Forms\Components\Toggle::make('approved')
-                                                    ->label('Approved')
+                                                    ->label(__('admin/resources.product.approved'))
                                                     ->default(true)
                                                     ->visible(fn () => auth()->user()->can('approve_products')),
                                             ]),
 
-                                        Forms\Components\Section::make('Product Image')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_image'))
                                             ->schema([
                                                 SpatieMediaLibraryFileUpload::make('thumbnail')
                                                     ->collection('thumbnail')
-                                                    ->label('Thumbnail Image')
+                                                    ->label(__('admin/resources.product.thumbnail'))
                                                     ->image()
                                                     ->imageEditor()
                                                     ->columnSpanFull(),
                                             ]),
 
-                                        Forms\Components\Section::make('Organization')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_organization'))
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
                                                     ->saveRelationshipsUsing(fn () => null)
                                                     ->dehydrated()
-                                                    ->label('Categories')
+                                                    ->label(__('admin/resources.product.categories'))
                                                     ->enableBranchNode()
                                                     ->expandSelected()
                                                     ->withCount()
@@ -111,11 +132,12 @@ class ProductResource extends Resource
                                                     ->columnSpanFull(),
                                                 Forms\Components\Select::make('brand_id')
                                                     ->required()
-                                                    ->label('Brand')
+                                                    ->label(__('admin/resources.product.brand'))
                                                     ->relationship('brand', 'name')
                                                     ->searchable()
                                                     ->preload(),
                                                 SpatieTagsInput::make('tags')
+                                                    ->label(__('admin/resources.product.tags'))
                                                     ->dehydrated()
                                                     ->columnSpanFull(),
                                             ])
@@ -126,31 +148,31 @@ class ProductResource extends Resource
                             ->columns(3),
 
                         // ── Price, Stock & Variants Tab ──
-                        Tabs\Tab::make('Price & Stock')
+                        Tabs\Tab::make(__('admin/resources.product.tab_price_stock'))
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
                                 // This repeater manages ALL stocks (variants).
                                 Forms\Components\Repeater::make('stocks')
-                                    ->label('Product Variants / Inventory')
+                                    ->label(__('admin/resources.product.variants_label'))
                                     ->itemLabel(fn (array $state): ?string => $state['variant'] ?? 'New Variant')
                                     ->defaultItems(1)
                                     ->minItems(1)
                                     ->schema([
-                                        Forms\Components\Section::make('Variant Details')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_variant_details'))
                                             ->schema([
                                                 Forms\Components\TextInput::make('variant')
-                                                    ->label('Variant Name')
-                                                    ->placeholder('e.g., Default, Large-Blue, Extra-Cotton')
+                                                    ->label(__('admin/resources.product.variant_name'))
+                                                    ->placeholder(__('admin/resources.product.variant_placeholder'))
                                                     ->default('Default')
                                                     ->required()
                                                     ->distinct()
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('sku')
-                                                    ->label('SKU')
+                                                    ->label(__('admin/resources.product.sku'))
                                                     ->placeholder(fn (
                                                         ?Product $record
-                                                    ): string => $record?->sku ?: 'Auto-generated if empty')->unique(
+                                                    ): string => $record?->sku ?: __('admin/resources.product.sku_placeholder'))->unique(
                                                         table: 'product_stocks',
                                                         column: 'sku',
                                                         modifyRuleUsing: function (Unique $rule, ?Product $record) {
@@ -165,45 +187,45 @@ class ProductResource extends Resource
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('price')
-                                                    ->label('Base Price')
+                                                    ->label(__('admin/resources.product.price'))
                                                     ->numeric()
                                                     ->prefix('$')
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('qty')
-                                                    ->label('Qty In Stock')
+                                                    ->label(__('admin/resources.product.qty'))
                                                     ->numeric()
                                                     ->default(0)
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('min_qty')
-                                                    ->label('Min Purchase Qty')
+                                                    ->label(__('admin/resources.product.min_qty'))
                                                     ->numeric()
                                                     ->default(1)
                                                     ->required(),
 
                                                 Forms\Components\Toggle::make('cash_on_delivery')
-                                                    ->label('COD Available')
+                                                    ->label(__('admin/resources.product.cod'))
                                                     ->default(true)
                                                     ->inline(false),
 
                                                 Forms\Components\Toggle::make('todays_deal')
-                                                    ->label('Today\'s Deal')
+                                                    ->label(__('admin/resources.product.todays_deal'))
                                                     ->default(true)
                                                     ->inline(false),
 
                                                 Forms\Components\Repeater::make('extra_attributes.specifications')
-                                                    ->label('Variant Specific Attributes')
-                                                    ->helperText('Define technical specs or attributes for this specific version.')
+                                                    ->label(__('admin/resources.product.variant_attributes'))
+                                                    ->helperText(__('admin/resources.product.variant_attributes_help'))
                                                     ->defaultItems(0)
                                                     ->schema([
                                                         Forms\Components\TextInput::make('key')
-                                                            ->label('Key')
-                                                            ->placeholder('e.g., Material, Warranty')
+                                                            ->label(__('admin/resources.product.attr_key'))
+                                                            ->placeholder(__('admin/resources.product.attr_key_placeholder'))
                                                             ->required()
                                                             ->columnSpan(1),
                                                         Forms\Components\RichEditor::make('value')
-                                                            ->label('Value')
+                                                            ->label(__('admin/resources.product.attr_value'))
                                                             ->required()
                                                             ->toolbarButtons([
                                                                 'bold',
@@ -215,48 +237,48 @@ class ProductResource extends Resource
                                                             ->extraInputAttributes(['style' => 'min-height: 100px;'])
                                                             ->columnSpan(2),
                                                     ])
-                                                    ->addActionLabel('Add another Attribute')
+                                                    ->addActionLabel(__('admin/resources.product.add_attribute'))
                                                     ->itemLabel(fn (array $state): ?string => $state['key'] ?? null)
                                                     ->collapsible()
                                                     ->columns(3)
                                                     ->columnSpanFull(),
 
-                                                Forms\Components\Section::make('Special Price')
+                                                Forms\Components\Section::make(__('admin/resources.product.section_special_price'))
                                                     ->collapsed()
                                                     ->schema([
                                                         Forms\Components\Select::make('special_price_type')
-                                                            ->label('Discount Type')
+                                                            ->label(__('admin/resources.product.discount_type'))
                                                             ->options(SpecialPriceType::class)
                                                             ->nullable()
                                                             ->live(),
                                                         Forms\Components\TextInput::make('special_price')
-                                                            ->label('Discount Value')
+                                                            ->label(__('admin/resources.product.discount_value'))
                                                             ->numeric()
                                                             ->requiredWith('special_price_type')
                                                             ->rules(['nullable', 'numeric', 'min:0'])
                                                             ->helperText(fn (
                                                                 Forms\Get $get
                                                             ) => match ($get('special_price_type')) {
-                                                                'discount_percent' => 'Percentage off (0–100)',
-                                                                'fixed_price' => 'Exact final price the customer pays',
-                                                                default => 'Select a discount type first',
+                                                                'discount_percent' => __('admin/resources.product.discount_percent_help'),
+                                                                'fixed_price' => __('admin/resources.product.fixed_price_help'),
+                                                                default => __('admin/resources.product.discount_type_hint'),
                                                             }),
                                                         Forms\Components\DateTimePicker::make('special_price_start')
-                                                            ->label('Start Date')
+                                                            ->label(__('admin/resources.product.special_price_start'))
                                                             ->requiredWith('special_price_type'),
                                                         Forms\Components\DateTimePicker::make('special_price_end')
-                                                            ->label('End Date')
+                                                            ->label(__('admin/resources.product.special_price_end'))
                                                             ->requiredWith('special_price_type')
                                                             ->afterOrEqual('special_price_start'),
                                                     ])->columns(2),
 
-                                                Forms\Components\Section::make('Media & Files')
+                                                Forms\Components\Section::make(__('admin/resources.product.section_media'))
                                                     ->collapsed()
                                                     ->schema([
                                                         // Gallery (First, Full Width)
                                                         SpatieMediaLibraryFileUpload::make('gallery')
                                                             ->collection('gallery')
-                                                            ->label('Variant Gallery')
+                                                            ->label(__('admin/resources.product.variant_gallery'))
                                                             ->multiple()
                                                             ->reorderable()
                                                             ->image()
@@ -270,7 +292,7 @@ class ProductResource extends Resource
                                                             ->schema([
                                                                 SpatieMediaLibraryFileUpload::make('thumbnail')
                                                                     ->collection('thumbnail')
-                                                                    ->label('Variant Thumbnail')
+                                                                    ->label(__('admin/resources.product.variant_thumbnail'))
                                                                     ->image()
                                                                     ->imageEditor(),
                                                             ]),
@@ -279,14 +301,14 @@ class ProductResource extends Resource
                                                             ->schema([
                                                                 SpatieMediaLibraryFileUpload::make('pdf')
                                                                     ->collection('pdf')
-                                                                    ->label('PDF Specification')
+                                                                    ->label(__('admin/resources.product.pdf_spec'))
                                                                     ->acceptedFileTypes(['application/pdf'])
                                                                     ->maxSize(51200), // 50MB
 
                                                                 SpatieMediaLibraryFileUpload::make('files')
                                                                     ->collection('files')
                                                                     ->collection('files')
-                                                                    ->label('Downloadable Files')
+                                                                    ->label(__('admin/resources.product.downloadable_files'))
                                                                     ->multiple()
                                                                     ->maxSize(51200), // 50MB
                                                             ]),
@@ -299,16 +321,16 @@ class ProductResource extends Resource
                                                                         'dailymotion' => 'Dailymotion',
                                                                         'vimeo' => 'Vimeo',
                                                                     ])
-                                                                    ->label('Video Provider'),
+                                                                    ->label(__('admin/resources.product.video_provider')),
                                                                 Forms\Components\TextInput::make('video_link')
-                                                                    ->label('Video Link'),
+                                                                    ->label(__('admin/resources.product.video_link')),
                                                             ]),
 
                                                         Forms\Components\Grid::make(2)
                                                             ->schema([
                                                                 SpatieMediaLibraryFileUpload::make('short_video')
                                                                     ->collection('short_video')
-                                                                    ->label('Short Video')
+                                                                    ->label(__('admin/resources.product.short_video'))
                                                                     ->acceptedFileTypes([
                                                                         'video/mp4',
                                                                         'video/webm',
@@ -318,7 +340,7 @@ class ProductResource extends Resource
 
                                                                 SpatieMediaLibraryFileUpload::make('short_video_thumbnail')
                                                                     ->collection('short_video_thumbnail')
-                                                                    ->label('Short Video Thumbnail')
+                                                                    ->label(__('admin/resources.product.short_video_thumbnail'))
                                                                     ->image(),
                                                             ]),
                                                     ]),
@@ -326,54 +348,57 @@ class ProductResource extends Resource
                                             ])->columns(4),
                                     ])
                                     ->reorderable()
-                                    ->addActionLabel('Add Another Variant')
+                                    ->addActionLabel(__('admin/resources.product.add_variant'))
                                     ->columnSpanFull(),
                             ]),
 
                         // ── SEO Tab ──
-                        Tabs\Tab::make('SEO')
+                        Tabs\Tab::make(__('admin/resources.product.tab_seo'))
                             ->icon('heroicon-o-magnifying-glass')
                             ->schema([
                                 Forms\Components\TextInput::make('meta_title')
+                                    ->label(__('admin/resources.general.meta_title'))
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('meta_description')
+                                    ->label(__('admin/resources.general.meta_description'))
                                     ->maxLength(65000)
                                     ->rows(3),
                                 SpatieMediaLibraryFileUpload::make('meta_img')
                                     ->collection('meta')
-                                    ->label('Meta Image (SEO)')
+                                    ->label(__('admin/resources.product.meta_image'))
                                     ->image()
                                     ->columnSpanFull(),
                             ]),
 
                         // ── Shipping Tab ──
-                        Tabs\Tab::make('Shipping')
+                        Tabs\Tab::make(__('admin/resources.product.tab_shipping'))
                             ->icon('heroicon-o-truck')
                             ->schema([
                                 // Cash on delivery moved to stocks
                                 Forms\Components\Select::make('shipping_type')
+                                    ->label(__('admin/resources.product.shipping_type'))
                                     ->options([
-                                        'free' => 'Free Shipping',
-                                        'flat_rate' => 'Flat Rate',
+                                        'free' => __('admin/resources.product.shipping_free'),
+                                        'flat_rate' => __('admin/resources.product.shipping_flat_rate'),
                                     ])
                                     ->default('flat_rate'),
                                 Forms\Components\TextInput::make('shipping_cost')
-                                    ->label('Shipping Cost')
+                                    ->label(__('admin/resources.product.shipping_cost'))
                                     ->numeric()
                                     ->default(0),
                                 Forms\Components\TextInput::make('est_shipping_days')
-                                    ->label('Estimate Shipping Days')
+                                    ->label(__('admin/resources.product.est_shipping_days'))
                                     ->numeric(),
                             ])->columns(2),
 
                         // Status tab content moved to General tab
 
                         // ── Warranty Tab ──
-                        Tabs\Tab::make('Warranty')
+                        Tabs\Tab::make(__('admin/resources.product.tab_warranty'))
                             ->icon('heroicon-o-shield-check')
                             ->schema([
                                 Forms\Components\Toggle::make('has_warranty')
-                                    ->label('Has Warranty'),
+                                    ->label(__('admin/resources.product.has_warranty')),
                             ]),
                     ])
                     ->persistTab()
@@ -388,34 +413,36 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')
-                    ->collection('thumbnail'),
+                    ->collection('thumbnail')
+                    ->label(__('admin/resources.product.thumbnail')),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin/resources.general.name'))
                     ->searchable()
                     ->sortable()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->name),
                 Tables\Columns\TextColumn::make('categories.name')
-                    ->label('Categories')
+                    ->label(__('admin/resources.product.categories'))
                     ->badge()
                     ->separator(',')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('min_price')
-                    ->label('Min Price')
+                    ->label(__('admin/resources.product.col_min_price'))
                     ->state(fn (Product $record) => $record->stocks_min_price ?? $record->stocks->min('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('max_price')
-                    ->label('Max Price')
+                    ->label(__('admin/resources.product.col_max_price'))
                     ->state(fn (Product $record) => $record->stocks_max_price ?? $record->stocks->max('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_qty')
-                    ->label('Qty')
+                    ->label(__('admin/resources.product.col_qty'))
                     ->state(fn (Product $record) => $record->stocks_sum_qty ?? $record->stocks->sum('qty'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('effective_min_price')
-                    ->label('Effective Min')
+                    ->label(__('admin/resources.product.col_effective_min'))
                     ->state(function (Product $record) {
                         $resolver = app(PricingResolverService::class);
 
@@ -426,10 +453,12 @@ class ProductResource extends Resource
                     ->money()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
+                    ->label(__('admin/resources.product.published'))
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin/resources.general.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

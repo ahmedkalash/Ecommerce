@@ -62,7 +62,17 @@ class AppLocale
             Session::put('locale_region', $localeDto->region);     // e.g. "SA"
         }
 
-        // Step 5: Continue processing the request (pass it to the next middleware/controller)
+        // Step 5: Override Kenepa Translation Manager config at runtime.
+        // - navigation_group: QuickTranslate hardcodes config() so we set it to
+        //   the translated label to match our resources' getLocalizedLabel().
+        // - quick_translate_navigation_registration: Hide Quick Translate from nav.
+        //   (mergeConfigFrom gives vendor defaults priority, so the published
+        //   config's `false` gets overwritten by the vendor's `true`.)
+        config([
+            'translation-manager.navigation_group' => __('admin/navigation.settings'),
+        ]);
+
+        // Step 6: Continue processing the request (pass it to the next middleware/controller)
         return $next($request);
     }
 
@@ -76,27 +86,29 @@ class AppLocale
     private function resolveLocale(Request $request): string
     {
         // Priority 1: Check for explicit header from API clients
-        // Mobile apps or API consumers send this header to tell us their language
         if ($request->hasHeader('App-Language')) {
             $candidate = $request->header('App-Language');
 
-            // Priority 1b: Check the standard browser header
-            // Browsers automatically send "Accept-Language: en-US,en;q=0.9,ar;q=0.8"
-            // which tells us the user's preferred languages in order of preference
-        } elseif ($request->hasHeader('Accept-Language')) {
-            $candidate = $this->parseAcceptLanguage($request->header('Accept-Language'));
+            // Priority 2: Kenepa Translation Manager language switcher
+            // Kenepa stores the selected language under the 'language' key in session.
+            // We check this BEFORE the Accept-Language browser header so a manual
+            // language selection always wins over the browser's preference.
+        } elseif ($request->hasSession() && Session::has('language')) {
+            $candidate = Session::get('language');
 
-            // Priority 2: Check the session (user previously selected a language)
+            // Priority 3: Our own session 'locale' key (e.g. set by other parts of the app)
         } elseif ($request->hasSession() && Session::has('locale')) {
             $candidate = Session::get('locale');
 
-            // Priority 3: Nothing found — use the default from config/app.php
+            // Priority 4: Browser Accept-Language header
+        } elseif ($request->hasHeader('Accept-Language')) {
+            $candidate = $this->parseAcceptLanguage($request->header('Accept-Language'));
+
+            // Priority 5: Config fallback
         } else {
             $candidate = config('app.locale', 'en');
         }
 
-        // Validate & normalize whatever we found (e.g. "ar-SA" → "ar_SA")
-        // If the locale isn't in our supported list, this will fall back to default
         return $this->validated($candidate);
     }
 
