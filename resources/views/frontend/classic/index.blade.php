@@ -8,8 +8,8 @@
             }
         }
     </style>
-    @php $lang = get_system_language()->code; @endphp
-        <!-- Sliders -->
+    @php $lang = get_system_language()?->code; @endphp
+            <!-- Sliders -->
     <div class="home-banner-area mb-3">
         <div class="container">
             <div class="d-flex flex-wrap position-relative">
@@ -32,13 +32,13 @@
                             @foreach ($sliders as $key => $slider)
                                 <div class="carousel-box">
                                     <a
-                                        href="{{ isset(json_decode($home_slider_links, true)[$key]) ? json_decode($home_slider_links, true)[$key] : '' }}">
+                                            href="{{ isset(json_decode($home_slider_links, true)[$key]) ? json_decode($home_slider_links, true)[$key] : '' }}">
                                         <!-- Image -->
                                         <img
-                                            class="d-block mw-100 img-fit overflow-hidden h-180px h-md-320px h-lg-460px overflow-hidden"
-                                            src="{{ $slider ? $slider->getUrl() : static_asset('assets/img/placeholder.jpg') }}"
-                                            alt="{{ config('app.name') }} promo"
-                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
+                                                class="d-block mw-100 img-fit overflow-hidden h-180px h-md-320px h-lg-460px overflow-hidden"
+                                                src="{{ $slider ? $slider->getUrl() : static_asset('assets/img/placeholder.jpg') }}"
+                                                alt="{{ config('app.name') }} promo"
+                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder-rect.jpg') }}';">
                                     </a>
                                 </div>
                             @endforeach
@@ -115,10 +115,10 @@
                             $flash_deal_products = get_flash_deal_products($flash_deal->id);
                         @endphp
                         <div
-                            class="aiz-carousel border-top @if (count($flash_deal_products) > 8) border-right @endif arrow-inactive-none arrow-x-0"
-                            data-rows="2" data-items="5" data-xxl-items="5" data-xl-items="3.5" data-lg-items="3"
-                            data-md-items="2" data-sm-items="2.5" data-xs-items="1.7" data-arrows="true"
-                            data-dots="false">
+                                class="aiz-carousel border-top @if (count($flash_deal_products) > 8) border-right @endif arrow-inactive-none arrow-x-0"
+                                data-rows="2" data-items="5" data-xxl-items="5" data-xl-items="3.5" data-lg-items="3"
+                                data-md-items="2" data-sm-items="2.5" data-xs-items="1.7" data-arrows="true"
+                                data-dots="false">
                             @foreach ($flash_deal_products as $key => $flash_deal_product)
                                 <div class="carousel-box border-left border-bottom">
                                     @if ($flash_deal_product->product != null && $flash_deal_product->product->published != 0)
@@ -132,7 +132,7 @@
                                             }
                                         @endphp
                                         <div
-                                            class="h-100px h-md-200px h-lg-auto flash-deal-item position-relative text-center has-transition hov-shadow-out z-1">
+                                                class="h-100px h-md-200px h-lg-auto flash-deal-item position-relative text-center has-transition hov-shadow-out z-1">
                                             <a href="{{ $product_url }}"
                                                class="d-block py-md-3 overflow-hidden hov-scale-img"
                                                title="{{ $flash_deal_product->product->getTranslation('name') }}">
@@ -143,12 +143,12 @@
                                                      onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                                 <!-- Price -->
                                                 <div
-                                                    class="fs-11 fs-md-14 mt-md-3 text-center h-md-48px has-transition overflow-hidden pt-md-4 flash-deal-price lh-1-5">
+                                                        class="fs-11 fs-md-14 mt-md-3 text-center h-md-48px has-transition overflow-hidden pt-md-4 flash-deal-price lh-1-5">
                                     <span
-                                        class="d-block text-primary fw-700">{{ home_discounted_base_price($flash_deal_product->product) }}</span>
+                                            class="d-block text-primary fw-700">{{ home_discounted_base_price($flash_deal_product->product) }}</span>
                                                     @if (home_base_price($flash_deal_product->product) != home_discounted_base_price($flash_deal_product->product))
                                                         <del
-                                                            class="d-block fw-400 text-secondary">{{ home_base_price($flash_deal_product->product) }}</del>
+                                                                class="d-block fw-400 text-secondary">{{ home_base_price($flash_deal_product->product) }}</del>
                                                     @endif
                                                 </div>
                                             </a>
@@ -192,16 +192,16 @@
                     <div class="mobile-category-slider row border-top border-left border-bottom">
                         @foreach ($featured_categories->take(6) as $key => $category)
                             @php
-                                $category_name = $category->getTranslation('name');
+                                $category_name = $category->getTranslation('name', 'en');
                             @endphp
                             <div class="col-xl-4 col-md-6  py-3 py-md-2rem category-slide border-right border-bottom">
                                 <div class="d-sm-flex text-center text-sm-left h-100 ">
                                     <div class="mb-3">
                                         <img
-                                            src="{{ get_file_by_id($category->banner) }}"
-                                            class="lazyload w-150px h-auto mx-auto has-transition"
-                                            alt="{{ $category->getTranslation('name') }}"
-                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                src="{{ get_file_by_id($category->banner) }}"
+                                                class="lazyload w-150px h-auto mx-auto has-transition"
+                                                alt="{{ $category->getTranslation('name', 'en') }}"
+                                                onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                     </div>
                                     <div class="px-2 px-lg-4 flex-grow-1">
                                         <h6 class="text-dark mb-0 text-truncate-2">
@@ -216,7 +216,7 @@
                                                 <p class="mb-0 mt-2">
                                                     <a href="{{ route('products.category', $child_category->slug) }}"
                                                        class="fs-13 fw-300 text-reset hov-text-primary animate-underline-primary">
-                                                        {{ $child_category->getTranslation('name') }}
+                                                        {{ $child_category->getTranslation('name', 'en') }}
                                                     </a>
                                                 </p>
                                             @endforeach
@@ -245,11 +245,11 @@
                 @endphp
                 <div class="w-100 w-100 pr-3 pr-md-0">
                     <div
-                        class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15 home-banner-1"
-                        data-items="{{ count($banner_1_imags) }}" data-xxl-items="{{ count($banner_1_imags) }}"
-                        data-xl-items="{{ count($banner_1_imags) }}" data-lg-items="{{ $data_md }}"
-                        data-md-items="2.5" data-sm-items="2.5" data-xs-items="2.5" data-arrows="true"
-                        data-dots="false">
+                            class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15 home-banner-1"
+                            data-items="{{ count($banner_1_imags) }}" data-xxl-items="{{ count($banner_1_imags) }}"
+                            data-xl-items="{{ count($banner_1_imags) }}" data-lg-items="{{ $data_md }}"
+                            data-md-items="2.5" data-sm-items="2.5" data-xs-items="2.5" data-arrows="true"
+                            data-dots="false">
                         @foreach ($banner_1_imags as $key => $value)
                             <div class="carousel-box overflow-hidden hov-scale-img">
                                 <a href="{{ isset(json_decode($home_banner1_links, true)[$key]) ? json_decode($home_banner1_links, true)[$key] : '' }}"
@@ -367,11 +367,11 @@
                 @endphp
                 <div class="w-100 pr-3 pr-md-0">
                     <div
-                        class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15 home-banner-1"
-                        data-items="{{ count($banner_3_imags) }}" data-xxl-items="{{ count($banner_3_imags) }}"
-                        data-xl-items="{{ count($banner_3_imags) }}" data-lg-items="{{ $data_md }}"
-                        data-md-items="2.5" data-sm-items="2.5" data-xs-items="2.5" data-arrows="true"
-                        data-dots="false">
+                            class="aiz-carousel gutters-16 overflow-hidden arrow-inactive-none arrow-dark arrow-x-15 home-banner-1"
+                            data-items="{{ count($banner_3_imags) }}" data-xxl-items="{{ count($banner_3_imags) }}"
+                            data-xl-items="{{ count($banner_3_imags) }}" data-lg-items="{{ $data_md }}"
+                            data-md-items="2.5" data-sm-items="2.5" data-xs-items="2.5" data-arrows="true"
+                            data-dots="false">
                         @foreach ($banner_3_imags as $key => $value)
                             <div class="carousel-box overflow-hidden hov-scale-img">
                                 <a href="{{ isset(json_decode($home_banner3_links, true)[$key]) ? json_decode($home_banner3_links, true)[$key] : '' }}"
@@ -424,11 +424,11 @@
                                                 <g id="Subtraction_167" data-name="Subtraction 167"
                                                    transform="translate(-12177 -8458)" fill="none">
                                                     <path
-                                                        d="M12335,13770h-56a8.009,8.009,0,0,1-8-8v-8a8,8,0,0,0,0-16v-8a8.009,8.009,0,0,1,8-8h56a8.009,8.009,0,0,1,8,8v8a8,8,0,0,0,0,16v8A8.009,8.009,0,0,1,12335,13770Z"
-                                                        stroke="none"/>
+                                                            d="M12335,13770h-56a8.009,8.009,0,0,1-8-8v-8a8,8,0,0,0,0-16v-8a8.009,8.009,0,0,1,8-8h56a8.009,8.009,0,0,1,8,8v8a8,8,0,0,0,0,16v8A8.009,8.009,0,0,1,12335,13770Z"
+                                                            stroke="none"/>
                                                     <path
-                                                        d="M 12335.0009765625 13768.0009765625 C 12338.3095703125 13768.0009765625 12341.0009765625 13765.30859375 12341.0009765625 13762 L 12341.0009765625 13755.798828125 C 12336.4423828125 13754.8701171875 12333.0009765625 13750.8291015625 12333.0009765625 13746 C 12333.0009765625 13741.171875 12336.4423828125 13737.130859375 12341.0009765625 13736.201171875 L 12341.0009765625 13729.9990234375 C 12341.0009765625 13726.6904296875 12338.3095703125 13723.9990234375 12335.0009765625 13723.9990234375 L 12278.9990234375 13723.9990234375 C 12275.6904296875 13723.9990234375 12272.9990234375 13726.6904296875 12272.9990234375 13729.9990234375 L 12272.9990234375 13736.201171875 C 12277.5576171875 13737.1298828125 12280.9990234375 13741.1708984375 12280.9990234375 13746 C 12280.9990234375 13750.828125 12277.5576171875 13754.869140625 12272.9990234375 13755.798828125 L 12272.9990234375 13762 C 12272.9990234375 13765.30859375 12275.6904296875 13768.0009765625 12278.9990234375 13768.0009765625 L 12335.0009765625 13768.0009765625 M 12335.0009765625 13770.0009765625 L 12278.9990234375 13770.0009765625 C 12274.587890625 13770.0009765625 12270.9990234375 13766.412109375 12270.9990234375 13762 L 12270.9990234375 13754 C 12275.4111328125 13753.9990234375 12278.9990234375 13750.4111328125 12278.9990234375 13746 C 12278.9990234375 13741.5888671875 12275.41015625 13738 12270.9990234375 13738 L 12270.9990234375 13729.9990234375 C 12270.9990234375 13725.587890625 12274.587890625 13721.9990234375 12278.9990234375 13721.9990234375 L 12335.0009765625 13721.9990234375 C 12339.412109375 13721.9990234375 12343.0009765625 13725.587890625 12343.0009765625 13729.9990234375 L 12343.0009765625 13738 C 12338.5888671875 13738.0009765625 12335.0009765625 13741.5888671875 12335.0009765625 13746 C 12335.0009765625 13750.4111328125 12338.58984375 13754 12343.0009765625 13754 L 12343.0009765625 13762 C 12343.0009765625 13766.412109375 12339.412109375 13770.0009765625 12335.0009765625 13770.0009765625 Z"
-                                                        stroke="none" fill="#fff"/>
+                                                            d="M 12335.0009765625 13768.0009765625 C 12338.3095703125 13768.0009765625 12341.0009765625 13765.30859375 12341.0009765625 13762 L 12341.0009765625 13755.798828125 C 12336.4423828125 13754.8701171875 12333.0009765625 13750.8291015625 12333.0009765625 13746 C 12333.0009765625 13741.171875 12336.4423828125 13737.130859375 12341.0009765625 13736.201171875 L 12341.0009765625 13729.9990234375 C 12341.0009765625 13726.6904296875 12338.3095703125 13723.9990234375 12335.0009765625 13723.9990234375 L 12278.9990234375 13723.9990234375 C 12275.6904296875 13723.9990234375 12272.9990234375 13726.6904296875 12272.9990234375 13729.9990234375 L 12272.9990234375 13736.201171875 C 12277.5576171875 13737.1298828125 12280.9990234375 13741.1708984375 12280.9990234375 13746 C 12280.9990234375 13750.828125 12277.5576171875 13754.869140625 12272.9990234375 13755.798828125 L 12272.9990234375 13762 C 12272.9990234375 13765.30859375 12275.6904296875 13768.0009765625 12278.9990234375 13768.0009765625 L 12335.0009765625 13768.0009765625 M 12335.0009765625 13770.0009765625 L 12278.9990234375 13770.0009765625 C 12274.587890625 13770.0009765625 12270.9990234375 13766.412109375 12270.9990234375 13762 L 12270.9990234375 13754 C 12275.4111328125 13753.9990234375 12278.9990234375 13750.4111328125 12278.9990234375 13746 C 12278.9990234375 13741.5888671875 12275.41015625 13738 12270.9990234375 13738 L 12270.9990234375 13729.9990234375 C 12270.9990234375 13725.587890625 12274.587890625 13721.9990234375 12278.9990234375 13721.9990234375 L 12335.0009765625 13721.9990234375 C 12339.412109375 13721.9990234375 12343.0009765625 13725.587890625 12343.0009765625 13729.9990234375 L 12343.0009765625 13738 C 12338.5888671875 13738.0009765625 12335.0009765625 13741.5888671875 12335.0009765625 13746 C 12335.0009765625 13750.4111328125 12338.58984375 13754 12343.0009765625 13754 L 12343.0009765625 13762 C 12343.0009765625 13766.412109375 12339.412109375 13770.0009765625 12335.0009765625 13770.0009765625 Z"
+                                                            stroke="none" fill="#fff"/>
                                                 </g>
                                             </g>
                                         </g>
@@ -437,11 +437,11 @@
                                             <g id="Subtraction_167-2" data-name="Subtraction 167"
                                                transform="translate(-12177 -8458)" fill="none">
                                                 <path
-                                                    d="M12335,13770h-56a8.009,8.009,0,0,1-8-8v-8a8,8,0,0,0,0-16v-8a8.009,8.009,0,0,1,8-8h56a8.009,8.009,0,0,1,8,8v8a8,8,0,0,0,0,16v8A8.009,8.009,0,0,1,12335,13770Z"
-                                                    stroke="none"/>
+                                                        d="M12335,13770h-56a8.009,8.009,0,0,1-8-8v-8a8,8,0,0,0,0-16v-8a8.009,8.009,0,0,1,8-8h56a8.009,8.009,0,0,1,8,8v8a8,8,0,0,0,0,16v8A8.009,8.009,0,0,1,12335,13770Z"
+                                                        stroke="none"/>
                                                 <path
-                                                    d="M 12335.0009765625 13768.0009765625 C 12338.3095703125 13768.0009765625 12341.0009765625 13765.30859375 12341.0009765625 13762 L 12341.0009765625 13755.798828125 C 12336.4423828125 13754.8701171875 12333.0009765625 13750.8291015625 12333.0009765625 13746 C 12333.0009765625 13741.171875 12336.4423828125 13737.130859375 12341.0009765625 13736.201171875 L 12341.0009765625 13729.9990234375 C 12341.0009765625 13726.6904296875 12338.3095703125 13723.9990234375 12335.0009765625 13723.9990234375 L 12278.9990234375 13723.9990234375 C 12275.6904296875 13723.9990234375 12272.9990234375 13726.6904296875 12272.9990234375 13729.9990234375 L 12272.9990234375 13736.201171875 C 12277.5576171875 13737.1298828125 12280.9990234375 13741.1708984375 12280.9990234375 13746 C 12280.9990234375 13750.828125 12277.5576171875 13754.869140625 12272.9990234375 13755.798828125 L 12272.9990234375 13762 C 12272.9990234375 13765.30859375 12275.6904296875 13768.0009765625 12278.9990234375 13768.0009765625 L 12335.0009765625 13768.0009765625 M 12335.0009765625 13770.0009765625 L 12278.9990234375 13770.0009765625 C 12274.587890625 13770.0009765625 12270.9990234375 13766.412109375 12270.9990234375 13762 L 12270.9990234375 13754 C 12275.4111328125 13753.9990234375 12278.9990234375 13750.4111328125 12278.9990234375 13746 C 12278.9990234375 13741.5888671875 12275.41015625 13738 12270.9990234375 13738 L 12270.9990234375 13729.9990234375 C 12270.9990234375 13725.587890625 12274.587890625 13721.9990234375 12278.9990234375 13721.9990234375 L 12335.0009765625 13721.9990234375 C 12339.412109375 13721.9990234375 12343.0009765625 13725.587890625 12343.0009765625 13729.9990234375 L 12343.0009765625 13738 C 12338.5888671875 13738.0009765625 12335.0009765625 13741.5888671875 12335.0009765625 13746 C 12335.0009765625 13750.4111328125 12338.58984375 13754 12343.0009765625 13754 L 12343.0009765625 13762 C 12343.0009765625 13766.412109375 12339.412109375 13770.0009765625 12335.0009765625 13770.0009765625 Z"
-                                                    stroke="none" fill="#fff"/>
+                                                        d="M 12335.0009765625 13768.0009765625 C 12338.3095703125 13768.0009765625 12341.0009765625 13765.30859375 12341.0009765625 13762 L 12341.0009765625 13755.798828125 C 12336.4423828125 13754.8701171875 12333.0009765625 13750.8291015625 12333.0009765625 13746 C 12333.0009765625 13741.171875 12336.4423828125 13737.130859375 12341.0009765625 13736.201171875 L 12341.0009765625 13729.9990234375 C 12341.0009765625 13726.6904296875 12338.3095703125 13723.9990234375 12335.0009765625 13723.9990234375 L 12278.9990234375 13723.9990234375 C 12275.6904296875 13723.9990234375 12272.9990234375 13726.6904296875 12272.9990234375 13729.9990234375 L 12272.9990234375 13736.201171875 C 12277.5576171875 13737.1298828125 12280.9990234375 13741.1708984375 12280.9990234375 13746 C 12280.9990234375 13750.828125 12277.5576171875 13754.869140625 12272.9990234375 13755.798828125 L 12272.9990234375 13762 C 12272.9990234375 13765.30859375 12275.6904296875 13768.0009765625 12278.9990234375 13768.0009765625 L 12335.0009765625 13768.0009765625 M 12335.0009765625 13770.0009765625 L 12278.9990234375 13770.0009765625 C 12274.587890625 13770.0009765625 12270.9990234375 13766.412109375 12270.9990234375 13762 L 12270.9990234375 13754 C 12275.4111328125 13753.9990234375 12278.9990234375 13750.4111328125 12278.9990234375 13746 C 12278.9990234375 13741.5888671875 12275.41015625 13738 12270.9990234375 13738 L 12270.9990234375 13729.9990234375 C 12270.9990234375 13725.587890625 12274.587890625 13721.9990234375 12278.9990234375 13721.9990234375 L 12335.0009765625 13721.9990234375 C 12339.412109375 13721.9990234375 12343.0009765625 13725.587890625 12343.0009765625 13729.9990234375 L 12343.0009765625 13738 C 12338.5888671875 13738.0009765625 12335.0009765625 13741.5888671875 12335.0009765625 13746 C 12335.0009765625 13750.4111328125 12338.58984375 13754 12343.0009765625 13754 L 12343.0009765625 13762 C 12343.0009765625 13766.412109375 12339.412109375 13770.0009765625 12335.0009765625 13770.0009765625 Z"
+                                                        stroke="none" fill="#fff"/>
                                             </g>
                                             <g id="Group_24325" data-name="Group 24325">
                                                 <rect id="Rectangle_18578" data-name="Rectangle 18578" width="8"
@@ -534,7 +534,7 @@
                         <div class="row no-gutters border-top border-left">
                             @foreach ($classified_products as $key => $classified_product)
                                 <div
-                                    class="col-xl-4 col-md-6 border-right border-bottom has-transition hov-shadow-out z-1">
+                                        class="col-xl-4 col-md-6 border-right border-bottom has-transition hov-shadow-out z-1">
                                     <div class="aiz-card-box p-2 has-transition bg-white">
                                         <div class="row hov-scale-img">
                                             <div class="col-4 col-md-5 mb-3 mb-md-0">
@@ -549,23 +549,23 @@
                                             </div>
                                             <div class="col">
                                                 <h3
-                                                    class="fw-400 fs-14 text-dark text-truncate-2 lh-1-4 mb-3 h-35px d-none d-sm-block">
+                                                        class="fw-400 fs-14 text-dark text-truncate-2 lh-1-4 mb-3 h-35px d-none d-sm-block">
                                                     <a href="{{ route('customer.product', $classified_product->slug) }}"
                                                        class="d-block text-reset hov-text-primary">{{ $classified_product->getTranslation('name') }}</a>
                                                 </h3>
                                                 <div class="fs-14 mb-3">
                                     <span
-                                        class="text-secondary">{{ $classified_product->user ? $classified_product->user->name : '' }}</span><br>
+                                            class="text-secondary">{{ $classified_product->user ? $classified_product->user->name : '' }}</span><br>
                                                     <span
-                                                        class="fw-700 text-primary">{{ single_price($classified_product->unit_price) }}</span>
+                                                            class="fw-700 text-primary">{{ single_price($classified_product->unit_price) }}</span>
                                                 </div>
                                                 @if ($classified_product->conditon == 'new')
                                                     <span
-                                                        class="badge badge-inline badge-soft-info fs-13 fw-700 p-3 text-info border-radius-20px">
+                                                            class="badge badge-inline badge-soft-info fs-13 fw-700 p-3 text-info border-radius-20px">
                                     {{ translate('New') }}</span>
                                                 @elseif($classified_product->conditon == 'used')
                                                     <span
-                                                        class="badge badge-inline badge-soft-danger fs-13 fw-700 p-3 text-danger border-radius-20px">{{ translate('Used') }}</span>
+                                                            class="badge badge-inline badge-soft-danger fs-13 fw-700 p-3 text-danger border-radius-20px">{{ translate('Used') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -578,13 +578,13 @@
                     <!-- Mobile Slider -->
                     <div class="bg-white d-sm-none ">
                         <div
-                            class="aiz-carousel @if (count($classified_products) <= 8) arrow-inactive-none arrow-x-0 @endif"
-                            data-items="1.5" data-sm-items="1.5" data-arrows="true" data-dots="false"
-                            data-dots="false"
-                            data-autoplay="true" data-autoplay-speed="3000" data-rows="2">
+                                class="aiz-carousel @if (count($classified_products) <= 8) arrow-inactive-none arrow-x-0 @endif"
+                                data-items="1.5" data-sm-items="1.5" data-arrows="true" data-dots="false"
+                                data-dots="false"
+                                data-autoplay="true" data-autoplay-speed="3000" data-rows="2">
                             @foreach ($classified_products as $key => $classified_product)
                                 <div
-                                    class="carousel-box classified-slider border has-transition hov-shadow-out bg-white ">
+                                        class="carousel-box classified-slider border has-transition hov-shadow-out bg-white ">
                                     <div class="d-flex flex-row align-items-start p-2">
                                         <!-- Image Section (Left) -->
                                         <a href="{{ route('customer.product', $classified_product->slug) }}"
@@ -611,10 +611,10 @@
                                             <div>
                                                 @if ($classified_product->conditon == 'new')
                                                     <span
-                                                        class="badge-sm badge-soft-info fs-11 fw-600 px-2 py-1 text-info rounded-pill">{{ translate('New') }}</span>
+                                                            class="badge-sm badge-soft-info fs-11 fw-600 px-2 py-1 text-info rounded-pill">{{ translate('New') }}</span>
                                                 @elseif($classified_product->conditon == 'used')
                                                     <span
-                                                        class="badge-sm badge-soft-danger fs-11 fw-600 px-2 py-1 text-danger rounded-pill">{{ translate('Used') }}</span>
+                                                            class="badge-sm badge-soft-danger fs-11 fw-600 px-2 py-1 text-danger rounded-pill">{{ translate('Used') }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -658,7 +658,7 @@
                         @foreach ($best_selers as $key => $seller)
                             @if ($seller->user != null)
                                 <div
-                                    class="carousel-box h-100 position-relative text-center border-right border-top border-bottom @if ($key == 0) border-left @endif has-transition hov-animate-outline">
+                                        class="carousel-box h-100 position-relative text-center border-right border-top border-bottom @if ($key == 0) border-left @endif has-transition hov-animate-outline">
                                     <div class="position-relative px-3 pt-3 pt-md-4 pb-1 pb-md-4">
                                         <!-- Shop logo & Verification Status -->
                                         <div class="position-relative mx-auto size-100px size-md-120px">
@@ -709,7 +709,7 @@
                                         </div>
                                         <!-- Shop name -->
                                         <h2
-                                            class="fs-14 fw-700 text-dark text-truncate-2 h-40px mt-3 mt-md-4 mb-0 mb-md-3">
+                                                class="fs-14 fw-700 text-dark text-truncate-2 h-40px mt-3 mt-md-4 mb-0 mb-md-3">
                                             <a href="{{ route('shop.visit', $seller->slug) }}"
                                                class="text-reset hov-text-primary"
                                                tabindex="0">{{ $seller->name }}</a>
@@ -765,20 +765,20 @@
                 <div class="bg-white px-sm-3 px-0">
                     <!-- Desktop Grid (hidden on mobile) -->
                     <div
-                        class="row row-cols-xxl-6 row-cols-xl-6 row-cols-lg-4 row-cols-md-4 row-cols-3 gutters-16 border-top border-left d-none d-sm-flex">
+                            class="row row-cols-xxl-6 row-cols-xl-6 row-cols-lg-4 row-cols-md-4 row-cols-3 gutters-16 border-top border-left d-none d-sm-flex">
                         @php
                             $top_brands = json_decode(get_setting('top_brands'));
                             $brands = get_brands($top_brands);
                         @endphp
                         @foreach ($brands as $brand)
                             <div
-                                class="col text-center border-right border-bottom hov-scale-img has-transition hov-shadow-out z-1">
+                                    class="col text-center border-right border-bottom hov-scale-img has-transition hov-shadow-out z-1">
                                 <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-sm-3">
                                     <img
-                                        src="{{ $brand->logo != null ? get_file_by_id($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
-                                        class="lazyload h-100 h-md-100px mx-auto has-transition p-2 p-sm-4 mw-100"
-                                        alt="{{ $brand->getTranslation('name') }}"
-                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                            src="{{ $brand->logo != null ? get_file_by_id($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
+                                            class="lazyload h-100 h-md-100px mx-auto has-transition p-2 p-sm-4 mw-100"
+                                            alt="{{ $brand->getTranslation('name') }}"
+                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                     <p class="text-center text-dark fs-12 fs-md-14 fw-700 mt-2">
                                         {{ $brand->getTranslation('name') }}
                                     </p>
@@ -793,13 +793,13 @@
                          data-arrows="true" data-dots="false">
                         @foreach ($brands as $brand)
                             <div
-                                class="carousel-box text-center border hov-scale-img has-transition hov-shadow-out z-1">
+                                    class="carousel-box text-center border hov-scale-img has-transition hov-shadow-out z-1">
                                 <a href="{{ route('products.brand', $brand->slug) }}" class="d-block p-2 p-sm-3">
                                     <img
-                                        src="{{ $brand->logo != null ? get_file_by_id($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
-                                        class="lazyload h-100 h-md-100px mx-auto has-transition p-1 p-sm-2 mw-100"
-                                        alt="{{ $brand->getTranslation('name') }}"
-                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                            src="{{ $brand->logo != null ? get_file_by_id($brand->logo) : static_asset('assets/img/placeholder.jpg') }}"
+                                            class="lazyload h-100 h-md-100px mx-auto has-transition p-1 p-sm-2 mw-100"
+                                            alt="{{ $brand->getTranslation('name') }}"
+                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                     <p class="text-center text-dark fs-12 fs-md-14 fw-700 mt-1 mt-sm-2">
                                         {{ $brand->getTranslation('name') }}
                                     </p>

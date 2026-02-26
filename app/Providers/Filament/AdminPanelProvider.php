@@ -11,6 +11,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -28,6 +29,12 @@ class AdminPanelProvider extends PanelProvider
      */
     public function panel(Panel $panel): Panel
     {
+        $supportedLocales = collect(config('app.supported_locales', []))
+            ->pluck('language')
+            ->unique()
+            ->values()
+            ->toArray() ?: ['en'];
+
         return $panel
             ->default()
             ->id('admin')
@@ -77,6 +84,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 TranslationManagerPlugin::make(),
+                SpatieLaravelTranslatablePlugin::make()
+                    ->defaultLocales($supportedLocales),
             ]);
     }
 }

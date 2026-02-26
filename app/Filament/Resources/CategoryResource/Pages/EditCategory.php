@@ -6,17 +6,21 @@ use App\Filament\Resources\CategoryResource;
 use App\Services\CategoryService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EditCategory extends EditRecord
 {
+    use Translatable;
+
     protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\LocaleSwitcher::make(),
             Actions\ViewAction::make(),
             Actions\DeleteAction::make()
                 ->using(fn (\App\Models\Category $record) => app(CategoryService::class)->delete($record)),

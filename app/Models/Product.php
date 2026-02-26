@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
-use App;
 use App\Models\Traits\Product\ProductRelationships;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\SchemalessAttributes\SchemalessAttributesTrait;
 use Spatie\Tags\HasTags;
+use Spatie\Translatable\HasTranslations;
 
 class Product extends Model implements HasMedia
 {
-    use HasFactory, HasTags, InteractsWithMedia, ProductRelationships, SchemalessAttributesTrait;
+    use HasFactory, HasTags, HasTranslations,
+        InteractsWithMedia, ProductRelationships,
+        SchemalessAttributesTrait, Searchable;
 
     protected $fillable = [
         'name',
@@ -67,8 +70,14 @@ class Product extends Model implements HasMedia
         'est_shipping_days' => 'integer',
     ];
 
+    /**
+     * Fields that are stored as JSON and served per active locale via
+     * spatie/laravel-translatable. Accessing $product->name automatically
+     * returns the string for the current app locale.
+     */
+    public array $translatable = ['name', 'description', 'meta_title', 'meta_description'];
+
     protected $with = [
-        'product_translations',
         'taxes',
         'media',
         'stocks',
@@ -76,12 +85,25 @@ class Product extends Model implements HasMedia
         'brand',
     ];
 
-    public function getTranslation($field = '', $lang = false)
+    /**
+     * Build the array that Meilisearch indexes for this model.
+     * Each translatable field is expanded per locale so all languages are searchable.
+     */
+    public function toSearchableArray(): array
     {
-        $lang = $lang == false ? App::getLocale() : $lang;
-        $product_translations = $this->product_translations->where('lang', $lang)->first();
+        $data = ['id' => $this->id];
 
-        return $product_translations != null ? $product_translations->$field : $this->$field;
+        foreach (array_keys($this->getTranslations('name')) as $locale) {
+            $data["name_{$locale}"] = $this->getTranslation('name', $locale, false);
+        }
+        foreach (array_keys($this->getTranslations('description')) as $locale) {
+            $data["description_{$locale}"] = $this->getTranslation('description', $locale, false);
+        }
+        foreach (array_keys($this->getTranslations('meta_title')) as $locale) {
+            $data["meta_title_{$locale}"] = $this->getTranslation('meta_title', $locale, false);
+        }
+
+        return $data;
     }
 
     public function scopePhysical($query)

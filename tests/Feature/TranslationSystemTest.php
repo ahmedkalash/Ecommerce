@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Spatie\TranslationLoader\LanguageLine;
 use Tests\TestCase;
 
@@ -18,7 +18,7 @@ use Tests\TestCase;
  */
 class TranslationSystemTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Test that a LanguageLine can be created and persisted.

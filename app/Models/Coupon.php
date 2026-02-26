@@ -9,10 +9,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 
 class Coupon extends Model
 {
-    use HasFactory, PreventDemoModeChanges;
+    use HasFactory, HasTranslations, PreventDemoModeChanges;
+
+    /**
+     * Fields stored as JSON, served per active locale via spatie/laravel-translatable.
+     */
+    public array $translatable = ['label'];
 
     protected $fillable = [
         'type',

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
@@ -13,7 +13,7 @@ use Tests\TestCase;
  */
 class AppLocaleMiddlewareTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * Test that the default locale is applied when no header or session is set.
@@ -22,7 +22,9 @@ class AppLocaleMiddlewareTest extends TestCase
     {
         $response = $this->get('/');
 
-        $this->assertContains(app()->getLocale(), ['en', 'ar']);
+        $locales = collect(config('app.supported_locales',
+            []))->pluck('language')->unique()->values()->toArray() ?: ['en'];
+        $this->assertContains(app()->getLocale(), $locales);
     }
 
     /**
@@ -87,7 +89,9 @@ class AppLocaleMiddlewareTest extends TestCase
         ])->get('/');
 
         // Should fall back to the default locale's language part
-        $this->assertContains(app()->getLocale(), ['en', 'ar']);
+        $locales = collect(config('app.supported_locales',
+            []))->pluck('language')->unique()->values()->toArray() ?: ['en'];
+        $this->assertContains(app()->getLocale(), $locales);
     }
 
     /**

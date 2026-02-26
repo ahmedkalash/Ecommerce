@@ -13,7 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(RoleAndPermissionSeeder::class);
-        $this->call(AssignSuperAdminSeeder::class);
+        // You should preserve the order of these seeders, not to get errors.
+
+        // app data
+        $this->call([
+            RoleAndPermissionSeeder::class,
+            AssignSuperAdminSeeder::class,
+        ]);
+
+        // demo data
+        $this->call([
+            CategoryDemoSeeder::class,
+            BrandDemoSeeder::class,
+            ProductDemoSeeder::class,
+            CouponDemoSeeder::class,
+        ]);
     }
 }

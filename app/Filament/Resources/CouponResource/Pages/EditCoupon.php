@@ -8,16 +8,20 @@ use App\Models\Coupon;
 use App\Services\CouponService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class EditCoupon extends EditRecord
 {
+    use Translatable;
+
     protected static string $resource = CouponResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\LocaleSwitcher::make(),
             Actions\DeleteAction::make(),
             Actions\CreateAction::make()->label('Create New'),
         ];

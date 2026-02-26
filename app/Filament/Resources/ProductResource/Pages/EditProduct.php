@@ -8,17 +8,21 @@ use App\Models\Product;
 use App\Services\ProductService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EditProduct extends EditRecord
 {
+    use Translatable;
+
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\LocaleSwitcher::make(),
             Actions\DeleteAction::make(),
             Actions\CreateAction::make()->label('Create New'),
         ];

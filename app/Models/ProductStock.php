@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\SpecialPriceType;
-use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -11,7 +10,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class ProductStock extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, PreventDemoModeChanges;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'product_id',

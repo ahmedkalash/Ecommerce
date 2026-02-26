@@ -8,6 +8,7 @@ use App\Filament\Resources\CouponResource;
 use App\Filament\Resources\ProductResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\StaffResource;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\App;
 use Tests\TestCase;
 
@@ -22,6 +23,7 @@ use Tests\TestCase;
  */
 class AdminTranslationTest extends TestCase
 {
+    use DatabaseTransactions;
     // ──────────────────── English ────────────────────
 
     /** @test */
@@ -170,7 +172,8 @@ class AdminTranslationTest extends TestCase
     /** @test */
     public function all_admin_php_lang_files_exist_and_contain_expected_keys(): void
     {
-        $locales = ['en', 'ar'];
+        $locales = collect(config('app.supported_locales',
+            []))->pluck('language')->unique()->values()->toArray() ?: ['en'];
         $files = ['navigation', 'resources', 'actions', 'validation'];
 
         foreach ($locales as $locale) {
@@ -190,11 +193,20 @@ class AdminTranslationTest extends TestCase
     public function admin_navigation_php_file_contains_all_expected_keys(): void
     {
         $expected = [
-            'catalog', 'shop_management', 'user_management', 'settings', 'products', 'categories', 'coupons', 'staff',
+            'catalog',
+            'shop_management',
+            'user_management',
+            'settings',
+            'products',
+            'categories',
+            'coupons',
+            'staff',
             'roles',
         ];
 
-        foreach (['en', 'ar'] as $locale) {
+        $locales = collect(config('app.supported_locales',
+            []))->pluck('language')->unique()->values()->toArray() ?: ['en'];
+        foreach ($locales as $locale) {
             $translations = require lang_path("{$locale}/admin/navigation.php");
 
             foreach ($expected as $key) {

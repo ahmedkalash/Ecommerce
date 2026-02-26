@@ -121,7 +121,6 @@ class StaffResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()->label(__('admin/actions.general.edit')),
                 Tables\Actions\DeleteAction::make()->label(__('admin/actions.general.delete')),
-                Tables\Actions\ViewAction::make()->label(__('admin/actions.general.view')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

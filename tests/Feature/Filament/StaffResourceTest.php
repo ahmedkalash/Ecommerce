@@ -7,7 +7,7 @@ use App\Filament\Resources\StaffResource\Pages\EditStaff;
 use App\Filament\Resources\StaffResource\Pages\ListStaff;
 use App\Models\Admin;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class StaffResourceTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     protected function setUp(): void
     {

@@ -6,14 +6,25 @@ use App\DTOs\ProductDTO;
 use App\Enums\UserType;
 use App\Filament\Resources\ProductResource;
 use App\Services\ProductService;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\CreateRecord\Concerns\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CreateProduct extends CreateRecord
 {
+    use Translatable;
+
     protected static string $resource = ProductResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\LocaleSwitcher::make(),
+        ];
+    }
 
     /**
      * Inject server-side defaults before the record is created.

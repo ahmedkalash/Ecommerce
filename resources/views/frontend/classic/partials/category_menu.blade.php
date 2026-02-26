@@ -2,7 +2,7 @@
     <ul class="list-unstyled categories no-scrollbar mb-0 text-left">
         @foreach (get_level_zero_categories()->take(10) as $key => $category)
             @php
-                $category_name = $category->getTranslation('name');
+                $category_name = $category->getTranslation('name', 'en');
             @endphp
             <li class="category-nav-element border border-top-0" data-id="{{ $category->id }}">
                 <a href="{{ route('products.category', $category->slug) }}"
