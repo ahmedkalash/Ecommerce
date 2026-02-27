@@ -17,14 +17,14 @@ class OrderCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($data) {
                 return [
-                    'id'                => $data->id,
-                    'order_code'        => $data->code,
-                    'total'             => format_price($data->grand_total),
-                    'order_date'        => date('d-m-Y', strtotime($data->created_at)),
-                    'payment_status'    => $data->payment_status,
-                    'delivery_status'   =>  join(" ", explode('_', $data->delivery_status)),
+                    'id' => $data->id,
+                    'order_code' => $data->code,
+                    'total' => format_price($data->grand_total),
+                    'order_date' => date('d-m-Y', strtotime($data->created_at)),
+                    'payment_status' => $data->payment_status,
+                    'delivery_status' => implode(' ', explode('_', $data->delivery_status)),
                 ];
-            })
+            }),
         ];
     }
 }

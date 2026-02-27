@@ -20,8 +20,9 @@ class BrandBulkUploadController extends Controller
 
     public function bulk_upload(Request $request)
     {
-        if (!extension_loaded('zip')){
+        if (! extension_loaded('zip')) {
             flash(translate('Please enable the Zip extension'))->error();
+
             return back();
         }
 

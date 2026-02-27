@@ -9,12 +9,12 @@ class CustomerCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'id' => $data->id,
-                    'name' => $data->name
+                    'name' => $data->name,
                 ];
-            })
+            }),
         ];
     }
 
@@ -22,7 +22,7 @@ class CustomerCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Tax;
+use Illuminate\Http\Request;
 
 class TaxController extends Controller
 {
@@ -21,6 +21,7 @@ class TaxController extends Controller
     public function index()
     {
         $all_taxes = Tax::orderBy('created_at', 'desc')->get();
+
         return view('backend.setup_configurations.tax.index', compact('all_taxes'));
     }
 
@@ -37,7 +38,6 @@ class TaxController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -49,9 +49,11 @@ class TaxController extends Controller
         if ($tax->save()) {
 
             flash(translate('Tax has been inserted successfully'))->success();
+
             return redirect()->route('tax.index');
         } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -76,13 +78,13 @@ class TaxController extends Controller
     public function edit($id)
     {
         $tax = Tax::findOrFail($id);
+
         return view('backend.setup_configurations.tax.edit', compact('tax'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -93,9 +95,11 @@ class TaxController extends Controller
         //        $language->code = $request->code;
         if ($tax->save()) {
             flash(translate('Tax has been updated successfully'))->success();
+
             return redirect()->route('tax.index');
         } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }
@@ -112,6 +116,7 @@ class TaxController extends Controller
         if ($tax->save()) {
             return 1;
         }
+
         return 0;
     }
 
@@ -127,9 +132,11 @@ class TaxController extends Controller
         $tax->product_taxes()->delete();
         if (Tax::destroy($id)) {
             flash(translate('Tax has been deleted successfully'))->success();
+
             return redirect()->route('tax.index');
         } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }

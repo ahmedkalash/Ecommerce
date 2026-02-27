@@ -15,7 +15,8 @@ class AuctionPurchaseHistory extends JsonResource
     public function toArray($request)
     {
         $order = \App\Models\Order::find($this->id);
-        return  [
+
+        return [
             'id' => $order->id,
             'code' => $order->code,
             'date' => date('d-m-Y', $order->date),

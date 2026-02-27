@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +11,9 @@ class ShopVerificationNotification extends Notification
     use Queueable;
 
     public $data;
+
     public $className;
+
     /**
      * Create a new notification instance.
      *
@@ -21,7 +22,7 @@ class ShopVerificationNotification extends Notification
     public function __construct($data)
     {
         $this->data = $data;
-        $this->className= ShopVerificationNotification::class;
+        $this->className = ShopVerificationNotification::class;
     }
 
     /**
@@ -44,9 +45,9 @@ class ShopVerificationNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -60,10 +61,10 @@ class ShopVerificationNotification extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'name'  => $this->data['shop']['name'],
-                'id'    => $this->data['shop']['id'],
-                'status'=> $this->data['status']
-            ]
+                'name' => $this->data['shop']['name'],
+                'id' => $this->data['shop']['id'],
+                'status' => $this->data['status'],
+            ],
         ];
     }
 }

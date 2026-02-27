@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\AppLanguage;
 use App\Http\Middleware\CheckoutMiddleware;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsAppUserUnbanned;
@@ -46,7 +45,7 @@ class Kernel extends HttpKernel
             // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\Language::class,
+            \App\Http\Middleware\AppLocale::class,
             \App\Http\Middleware\HttpsProtocol::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class,
         ],
@@ -69,7 +68,6 @@ class Kernel extends HttpKernel
      */
     protected $routeMiddleware = [
         'prevent_db_action' => PreventDatabaseAction::class,
-        'app_language' => AppLanguage::class,
         'app_user_unbanned' => IsAppUserUnbanned::class,
         'admin' => IsAdmin::class,
         'isPreorder' => isPreorder::class,

@@ -18,7 +18,12 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasMedia, MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, HasRoles, InteractsWithMedia, Notifiable, UserRelationships;
+    use HasApiTokens,
+        HasFactory,
+        HasRoles,
+        InteractsWithMedia,
+        Notifiable,
+        UserRelationships;
 
     public function canAccessPanel(Panel $panel): bool
     {

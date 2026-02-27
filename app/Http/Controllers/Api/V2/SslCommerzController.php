@@ -1,34 +1,37 @@
 <?php
 
-
 namespace App\Http\Controllers\Api\V2;
 
-
-use App\Models\BusinessSetting;
 use App\Http\Controllers\SSLCommerz;
+use App\Models\BusinessSetting;
 use App\Models\CombinedOrder;
 use App\Models\Order;
-use App\Models\User;
-use App\Models\Wallet;
 use Illuminate\Http\Request;
-# IF BROWSE FROM LOCAL HOST, KEEP true
-if (!defined("SSLCZ_IS_LOCAL_HOST")) {
-    define("SSLCZ_IS_LOCAL_HOST", true);
+
+// IF BROWSE FROM LOCAL HOST, KEEP true
+if (! defined('SSLCZ_IS_LOCAL_HOST')) {
+    define('SSLCZ_IS_LOCAL_HOST', true);
 }
 
 class SslCommerzController extends Controller
 {
     public $sslc_submit_url;
+
     public $sslc_validation_url;
+
     public $sslc_mode;
+
     public $sslc_data;
+
     public $store_id;
+
     public $store_pass;
+
     public $error = '';
 
     public function __construct()
     {
-        # IF SANDBOX TRUE, THEN IT WILL CONNECT WITH SSLCOMMERZ SANDBOX (TEST) SYSTEM
+        // IF SANDBOX TRUE, THEN IT WILL CONNECT WITH SSLCOMMERZ SANDBOX (TEST) SYSTEM
         if (BusinessSetting::where('type', 'sslcommerz_sandbox')->first()->value == 1) {
             $this->setSSLCommerzMode(true);
         } else {
@@ -38,8 +41,8 @@ class SslCommerzController extends Controller
         $this->store_id = env('SSLCZ_STORE_ID');
         $this->store_pass = env('SSLCZ_STORE_PASSWD');
 
-        $this->sslc_submit_url = "https://" . $this->sslc_mode . ".sslcommerz.com/gwprocess/v3/api.php";
-        $this->sslc_validation_url = "https://" . $this->sslc_mode . ".sslcommerz.com/validator/api/validationserverAPI.php";
+        $this->sslc_submit_url = 'https://'.$this->sslc_mode.'.sslcommerz.com/gwprocess/v3/api.php';
+        $this->sslc_validation_url = 'https://'.$this->sslc_mode.'.sslcommerz.com/validator/api/validationserverAPI.php';
     }
 
     public function begin(Request $request)
@@ -50,63 +53,58 @@ class SslCommerzController extends Controller
         $amount = $request->amount;
         $user_id = $request->user_id;
 
-        $post_data = array();
-        $post_data['currency'] = "BDT";
+        $post_data = [];
+        $post_data['currency'] = 'BDT';
         $post_data['value_a'] = $user_id;
 
-        if ($paymentType == "cart_payment") {
+        if ($paymentType == 'cart_payment') {
             $combined_order = CombinedOrder::find($combined_order_id);
             $amount = $combined_order->grand_total;
             $combinedOrderID = $combined_order->id;
 
             $post_data['value_b'] = $combinedOrderID;
-            $post_data['tran_id'] = 'AIZ-' . $combinedOrderID. '-' . date('Ymd'); // tran_id must be unique
-        }
-        elseif ($paymentType == "order_re_payment") {
+            $post_data['tran_id'] = 'AIZ-'.$combinedOrderID.'-'.date('Ymd'); // tran_id must be unique
+        } elseif ($paymentType == 'order_re_payment') {
             $order = Order::findOrFail($request->order_id);
             $amount = $order->grand_total;
             $orderID = $order->id;
 
             $post_data['value_b'] = $orderID;
-            $post_data['tran_id'] = 'AIZ-' . $orderID . '-' . date('Ymd'); // tran_id must be unique
-        }
-        else if ($paymentType == "wallet_payment"){
+            $post_data['tran_id'] = 'AIZ-'.$orderID.'-'.date('Ymd'); // tran_id must be unique
+        } elseif ($paymentType == 'wallet_payment') {
             $post_data['value_b'] = 'sslcommerz';
-            $post_data['tran_id'] = 'AIZ-' . $user_id . '-' . date('Ymd');
-        } 
-        else if ($paymentType ==  "seller_package_payment" || $paymentType ==  "customer_package_payment") {
+            $post_data['tran_id'] = 'AIZ-'.$user_id.'-'.date('Ymd');
+        } elseif ($paymentType == 'seller_package_payment' || $paymentType == 'customer_package_payment') {
             $post_data['value_b'] = $request->package_id;
-            $post_data['tran_id'] = 'AIZ-' . $user_id . '-' . date('Ymd');
+            $post_data['tran_id'] = 'AIZ-'.$user_id.'-'.date('Ymd');
         }
 
-        $post_data['total_amount'] = $amount; # You cant not pay less than 10
+        $post_data['total_amount'] = $amount; // You cant not pay less than 10
         $post_data['value_c'] = $paymentType;
         $post_data['value_d'] = $amount;
 
+        // CUSTOMER INFORMATION
+        $post_data['cus_name'] = 'Customer Name';
+        $post_data['cus_add1'] = 'Customer Address';
+        $post_data['cus_city'] = 'Customer City';
+        $post_data['cus_postcode'] = '1234';
+        $post_data['cus_country'] = 'Bangladesh';
+        $post_data['cus_phone'] = '123456123';
+        $post_data['cus_email'] = 'some@mail.com';
 
-        # CUSTOMER INFORMATION
-        $post_data['cus_name'] = "Customer Name";
-        $post_data['cus_add1'] = "Customer Address";
-        $post_data['cus_city'] = "Customer City";
-        $post_data['cus_postcode'] = "1234";
-        $post_data['cus_country'] = "Bangladesh";
-        $post_data['cus_phone'] = "123456123";
-        $post_data['cus_email'] = "some@mail.com";
-
-
-        $post_data['success_url'] = url("api/v2/sslcommerz/success");
-        $post_data['fail_url'] = url("api/v2/sslcommerz/fail");
-        $post_data['cancel_url'] = url("api/v2/sslcommerz/cancel");
+        $post_data['success_url'] = url('api/v2/sslcommerz/success');
+        $post_data['fail_url'] = url('api/v2/sslcommerz/fail');
+        $post_data['cancel_url'] = url('api/v2/sslcommerz/cancel');
 
         return $this->initiate($post_data);
     }
 
     public function payment_success(Request $request)
     {
-        $sslc = new SSLCommerz();
-        #Start to received these value from session. which was saved in index function.
+        $sslc = new SSLCommerz;
+        // Start to received these value from session. which was saved in index function.
         $tran_id = $request->value_a;
-        #End to received these value from session. which was saved in index function.
+        // End to received these value from session. which was saved in index function.
         $payment = json_encode($request->all());
 
         if (isset($request->value_c)) {
@@ -114,21 +112,17 @@ class SslCommerzController extends Controller
             try {
                 if ($request->value_c == 'cart_payment') {
                     checkout_done($request->value_b, $payment);
-                }
-                elseif ($request->value_c == 'order_re_payment') {
+                } elseif ($request->value_c == 'order_re_payment') {
                     order_re_payment_done($request->value_b, 'SslCommerz', $payment);
-                }
-                elseif ($request->value_c == 'wallet_payment') {
+                } elseif ($request->value_c == 'wallet_payment') {
                     wallet_payment_done($request->value_a, $request->value_d, 'SslCommerz', $payment);
-                }
-                elseif ($request->value_c == 'seller_package_payment') {
+                } elseif ($request->value_c == 'seller_package_payment') {
                     seller_purchase_payment_done($request->value_a, $request->value_b, 'SslCommerz', $payment);
-                }
-                else if ($request->value_c == 'customer_package_payment') {
+                } elseif ($request->value_c == 'customer_package_payment') {
                     customer_purchase_payment_done($request->value_a, $request->value_b, 'SslCommerz', $payment);
                 }
 
-                return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
+                return response()->json(['result' => true, 'message' => translate('Payment is successful')]);
             } catch (\Exception $e) {
                 return response()->json(['result' => false, 'message' => $e->getMessage()]);
             }
@@ -136,7 +130,7 @@ class SslCommerzController extends Controller
 
         return response()->json([
             'result' => false,
-            'message' => translate('Payment Failed')
+            'message' => translate('Payment Failed'),
         ]);
 
         /*return response()->json([
@@ -146,15 +140,13 @@ class SslCommerzController extends Controller
         ]);*/
     }
 
-    public function payment_process(Request $request)
-    {
-    }
+    public function payment_process(Request $request) {}
 
     public function payment_fail(Request $request)
     {
         return response()->json([
             'result' => false,
-            'message' => translate('Payment Failed')
+            'message' => translate('Payment Failed'),
         ]);
     }
 
@@ -162,10 +154,9 @@ class SslCommerzController extends Controller
     {
         return response()->json([
             'result' => false,
-            'message' => translate('Payment Cancelled')
+            'message' => translate('Payment Cancelled'),
         ]);
     }
-
 
     public function initiate($post_data)
     {
@@ -189,14 +180,14 @@ class SslCommerzController extends Controller
 
                         return response()->json([
                             'result' => true,
-                            'url' =>  $this->sslc_data['GatewayPageURL'],
-                            'message' => 'Redirect Url is found'
+                            'url' => $this->sslc_data['GatewayPageURL'],
+                            'message' => 'Redirect Url is found',
                         ]);
                     } else {
                         return response()->json([
                             'result' => false,
                             'url' => '',
-                            'message' => 'No redirect URL found!'
+                            'message' => 'No redirect URL found!',
                         ]);
                     }
                 } else {
@@ -204,7 +195,7 @@ class SslCommerzController extends Controller
                     return response()->json([
                         'result' => false,
                         'url' => '',
-                        'message' => "Invalid Credential!",
+                        'message' => 'Invalid Credential!',
                     ]);
                 }
             } else {
@@ -212,7 +203,7 @@ class SslCommerzController extends Controller
                 return response()->json([
                     'result' => false,
                     'url' => '',
-                    'message' => "Connectivity Issue. Please contact your sslcommerz manager",
+                    'message' => 'Connectivity Issue. Please contact your sslcommerz manager',
                 ]);
             }
         } else {
@@ -220,16 +211,14 @@ class SslCommerzController extends Controller
             return response()->json([
                 'result' => false,
                 'url' => '',
-                'message' => "Please provide a valid information list about transaction with transaction id, amount, success url, fail url, cancel url, store id and pass at least",
+                'message' => 'Please provide a valid information list about transaction with transaction id, amount, success url, fail url, cancel url, store id and pass at least',
             ]);
         }
     }
 
-
-    # SEND CURL REQUEST
+    // SEND CURL REQUEST
     public function sendRequest($data)
     {
-
 
         $handle = curl_init();
         curl_setopt($handle, CURLOPT_URL, $this->sslc_submit_url);
@@ -245,44 +234,44 @@ class SslCommerzController extends Controller
             curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
         }
 
-
         $content = curl_exec($handle);
 
         $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-        if ($code == 200 && !(curl_errno($handle))) {
+        if ($code == 200 && ! (curl_errno($handle))) {
             curl_close($handle);
             $sslcommerzResponse = $content;
 
-            # PARSE THE JSON RESPONSE
+            // PARSE THE JSON RESPONSE
             $this->sslc_data = json_decode($sslcommerzResponse, true);
 
             return $this;
         } else {
             curl_close($handle);
-            $msg = "FAILED TO CONNECT WITH SSLCOMMERZ API";
+            $msg = 'FAILED TO CONNECT WITH SSLCOMMERZ API';
             $this->error = $msg;
+
             return false;
         }
     }
 
-    # SET SSLCOMMERZ PAYMENT MODE - LIVE OR TEST
+    // SET SSLCOMMERZ PAYMENT MODE - LIVE OR TEST
     public function setSSLCommerzMode($test)
     {
         if ($test) {
-            $this->sslc_mode = "sandbox";
+            $this->sslc_mode = 'sandbox';
         } else {
-            $this->sslc_mode = "securepay";
+            $this->sslc_mode = 'securepay';
         }
     }
 
-    # VALIDATE SSLCOMMERZ TRANSACTION
+    // VALIDATE SSLCOMMERZ TRANSACTION
     public function sslcommerz_validate($merchant_trans_id, $merchant_trans_amount, $merchant_trans_currency, $post_data)
     {
-        # MERCHANT SYSTEM INFO
-        if ($merchant_trans_id != "" && $merchant_trans_amount != 0) {
+        // MERCHANT SYSTEM INFO
+        if ($merchant_trans_id != '' && $merchant_trans_amount != 0) {
 
-            # CALL THE FUNCTION TO CHECK THE RESUKT
+            // CALL THE FUNCTION TO CHECK THE RESUKT
             $post_data['store_id'] = $this->store_id;
             $post_data['store_pass'] = $this->store_pass;
 
@@ -291,7 +280,7 @@ class SslCommerzController extends Controller
                 $val_id = urlencode($post_data['val_id']);
                 $store_id = urlencode($this->store_id);
                 $store_passwd = urlencode($this->store_pass);
-                $requested_url = ($this->sslc_validation_url . "?val_id=" . $val_id . "&store_id=" . $store_id . "&store_passwd=" . $store_passwd . "&v=1&format=json");
+                $requested_url = ($this->sslc_validation_url.'?val_id='.$val_id.'&store_id='.$store_id.'&store_passwd='.$store_passwd.'&v=1&format=json');
 
                 $handle = curl_init();
                 curl_setopt($handle, CURLOPT_URL, $requested_url);
@@ -305,22 +294,21 @@ class SslCommerzController extends Controller
                     curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
                 }
 
-
                 $result = curl_exec($handle);
 
                 $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-                if ($code == 200 && !(curl_errno($handle))) {
+                if ($code == 200 && ! (curl_errno($handle))) {
 
-                    # TO CONVERT AS ARRAY
-                    # $result = json_decode($result, true);
-                    # $status = $result['status'];
+                    // TO CONVERT AS ARRAY
+                    // $result = json_decode($result, true);
+                    // $status = $result['status'];
 
-                    # TO CONVERT AS OBJECT
+                    // TO CONVERT AS OBJECT
                     $result = json_decode($result);
                     $this->sslc_data = $result;
 
-                    # TRANSACTION INFO
+                    // TRANSACTION INFO
                     $status = $result->status;
                     $tran_date = $result->tran_date;
                     $tran_id = $result->tran_id;
@@ -332,85 +320,91 @@ class SslCommerzController extends Controller
                     $currency_type = $result->currency_type;
                     $currency_amount = $result->currency_amount;
 
-                    # ISSUER INFO
+                    // ISSUER INFO
                     $card_no = $result->card_no;
                     $card_issuer = $result->card_issuer;
                     $card_brand = $result->card_brand;
                     $card_issuer_country = $result->card_issuer_country;
                     $card_issuer_country_code = $result->card_issuer_country_code;
 
-                    # API AUTHENTICATION
+                    // API AUTHENTICATION
                     $APIConnect = $result->APIConnect;
                     $validated_on = $result->validated_on;
                     $gw_version = $result->gw_version;
 
-                    # GIVE SERVICE
-                    if ($status == "VALID" || $status == "VALIDATED") {
-                        if ($merchant_trans_currency == "BDT") {
+                    // GIVE SERVICE
+                    if ($status == 'VALID' || $status == 'VALIDATED') {
+                        if ($merchant_trans_currency == 'BDT') {
                             if (trim($merchant_trans_id) == trim($tran_id) && (abs($merchant_trans_amount - $amount) < 1) && trim($merchant_trans_currency) == trim('BDT')) {
                                 return true;
                             } else {
-                                # DATA TEMPERED
-                                $this->error = "Data has been tempered";
+                                // DATA TEMPERED
+                                $this->error = 'Data has been tempered';
+
                                 return false;
                             }
                         } else {
-                            //echo "trim($merchant_trans_id) == trim($tran_id) && ( abs($merchant_trans_amount-$currency_amount) < 1 ) && trim($merchant_trans_currency)==trim($currency_type)";
+                            // echo "trim($merchant_trans_id) == trim($tran_id) && ( abs($merchant_trans_amount-$currency_amount) < 1 ) && trim($merchant_trans_currency)==trim($currency_type)";
                             if (trim($merchant_trans_id) == trim($tran_id) && (abs($merchant_trans_amount - $currency_amount) < 1) && trim($merchant_trans_currency) == trim($currency_type)) {
                                 return true;
                             } else {
-                                # DATA TEMPERED
-                                $this->error = "Data has been tempered";
+                                // DATA TEMPERED
+                                $this->error = 'Data has been tempered';
+
                                 return false;
                             }
                         }
                     } else {
-                        # FAILED TRANSACTION
-                        $this->error = "Failed Transaction";
+                        // FAILED TRANSACTION
+                        $this->error = 'Failed Transaction';
+
                         return false;
                     }
                 } else {
-                    # Failed to connect with SSLCOMMERZ
-                    $this->error = "Faile to connect with SSLCOMMERZ";
+                    // Failed to connect with SSLCOMMERZ
+                    $this->error = 'Faile to connect with SSLCOMMERZ';
+
                     return false;
                 }
             } else {
-                # Hash validation failed
-                $this->error = "Hash validation failed";
+                // Hash validation failed
+                $this->error = 'Hash validation failed';
+
                 return false;
             }
         } else {
-            # INVALID DATA
-            $this->error = "Invalid data";
+            // INVALID DATA
+            $this->error = 'Invalid data';
+
             return false;
         }
     }
 
-    # FUNCTION TO CHECK HASH VALUE
-    public function SSLCOMMERZ_hash_varify($store_passwd = "", $post_data)
+    // FUNCTION TO CHECK HASH VALUE
+    public function SSLCOMMERZ_hash_varify($store_passwd, $post_data)
     {
 
         if (isset($post_data) && isset($post_data['verify_sign']) && isset($post_data['verify_key'])) {
-            # NEW ARRAY DECLARED TO TAKE VALUE OF ALL POST
+            // NEW ARRAY DECLARED TO TAKE VALUE OF ALL POST
             $pre_define_key = explode(',', $post_data['verify_key']);
 
-            $new_data = array();
-            if (!empty($pre_define_key)) {
+            $new_data = [];
+            if (! empty($pre_define_key)) {
                 foreach ($pre_define_key as $value) {
                     if (isset($post_data[$value])) {
                         $new_data[$value] = ($post_data[$value]);
                     }
                 }
             }
-            # ADD MD5 OF STORE PASSWORD
+            // ADD MD5 OF STORE PASSWORD
             $new_data['store_passwd'] = md5($store_passwd);
 
-            # SORT THE KEY AS BEFORE
+            // SORT THE KEY AS BEFORE
             ksort($new_data);
 
-            $hash_string = "";
+            $hash_string = '';
             foreach ($new_data as $key => $value) {
-                $hash_string .= $key . '=' . ($value) . '&';
+                $hash_string .= $key.'='.($value).'&';
             }
             $hash_string = rtrim($hash_string, '&');
 
@@ -418,34 +412,37 @@ class SslCommerzController extends Controller
 
                 return true;
             } else {
-                $this->error = "Verification signature not matched";
+                $this->error = 'Verification signature not matched';
+
                 return false;
             }
         } else {
             $this->error = 'Required data mission. ex: verify_key, verify_sign';
+
             return false;
         }
     }
 
-    # FUNCTION TO GET IMAGES FROM WEB
-    public function _get_image($gw = "", $source = array())
+    // FUNCTION TO GET IMAGES FROM WEB
+    public function _get_image($gw = '', $source = [])
     {
-        $logo = "";
-        if (!empty($source) && isset($source['desc'])) {
+        $logo = '';
+        if (! empty($source) && isset($source['desc'])) {
 
             foreach ($source['desc'] as $key => $volume) {
 
                 if (isset($volume['gw']) && $volume['gw'] == $gw) {
 
                     if (isset($volume['logo'])) {
-                        $logo = str_replace("/gw/", "/gw1/", $volume['logo']);
+                        $logo = str_replace('/gw/', '/gw1/', $volume['logo']);
                         break;
                     }
                 }
             }
+
             return $logo;
         } else {
-            return "";
+            return '';
         }
     }
 

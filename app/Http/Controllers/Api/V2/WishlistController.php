@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\WishlistCollection;
-use App\Models\Wishlist;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use App\Models\Wishlist;
 
 class WishlistController extends Controller
 {
-
     public function index()
     {
         return new WishlistCollection(get_wishlists()->get());
@@ -23,21 +21,21 @@ class WishlistController extends Controller
             return response()->json([
                 'message' => translate('Product present in wishlist'),
                 'is_in_wishlist' => true,
-                'product_id' => (integer)$product->id,
+                'product_id' => (int) $product->id,
                 'product_slug' => $product->slug,
-                'wishlist_id' => $wishlist->id
+                'wishlist_id' => $wishlist->id,
             ], 200);
         } else {
             $wishlist = Wishlist::create(
-                ['user_id' =>auth()->user()->id, 'product_id' =>$product->id]
+                ['user_id' => auth()->user()->id, 'product_id' => $product->id]
             );
 
             return response()->json([
                 'message' => translate('Product added to wishlist'),
                 'is_in_wishlist' => true,
-               'product_id' => (integer)$product->id,
+                'product_id' => (int) $product->id,
                 'product_slug' => $product->slug,
-                'wishlist_id' => $wishlist->id
+                'wishlist_id' => $wishlist->id,
             ], 200);
         }
     }
@@ -45,21 +43,22 @@ class WishlistController extends Controller
     public function remove($slug)
     {
         $product = Product::where('slug', $slug)->first();
-        $wishlist = Wishlist::where('product_id', $product->id)->where('user_id',  auth()->user()->id)->first();
+        $wishlist = Wishlist::where('product_id', $product->id)->where('user_id', auth()->user()->id)->first();
         if ($wishlist == null) {
             return response()->json([
                 'message' => translate('Product in not in wishlist'),
                 'is_in_wishlist' => false,
-                'product_id' => (integer)$product->id,
-                'product_slug' => $product->slug
+                'product_id' => (int) $product->id,
+                'product_slug' => $product->slug,
             ], 200);
         } else {
-            Wishlist::where('product_id' , $product->id)->where( 'user_id' , auth()->user()->id)->delete();
+            Wishlist::where('product_id', $product->id)->where('user_id', auth()->user()->id)->delete();
+
             return response()->json([
                 'message' => translate('Product is removed from wishlist'),
                 'is_in_wishlist' => false,
-                'product_id' => (integer)$product->id,
-                'product_slug' => $product->slug
+                'product_id' => (int) $product->id,
+                'product_slug' => $product->slug,
             ], 200);
         }
     }
@@ -68,23 +67,23 @@ class WishlistController extends Controller
     {
         $product = Product::where('slug', $slug)->first();
 
-        $wishlist = Wishlist::where('product_id', $product->id)->where('user_id',  auth()->user()->id)->first();
+        $wishlist = Wishlist::where('product_id', $product->id)->where('user_id', auth()->user()->id)->first();
 
         if ($wishlist != null) {
             return response()->json([
                 'message' => translate('Product present in wishlist'),
                 'is_in_wishlist' => true,
-                'product_id' => (integer)$product->id,
-                'wishlist_id' => $wishlist->id
+                'product_id' => (int) $product->id,
+                'wishlist_id' => $wishlist->id,
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'message' => translate('Product is not present in wishlist'),
                 'is_in_wishlist' => false,
-                'product_id' => (integer)$product->id,
-                'wishlist_id' => $wishlist->id
+                'product_id' => (int) $product->id,
+                'wishlist_id' => $wishlist->id,
             ], 200);
         }
-       
+
     }
 }

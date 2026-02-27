@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\BlogCategory;
 use App\Models\Blog;
+use App\Models\BlogCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 
@@ -32,7 +31,7 @@ class BlogController extends Controller
         $blogs = Blog::orderBy('created_at', 'desc');
 
         if ($request->search != null) {
-            $blogs = $blogs->where('title', 'like', '%' . $request->search . '%');
+            $blogs = $blogs->where('title', 'like', '%'.$request->search.'%');
             $sort_search = $request->search;
         }
 
@@ -49,13 +48,13 @@ class BlogController extends Controller
     public function create()
     {
         $blog_categories = BlogCategory::all();
+
         return view('backend.blog_system.blog.create', compact('blog_categories'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -83,6 +82,7 @@ class BlogController extends Controller
         $blog->save();
 
         flash(translate('Blog post has been created successfully'))->success();
+
         return redirect()->route('blog.index');
     }
 
@@ -111,7 +111,6 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -139,6 +138,7 @@ class BlogController extends Controller
         $blog->save();
 
         flash(translate('Blog post has been updated successfully'))->success();
+
         return redirect()->route('blog.index');
     }
 
@@ -148,6 +148,7 @@ class BlogController extends Controller
         $blog->status = $request->status;
 
         $blog->save();
+
         return 1;
     }
 
@@ -160,27 +161,27 @@ class BlogController extends Controller
     public function destroy($id)
     {
         Blog::find($id)->delete();
+
         return back();
     }
 
-
     public function all_blog(Request $request)
     {
-        $selected_categories = array();
+        $selected_categories = [];
         $search = null;
         $blogs = Blog::query();
 
         if ($request->has('search')) {
-            $search = $request->search;;
+            $search = $request->search;
             $blogs->where(function ($q) use ($search) {
                 foreach (explode(' ', trim($search)) as $word) {
-                    $q->where('title', 'like', '%' . $word . '%')
-                        ->orWhere('short_description', 'like', '%' . $word . '%');
+                    $q->where('title', 'like', '%'.$word.'%')
+                        ->orWhere('short_description', 'like', '%'.$word.'%');
                 }
             });
 
-            $case1 = $search . '%';
-            $case2 = '%' . $search . '%';
+            $case1 = $search.'%';
+            $case2 = '%'.$search.'%';
 
             $blogs->orderByRaw("CASE 
                 WHEN title LIKE '$case1' THEN 1 
@@ -200,14 +201,15 @@ class BlogController extends Controller
 
         $recent_blogs = Blog::where('status', 1)->orderBy('created_at', 'desc')->limit(9)->get();
 
-        return view("frontend.blog.listing", compact('blogs', 'selected_categories', 'search', 'recent_blogs'));
+        return view('frontend.blog.listing', compact('blogs', 'selected_categories', 'search', 'recent_blogs'));
     }
 
     public function blog_details($slug)
     {
         $blog = Blog::where('slug', $slug)->first();
         $recent_blogs = Blog::where('status', 1)->orderBy('created_at', 'desc')->limit(9)->get();
-        return view("frontend.blog.details", compact('blog', 'recent_blogs'));
+
+        return view('frontend.blog.details', compact('blog', 'recent_blogs'));
     }
 
     public function generateSlug(Request $request)

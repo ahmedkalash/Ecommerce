@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V2\Seller;
 
 use App\Http\Resources\V2\Seller\SellerWithdrawResource;
-use Illuminate\Http\Request;
 use App\Models\SellerWithdrawRequest;
 use Auth;
+use Illuminate\Http\Request;
 
 class WithdrawRequestController extends Controller
 {
@@ -17,14 +17,13 @@ class WithdrawRequestController extends Controller
     public function index()
     {
         $seller_withdraw_requests = SellerWithdrawRequest::where('user_id', auth()->user()->id)->latest()->paginate(10);
+
         return SellerWithdrawResource::collection($seller_withdraw_requests);
     }
-
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)

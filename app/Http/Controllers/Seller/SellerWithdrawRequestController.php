@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Seller;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\PayoutNotification;
 use App\Models\SellerWithdrawRequest;
 use App\Models\User;
+use App\Notifications\PayoutNotification;
 use App\Utility\EmailUtility;
 use Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class SellerWithdrawRequestController extends Controller
 {
@@ -20,14 +20,13 @@ class SellerWithdrawRequestController extends Controller
     public function index()
     {
         $seller_withdraw_requests = SellerWithdrawRequest::where('user_id', Auth::user()->id)->latest()->paginate(9);
+
         return view('seller.money_withdraw_requests.index', compact('seller_withdraw_requests'));
     }
-
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -43,7 +42,7 @@ class SellerWithdrawRequestController extends Controller
 
             // Seller payout request web notification to admin
             $users = User::findMany(User::where('user_type', 'admin')->first()->id);
-            $data = array();
+            $data = [];
             $data['user'] = $seller;
             $data['amount'] = $request->amount;
             $data['status'] = 'pending';
@@ -51,14 +50,15 @@ class SellerWithdrawRequestController extends Controller
             Notification::send($users, new PayoutNotification($data));
 
             // Seller payout request email to admin & seller
-            $emailIdentifiers = ['seller_payout_request_email_to_admin','seller_payout_request_email_to_seller'];
-            EmailUtility::seller_payout($emailIdentifiers, $seller, $request->amount,  null);
+            $emailIdentifiers = ['seller_payout_request_email_to_admin', 'seller_payout_request_email_to_seller'];
+            EmailUtility::seller_payout($emailIdentifiers, $seller, $request->amount, null);
 
             flash(translate('Request has been sent successfully'))->success();
+
             return redirect()->route('seller.money_withdraw_requests.index');
-        }
-        else{
+        } else {
             flash(translate('Something went wrong'))->error();
+
             return back();
         }
     }

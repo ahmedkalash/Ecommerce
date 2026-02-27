@@ -12,7 +12,7 @@ class ProductTaxService
 
         if ($collection['tax_id']) {
             foreach ($collection['tax_id'] as $key => $val) {
-                $product_tax = new ProductTax();
+                $product_tax = new ProductTax;
                 $product_tax->tax_id = $val;
                 $product_tax->product_id = $collection['product_id'];
                 $product_tax->tax = $collection['tax'][$key];
@@ -23,9 +23,9 @@ class ProductTaxService
 
     }
 
-    public function product_duplicate_store($product_taxes , $product_new)
+    public function product_duplicate_store($product_taxes, $product_new)
     {
-         foreach ($product_taxes as $key => $tax) {
+        foreach ($product_taxes as $key => $tax) {
             $product_tax = new ProductTax;
             $product_tax->product_id = $product_new->id;
             $product_tax->tax_id = $tax->tax_id;
@@ -34,5 +34,4 @@ class ProductTaxService
             $product_tax->save();
         }
     }
-
 }

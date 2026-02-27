@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:seller_payment_history'])->only('payment_histories');
     }
@@ -31,6 +32,7 @@ class PaymentController extends Controller
     public function payment_histories(Request $request)
     {
         $payments = Payment::orderBy('created_at', 'desc')->paginate(15);
+
         return view('backend.sellers.payment_histories.index', compact('payments'));
     }
 
@@ -47,7 +49,6 @@ class PaymentController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -65,10 +66,11 @@ class PaymentController extends Controller
     {
         $user = User::find(decrypt($id));
         $payments = Payment::where('seller_id', $user->id)->orderBy('created_at', 'desc')->get();
-        if($payments->count() > 0){
+        if ($payments->count() > 0) {
             return view('backend.sellers.payment', compact('payments', 'user'));
         }
         flash(translate('No payment history available for this seller'))->warning();
+
         return back();
     }
 
@@ -86,7 +88,6 @@ class PaymentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

@@ -2,31 +2,35 @@
 
 namespace App\Models;
 
-use App;
-use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Translatable\HasTranslations;
 
 class Brand extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, PreventDemoModeChanges;
+    use HasFactory, HasTranslations, InteractsWithMedia, Searchable;
 
-    protected $with = ['brand_translations'];
+    /**
+     * Fields stored as JSON, served per active locale via spatie/laravel-translatable.
+     */
+    public array $translatable = ['name', 'meta_title', 'meta_description'];
 
     protected $fillable = ['name', 'logo', 'slug', 'meta_title', 'meta_description'];
 
-    public function getTranslation($field = '', $lang = false)
+    /**
+     * Build the array that Meilisearch indexes for this model.
+     */
+    public function toSearchableArray(): array
     {
-        $lang = $lang == false ? App::getLocale() : $lang;
-        $brand_translation = $this->brand_translations->where('lang', $lang)->first();
+        $data = ['id' => $this->id];
 
-        return $brand_translation != null ? $brand_translation->$field : $this->$field;
-    }
+        foreach (array_keys($this->getTranslations('name')) as $locale) {
+            $data["name_{$locale}"] = $this->getTranslation('name', $locale, false);
+        }
 
-    public function brand_translations()
-    {
-        return $this->hasMany(BrandTranslation::class);
+        return $data;
     }
 }

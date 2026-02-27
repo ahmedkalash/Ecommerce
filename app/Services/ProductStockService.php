@@ -2,68 +2,65 @@
 
 namespace App\Services;
 
+use App\DTOs\ProductStockDTO;
+use App\Exceptions\Redirectingexception;
 use App\Models\Product;
-use Illuminate\Support\Facades\Log;
+use App\Models\ProductStock;
 
+/**
+ * Handles the persistence of product variants (stocks).
+ *
+ * This service is exclusively DTO-driven and focused on the modern workflow.
+ */
 class ProductStockService
 {
     /**
-     * Store or update stocks for a given product.
+     * Store or update product stocks for a given product.
      *
-     * @param array{
-     *     stocks?: array<int, array{
-     *         variant: string,
-     *         price?: float|string,
-     *         qty?: int|string,
-     *         sku?: string|null,
-     *         min_qty?: int|string,
-     *         cash_on_delivery?: bool|int,
-     *         video_link?: string|null,
-     *         video_provider?: string|null
-     *     }>
-     * } $data Raw input data containing 'stocks'
-     * @param  Product  $product  The product record
+     * Synchronizes the database variants with the provided DTO list,
+     * removing any variants that are no longer present in the input.
+     *
+     * @param  Product  $product  The product model.
+     * @param  ProductStockDTO  ...$stocks  Variadic list of variant DTOs.
      */
-    public function store(array $data, Product $product): void
+    public function store(Product $product, ProductStockDTO ...$stocks): void
     {
-        $stocksData = $data['stocks'] ?? [];
-
-        if (empty($stocksData)) {
-            Log::warning('ProductStockService::store called with empty stocks data', [
-                'product_id' => $product->id,
-            ]);
-
-            return;
-        }
-
         $processedIds = [];
 
-        foreach ($stocksData as $stockData) {
-            $variantName = $stockData['variant'] ?? '';
+        foreach ($stocks as $stockData) {
+            $stock = $product->stocks()->updateOrCreate(
+                ['variant' => $stockData->variant],
+                [
+                    'sku' => $stockData->sku,
+                    'price' => $stockData->price,
+                    'qty' => $stockData->qty,
+                    'min_qty' => $stockData->min_qty,
+                    'cash_on_delivery' => $stockData->cash_on_delivery,
+                    'todays_deal' => $stockData->todays_deal,
+                    'special_price' => $stockData->special_price,
+                    'special_price_type' => $stockData->special_price_type,
+                    'special_price_start' => $stockData->special_price_start,
+                    'special_price_end' => $stockData->special_price_end,
+                    'extra_attributes' => $stockData->extra_attributes,
+                ]
+            );
 
-            $stock = $product->stocks()->firstOrNew(['variant' => $variantName]);
-
-            $stock->price = (float) ($stockData['price'] ?? 0);
-            $stock->qty = (int) ($stockData['qty'] ?? 0);
-            $stock->sku = $stockData['sku'] ?? null;
-            $stock->min_qty = (int) ($stockData['min_qty'] ?? 1);
-            $stock->cash_on_delivery = (bool) ($stockData['cash_on_delivery'] ?? true);
-            $stock->video_link = $stockData['video_link'] ?? null;
-            $stock->video_provider = $stockData['video_provider'] ?? null;
-
-            $stock->save();
             $processedIds[] = $stock->id;
         }
 
-        // Remove stocks that are no longer part of the product definition
+        // Cleanup: Remove any variants that weren't present in the provided DTO list.
         $product->stocks()->whereNotIn('id', $processedIds)->delete();
     }
 
     /**
-     * Replicate stocks for a duplicated product.
+     * Replicates stocks for a duplicate product.
      *
-     * @param  iterable  $stocks  Collection of ProductStock models
-     * @param  Product  $new_product  The new product record
+     * Iterates through existing stocks and replicates them for the new product.
+     *
+     * @param  iterable<ProductStock>  $stocks  The collection of stocks to duplicate.
+     * @param  Product  $new_product  The target product for the duplicated stocks.
+     *
+     * @throws Redirectingexception
      */
     public function product_duplicate_store(iterable $stocks, Product $new_product): void
     {

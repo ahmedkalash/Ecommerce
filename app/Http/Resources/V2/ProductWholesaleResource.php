@@ -18,9 +18,9 @@ class ProductWholesaleResource extends JsonResource
         return [
             // 'id' => $this->id,
             // 'product_stock_id' => $this->product_stock_id,
-            'min_qty' => (int)$this->min_qty,
+            'min_qty' => (int) $this->min_qty,
             'max_qty' => (int) $this->max_qty,
-            'price' => single_price($this->price)
+            'price' => single_price($this->price),
         ];
     }
 }

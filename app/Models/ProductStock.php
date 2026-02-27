@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Enums\SpecialPriceType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class ProductStock extends Model implements HasMedia
 {
-    use InteractsWithMedia;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'product_id',
@@ -16,10 +18,28 @@ class ProductStock extends Model implements HasMedia
         'sku',
         'price',
         'qty',
-        'video_link',
-        'video_provider',
+        'image',
         'min_qty',
         'cash_on_delivery',
+        'todays_deal',
+        'special_price',
+        'special_price_type',
+        'special_price_start',
+        'special_price_end',
+        'extra_attributes',
+    ];
+
+    protected $casts = [
+        'price' => 'float',
+        'qty' => 'integer',
+        'min_qty' => 'integer',
+        'cash_on_delivery' => 'boolean',
+        'todays_deal' => 'boolean',
+        'special_price' => 'float',
+        'special_price_type' => SpecialPriceType::class,
+        'special_price_start' => 'datetime',
+        'special_price_end' => 'datetime',
+        'extra_attributes' => 'array',
     ];
 
     public function product()
@@ -30,21 +50,12 @@ class ProductStock extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('thumbnail')
-            ->singleFile();
+            ->singleFile()
+            ->useFallbackUrl(static_asset('assets/img/placeholder.jpg'));
 
         $this->addMediaCollection('gallery');
 
-        $this->addMediaCollection('files');
-
-        $this->addMediaCollection('short_video')
+        $this->addMediaCollection('meta')
             ->singleFile();
-
-        $this->addMediaCollection('video_thumbnail')
-            ->singleFile();
-
-        $this->addMediaCollection('meta_img')
-            ->singleFile();
-
-        $this->addMediaCollection('pdf');
     }
 }

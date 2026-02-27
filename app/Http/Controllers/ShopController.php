@@ -3,25 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SellerRegistrationRequest;
-use App\Models\AffiliateConfig;
-use Illuminate\Http\Request;
-use App\Models\Shop;
-use App\Models\User;
-use App\Models\BusinessSetting;
 use App\Models\RegistrationVerificationCode;
+use App\Models\Shop;
 use App\Models\SmsTemplate;
+use App\Models\User;
 use App\Services\SendSmsService;
+use App\Utility\EmailUtility;
 use Auth;
 use Hash;
-use App\Utility\EmailUtility;
-use Illuminate\Support\Facades\Notification;
-use App\Http\Controllers\OTPVerificationController;
-use Cookie;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('user', ['only' => ['index']]);
@@ -35,6 +28,7 @@ class ShopController extends Controller
     public function index()
     {
         $shop = Auth::user()->shop;
+
         return view('seller.shop', compact('shop'));
     }
 
@@ -46,7 +40,7 @@ class ShopController extends Controller
     public function create()
     {
         // check if the seller verification enable
-        if(get_setting('seller_registration_verify') === '1' ){
+        if (get_setting('seller_registration_verify') === '1') {
             abort(404);
         }
 
@@ -56,15 +50,18 @@ class ShopController extends Controller
         if (Auth::check()) {
             if ((Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'customer')) {
                 flash(translate('Admin or Customer cannot be a seller'))->error();
+
                 return back();
             }
             if (Auth::user()->user_type == 'seller') {
                 flash(translate('This user already a seller'))->error();
+
                 return back();
             }
         } else {
-            
-            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration', compact('email','phone'));
+
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration',
+                compact('email', 'phone'));
         }
     }
 
@@ -80,7 +77,7 @@ class ShopController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->phone;
-        $user->user_type = "seller";
+        $user->user_type = 'seller';
         $user->password = Hash::make($request->password);
         $user->email_verified_at = date('Y-m-d H:m:s');
 
@@ -89,11 +86,11 @@ class ShopController extends Controller
             $shop->user_id = $user->id;
             $shop->name = $request->shop_name;
             $shop->address = $request->address;
-            $shop->registration_approval= 0;
-            $shop->slug = preg_replace('/\s+/', '-', str_replace("/", " ", $request->shop_name));
+            $shop->registration_approval = 0;
+            $shop->slug = preg_replace('/\s+/', '-', str_replace('/', ' ', $request->shop_name));
             $shop->save();
 
-            //auth()->login($user, true);
+            // auth()->login($user, true);
             // if (BusinessSetting::where('type', 'email_verification')->first()->value == 0) {
             //     $user->email_verified_at = date('Y-m-d H:m:s');
             //     $user->save();
@@ -112,21 +109,25 @@ class ShopController extends Controller
             if ((get_email_template_data('registration_email_to_seller', 'status') == 1)) {
                 try {
                     EmailUtility::selelr_registration_email('registration_email_to_seller', $user, null);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             // Seller Account Opening Email to Admin
             if ((get_email_template_data('seller_reg_email_to_admin', 'status') == 1)) {
                 try {
                     EmailUtility::selelr_registration_email('seller_reg_email_to_admin', $user, null);
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             flash(translate('Your Shop has been created successfully! Your seller account is under review. We will notify you once approved. '))->success();
+
             return redirect()->route('home');
         }
 
         flash(translate('Sorry! Something went wrong.'))->error();
+
         return back();
     }
 
@@ -157,15 +158,18 @@ class ShopController extends Controller
         //
     }
 
-    public function verifyRegEmailorPhone(){
+    public function verifyRegEmailorPhone()
+    {
         $type = 'seller';
         if (Auth::check()) {
             if ((Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'customer')) {
                 flash(translate('Admin or Customer cannot be a seller'))->error();
+
                 return back();
             }
             if (Auth::user()->user_type == 'seller') {
                 flash(translate('This user already a seller'))->error();
+
                 return back();
             }
         } else {
@@ -173,24 +177,26 @@ class ShopController extends Controller
         }
     }
 
-    public function sendRegVerificationCode(Request $request){
+    public function sendRegVerificationCode(Request $request)
+    {
         $email = $request->email ?? null;
         $phone = $request->phone != null ? '+'.$request->country_code.$request->phone : null;
 
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            if(User::where('email', $email)->first() != null){
+            if (User::where('email', $email)->first() != null) {
                 flash(translate('Email already exists.'))->error();
+
                 return back();
             }
-        }
-        elseif (User::where('phone', $phone)->first() != null) {
+        } elseif (User::where('phone', $phone)->first() != null) {
             flash(translate('Phone already exists.'))->error();
+
             return back();
         }
 
         $verificationCode = rand(100000, 999999);
         $sellerVerification = RegistrationVerificationCode::updateOrCreate(
-            ['email' => $email, 'phone' => $phone], 
+            ['email' => $email, 'phone' => $phone],
             ['code' => $verificationCode]
         );
         $success = 1;
@@ -201,51 +207,55 @@ class ShopController extends Controller
             } catch (\Exception $e) {
                 $success = 0;
             }
-        }
-        else {
-            if (addon_is_activated('otp_system')){
-                $sms_template   = SmsTemplate::where('identifier', 'phone_number_verification')->first();
-                $sms_body       = $sms_template->sms_body;
-                $sms_body       = str_replace('[[code]]', $verificationCode, $sms_body);
-                $sms_body       = str_replace('[[site_name]]', env('APP_NAME'), $sms_body);
-                $template_id    = $sms_template->template_id;
-                
-                (new SendSmsService())->sendSMS($phone, env('APP_NAME'), $sms_body, $template_id);
+        } else {
+            if (addon_is_activated('otp_system')) {
+                $sms_template = SmsTemplate::where('identifier', 'phone_number_verification')->first();
+                $sms_body = $sms_template->sms_body;
+                $sms_body = str_replace('[[code]]', $verificationCode, $sms_body);
+                $sms_body = str_replace('[[site_name]]', env('APP_NAME'), $sms_body);
+                $template_id = $sms_template->template_id;
+
+                (new SendSmsService)->sendSMS($phone, env('APP_NAME'), $sms_body, $template_id);
             }
         }
 
-        if($success){
+        if ($success) {
             return redirect()->route('shop-reg.verify_code', encrypt($sellerVerification->id));
-        }
-        else {
+        } else {
             flash(translate('Something went wrong!'))->error();
+
             return back();
         }
     }
 
-    public function regVerifyCode($id){
+    public function regVerifyCode($id)
+    {
         // $sellerVerification = $id;
         $sellerVerification = RegistrationVerificationCode::whereId(decrypt($id))->first();
+
         return view('auth.'.get_setting('authentication_layout_select').'.seller_verify_confirmation', compact('sellerVerification'));
     }
 
-    public function regVerifyCodeConfirmation(Request $request){
+    public function regVerifyCodeConfirmation(Request $request)
+    {
         $email = isset($request->email) ? $request->email : null;
-        $phone = isset($request->phone) ? $request->phone  : null;
+        $phone = isset($request->phone) ? $request->phone : null;
 
         $sellerVerification = RegistrationVerificationCode::where('code', $request->verification_code);
-        $sellerVerification = $request->email != null ? 
+        $sellerVerification = $request->email != null ?
                                 $sellerVerification->where('email', $email) :
                                 $sellerVerification->where('phone', $phone);
         $sellerVerification = $sellerVerification->first();
-        if($sellerVerification == null){
+        if ($sellerVerification == null) {
             flash(translate('Verification code do not matched'))->error();
+
             return back();
-        }
-        else {
+        } else {
             $sellerVerification->is_verified = 1;
             $sellerVerification->save();
-                return view('auth.'.get_setting('authentication_layout_select').'.seller_registration', compact('sellerVerification','email','phone'));
+
+            return view('auth.'.get_setting('authentication_layout_select').'.seller_registration',
+                compact('sellerVerification', 'email', 'phone'));
         }
     }
 }

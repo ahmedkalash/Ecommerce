@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +11,9 @@ class PayoutNotification extends Notification
     use Queueable;
 
     public $data;
+
     public $className;
+
     /**
      * Create a new notification instance.
      *
@@ -21,7 +22,7 @@ class PayoutNotification extends Notification
     public function __construct($data)
     {
         $this->data = $data;
-        $this->className= PayoutNotification::class;
+        $this->className = PayoutNotification::class;
     }
 
     /**
@@ -44,9 +45,9 @@ class PayoutNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -60,12 +61,12 @@ class PayoutNotification extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'user_id'        => $this->data['user']['id'],
-                'user_type'      => $this->data['user']['user_type'],
-                'name'           => $this->data['user']['name'],
-                'payment_amount' => $this->data['amount'], 
-                'status'         => $this->data['status']
-            ]
+                'user_id' => $this->data['user']['id'],
+                'user_type' => $this->data['user']['user_type'],
+                'name' => $this->data['user']['name'],
+                'payment_amount' => $this->data['amount'],
+                'status' => $this->data['status'],
+            ],
         ];
     }
 }

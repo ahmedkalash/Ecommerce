@@ -2,36 +2,32 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Http\Resources\V2\PurchaseHistoryMiniCollection;
 use App\Http\Resources\V2\DeliveryBoyPurchaseHistoryMiniCollection;
-use Illuminate\Http\Request;
 use App\Http\Resources\V2\DeliveryHistoryCollection;
 use App\Http\Resources\V2\PurchaseHistoryCollection;
 use App\Http\Resources\V2\PurchaseHistoryItemsCollection;
+use App\Http\Resources\V2\PurchaseHistoryMiniCollection;
 use App\Models\DeliveryBoy;
 use App\Models\DeliveryHistory;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\User;
 use App\Models\SmsTemplate;
+use App\Models\User;
 use App\Utility\SmsUtility;
-
+use Illuminate\Http\Request;
 
 class DeliveryBoyController extends Controller
 {
-
     /**
      * Show the list of assigned delivery by the admin.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function dashboard_summary($id)
     {
         $order_query = Order::query();
         $order_query->where('assign_delivery_boy', $id);
-
 
         $delivery_boy = DeliveryBoy::where('user_id', $id)->first();
 
@@ -69,7 +65,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of pickup delivery by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function picked_up_delivery($id)
@@ -84,7 +80,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of pickup delivery by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function on_the_way_delivery($id)
@@ -99,7 +95,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of completed delivery by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function completed_delivery($id)
@@ -107,27 +103,28 @@ class DeliveryBoyController extends Controller
         $order_query = Order::query();
         $order_query->where('delivery_status', 'delivered');
 
-        if (request()->has('date_range') && request()->date_range != null &&  request()->date_range != "") {
+        if (request()->has('date_range') && request()->date_range != null && request()->date_range != '') {
             $max_date = date('Y-m-d H:i:s');
             $min_date = date('Y-m-d 00:00:00');
-            if (request()->date_range == "today") {
+            if (request()->date_range == 'today') {
                 $min_date = date('Y-m-d 00:00:00');
-            } else if (request()->date_range == "this_week") {
-                $min_date = date('Y-m-d 00:00:00', strtotime("-7 days"));
-            } else if (request()->date_range == "this_month") {
-                $min_date = date('Y-m-d 00:00:00', strtotime("-30 days"));
+            } elseif (request()->date_range == 'this_week') {
+                $min_date = date('Y-m-d 00:00:00', strtotime('-7 days'));
+            } elseif (request()->date_range == 'this_month') {
+                $min_date = date('Y-m-d 00:00:00', strtotime('-30 days'));
             }
 
-            $order_query->where('delivery_history_date','>=',$min_date)->where('delivery_history_date','<=',$max_date);
+            $order_query->where('delivery_history_date', '>=', $min_date)->where('delivery_history_date', '<=',
+                $max_date);
 
         }
 
-        if (request()->has('payment_type') && request()->payment_type != null &&  request()->payment_type != "") {
+        if (request()->has('payment_type') && request()->payment_type != null && request()->payment_type != '') {
 
-            if (request()->payment_type == "cod") {
-                $order_query->where('payment_type','=','cash_on_delivery');
-            } else if (request()->payment_type == "non-cod") {
-                $order_query->where('payment_type','!=','cash_on_delivery');
+            if (request()->payment_type == 'cod') {
+                $order_query->where('payment_type', '=', 'cash_on_delivery');
+            } elseif (request()->payment_type == 'non-cod') {
+                $order_query->where('payment_type', '!=', 'cash_on_delivery');
             }
 
         }
@@ -138,7 +135,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of pending delivery by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function pending_delivery($id)
@@ -154,7 +151,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of cancelled delivery by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function cancelled_delivery($id)
@@ -162,27 +159,28 @@ class DeliveryBoyController extends Controller
         $order_query = Order::query();
         $order_query->where('delivery_status', 'cancelled');
 
-        if (request()->has('date_range') && request()->date_range != null &&  request()->date_range != "") {
+        if (request()->has('date_range') && request()->date_range != null && request()->date_range != '') {
             $max_date = date('Y-m-d H:i:s');
             $min_date = date('Y-m-d 00:00:00');
-            if (request()->date_range == "today") {
+            if (request()->date_range == 'today') {
                 $min_date = date('Y-m-d 00:00:00');
-            } else if (request()->date_range == "this_week") {
-                $min_date = date('Y-m-d 00:00:00', strtotime("-7 days"));
-            } else if (request()->date_range == "this_month") {
-                $min_date = date('Y-m-d 00:00:00', strtotime("-30 days"));
+            } elseif (request()->date_range == 'this_week') {
+                $min_date = date('Y-m-d 00:00:00', strtotime('-7 days'));
+            } elseif (request()->date_range == 'this_month') {
+                $min_date = date('Y-m-d 00:00:00', strtotime('-30 days'));
             }
 
-            $order_query->where('delivery_history_date','>=',$min_date)->where('delivery_history_date','<=',$max_date);
+            $order_query->where('delivery_history_date', '>=', $min_date)->where('delivery_history_date', '<=',
+                $max_date);
 
         }
 
-        if (request()->has('payment_type') && request()->payment_type != null &&  request()->payment_type != "") {
+        if (request()->has('payment_type') && request()->payment_type != null && request()->payment_type != '') {
 
-            if (request()->payment_type == "cod") {
-                $order_query->where('payment_type','=','cash_on_delivery');
-            } else if (request()->payment_type == "non-cod") {
-                $order_query->where('payment_type','!=','cash_on_delivery');
+            if (request()->payment_type == 'cod') {
+                $order_query->where('payment_type', '=', 'cash_on_delivery');
+            } elseif (request()->payment_type == 'non-cod') {
+                $order_query->where('payment_type', '!=', 'cash_on_delivery');
             }
 
         }
@@ -193,7 +191,7 @@ class DeliveryBoyController extends Controller
     /**
      * Show the list of today's collection by the delivery boy.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function collection($id)
@@ -219,31 +217,28 @@ class DeliveryBoyController extends Controller
         $collection_query->where('delivery_status', 'delivered');
         $collection_query->where('payment_type', 'cash_on_delivery');
 
-
         $today_date = date('Y-m-d');
-        $yesterday_date = date('Y-m-d', strtotime("-1 day"));
+        $yesterday_date = date('Y-m-d', strtotime('-1 day'));
         $today_date_formatted = date('d M, Y');
-        $yesterday_date_formatted = date('d M,Y', strtotime("-1 day"));
-
+        $yesterday_date_formatted = date('d M,Y', strtotime('-1 day'));
 
         $today_collection = DeliveryHistory::where('delivery_status', 'delivered')
             ->where('payment_type', 'cash_on_delivery')
             ->where('delivery_boy_id', $id)
-            ->where('created_at','like',"%$today_date%")
+            ->where('created_at', 'like', "%$today_date%")
             ->sum('collection');
 
         $yesterday_collection = DeliveryHistory::where('delivery_status', 'delivered')
             ->where('payment_type', 'cash_on_delivery')
             ->where('delivery_boy_id', $id)
-            ->where('created_at','like',"%$yesterday_date%")
+            ->where('created_at', 'like', "%$yesterday_date%")
             ->sum('collection');
-
 
         return response()->json([
             'today_date' => $today_date_formatted,
-            'today_collection' => format_price($today_collection) ,
+            'today_collection' => format_price($today_collection),
             'yesterday_date' => $yesterday_date_formatted,
-            'yesterday_collection' => format_price($yesterday_collection) ,
+            'yesterday_collection' => format_price($yesterday_collection),
 
         ]);
     }
@@ -254,27 +249,25 @@ class DeliveryBoyController extends Controller
         $collection_query->where('delivery_status', 'delivered');
 
         $today_date = date('Y-m-d');
-        $yesterday_date = date('Y-m-d', strtotime("-1 day"));
+        $yesterday_date = date('Y-m-d', strtotime('-1 day'));
         $today_date_formatted = date('d M, Y');
-        $yesterday_date_formatted = date('d M,Y', strtotime("-1 day"));
-
+        $yesterday_date_formatted = date('d M,Y', strtotime('-1 day'));
 
         $today_collection = DeliveryHistory::where('delivery_status', 'delivered')
             ->where('delivery_boy_id', $id)
-            ->where('created_at','like',"%$today_date%")
+            ->where('created_at', 'like', "%$today_date%")
             ->sum('earning');
 
         $yesterday_collection = DeliveryHistory::where('delivery_status', 'delivered')
             ->where('delivery_boy_id', $id)
-            ->where('created_at','like',"%$yesterday_date%")
+            ->where('created_at', 'like', "%$yesterday_date%")
             ->sum('earning');
-
 
         return response()->json([
             'today_date' => $today_date_formatted,
-            'today_earning' => format_price($today_collection) ,
+            'today_earning' => format_price($today_collection),
             'yesterday_date' => $yesterday_date_formatted,
-            'yesterday_earning' => format_price($yesterday_collection) ,
+            'yesterday_earning' => format_price($yesterday_collection),
 
         ]);
     }
@@ -283,10 +276,11 @@ class DeliveryBoyController extends Controller
      * For only delivery boy while changing delivery status.
      * Call from order controller
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function change_delivery_status(Request $request) {
+    public function change_delivery_status(Request $request)
+    {
         $order = Order::find($request->order_id);
         $order->delivery_viewed = '0';
         $order->delivery_status = $request->status;
@@ -294,22 +288,22 @@ class DeliveryBoyController extends Controller
 
         $delivery_history = new DeliveryHistory;
 
-        $delivery_history->order_id         = $order->id;
-        $delivery_history->delivery_boy_id  = $request->delivery_boy_id;
-        $delivery_history->delivery_status  = $order->delivery_status;
-        $delivery_history->payment_type     = $order->payment_type;
+        $delivery_history->order_id = $order->id;
+        $delivery_history->delivery_boy_id = $request->delivery_boy_id;
+        $delivery_history->delivery_status = $order->delivery_status;
+        $delivery_history->payment_type = $order->payment_type;
 
-        if($order->delivery_status == 'delivered') {
+        if ($order->delivery_status == 'delivered') {
             foreach ($order->orderDetails as $key => $orderDetail) {
                 if (addon_is_activated('affiliate_system')) {
                     if ($orderDetail->product_referral_code) {
                         $no_of_delivered = 0;
                         $no_of_canceled = 0;
 
-                        if($request->status == 'delivered') {
+                        if ($request->status == 'delivered') {
                             $no_of_delivered = $orderDetail->quantity;
                         }
-                        if($request->status == 'cancelled') {
+                        if ($request->status == 'cancelled') {
                             $no_of_canceled = $orderDetail->quantity;
                         }
 
@@ -340,12 +334,13 @@ class DeliveryBoyController extends Controller
 
             $delivery_boy->save();
         }
-        $order->delivery_history_date = date("Y-m-d H:i:s");
+        $order->delivery_history_date = date('Y-m-d H:i:s');
 
         $order->save();
         $delivery_history->save();
 
-        if (addon_is_activated('otp_system') && SmsTemplate::where('identifier','delivery_status_change')->first()->status == 1){
+        if (addon_is_activated('otp_system') && SmsTemplate::where('identifier',
+            'delivery_status_change')->first()->status == 1) {
             try {
                 SmsUtility::delivery_status_change($order->user->phone, $order);
             } catch (\Exception $e) {
@@ -355,13 +350,13 @@ class DeliveryBoyController extends Controller
 
         return response()->json([
             'result' => true,
-            'message' => translate('Delivery status changed to ').ucwords(str_replace('_',' ',$request->status))
+            'message' => translate('Delivery status changed to ').ucwords(str_replace('_', ' ', $request->status)),
         ]);
     }
 
     public function cancel_request($id)
     {
-        $order =  Order::find($id);
+        $order = Order::find($id);
 
         $order->cancel_request = 1;
         $order->cancel_request_at = date('Y-m-d H:i:s');
@@ -369,13 +364,14 @@ class DeliveryBoyController extends Controller
 
         return response()->json([
             'result' => true,
-            'message' => translate('Requested for cancellation')
+            'message' => translate('Requested for cancellation'),
         ]);
     }
 
     public function details($id)
     {
         $order_detail = Order::where('id', $id)->where('assign_delivery_boy', auth()->user()->id)->get();
+
         return new PurchaseHistoryCollection($order_detail);
     }
 
@@ -383,6 +379,7 @@ class DeliveryBoyController extends Controller
     {
         $order_id = Order::select('id')->where('id', $id)->where('assign_delivery_boy', auth()->user()->id)->first();
         $order_query = OrderDetail::where('order_id', $order_id->id);
+
         return new PurchaseHistoryItemsCollection($order_query->get());
     }
 }

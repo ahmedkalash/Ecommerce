@@ -2,16 +2,16 @@
 
 namespace App\Http\Resources\V2;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use App\Models\BusinessSetting;
 use App\Models\Currency;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class SettingsCollection extends ResourceCollection
 {
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function($data) {
+            'data' => $this->collection->map(function ($data) {
                 return [
                     'name' => $data->name,
                     'logo' => $data->logo,
@@ -23,12 +23,14 @@ class SettingsCollection extends ResourceCollection
                     'currency' => [
                         'name' => Currency::findOrFail(BusinessSetting::where('type', 'system_default_currency')->first()->value)->name,
                         'symbol' => Currency::findOrFail(BusinessSetting::where('type', 'system_default_currency')->first()->value)->symbol,
-                        'exchange_rate' => (double) $this->exchangeRate(Currency::findOrFail(BusinessSetting::where('type', 'system_default_currency')->first()->value)),
-                        'code' => Currency::findOrFail(BusinessSetting::where('type', 'system_default_currency')->first()->value)->code
+                        'exchange_rate' => (float) $this->exchangeRate(Currency::findOrFail(BusinessSetting::where('type',
+                            'system_default_currency')->first()->value)),
+                        'code' => Currency::findOrFail(BusinessSetting::where('type',
+                            'system_default_currency')->first()->value)->code,
                     ],
-                    'currency_format' => $data->currency_format
+                    'currency_format' => $data->currency_format,
                 ];
-            })
+            }),
         ];
     }
 
@@ -36,12 +38,14 @@ class SettingsCollection extends ResourceCollection
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 
-    public function exchangeRate($currency){
+    public function exchangeRate($currency)
+    {
         $base_currency = Currency::find(BusinessSetting::where('type', 'system_default_currency')->first()->value);
-        return $currency->exchange_rate/$base_currency->exchange_rate;
+
+        return $currency->exchange_rate / $base_currency->exchange_rate;
     }
 }

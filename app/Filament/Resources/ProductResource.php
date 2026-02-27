@@ -2,34 +2,60 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\SpecialPriceType;
 use App\Filament\Enums\NavigationGroups;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use App\Services\PricingResolverService;
 use App\Services\ProductService;
 use CodeWithDennis\FilamentSelectTree\SelectTree;
 use Exception;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Unique;
 
 class ProductResource extends Resource
 {
+    use Translatable;
+
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = NavigationGroups::CATALOG;
-
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return NavigationGroups::CATALOG->getLocalizedLabel();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('admin/resources.product.singular');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin/resources.product.plural');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('admin/navigation.products');
+    }
 
     public static function form(Form $form): Form
     {
@@ -38,14 +64,15 @@ class ProductResource extends Resource
                 Tabs::make('ProductTabs')
                     ->tabs([
                         // ── General Tab ──
-                        Tabs\Tab::make('General')
+                        Tabs\Tab::make(__('admin/resources.product.tab_general'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        Forms\Components\Section::make('Product Information')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_information'))
                                             ->schema([
                                                 Forms\Components\TextInput::make('name')
+                                                    ->label(__('admin/resources.general.name'))
                                                     ->required()
                                                     ->maxLength(200)
                                                     ->live(onBlur: true)
@@ -56,10 +83,12 @@ class ProductResource extends Resource
                                                         $set('slug', Str::slug($state));
                                                     }),
                                                 Forms\Components\TextInput::make('slug')
+                                                    ->label(__('admin/resources.general.slug'))
                                                     ->required()
                                                     ->maxLength(255)
                                                     ->unique(Product::class, 'slug', ignoreRecord: true),
                                                 Forms\Components\RichEditor::make('description')
+                                                    ->label(__('admin/resources.general.description'))
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(2),
@@ -69,33 +98,35 @@ class ProductResource extends Resource
 
                                 Forms\Components\Group::make()
                                     ->schema([
-                                        Forms\Components\Section::make('Visibility & Status')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_visibility'))
                                             ->schema([
                                                 Forms\Components\Toggle::make('published')
                                                     ->required()
-                                                    ->label('Published')
+                                                    ->label(__('admin/resources.product.published'))
                                                     ->default(true),
                                                 Forms\Components\Toggle::make('approved')
-                                                    ->label('Approved')
+                                                    ->label(__('admin/resources.product.approved'))
                                                     ->default(true)
                                                     ->visible(fn () => auth()->user()->can('approve_products')),
                                             ]),
 
-                                        Forms\Components\Section::make('Product Image')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_image'))
                                             ->schema([
                                                 SpatieMediaLibraryFileUpload::make('thumbnail')
                                                     ->collection('thumbnail')
-                                                    ->label('Thumbnail Image')
+                                                    ->label(__('admin/resources.product.thumbnail'))
                                                     ->image()
                                                     ->imageEditor()
                                                     ->columnSpanFull(),
                                             ]),
 
-                                        Forms\Components\Section::make('Organization')
+                                        Forms\Components\Section::make(__('admin/resources.product.section_organization'))
                                             ->schema([
                                                 SelectTree::make('categories')
                                                     ->relationship('categories', 'name', 'parent_id')
-                                                    ->label('Categories')
+                                                    ->saveRelationshipsUsing(fn () => null)
+                                                    ->dehydrated()
+                                                    ->label(__('admin/resources.product.categories'))
                                                     ->enableBranchNode()
                                                     ->expandSelected()
                                                     ->withCount()
@@ -104,11 +135,13 @@ class ProductResource extends Resource
                                                     ->columnSpanFull(),
                                                 Forms\Components\Select::make('brand_id')
                                                     ->required()
-                                                    ->label('Brand')
+                                                    ->label(__('admin/resources.product.brand'))
                                                     ->relationship('brand', 'name')
                                                     ->searchable()
                                                     ->preload(),
-                                                Forms\Components\TagsInput::make('tags')
+                                                SpatieTagsInput::make('tags')
+                                                    ->label(__('admin/resources.product.tags'))
+                                                    ->dehydrated()
                                                     ->columnSpanFull(),
                                             ])
                                             ->columns(1),
@@ -117,180 +150,258 @@ class ProductResource extends Resource
                             ])
                             ->columns(3),
 
-                        // ── Price & Stock Tab (Variations) ──
-                        Tabs\Tab::make('Variants')
+                        // ── Price, Stock & Variants Tab ──
+                        Tabs\Tab::make(__('admin/resources.product.tab_price_stock'))
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
                                 // This repeater manages ALL stocks (variants).
                                 Forms\Components\Repeater::make('stocks')
-                                    ->label('Product Variants')
-                                    ->relationship()
+                                    ->label(__('admin/resources.product.variants_label'))
+                                    ->itemLabel(fn (array $state): ?string => $state['variant'] ?? 'New Variant')
+                                    ->defaultItems(1)
+                                    ->minItems(1)
                                     ->schema([
-                                        Forms\Components\Group::make()
+                                        Forms\Components\Section::make(__('admin/resources.product.section_variant_details'))
                                             ->schema([
                                                 Forms\Components\TextInput::make('variant')
-                                                    ->label('Variant Name')
-                                                    ->placeholder('e.g., Default, Red XL, 128GB')
+                                                    ->label(__('admin/resources.product.variant_name'))
+                                                    ->placeholder(__('admin/resources.product.variant_placeholder'))
                                                     ->default('Default')
                                                     ->required()
-                                                    ->distinct() // Ensure variant names are unique within the repeater
+                                                    ->distinct()
                                                     ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('sku')
-                                                    ->label('SKU')
-                                                    ->unique('product_stocks', 'sku', ignoreRecord: true), // Ensure SKU is unique in DB
+                                                    ->label(__('admin/resources.product.sku'))
+                                                    ->placeholder(fn (
+                                                        ?Product $record
+                                                    ): string => $record?->sku ?: __('admin/resources.product.sku_placeholder'))->unique(
+                                                        table: 'product_stocks',
+                                                        column: 'sku',
+                                                        modifyRuleUsing: function (Unique $rule, ?Product $record) {
+                                                            // If we are editing an existing product, ignore its associated stock row.
+                                                            if ($record) {
+                                                                return $rule->whereNot('product_id', $record->id);
+                                                            }
+
+                                                            return $rule;
+                                                        }
+                                                    )
+                                                    ->columnSpan(2),
 
                                                 Forms\Components\TextInput::make('price')
-                                                    ->label('Price')
+                                                    ->label(__('admin/resources.product.price'))
                                                     ->numeric()
                                                     ->prefix('$')
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('qty')
-                                                    ->label('Quantity')
+                                                    ->label(__('admin/resources.product.qty'))
                                                     ->numeric()
                                                     ->default(0)
                                                     ->required(),
 
                                                 Forms\Components\TextInput::make('min_qty')
-                                                    ->label('Min Qty')
+                                                    ->label(__('admin/resources.product.min_qty'))
                                                     ->numeric()
                                                     ->default(1)
                                                     ->required(),
 
                                                 Forms\Components\Toggle::make('cash_on_delivery')
-                                                    ->label('Cash On Delivery')
+                                                    ->label(__('admin/resources.product.cod'))
                                                     ->default(true)
-                                                    ->columnSpanFull(),
-                                            ])
-                                            ->columns(2),
+                                                    ->inline(false),
 
-                                        Forms\Components\Section::make('Media & Files')
-                                            ->schema([
-                                                Forms\Components\Grid::make(3)
+                                                Forms\Components\Toggle::make('todays_deal')
+                                                    ->label(__('admin/resources.product.todays_deal'))
+                                                    ->default(true)
+                                                    ->inline(false),
+
+                                                Forms\Components\Repeater::make('extra_attributes.specifications')
+                                                    ->label(__('admin/resources.product.variant_attributes'))
+                                                    ->helperText(__('admin/resources.product.variant_attributes_help'))
+                                                    ->defaultItems(0)
                                                     ->schema([
-                                                        SpatieMediaLibraryFileUpload::make('thumbnail')
-                                                            ->collection('thumbnail')
-                                                            ->label('Variant Thumbnail')
-                                                            ->image()
-                                                            ->imageEditor(),
-
-                                                        SpatieMediaLibraryFileUpload::make('video_thumbnail')
-                                                            ->collection('video_thumbnail')
-                                                            ->label('Video Thumbnail')
-                                                            ->image()
-                                                            ->imageEditor(),
-
-                                                        SpatieMediaLibraryFileUpload::make('meta_img')
-                                                            ->collection('meta_img')
-                                                            ->label('Meta Image')
-                                                            ->image()
-                                                            ->imageEditor(),
-                                                    ]),
-
-                                                SpatieMediaLibraryFileUpload::make('gallery')
-                                                    ->collection('gallery')
-                                                    ->label('Variant Gallery')
-                                                    ->multiple()
-                                                    ->reorderable()
-                                                    ->image()
-                                                    ->imageEditor()
-                                                    ->panelLayout('grid')
-                                                    ->columnSpanFull(),
-
-                                                Forms\Components\Grid::make(2)
-                                                    ->schema([
-                                                        SpatieMediaLibraryFileUpload::make('short_video')
-                                                            ->collection('short_video')
-                                                            ->label('Short Video')
-                                                            ->acceptedFileTypes(['video/mp4', 'video/webm', 'video/ogg'])
-                                                            ->maxSize(50000), // 50MB limit
-
-                                                        SpatieMediaLibraryFileUpload::make('pdf')
-                                                            ->collection('pdf')
-                                                            ->label('PDF Specification')
-                                                            ->acceptedFileTypes(['application/pdf'])
-                                                            ->maxSize(10000), // 10MB limit
-                                                    ]),
-
-                                                SpatieMediaLibraryFileUpload::make('files')
-                                                    ->collection('files')
-                                                    ->label('Downloadable Files')
-                                                    ->multiple()
+                                                        Forms\Components\TextInput::make('key')
+                                                            ->label(__('admin/resources.product.attr_key'))
+                                                            ->placeholder(__('admin/resources.product.attr_key_placeholder'))
+                                                            ->required()
+                                                            ->columnSpan(1),
+                                                        Forms\Components\RichEditor::make('value')
+                                                            ->label(__('admin/resources.product.attr_value'))
+                                                            ->required()
+                                                            ->toolbarButtons([
+                                                                'bold',
+                                                                'italic',
+                                                                'link',
+                                                                'bulletList',
+                                                                'orderedList',
+                                                            ])
+                                                            ->extraInputAttributes(['style' => 'min-height: 100px;'])
+                                                            ->columnSpan(2),
+                                                    ])
+                                                    ->addActionLabel(__('admin/resources.product.add_attribute'))
+                                                    ->itemLabel(fn (array $state): ?string => $state['key'] ?? null)
+                                                    ->collapsible()
+                                                    ->columns(3)
                                                     ->columnSpanFull(),
 
-                                                Forms\Components\Grid::make(2)
+                                                Forms\Components\Section::make(__('admin/resources.product.section_special_price'))
+                                                    ->collapsed()
                                                     ->schema([
-                                                        Forms\Components\TextInput::make('video_link')
-                                                            ->label('External Video Link')
-                                                            ->placeholder('https://youtube.com/watch?v=...'),
+                                                        Forms\Components\Select::make('special_price_type')
+                                                            ->label(__('admin/resources.product.discount_type'))
+                                                            ->options(SpecialPriceType::class)
+                                                            ->nullable()
+                                                            ->live(),
+                                                        Forms\Components\TextInput::make('special_price')
+                                                            ->label(__('admin/resources.product.discount_value'))
+                                                            ->numeric()
+                                                            ->requiredWith('special_price_type')
+                                                            ->rules(['nullable', 'numeric', 'min:0'])
+                                                            ->helperText(fn (
+                                                                Forms\Get $get
+                                                            ) => match ($get('special_price_type')) {
+                                                                'discount_percent' => __('admin/resources.product.discount_percent_help'),
+                                                                'fixed_price' => __('admin/resources.product.fixed_price_help'),
+                                                                default => __('admin/resources.product.discount_type_hint'),
+                                                            }),
+                                                        Forms\Components\DateTimePicker::make('special_price_start')
+                                                            ->label(__('admin/resources.product.special_price_start'))
+                                                            ->requiredWith('special_price_type'),
+                                                        Forms\Components\DateTimePicker::make('special_price_end')
+                                                            ->label(__('admin/resources.product.special_price_end'))
+                                                            ->requiredWith('special_price_type')
+                                                            ->afterOrEqual('special_price_start'),
+                                                    ])->columns(2),
 
-                                                        Forms\Components\Select::make('video_provider')
-                                                            ->label('Video Provider')
-                                                            ->options([
-                                                                'youtube' => 'Youtube',
-                                                                'dailymotion' => 'Dailymotion',
-                                                                'vimeo' => 'Vimeo',
+                                                Forms\Components\Section::make(__('admin/resources.product.section_media'))
+                                                    ->collapsed()
+                                                    ->schema([
+                                                        // Gallery (First, Full Width)
+                                                        SpatieMediaLibraryFileUpload::make('gallery')
+                                                            ->collection('gallery')
+                                                            ->label(__('admin/resources.product.variant_gallery'))
+                                                            ->multiple()
+                                                            ->reorderable()
+                                                            ->image()
+                                                            ->imageEditor()
+                                                            ->columnSpanFull()
+                                                            ->panelLayout('grid') // Attempt to force grid layout if supported by theme, otherwise full width usually does it
+                                                            ->extraAttributes(['class' => 'gallery-grid']),
+                                                        // Hooks for custom CSS if needed
+
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('thumbnail')
+                                                                    ->collection('thumbnail')
+                                                                    ->label(__('admin/resources.product.variant_thumbnail'))
+                                                                    ->image()
+                                                                    ->imageEditor(),
+                                                            ]),
+
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('pdf')
+                                                                    ->collection('pdf')
+                                                                    ->label(__('admin/resources.product.pdf_spec'))
+                                                                    ->acceptedFileTypes(['application/pdf'])
+                                                                    ->maxSize(51200), // 50MB
+
+                                                                SpatieMediaLibraryFileUpload::make('files')
+                                                                    ->collection('files')
+                                                                    ->collection('files')
+                                                                    ->label(__('admin/resources.product.downloadable_files'))
+                                                                    ->multiple()
+                                                                    ->maxSize(51200), // 50MB
+                                                            ]),
+
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                Forms\Components\Select::make('video_provider')
+                                                                    ->options([
+                                                                        'youtube' => 'Youtube',
+                                                                        'dailymotion' => 'Dailymotion',
+                                                                        'vimeo' => 'Vimeo',
+                                                                    ])
+                                                                    ->label(__('admin/resources.product.video_provider')),
+                                                                Forms\Components\TextInput::make('video_link')
+                                                                    ->label(__('admin/resources.product.video_link')),
+                                                            ]),
+
+                                                        Forms\Components\Grid::make(2)
+                                                            ->schema([
+                                                                SpatieMediaLibraryFileUpload::make('short_video')
+                                                                    ->collection('short_video')
+                                                                    ->label(__('admin/resources.product.short_video'))
+                                                                    ->acceptedFileTypes([
+                                                                        'video/mp4',
+                                                                        'video/webm',
+                                                                        'video/ogg',
+                                                                    ])
+                                                                    ->maxSize(51200), // 50MB
+
+                                                                SpatieMediaLibraryFileUpload::make('short_video_thumbnail')
+                                                                    ->collection('short_video_thumbnail')
+                                                                    ->label(__('admin/resources.product.short_video_thumbnail'))
+                                                                    ->image(),
                                                             ]),
                                                     ]),
-                                            ])
-                                            ->collapsed()
-                                            ->columnSpanFull(),
+
+                                            ])->columns(4),
                                     ])
-                                    ->columns(2)
-                                    ->reorderable(true)
-                                    ->addable(true)
-                                    ->deletable(true)
-                                    ->defaultItems(1)
-                                    ->minItems(1)
-                                    ->addActionLabel('Add Another Variant')
+                                    ->reorderable()
+                                    ->addActionLabel(__('admin/resources.product.add_variant'))
                                     ->columnSpanFull(),
                             ]),
 
                         // ── SEO Tab ──
-                        Tabs\Tab::make('SEO')
+                        Tabs\Tab::make(__('admin/resources.product.tab_seo'))
                             ->icon('heroicon-o-magnifying-glass')
                             ->schema([
                                 Forms\Components\TextInput::make('meta_title')
+                                    ->label(__('admin/resources.general.meta_title'))
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('meta_description')
-                                    ->maxLength(255)
+                                    ->label(__('admin/resources.general.meta_description'))
+                                    ->maxLength(65000)
                                     ->rows(3),
                                 SpatieMediaLibraryFileUpload::make('meta_img')
                                     ->collection('meta')
-                                    ->label('Meta Image (SEO)')
+                                    ->label(__('admin/resources.product.meta_image'))
                                     ->image()
                                     ->columnSpanFull(),
                             ]),
 
                         // ── Shipping Tab ──
-                        Tabs\Tab::make('Shipping')
+                        Tabs\Tab::make(__('admin/resources.product.tab_shipping'))
                             ->icon('heroicon-o-truck')
                             ->schema([
                                 // Cash on delivery moved to stocks
                                 Forms\Components\Select::make('shipping_type')
+                                    ->label(__('admin/resources.product.shipping_type'))
                                     ->options([
-                                        'free' => 'Free Shipping',
-                                        'flat_rate' => 'Flat Rate',
+                                        'free' => __('admin/resources.product.shipping_free'),
+                                        'flat_rate' => __('admin/resources.product.shipping_flat_rate'),
                                     ])
                                     ->default('flat_rate'),
                                 Forms\Components\TextInput::make('shipping_cost')
-                                    ->label('Shipping Cost')
+                                    ->label(__('admin/resources.product.shipping_cost'))
                                     ->numeric()
                                     ->default(0),
                                 Forms\Components\TextInput::make('est_shipping_days')
-                                    ->label('Estimate Shipping Days')
+                                    ->label(__('admin/resources.product.est_shipping_days'))
                                     ->numeric(),
                             ])->columns(2),
 
                         // Status tab content moved to General tab
 
                         // ── Warranty Tab ──
-                        Tabs\Tab::make('Warranty')
+                        Tabs\Tab::make(__('admin/resources.product.tab_warranty'))
                             ->icon('heroicon-o-shield-check')
                             ->schema([
                                 Forms\Components\Toggle::make('has_warranty')
-                                    ->label('Has Warranty'),
+                                    ->label(__('admin/resources.product.has_warranty')),
                             ]),
                     ])
                     ->persistTab()
@@ -305,37 +416,52 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')
-                    ->collection('thumbnail'),
+                    ->collection('thumbnail')
+                    ->label(__('admin/resources.product.thumbnail')),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('admin/resources.general.name'))
                     ->searchable()
                     ->sortable()
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->name),
                 Tables\Columns\TextColumn::make('categories.name')
-                    ->label('Categories')
+                    ->label(__('admin/resources.product.categories'))
                     ->badge()
                     ->separator(',')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('min_price')
-                    ->label('Min Price')
-                    ->state(fn (Product $record) => $record->stocks->min('price')) // Calculate min price from stocks
+                    ->label(__('admin/resources.product.col_min_price'))
+                    ->state(fn (Product $record) => $record->stocks_min_price ?? $record->stocks->min('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('max_price')
-                    ->label('Max Price')
-                    ->state(fn (Product $record) => $record->stocks->max('price')) // Calculate min price from stocks
+                    ->label(__('admin/resources.product.col_max_price'))
+                    ->state(fn (Product $record) => $record->stocks_max_price ?? $record->stocks->max('price'))
                     ->money()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_qty')
-                    ->label('Qty')
-                    ->state(fn (Product $record) => $record->stocks->sum('qty')) // Calculate total qty
+                    ->label(__('admin/resources.product.col_qty'))
+                    ->state(fn (Product $record) => $record->stocks_sum_qty ?? $record->stocks->sum('qty'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('effective_min_price')
+                    ->label(__('admin/resources.product.col_effective_min'))
+                    ->state(function (Product $record) {
+                        $resolver = app(PricingResolverService::class);
+
+                        return $record->stocks
+                            ->map(fn ($s) => $resolver->resolve($s)->finalPrice)
+                            ->min();
+                    })
+                    ->money()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('published')
+                    ->label(__('admin/resources.product.published'))
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('admin/resources.general.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -360,7 +486,6 @@ class ProductResource extends Resource
                             }
                         });
                     }),
-                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -400,5 +525,13 @@ class ProductResource extends Resource
             'create' => Pages\CreateProduct::route('/create'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withMin('stocks', 'price')
+            ->withMax('stocks', 'price')
+            ->withSum('stocks', 'qty');
     }
 }

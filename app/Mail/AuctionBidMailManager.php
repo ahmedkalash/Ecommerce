@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -16,7 +15,6 @@ class AuctionBidMailManager extends Mailable
      *
      * @return void
      */
-
     public $array;
 
     public function __construct($array)
@@ -32,11 +30,11 @@ class AuctionBidMailManager extends Mailable
     public function build()
     {
         return $this->view('emails.auction_bid')
-                    ->from($this->array['from'], env('MAIL_FROM_NAME'))
-                    ->subject($this->array['subject'])
-                    ->with([
-                        'content' => $this->array['content'],
-                        'link' => $this->array['link'],
-                    ]);
+            ->from($this->array['from'], env('MAIL_FROM_NAME'))
+            ->subject($this->array['subject'])
+            ->with([
+                'content' => $this->array['content'],
+                'link' => $this->array['link'],
+            ]);
     }
 }

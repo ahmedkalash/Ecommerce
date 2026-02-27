@@ -10,7 +10,9 @@ class CustomNotification extends Notification
     use Queueable;
 
     public $data;
+
     public $className;
+
     /**
      * Create a new notification instance.
      *
@@ -18,8 +20,8 @@ class CustomNotification extends Notification
      */
     public function __construct($data)
     {
-        $this->data  = $data;
-        $this->className= CustomNotification::class;
+        $this->data = $data;
+        $this->className = CustomNotification::class;
     }
 
     /**
@@ -28,7 +30,6 @@ class CustomNotification extends Notification
      * @param  mixed  $notifiable
      * @return array
      */
-
     public function via($notifiable)
     {
         return [DbNotification::class];
@@ -42,9 +43,8 @@ class CustomNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        // 
+        //
     }
-
 
     /**
      * Get the array representation of the notification.
@@ -57,8 +57,8 @@ class CustomNotification extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'link'    => $this->data['link']
-            ]
+                'link' => $this->data['link'],
+            ],
         ];
     }
 }

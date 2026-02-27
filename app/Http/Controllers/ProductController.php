@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\DTOs\ProductDTO;
 use App\Enums\UserType;
 use App\Http\Requests\ProductRequest;
-use App\Models\AttributeValue;
 use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
 use App\Models\User;
 use App\Models\Wishlist;
@@ -19,14 +18,13 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
-use Artisan;
-use Cache;
-use Carbon\Carbon;
-use CoreComponentRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\URL;
+
+// use App\Models\AttributeValue;
+// use App\Models\Color;
 
 class ProductController extends Controller
 {
@@ -60,8 +58,10 @@ class ProductController extends Controller
         $query = null;
         $sort_search = null;
 
-        $products = Product::where('added_by', UserType::ADMIN->value)->where('auction_product',
-            0)->where('wholesale_product', 0);
+        $products = Product::where('added_by', UserType::ADMIN->value)->where(
+            'auction_product',
+            0
+        )->where('wholesale_product', 0);
 
         if ($request->type != null) {
             $var = explode(',', $request->type);
@@ -79,7 +79,10 @@ class ProductController extends Controller
                 });
         }
 
-        $products = $products->where('digital', 0)->orderBy('created_at', 'desc')->paginate(15);
+        $products = $products->where('digital', 0)->with(['stocks', 'categories'])->orderBy(
+            'created_at',
+            'desc'
+        )->paginate(15);
 
         return view('backend.product.products.index', compact('products', 'type', 'col_name', 'query', 'sort_search'));
     }
@@ -93,8 +96,10 @@ class ProductController extends Controller
         $query = null;
         $seller_id = null;
         $sort_search = null;
-        $products = Product::where('added_by', UserType::SELLER->value)->where('auction_product',
-            0)->where('wholesale_product', 0);
+        $products = Product::where('added_by', UserType::SELLER->value)->where(
+            'auction_product',
+            0
+        )->where('wholesale_product', 0);
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
@@ -112,7 +117,7 @@ class ProductController extends Controller
             $sort_type = $request->type;
         }
         $products = $product_type == 'physical' ? $products->where('digital', 0) : $products->where('digital', 1);
-        $products = $products->orderBy('created_at', 'desc')->paginate(15);
+        $products = $products->with(['stocks', 'categories', 'user'])->orderBy('created_at', 'desc')->paginate(15);
         $type = 'Seller';
 
         if ($product_type == 'digital') {
@@ -155,7 +160,7 @@ class ProductController extends Controller
             $sort_type = $request->type;
         }
 
-        $products = $products->orderBy('created_at', 'desc')->paginate(15);
+        $products = $products->with(['stocks', 'categories', 'user'])->orderBy('created_at', 'desc')->paginate(15);
         $type = 'All';
 
         return view(
@@ -179,12 +184,43 @@ class ProductController extends Controller
 
     public function add_more_choice_option(Request $request)
     {
-        $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $request->attribute_id)->get();
+        // $all_attribute_values = AttributeValue::with('attribute')->where('attribute_id', $request->attribute_id)->get();
+        // Updated for schemaless attributes (config based)
+        // Request sends 'attribute_id' which is now the attribute key (e.g. 'size')
+
+        $key = $request->attribute_id; // Frontend sends 'attribute_id' via existing JS logic
+        $options = config("attributes.presets.{$key}.options", []);
+
+        // If options is simple array ['S', 'M'], make it associative for loop
+        // If associative ['Small' => 'S'], use keys as value? No, use Value.
+        // Wait, standard options structure in config?
+        // Step 5883 config generation:
+        // 'size' => [ ..., 'options' => ['XS', 'S'...]] (simple array)
+        // 'color' => [ ..., 'options' => ['Name' => 'Code']] (assoc array)
 
         $html = '';
 
-        foreach ($all_attribute_values as $row) {
-            $html .= '<option value="'.$row->value.'">'.$row->value.'</option>';
+        if ($key === 'color') {
+            // For color, usually frontend handles it via specialized color picker if type is color?
+            // But if this endpoint is called for color? (unlikely, usually separate logic)
+            // If called for color, return names?
+            // Actually, standard Active eCommerce uses 'colors' separate input.
+            // This method is for "Choice Options" (Select inputs).
+            // But if 'color' is added as a choice option?
+            // We return names.
+        }
+
+        foreach ($options as $option_key => $option_value) {
+            // If simple array: key is index, value is value.
+            // If assoc array (Color): key is Name, value is Code.
+
+            $val = is_numeric($option_key) ? $option_value : $option_key; // Use Key as Value for assoc (e.g. 'Red')
+            // Wait, for colors, we want the Name 'Red' as the value, passing Code?
+            // No, standard system stores Name 'Red'.
+
+            // For Size: value is 'S'.
+
+            $html .= '<option value="'.$val.'">'.$val.'</option>';
         }
 
         echo json_encode($html);
@@ -198,73 +234,68 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]));
-        $request->merge(['product_id' => $product->id]);
+        try {
+            \DB::beginTransaction();
 
-        // Product categories
-        $product->categories()->attach($request->category_ids);
+            $product = $this->productService->store(ProductDTO::fromArray($request->all()));
+            $request->merge(['product_id' => $product->id]);
 
-        // VAT & Tax
-        if ($request->tax_id) {
-            $this->productTaxService->store($request->only([
-                'tax_id',
-                'tax',
-                'tax_type',
+            // Product categories
+            $product->categories()->attach($request->category_ids);
+
+            // VAT & Tax
+            if ($request->tax_id) {
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id',
+                ]));
+            }
+
+            // Flash Deal
+            $this->productFlashDealService->store($request->only([
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type',
+            ]), $product);
+
+            // Product Stock - REMOVED redundant call (handled in ProductService)
+            // But ProductService::store calls ProductStockService::store($data).
+            // Since we passed $request->all(), it has everything needed.
+
+            // Frequently Bought Products
+            $this->frequentlyBoughtProductService->store($request->only([
+                'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id',
+            ]));
+
+            // Product Translations
+            $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
+            ProductTranslation::create($request->only([
+                'lang',
+                'name',
+                'description',
                 'product_id',
             ]));
+
+            \DB::commit();
+
+            flash(translate('Product has been inserted successfully'))->success();
+
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return redirect()->route('products.admin');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Product Store Failed: '.$e->getMessage().$e->getTraceAsString());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
         }
-
-        // Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]), $product);
-
-        // Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id',
-        ]), $product);
-
-        // Frequently Bought Products
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id',
-        ]));
-
-        // Product Translations
-        $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
-        ProductTranslation::create($request->only([
-            'lang',
-            'name',
-            'description',
-            'product_id',
-        ]));
-
-        flash(translate('Product has been inserted successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-
-        return redirect()->route('products.admin');
     }
 
     /**
@@ -335,85 +366,85 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+        try {
+            \DB::beginTransaction();
 
-        // Product
-        $product = $this->productService->update($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]), $product);
+            // Product Stock (Clear old stocks first, Service will recreate them)
+            $product->stocks()->delete();
 
-        $request->merge(['product_id' => $product->id]);
+            // Product Update (Pass full request data so Service can handle Stocks)
+            // Note: Service expects 'categories' array key, but Request has 'category_ids'.
+            // So Service won't sync categories, we do it below.
+            $product = $this->productService->update(ProductDTO::fromArray($request->all()), $product);
 
-        // Product categories
-        $product->categories()->sync($request->category_ids);
+            $request->merge(['product_id' => $product->id]);
 
-        // Product Stock
-        $product->stocks()->delete();
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id',
-        ]), $product);
+            // Product categories
+            $product->categories()->sync($request->category_ids);
 
-        // Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]), $product);
+            // Flash Deal
+            $this->productFlashDealService->store($request->only([
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type',
+            ]), $product);
 
-        // VAT & Tax
-        if ($request->tax_id) {
-            $product->taxes()->delete();
-            $this->productTaxService->store($request->only([
-                'tax_id',
-                'tax',
-                'tax_type',
+            // VAT & Tax
+            if ($request->tax_id) {
+                // $product->taxes()->delete(); // Service store logic?
+                // ProductTaxService::store might update or create?
+                // Legacy code deleted taxes inside if block?
+                // Line 409: $product->taxes()->delete();
+                // I should keep it.
+                $product->taxes()->delete();
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id',
+                ]));
+            }
+
+            // Frequently Bought Products
+            $product->frequently_bought_products()->delete();
+            $this->frequentlyBoughtProductService->store($request->only([
                 'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id',
             ]));
+
+            // Product Translations
+            ProductTranslation::updateOrCreate(
+                $request->only([
+                    'lang',
+                    'product_id',
+                ]),
+                $request->only([
+                    'name',
+                    'description',
+                ])
+            );
+
+            \DB::commit();
+
+            flash(translate('Product has been updated successfully'))->success();
+
+            \Artisan::call('view:clear');
+            \Artisan::call('cache:clear');
+
+            if ($request->has('tab') && $request->tab != null) {
+                return \Redirect::to(\URL::previous().'#'.$request->tab);
+            }
+
+            return back();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Product Update Failed: '.$e->getMessage().$e->getTraceAsString());
+            flash(translate('Something went wrong'))->error();
+
+            return back();
         }
-
-        // Frequently Bought Products
-        $product->frequently_bought_products()->delete();
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id',
-        ]));
-
-        // Product Translations
-        ProductTranslation::updateOrCreate(
-            $request->only([
-                'lang',
-                'product_id',
-            ]),
-            $request->only([
-                'name',
-                'description',
-            ])
-        );
-
-        flash(translate('Product has been updated successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        if ($request->has('tab') && $request->tab != null) {
-            return Redirect::to(URL::previous().'#'.$request->tab);
-        }
-
-        return back();
     }
 
     /**
@@ -479,22 +510,11 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        // Product
-        $product_new = $this->productService->product_duplicate_store($product);
+        // Duplicate Product and its relationships via Service
+        $product_new = $this->productService->duplicate($product);
 
-        // Product Stock
-        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
-
-        // VAT & Tax
+        // VAT & Tax Duplication
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
-
-        // Product Categories
-        foreach ($product->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
-            ]);
-        }
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->product_duplicate_store(

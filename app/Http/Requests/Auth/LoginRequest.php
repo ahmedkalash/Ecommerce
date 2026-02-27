@@ -3,10 +3,8 @@
 namespace App\Http\Requests\Auth;
 
 use App\Enums\RecaptchaAction;
-use App\Rules\Recaptcha;
 use App\Services\RecaptchaService;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class LoginRequest extends FormRequest
 {

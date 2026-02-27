@@ -2,10 +2,6 @@
 
 namespace App\Http\Controllers\Api\V2;
 
-use App\Models\CustomerPackage;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CustomerPackageController;
-use App\Http\Controllers\WalletController;
 use App\Models\CombinedOrder;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -17,7 +13,6 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 
 class PaypalController extends Controller
 {
-
     public function getUrl(Request $request)
     {
         // Creating an environment
@@ -36,63 +31,65 @@ class PaypalController extends Controller
         if ($request->payment_type == 'cart_payment') {
             $combined_order = CombinedOrder::find($request->combined_order_id);
             $amount = $combined_order->grand_total;
-        }
-        elseif ($request->payment_type == 'order_re_payment') {
+        } elseif ($request->payment_type == 'order_re_payment') {
             $order = Order::findOrFail($request->order_id);
             $amount = $order->grand_total;
         }
 
-        $data = array();
+        $data = [];
         $data['payment_type'] = $request->payment_type;
         $data['combined_order_id'] = $request->combined_order_id;
         $data['amount'] = $request->amount;
         $data['user_id'] = $request->user_id;
         $data['package_id'] = 0;
         $data['order_id'] = 0;
-        if(isset($request->order_id)) {
+        if (isset($request->order_id)) {
             $data['order_id'] = $request->order_id;
         }
-        if(isset($request->package_id)) {
+        if (isset($request->package_id)) {
             $data['package_id'] = $request->package_id;
         }
 
-        $order_create_request = new OrdersCreateRequest();
+        $order_create_request = new OrdersCreateRequest;
         $order_create_request->prefer('return=representation');
         $order_create_request->body = [
-            "intent" => "CAPTURE",
-            "purchase_units" => [[
-                "reference_id" => rand(000000, 999999),
-                "amount" => [
-                    "value" => number_format($amount, 2, '.', ''),
-                    "currency_code" => \App\Models\Currency::find(get_setting('system_default_currency'))->code
-                ]
-            ]],
-            "application_context" => [
-                "cancel_url" => route('api.paypal.cancel'),
-                "return_url" => route('api.paypal.done', $data),
-            ]
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'reference_id' => rand(000000, 999999),
+                    'amount' => [
+                        'value' => number_format($amount, 2, '.', ''),
+                        'currency_code' => \App\Models\Currency::find(get_setting('system_default_currency'))->code,
+                    ],
+                ]],
+            'application_context' => [
+                'cancel_url' => route('api.paypal.cancel'),
+                'return_url' => route('api.paypal.done', $data),
+            ],
         ];
 
         try {
             // Call API with your client and get a response for your call
             $response = $client->execute($order_create_request);
+
             // If call returns body in response, you can get the deserialized version from the result attribute of the response
-            //return Redirect::to($response->result->links[1]->href);
-            return response()->json(['result' => true, 'url' => $response->result->links[1]->href, 'message' => "Found redirect url"]);
+            // return Redirect::to($response->result->links[1]->href);
+            return response()->json([
+                'result' => true, 'url' => $response->result->links[1]->href, 'message' => 'Found redirect url',
+            ]);
         } catch (\Exception $ex) {
-            return response()->json(['result' => false, 'url' => '', 'message' => "Could not find redirect url"]);
+            return response()->json(['result' => false, 'url' => '', 'message' => 'Could not find redirect url']);
         }
     }
 
-
     public function getCancel(Request $request)
     {
-        return response()->json(['result' => true, 'message' => translate("Payment failed or got cancelled")]);
+        return response()->json(['result' => true, 'message' => translate('Payment failed or got cancelled')]);
     }
 
     public function getDone(Request $request)
     {
-        //dd($request->all());
+        // dd($request->all());
         // Creating an environment
         $clientId = env('PAYPAL_CLIENT_ID');
         $clientSecret = env('PAYPAL_CLIENT_SECRET');
@@ -126,10 +123,9 @@ class PaypalController extends Controller
                 customer_purchase_payment_done($request->user_id, $request->package_id, 'Paypal', json_encode($response));
             }
 
-            return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
+            return response()->json(['result' => true, 'message' => translate('Payment is successful')]);
         } catch (\Exception $ex) {
-            return response()->json(['result' => false, 'message' => translate("Payment failed")]);
+            return response()->json(['result' => false, 'message' => translate('Payment failed')]);
         }
     }
-
 }

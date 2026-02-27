@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 use App;
+use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class SellerPackage extends Model
 {
@@ -12,14 +12,17 @@ class SellerPackage extends Model
 
     protected $guarded = [];
 
-    public function getTranslation($field = '', $lang = false){
+    public function getTranslation($field = '', $lang = false)
+    {
         $lang = $lang == false ? App::getLocale() : $lang;
         $seller_package_translation = $this->hasMany(SellerPackageTranslation::class)->where('lang', $lang)->first();
+
         return $seller_package_translation != null ? $seller_package_translation->$field : $this->$field;
     }
 
-    public function seller_package_translations(){
-      return $this->hasMany(SellerPackageTranslation::class);
+    public function seller_package_translations()
+    {
+        return $this->hasMany(SellerPackageTranslation::class);
     }
 
     public function seller_package_payments()
@@ -31,5 +34,4 @@ class SellerPackage extends Model
     {
         return $this->hasOne(Shop::class);
     }
-
 }

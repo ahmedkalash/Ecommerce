@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Payment;
 
-use App\Http\Controllers\Controller;
-use App\Models\CombinedOrder;
-use App\Models\CustomerPackage;
-use App\Models\SellerPackage;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
+use App\Models\CombinedOrder;
+use App\Models\CustomerPackage;
 use App\Models\Order;
-use Session;
+use App\Models\SellerPackage;
 use Auth;
+use Session;
 
 class MercadopagoController extends Controller
 {
@@ -22,7 +22,7 @@ class MercadopagoController extends Controller
         if (Session::has('payment_type')) {
             $paymentType = Session::get('payment_type');
             $paymentData = Session::get('payment_data');
-            
+
             $user = Auth::user();
             $first_name = $user->name;
             $phone = ($user->phone != null) ? $user->phone : '123456789';
@@ -63,22 +63,22 @@ class MercadopagoController extends Controller
             $success_url = url('/mercadopago/payment/done');
             $fail_url = url('/mercadopago/payment/cancel');
         }
+
         return view('frontend.payment.mercadopago', compact('combined_order_id', 'billname', 'phone', 'amount', 'first_name', 'email', 'success_url', 'fail_url'));
     }
-
-
 
     public function paymentstatus()
     {
 
         $response = request()->status;
         if ($response == 'approved') {
-            $payment = ["status" => "Success"];
+            $payment = ['status' => 'Success'];
             $payment_type = Session::get('payment_type');
             $paymentData = session()->get('payment_data');
 
             if ($payment_type == 'cart_payment') {
-                flash(translate("Your order has been placed successfully"))->success();
+                flash(translate('Your order has been placed successfully'))->success();
+
                 return (new CheckoutController)->checkout_done(session()->get('combined_order_id'), json_encode($payment));
             } elseif ($payment_type == 'order_re_payment') {
                 return (new CheckoutController)->orderRePaymentDone($paymentData, json_encode($payment));
@@ -91,6 +91,7 @@ class MercadopagoController extends Controller
             }
         } else {
             flash(translate('Payment is cancelled'))->error();
+
             return redirect()->route('home');
         }
     }
@@ -99,8 +100,9 @@ class MercadopagoController extends Controller
     {
 
         $response = request()->all(['collection_id', 'collection_status', 'payment_id', 'status', 'preference_id']);
-        //Log::info($response);
+        // Log::info($response);
         flash(translate('Payment is cancelled'))->error();
+
         return redirect()->route('home');
     }
 }

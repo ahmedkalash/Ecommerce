@@ -2,20 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class AffiliateUser extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
     //
-    public function user(){
-    	return $this->belongsTo(User::class);
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function affiliate_payments()
     {
-      return $this->hasMany(AffiliatePayment::class)->orderBy('created_at', 'desc')->paginate(12);
+        return $this->hasMany(AffiliatePayment::class)->orderBy('created_at', 'desc')->paginate(12);
     }
 }

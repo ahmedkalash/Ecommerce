@@ -24,10 +24,11 @@ use App\Models\Review;
 use App\Models\Seller;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
-// use App\Models\Upload;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
 use App\Models\Wishlist;
+
+// use App\Models\Upload;
 
 trait UserRelationships
 {

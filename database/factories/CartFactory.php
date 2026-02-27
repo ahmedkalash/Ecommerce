@@ -56,7 +56,7 @@ class CartFactory extends Factory
      */
     public function guest(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => null,
             'temp_user_id' => Str::random(32),
         ]);

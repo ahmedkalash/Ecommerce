@@ -1,6 +1,6 @@
 @if (count(get_featured_products()) > 0)
     @php
-        $lang = get_system_language()->code;
+        $lang = get_system_language()?->code;
         $homeBanner1Images = get_setting('featuredPreorder_images', null, $lang);
         $xxl_items = 6;
         $xl_items = 5;
@@ -27,10 +27,10 @@
                         <div class="d-flex">
                             <a type="button" class="arrow-prev slide-arrow link-disable text-secondary mr-2"
                                onclick="clickToSlide('slick-prev','section_preorder_featured_div')"><i
-                                    class="las la-angle-left fs-20 fw-600"></i></a>
+                                        class="las la-angle-left fs-20 fw-600"></i></a>
                             <a type="button" class="arrow-next slide-arrow text-secondary ml-2"
                                onclick="clickToSlide('slick-next','section_preorder_featured_div')"><i
-                                    class="las la-angle-right fs-20 fw-600"></i></a>
+                                        class="las la-angle-right fs-20 fw-600"></i></a>
                         </div>
                     </div>
                     <div class="border mt-3">

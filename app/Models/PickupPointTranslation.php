@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class PickupPointTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
     protected $fillable = ['name', 'address', 'lang', 'pickup_point_id'];
 
-    public function poickup_point(){
-      return $this->belongsTo(PickupPoint::class);
+    public function poickup_point()
+    {
+        return $this->belongsTo(PickupPoint::class);
     }
 }

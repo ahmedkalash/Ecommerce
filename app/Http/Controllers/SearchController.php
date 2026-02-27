@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Search;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
-use App\Models\Color;
-use App\Models\Shop;
-use App\Models\Attribute;
-use App\Models\AttributeCategory;
+use App\Models\Category;
 use App\Models\PreorderProduct;
+use App\Models\Product;
+use App\Models\Search;
+use App\Models\Shop;
 use App\Utility\CategoryUtility;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
@@ -26,10 +23,12 @@ class SearchController extends Controller
         $min_price = $request->min_price;
         $max_price = $request->max_price;
         $seller_id = $request->seller_id;
-        $attributes = Attribute::all();
-        $selected_attribute_values = array();
-        $colors = Color::all();
-        $is_available = array();
+        // $attributes = Attribute::all();
+        $attributes = collect([]);
+        $selected_attribute_values = [];
+        // $colors = Color::all();
+        $colors = collect([]);
+        $is_available = [];
         $selected_color = null;
         $category = [];
         $categories = [];
@@ -80,20 +79,20 @@ class SearchController extends Controller
 
                 $products->where(function ($q) use ($query) {
                     foreach (explode(' ', trim($query)) as $word) {
-                        $q->where('product_name', 'like', '%' . $word . '%')
-                            ->orWhere('tags', 'like', '%' . $word . '%')
+                        $q->where('product_name', 'like', '%'.$word.'%')
+                            ->orWhere('tags', 'like', '%'.$word.'%')
                             ->orWhereHas('preorder_product_translations', function ($q) use ($word) {
-                                $q->where('product_name', 'like', '%' . $word . '%');
+                                $q->where('product_name', 'like', '%'.$word.'%');
                             });
                     }
                 });
 
-                $case1 = $query . '%';
-                $case2 = '%' . $query . '%';
+                $case1 = $query.'%';
+                $case2 = '%'.$query.'%';
 
                 $products->orderByRaw('CASE
-                    WHEN product_name LIKE "' . $case1 . '" THEN 1
-                    WHEN product_name LIKE "' . $case2 . '" THEN 2
+                    WHEN product_name LIKE "'.$case1.'" THEN 1
+                    WHEN product_name LIKE "'.$case2.'" THEN 2
                     ELSE 3
                     END');
             }
@@ -120,7 +119,6 @@ class SearchController extends Controller
             return view('frontend.product_listing', compact('products', 'query', 'category', 'categories', 'category_id', 'brand_id', 'sort_by', 'seller_id', 'min_price', 'max_price', 'attributes', 'selected_attribute_values', 'colors', 'selected_color', 'product_type', 'is_available'));
         }
 
-
         if ($brand_id != null) {
             $conditions = array_merge($conditions, ['brand_id' => $brand_id]);
         } elseif ($request->brand != null) {
@@ -137,8 +135,9 @@ class SearchController extends Controller
 
             $products = $category->products();
 
-            $attribute_ids = AttributeCategory::whereIn('category_id', $category_ids)->pluck('attribute_id')->toArray();
-            $attributes = Attribute::whereIn('id', $attribute_ids)->get();
+            // $attribute_ids = AttributeCategory::whereIn('category_id', $category_ids)->pluck('attribute_id')->toArray();
+            // $attributes = Attribute::whereIn('id', $attribute_ids)->get();
+            $attributes = collect([]);
         } else {
             $categories = Category::with('childrenCategories', 'coverImage')->whereNull('parent_id')->orderBy('name', 'asc')->get();
         }
@@ -153,23 +152,23 @@ class SearchController extends Controller
 
             $products->where(function ($q) use ($query) {
                 foreach (explode(' ', trim($query)) as $word) {
-                    $q->where('name', 'like', '%' . $word . '%')
-                        ->orWhere('tags', 'like', '%' . $word . '%')
+                    $q->where('name', 'like', '%'.$word.'%')
+                        ->orWhere('tags', 'like', '%'.$word.'%')
                         ->orWhereHas('product_translations', function ($q) use ($word) {
-                            $q->where('name', 'like', '%' . $word . '%');
+                            $q->where('name', 'like', '%'.$word.'%');
                         })
                         ->orWhereHas('stocks', function ($q) use ($word) {
-                            $q->where('sku', 'like', '%' . $word . '%');
+                            $q->where('sku', 'like', '%'.$word.'%');
                         });
                 }
             });
 
-            $case1 = $query . '%';
-            $case2 = '%' . $query . '%';
+            $case1 = $query.'%';
+            $case2 = '%'.$query.'%';
 
             $products->orderByRaw('CASE
-                WHEN name LIKE "' . $case1 . '" THEN 1
-                WHEN name LIKE "' . $case2 . '" THEN 2
+                WHEN name LIKE "'.$case1.'" THEN 1
+                WHEN name LIKE "'.$case2.'" THEN 2
                 ELSE 3
                 END');
         }
@@ -193,8 +192,8 @@ class SearchController extends Controller
         }
 
         if ($request->has('color')) {
-            $str = '"' . $request->color . '"';
-            $products->where('colors', 'like', '%' . $str . '%');
+            $str = '"'.$request->color.'"';
+            $products->where('colors', 'like', '%'.$str.'%');
             $selected_color = $request->color;
         }
 
@@ -202,9 +201,9 @@ class SearchController extends Controller
             $selected_attribute_values = $request->selected_attribute_values;
             $products->where(function ($query) use ($selected_attribute_values) {
                 foreach ($selected_attribute_values as $key => $value) {
-                    $str = '"' . $value . '"';
+                    $str = '"'.$value.'"';
 
-                    $query->orWhere('choice_options', 'like', '%' . $str . '%');
+                    $query->orWhere('choice_options', 'like', '%'.$str.'%');
                 }
             });
         }
@@ -238,20 +237,20 @@ class SearchController extends Controller
         abort(404);
     }
 
-    //Suggestional Search
+    // Suggestional Search
     public function ajax_search(Request $request)
     {
-        $keywords = array();
+        $keywords = [];
         $query = $request->search;
         $preorder_products = null;
-        $products = Product::where('published', 1)->where('tags', 'like', '%' . $query . '%')->get();
+        $products = Product::where('published', 1)->where('tags', 'like', '%'.$query.'%')->get();
         foreach ($products as $key => $product) {
             foreach (explode(',', $product->tags) as $key => $tag) {
                 if (stripos($tag, $query) !== false) {
-                    if (sizeof($keywords) > 5) {
+                    if (count($keywords) > 5) {
                         break;
                     } else {
-                        if (!in_array(strtolower($tag), $keywords)) {
+                        if (! in_array(strtolower($tag), $keywords)) {
                             array_push($keywords, strtolower($tag));
                         }
                     }
@@ -264,35 +263,35 @@ class SearchController extends Controller
         $products_query = $products_query->where('published', 1)
             ->where(function ($q) use ($query) {
                 foreach (explode(' ', trim($query)) as $word) {
-                    $q->where('name', 'like', '%' . $word . '%')
-                        ->orWhere('tags', 'like', '%' . $word . '%')
+                    $q->where('name', 'like', '%'.$word.'%')
+                        ->orWhere('tags', 'like', '%'.$word.'%')
                         ->orWhereHas('product_translations', function ($q) use ($word) {
-                            $q->where('name', 'like', '%' . $word . '%');
+                            $q->where('name', 'like', '%'.$word.'%');
                         })
                         ->orWhereHas('stocks', function ($q) use ($word) {
-                            $q->where('sku', 'like', '%' . $word . '%');
+                            $q->where('sku', 'like', '%'.$word.'%');
                         });
                 }
             });
-        $case1 = $query . '%';
-        $case2 = '%' . $query . '%';
+        $case1 = $query.'%';
+        $case2 = '%'.$query.'%';
 
         $products_query->orderByRaw('CASE
-                WHEN name LIKE "' . $case1 . '" THEN 1
-                WHEN name LIKE "' . $case2 . '" THEN 2
+                WHEN name LIKE "'.$case1.'" THEN 1
+                WHEN name LIKE "'.$case2.'" THEN 2
                 ELSE 3
                 END');
         $products = $products_query->limit(3)->get();
 
-        $categories = Category::where('name', 'like', '%' . $query . '%')->get()->take(3);
+        $categories = Category::where('name', 'like', '%'.$query.'%')->get()->take(3);
 
-        $shops = Shop::whereIn('user_id', verified_sellers_id())->where('name', 'like', '%' . $query . '%')->get()->take(3);
+        $shops = Shop::whereIn('user_id', verified_sellers_id())->where('name', 'like', '%'.$query.'%')->get()->take(3);
 
         if (addon_is_activated('preorder')) {
-            $preorder_products =  PreorderProduct::where('is_published', 1)
+            $preorder_products = PreorderProduct::where('is_published', 1)
                 ->where(function ($queryBuilder) use ($query) {
-                    $queryBuilder->where('product_name', 'like', '%' . $query . '%')
-                        ->orWhere('tags', 'like', '%' . $query . '%');
+                    $queryBuilder->where('product_name', 'like', '%'.$query.'%')
+                        ->orWhere('tags', 'like', '%'.$query.'%');
                 })
                 ->where(function ($query) {
                     $query->whereHas('user', function ($q) {
@@ -305,16 +304,16 @@ class SearchController extends Controller
                 ->get();
         }
 
-        if (sizeof($keywords) > 0 || sizeof($categories) > 0 || sizeof($products) > 0 || sizeof($shops) > 0  || sizeof($preorder_products) > 0) {
+        if (count($keywords) > 0 || count($categories) > 0 || count($products) > 0 || count($shops) > 0 || count($preorder_products) > 0) {
             return view('frontend.partials.search_content', compact('products', 'categories', 'keywords', 'shops', 'preorder_products'));
         }
+
         return '0';
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)

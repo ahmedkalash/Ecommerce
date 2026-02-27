@@ -2,27 +2,26 @@
 
 namespace App\Http\Controllers\Payment;
 
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\SellerPackageController;
 use App\Http\Controllers\WalletController;
-use Illuminate\Http\Request;
 use App\Models\CombinedOrder;
 use App\Models\CustomerPackage;
 use App\Models\Order;
 use App\Models\SellerPackage;
+use Illuminate\Http\Request;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
-use Session;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 use Redirect;
+use Session;
 
 class PaypalController extends Controller
 {
-
     public function pay()
     {
         // Creating an environment
@@ -39,7 +38,7 @@ class PaypalController extends Controller
         if (Session::has('payment_type')) {
             $paymentType = Session::get('payment_type');
             $paymentData = Session::get('payment_data');
-            
+
             if ($paymentType == 'cart_payment') {
                 $combined_order = CombinedOrder::findOrFail(Session::get('combined_order_id'));
                 $amount = $combined_order->grand_total;
@@ -57,34 +56,36 @@ class PaypalController extends Controller
             }
         }
 
-        $request = new OrdersCreateRequest();
+        $request = new OrdersCreateRequest;
         $request->prefer('return=representation');
         $request->body = [
-            "intent" => "CAPTURE",
-            "purchase_units" => [[
-                "reference_id" => rand(000000, 999999),
-                "amount" => [
-                    "value" => number_format($amount, 2, '.', ''),
-                    "currency_code" => \App\Models\Currency::findOrFail(get_setting('system_default_currency'))->code
-                ]
-            ]],
-            "application_context" => [
-                "cancel_url" => url('paypal/payment/cancel'),
-                "return_url" => url('paypal/payment/done')
-            ]
+            'intent' => 'CAPTURE',
+            'purchase_units' => [
+                [
+                    'reference_id' => rand(000000, 999999),
+                    'amount' => [
+                        'value' => number_format($amount, 2, '.', ''),
+                        'currency_code' => \App\Models\Currency::findOrFail(get_setting('system_default_currency'))->code,
+                    ],
+                ]],
+            'application_context' => [
+                'cancel_url' => url('paypal/payment/cancel'),
+                'return_url' => url('paypal/payment/done'),
+            ],
         ];
 
         try {
             // Call API with your client and get a response for your call
             $response = $client->execute($request);
+
             // If call returns body in response, you can get the deserialized version from the result attribute of the response
             return Redirect::to($response->result->links[1]->href);
         } catch (\Exception $ex) {
             flash(translate('Something was wrong'))->error();
+
             return redirect()->route('home');
         }
     }
-
 
     public function getCancel(Request $request)
     {
@@ -92,6 +93,7 @@ class PaypalController extends Controller
         $request->session()->forget('order_id');
         $request->session()->forget('payment_data');
         flash(translate('Payment cancelled'))->success();
+
         return redirect()->route('home');
     }
 

@@ -1,18 +1,16 @@
 <?php
+
 namespace App\Services;
 
-use Illuminate\Http\Request;
-
 use App\Models\Order;
-use App\Models\ProductStock;
 use App\Models\SmsTemplate;
 use App\Models\User;
 use App\Utility\NotificationUtility;
 use App\Utility\SmsUtility;
+use Illuminate\Http\Request;
 
-
-class OrderService{
-
+class OrderService
+{
     public function handle_delivery_status(Request $request)
     {
         $order = Order::findOrFail($request->order_id);
@@ -65,21 +63,20 @@ class OrderService{
             }
         }
 
-        //sends Notifications to user
+        // sends Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
-            $request->title = "Order updated !";
-            $status = str_replace("_", "", $order->delivery_status);
+            $request->title = 'Order updated !';
+            $status = str_replace('_', '', $order->delivery_status);
             $request->text = " Your order {$order->code} has been {$status}";
 
-            $request->type = "order";
+            $request->type = 'order';
             $request->id = $order->id;
             $request->user_id = $order->user->id;
 
             NotificationUtility::sendFirebaseNotification($request);
         }
-
 
         if (addon_is_activated('delivery_boy')) {
             if (auth()->user()->user_type == 'delivery_boy') {
@@ -116,26 +113,24 @@ class OrderService{
         $order->payment_status = $status;
         $order->save();
 
-
         if ($order->payment_status == 'paid' && $order->commission_calculated == 0) {
             calculateCommissionAffilationClubPoint($order);
         }
 
-        //sends Notifications to user
+        // sends Notifications to user
         NotificationUtility::sendNotification($order, $request->status);
         if (get_setting('google_firebase') == 1 && $order->user->device_token != null) {
             $request->device_token = $order->user->device_token;
-            $request->title = "Order updated !";
-            $status = str_replace("_", "", $order->payment_status);
+            $request->title = 'Order updated !';
+            $status = str_replace('_', '', $order->payment_status);
             $request->text = " Your order {$order->code} has been {$status}";
 
-            $request->type = "order";
+            $request->type = 'order';
             $request->id = $order->id;
             $request->user_id = $order->user->id;
 
             NotificationUtility::sendFirebaseNotification($request);
         }
-
 
         if (addon_is_activated('otp_system') && SmsTemplate::where('identifier', 'payment_status_change')->first()->status == 1) {
             try {
@@ -144,8 +139,8 @@ class OrderService{
 
             }
         }
-        return 1;
-    
-    }
 
+        return 1;
+
+    }
 }

@@ -1,9 +1,10 @@
-<?php 
+<?php
+
 namespace App\Exceptions;
 
 use Exception;
 
-class Redirectingexception extends Exception {
-    public function __construct() {
-    }
+class Redirectingexception extends Exception
+{
+    public function __construct() {}
 }

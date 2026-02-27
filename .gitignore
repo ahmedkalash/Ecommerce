@@ -70,3 +70,7 @@ _ide_helper.php
 /test_results.txt
 /database/seeders/media_source/*
 /public/livewire-tmp
+/test_output.txt
+/app/Livewire/
+/resources/views/livewire/
+/resources/views/test.blade.php

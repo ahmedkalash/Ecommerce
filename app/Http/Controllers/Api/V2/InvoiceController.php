@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api\V2;
 use App\Models\Currency;
 use App\Models\Language;
 use App\Models\Order;
-use Session;
-use PDF;
 use Config;
+use PDF;
 
 class InvoiceController extends Controller
 {
-    //download invoice
+    // download invoice
     public function invoice_download($id)
     {
         if (request()->header('Currency-Code')) {
@@ -97,12 +96,13 @@ class InvoiceController extends Controller
         $config = [];
 
         $order = Order::findOrFail($id);
+
         return PDF::loadView('backend.invoices.invoice', [
             'order' => $order,
             'font_family' => $font_family,
             'direction' => $direction,
             'text_align' => $text_align,
-            'not_text_align' => $not_text_align
-        ], [], $config)->download('order-' . $order->code . '.pdf');
+            'not_text_align' => $not_text_align,
+        ], [], $config)->download('order-'.$order->code.'.pdf');
     }
 }

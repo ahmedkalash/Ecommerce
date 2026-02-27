@@ -7,12 +7,12 @@
     $data_xs_items = '3';
 
     if (get_setting('vendor_system_activation') == 1){
-        $data_items = '6.5';
-        $data_xl_items = '5';
-        $data_lg_items = '4.5';
+    $data_items = '6.5';
+    $data_xl_items = '5';
+    $data_lg_items = '4.5';
     }
 @endphp
-    <!-- brands -->
+        <!-- brands -->
 <div class="aiz-carousel dashboard-box-carousel half-outside-arrow" data-items="{{ $data_items }}"
      data-xl-items="{{ $data_xl_items }}"
      data-lg-items="{{ $data_lg_items }}" data-md-items="{{ $data_md_items }}" data-sm-items="{{ $data_md_items }}"
@@ -34,8 +34,8 @@
                 @php
                     $lang = App::getLocale();
                     $brand = App\Models\BrandTranslation::where('brand_id', $top_brands_product[0]->brand_id)
-                        ->where('lang', $lang)
-                        ->first();
+                    ->where('lang', $lang)
+                    ->first();
                 @endphp
                 {{ $brand ? $brand->name : translate('Not Found') }}
             </p>
@@ -44,7 +44,7 @@
         @php
             $top_brands_product_limit++;
             if($top_brands_product_limit > 15)
-                break;
+            break;
         @endphp
     @endforeach
 </div>
@@ -56,8 +56,8 @@
     @endphp
     @foreach($top_brands_products as $key => $top_brands_product)
         <div
-            class="top_brands_product_table top-products-table table-responsive c-scrollbar-light @if ($key == $top_brands2[0]) show @endif"
-            style="max-height: 215px; width: 100%;" id="top_brands_product_table_{{ $key }}">
+                class="top_brands_product_table top-products-table table-responsive c-scrollbar-light @if ($key == $top_brands2[0]) show @endif"
+                style="max-height: 215px; width: 100%;" id="top_brands_product_table_{{ $key }}">
             <table class="table dashboard-table mb-0">
                 <thead>
                 <tr class="fs-11 fw-600 text-secondary">
@@ -71,8 +71,8 @@
                     @php
                         $product_img = $row->product_thumbnail_img ?? static_asset('assets/img/placeholder.jpg');
                         $product_url = route('product', $row->product_slug);
-                        if ($row->auction_product == 1) {
-                            $product_url = route('auction-product', $row->product_slug);
+                        if (isset($row->auction_product) && $row->auction_product == 1) {
+                        $product_url = route('auction-product', $row->product_slug);
                         }
                     @endphp
                     <tr>
@@ -108,7 +108,7 @@
         @php
             $top_brands_product_limit++;
             if($top_brands_product_limit > 15)
-                break;
+            break;
         @endphp
     @endforeach
 </div>

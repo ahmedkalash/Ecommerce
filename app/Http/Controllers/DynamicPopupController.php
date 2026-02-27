@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class DynamicPopupController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_dynamic_popups'])->only('index');
         $this->middleware(['permission:add_dynamic_popups'])->only('create');
@@ -26,11 +27,12 @@ class DynamicPopupController extends Controller
     {
         $sort_search = null;
         $dynamic_popups = DynamicPopup::orderBy('id', 'asc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $dynamic_popups = $dynamic_popups->where('title', 'like', '%'.$sort_search.'%');
         }
         $dynamic_popups = $dynamic_popups->paginate(15);
+
         return view('backend.marketing.dynamic_popup.index', compact('dynamic_popups', 'sort_search'));
     }
 
@@ -54,6 +56,7 @@ class DynamicPopupController extends Controller
     {
         DynamicPopup::create($request->except('_token'));
         flash(translate('Dynamic Popup has been inserted successfully'))->success();
+
         return redirect()->route('dynamic-popups.index');
     }
 
@@ -88,11 +91,12 @@ class DynamicPopupController extends Controller
      */
     public function update(DynamicPopupRequest $request, DynamicPopup $dynamic_popup)
     {
-        if (!$request->has('show_subscribe_form')) {
+        if (! $request->has('show_subscribe_form')) {
             $request->request->add(['show_subscribe_form' => null]);
         }
-        $dynamic_popup->update($request->except(['_token','_method']));
+        $dynamic_popup->update($request->except(['_token', '_method']));
         flash(translate('Dynamic Popup has been updated successfully'))->success();
+
         return redirect()->route('dynamic-popups.index');
     }
 
@@ -106,26 +110,30 @@ class DynamicPopupController extends Controller
     {
         if ($id == 1) {
             flash(translate('This Dynamic Popup cannot be deleted'))->error();
+
             return redirect()->route('dynamic-popups.index');
         }
         DynamicPopup::destroy($id);
         flash(translate('Dynamic Popup has been deleted successfully'))->success();
+
         return redirect()->route('dynamic-popups.index');
     }
-    
+
     public function bulk_dynamic_popup_delete(Request $request)
     {
         DynamicPopup::whereIn('id', $request->id)->delete();
+
         return 1;
     }
-    
+
     public function update_status(Request $request)
     {
         $dynamic_popup = DynamicPopup::findOrFail($request->id);
         $dynamic_popup->status = $request->status;
-        if($dynamic_popup->save()){
+        if ($dynamic_popup->save()) {
             return 1;
         }
+
         return 0;
     }
 }

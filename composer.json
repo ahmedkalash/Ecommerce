@@ -7,6 +7,12 @@
     ],
     "license": "MIT",
     "type": "project",
+    "repositories": [
+        {
+            "type": "github",
+            "url": "https://github.com/lara-zeus/translatable"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "ext-zip": "*",
@@ -21,24 +27,30 @@
         "filament/spatie-laravel-media-library-plugin": "^3.3",
         "filament/spatie-laravel-settings-plugin": "^3.3",
         "filament/spatie-laravel-tags-plugin": "3.0",
+        "filament/spatie-laravel-translatable-plugin": "^3.2.80",
         "genealabs/laravel-sign-in-with-apple": "*",
         "genealabs/laravel-socialiter": "*",
         "guzzlehttp/guzzle": "^7.5",
+        "http-interop/http-factory-guzzle": "^1.2",
         "instamojo/instamojo-php": "^0.4.0",
         "intervention/image": "^2.5",
         "iyzico/iyzipay-php": "^2.0",
+        "kenepa/translation-manager": "^4.0",
         "kingflamez/laravelrave": "dev-master",
         "laracasts/flash": "^3.2",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
+        "laravel/scout": "^10.24",
         "laravel/socialite": "^5.6",
         "laravel/telescope": "^5.16",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
         "lcobucci/jwt": "^4.0",
         "league/flysystem-aws-s3-v3": "^3.12",
+        "livewire/flux": "^2.12",
         "maatwebsite/excel": "^3.1",
         "mehedi-iitdu/core-component-repository": "^2.2",
+        "meilisearch/meilisearch-php": "^1.16",
         "mercadopago/dx-php": "^2.5",
         "mpdf/mpdf": "^8.1",
         "myfatoorah/laravel-package": "2.0.0",
@@ -51,9 +63,13 @@
         "sebacarrasco93/laravel-payku": "^1.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/db-dumper": "^3.3",
+        "spatie/laravel-data": "^4.20",
         "spatie/laravel-medialibrary": "^11.19",
         "spatie/laravel-permission": "^5.5",
+        "spatie/laravel-schemaless-attributes": "^2.5",
         "spatie/laravel-sitemap": "^7.3",
+        "spatie/laravel-translatable": "^6.11",
+        "spatie/laravel-translation-loader": "^2.8",
         "staudenmeir/laravel-adjacency-list": "^1.20",
         "stichoza/google-translate-php": "^5.2",
         "stripe/stripe-php": "^10.5",
@@ -61,13 +77,12 @@
         "unicodeveloper/laravel-paystack": "^1.0"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.8",
         "barryvdh/laravel-ide-helper": "^2.13",
         "fakerphp/faker": "^1.9.1",
         "larastan/larastan": "^2.11",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.27",
-        "laravel/sail": "^1.0.1",
+        "laravel/sail": "^1.53",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "phpunit/phpunit": "10.5.63",
@@ -119,6 +134,7 @@
         "sort-packages": true,
         "optimize-autoloader": true,
         "allow-plugins": {
+            "php-http/discovery": true,
             "symfony/thanks": true
         },
         "audit": {
@@ -127,6 +143,6 @@
             ]
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

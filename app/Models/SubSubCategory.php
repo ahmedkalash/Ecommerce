@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\SubSubCategory
@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $brands
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory query()
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory whereSubCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubSubCategory whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class SubSubCategory extends Model

@@ -62,7 +62,7 @@ class ProductsImport implements ToCollection, ToModel, WithHeadingRow, WithValid
                         '/[^A-Za-z0-9\-]/',
                         '',
                         str_replace(' ', '-', strtolower($row['slug']))
-                    ) . '-' . Str::random(5),
+                    ).'-'.Str::random(5),
                     'thumbnail_img' => $this->downloadThumbnail($row['thumbnail_img']),
                     'photos' => $this->downloadGalleryImages($row['photos']),
                 ]);

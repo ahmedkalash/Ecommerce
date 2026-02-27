@@ -3,27 +3,25 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Api\V2\Seller\SellerPackageController;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\CheckoutController;
-use App\Models\User;
-use App\Models\Wallet;
+use App\Http\Controllers\Controller;
 use App\Models\CombinedOrder;
-use App\Utility\PayhereUtility;
 use App\Models\CustomerPackage;
 use App\Models\CustomerPackagePayment;
 use App\Models\Order;
 use App\Models\SellerPackage;
-use Session;
+use App\Models\User;
+use App\Models\Wallet;
+use App\Utility\PayhereUtility;
 use Auth;
 use Illuminate\Http\Request;
+use Session;
 
 class PayhereController extends Controller
 {
     private $security_key;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function pay(Request $request)
     {
@@ -49,9 +47,9 @@ class PayhereController extends Controller
                 $email = json_decode($combined_order->shipping_address)->email;
                 $address = json_decode($combined_order->shipping_address)->address;
                 $city = json_decode($combined_order->shipping_address)->city;
+
                 return PayhereUtility::create_checkout_form($combined_order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
-            }
-            elseif ($paymentType == 'order_re_payment') {
+            } elseif ($paymentType == 'order_re_payment') {
                 $order = Order::findOrFail($paymentData['order_id']);
                 $order_id = $order->id;
                 $amount = $order->grand_total;
@@ -60,29 +58,31 @@ class PayhereController extends Controller
                 $email = json_decode($order->shipping_address)->email;
                 $address = json_decode($order->shipping_address)->address;
                 $city = json_decode($order->shipping_address)->city;
+
                 return PayhereUtility::create_order_re_payment_form($order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
-            }
-            elseif ($paymentType == 'wallet_payment') {
+            } elseif ($paymentType == 'wallet_payment') {
                 $order_id = rand(100000, 999999);
                 $amount = $request->amount;
+
                 return PayhereUtility::create_wallet_form($user_id, $order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
-            }
-            elseif ($paymentType == 'customer_package_payment') {
+            } elseif ($paymentType == 'customer_package_payment') {
                 $customer_package = CustomerPackage::findOrFail($paymentData['customer_package_id']);
                 $order_id = rand(100000, 999999);
                 $package_id = $customer_package->id;
                 $amount = $customer_package->amount;
+
                 return PayhereUtility::create_customer_package_form($user_id, $package_id, $order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
-            }
-            elseif ($paymentType == 'seller_package_payment') {
+            } elseif ($paymentType == 'seller_package_payment') {
                 $seller_package = SellerPackage::findOrFail($paymentData['seller_package_id']);
                 $order_id = rand(100000, 999999);
                 $package_id = $seller_package->id;
                 $amount = $seller_package->amount;
+
                 return PayhereUtility::create_seller_package_form($user_id, $package_id, $order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
             }
         }
     }
+
     public function checkout_testing()
     {
         $order_id = rand(100000, 999999);
@@ -128,8 +128,7 @@ class PayhereController extends Controller
         return PayhereUtility::create_customer_package_form($user_id, $package_id, $order_id, $amount, $first_name, $last_name, $phone, $email, $address, $city);
     }
 
-
-    //sample response
+    // sample response
     /*
      {
        "merchant_id":"1215091",
@@ -150,8 +149,7 @@ class PayhereController extends Controller
     }
     */
 
-
-    //checkout related functions ------------------------------------<starts>
+    // checkout related functions ------------------------------------<starts>
     public static function checkout_notify()
     {
         $merchant_id = $_POST['merchant_id'];
@@ -163,10 +161,10 @@ class PayhereController extends Controller
 
         $merchant_secret = env('PAYHERE_SECRET'); // Replace with your Merchant Secret (Can be found on your PayHere account's Settings page)
 
-        $local_md5sig = strtoupper(md5($merchant_id . $order_id . $payhere_amount . $payhere_currency . $status_code . strtoupper(md5($merchant_secret))));
+        $local_md5sig = strtoupper(md5($merchant_id.$order_id.$payhere_amount.$payhere_currency.$status_code.strtoupper(md5($merchant_secret))));
 
         if (($local_md5sig === $md5sig) and ($status_code == 2)) {
-            //custom_1 will have order_id
+            // custom_1 will have order_id
             return PayhereController::checkout_success($_POST['custom_1'], $_POST);
         }
 
@@ -182,6 +180,7 @@ class PayhereController extends Controller
         Session::forget('coupon_discount');
 
         flash(translate('Payment process completed'))->success();
+
         return redirect()->route('order_confirmed');
     }
 
@@ -193,16 +192,18 @@ class PayhereController extends Controller
     public static function checkout_success($combined_order_id, $responses)
     {
         $payment_details = json_encode($responses);
+
         return (new CheckoutController)->checkout_done($combined_order_id, $payment_details);
     }
 
     public static function checkout_incomplete()
     {
         Session::forget('order_id');
-        flash(translate("Incomplete"))->error();
+        flash(translate('Incomplete'))->error();
+
         return redirect()->route('home')->send();
     }
-    //checkout related functions ------------------------------------<ends>
+    // checkout related functions ------------------------------------<ends>
 
     // Order Re payment Related Functions -----------------------------<Start>
     public static function orderRepaymentNotify()
@@ -216,11 +217,11 @@ class PayhereController extends Controller
 
         $merchant_secret = env('PAYHERE_SECRET'); // Replace with your Merchant Secret (Can be found on your PayHere account's Settings page)
 
-        $local_md5sig = strtoupper(md5($merchant_id . $order_id . $payhere_amount . $payhere_currency . $status_code . strtoupper(md5($merchant_secret))));
+        $local_md5sig = strtoupper(md5($merchant_id.$order_id.$payhere_amount.$payhere_currency.$status_code.strtoupper(md5($merchant_secret))));
 
         if (($local_md5sig === $md5sig) and ($status_code == 2)) {
-             //custom_1 will have order_id
-             return PayhereController::orderRepaymentSuccess($_POST['custom_1'], $_POST);
+            // custom_1 will have order_id
+            return PayhereController::orderRepaymentSuccess($_POST['custom_1'], $_POST);
         }
 
         return PayhereController::orderRepaymentIncomplete();
@@ -231,6 +232,7 @@ class PayhereController extends Controller
         Session::forget('order_id');
         Session::forget('payment_data');
         flash(translate('Payment process completed'))->success();
+
         return redirect()->route('dashboard');
     }
 
@@ -245,6 +247,7 @@ class PayhereController extends Controller
 
         $data['order_id'] = $order_id;
         $data['payment_method'] = 'payhere';
+
         return (new CheckoutController)->orderRePaymentDone($data, $payment_details);
     }
 
@@ -252,12 +255,13 @@ class PayhereController extends Controller
     {
         Session::forget('order_id');
         Session::forget('payment_data');
-        flash(translate("Payment Incomplete"))->error();
+        flash(translate('Payment Incomplete'))->error();
+
         return redirect()->route('home')->send();
     }
     // Order Re payment Related Functions End--------------------------<Ends>
 
-    //wallet related functions ------------------------------------<starts>
+    // wallet related functions ------------------------------------<starts>
     public static function wallet_notify()
     {
         $merchant_id = $_POST['merchant_id'];
@@ -269,10 +273,10 @@ class PayhereController extends Controller
 
         $merchant_secret = env('PAYHERE_SECRET'); // Replace with your Merchant Secret (Can be found on your PayHere account's Settings page)
 
-        $local_md5sig = strtoupper(md5($merchant_id . $order_id . $payhere_amount . $payhere_currency . $status_code . strtoupper(md5($merchant_secret))));
+        $local_md5sig = strtoupper(md5($merchant_id.$order_id.$payhere_amount.$payhere_currency.$status_code.strtoupper(md5($merchant_secret))));
 
         if (($local_md5sig === $md5sig) and ($status_code == 2)) {
-            //custom_1 will have user_id
+            // custom_1 will have user_id
             return PayhereController::wallet_success($_POST['custom_1'], $payhere_amount, $_POST);
         }
 
@@ -285,6 +289,7 @@ class PayhereController extends Controller
         Session::forget('payment_type');
 
         flash(translate('Payment process completed'))->success();
+
         return redirect()->route('wallet.index');
     }
 
@@ -311,11 +316,12 @@ class PayhereController extends Controller
     {
         Session::forget('payment_data');
         flash(translate('Payment Incomplete'))->error();
+
         return redirect()->route('home')->send();
     }
-    //wallet related functions ------------------------------------<ends>
+    // wallet related functions ------------------------------------<ends>
 
-    //customer package related functions ------------------------------------<starts>
+    // customer package related functions ------------------------------------<starts>
     public static function customer_package_notify()
     {
         $merchant_id = $_POST['merchant_id'];
@@ -327,10 +333,10 @@ class PayhereController extends Controller
 
         $merchant_secret = env('PAYHERE_SECRET'); // Replace with your Merchant Secret (Can be found on your PayHere account's Settings page)
 
-        $local_md5sig = strtoupper(md5($merchant_id . $order_id . $payhere_amount . $payhere_currency . $status_code . strtoupper(md5($merchant_secret))));
+        $local_md5sig = strtoupper(md5($merchant_id.$order_id.$payhere_amount.$payhere_currency.$status_code.strtoupper(md5($merchant_secret))));
 
         if (($local_md5sig === $md5sig) and ($status_code == 2)) {
-            //custom_1 will have user_id custom_2 will have package_id
+            // custom_1 will have user_id custom_2 will have package_id
             return PayhereController::customer_package_success($_POST['custom_1'], $_POST['custom_2'], $_POST);
         }
 
@@ -341,6 +347,7 @@ class PayhereController extends Controller
     {
         Session::forget('payment_data');
         flash(translate('Payment process completed'))->success();
+
         return redirect()->route('dashboard');
     }
 
@@ -357,7 +364,7 @@ class PayhereController extends Controller
         $user->remaining_uploads += $customer_package->product_upload;
         $user->save();
 
-        $customer_package_payment = new CustomerPackagePayment();
+        $customer_package_payment = new CustomerPackagePayment;
         $customer_package_payment->user_id = $user->id;
         $customer_package_payment->customer_package_id = $customer_package_id;
         $customer_package_payment->amount = $customer_package->amount;
@@ -370,13 +377,13 @@ class PayhereController extends Controller
     public static function customer_package_incomplete()
     {
         Session::forget('payment_data');
-        flash(translate("Payment Incomplete"))->error();
+        flash(translate('Payment Incomplete'))->error();
+
         return redirect()->route('home')->send();
     }
-    //customer package related functions ------------------------------------<ends>
+    // customer package related functions ------------------------------------<ends>
 
-
-    //Seller package related functions ------------------------------------<starts>
+    // Seller package related functions ------------------------------------<starts>
     public static function sellerPackageNotify()
     {
         $merchant_id = $_POST['merchant_id'];
@@ -388,7 +395,7 @@ class PayhereController extends Controller
 
         $merchant_secret = env('PAYHERE_SECRET'); // Replace with your Merchant Secret (Can be found on your PayHere account's Settings page)
 
-        $local_md5sig = strtoupper(md5($merchant_id . $order_id . $payhere_amount . $payhere_currency . $status_code . strtoupper(md5($merchant_secret))));
+        $local_md5sig = strtoupper(md5($merchant_id.$order_id.$payhere_amount.$payhere_currency.$status_code.strtoupper(md5($merchant_secret))));
 
         if (($local_md5sig === $md5sig) and ($status_code == 2)) {
             return PayhereController::sellerPackageSuccess($_POST);
@@ -401,6 +408,7 @@ class PayhereController extends Controller
     {
         Session::forget('payment_data');
         flash(translate('Payment process completed'))->success();
+
         return redirect()->route('dashboard');
     }
 
@@ -417,9 +425,10 @@ class PayhereController extends Controller
     public static function sellerPackageIncomplete()
     {
         Session::forget('payment_data');
-        flash(translate("Payment Incomplete"))->error();
+        flash(translate('Payment Incomplete'))->error();
+
         return redirect()->route('home')->send();
     }
-    //Seller package related functions ------------------------------------<ends
+    // Seller package related functions ------------------------------------<ends
 
 }

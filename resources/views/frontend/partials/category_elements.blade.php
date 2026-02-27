@@ -10,8 +10,9 @@
                 @if($category->childrenCategories->count())
                     @foreach ($category->childrenCategories as $key => $child_category)
                         <li class="mb-2 fs-14 pl-2">
-                            <a class="text-reset hov-text-primary animate-underline-primary" href="{{ route('products.category', $child_category->slug) }}">
-                                {{ $child_category->getTranslation('name') }}
+                            <a class="text-reset hov-text-primary animate-underline-primary"
+                               href="{{ route('products.category', $child_category->slug) }}">
+                                {{ $child_category->getTranslation('name'), 'en' }}
                             </a>
                         </li>
                     @endforeach

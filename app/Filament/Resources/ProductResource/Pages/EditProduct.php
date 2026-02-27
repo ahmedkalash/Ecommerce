@@ -2,73 +2,69 @@
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
+use App\DTOs\ProductDTO;
 use App\Filament\Resources\ProductResource;
+use App\Models\Product;
 use App\Services\ProductService;
-use Exception;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\Pages\EditRecord\Concerns\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EditProduct extends EditRecord
 {
+    use Translatable;
+
     protected static string $resource = ProductResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\LocaleSwitcher::make(),
             Actions\DeleteAction::make(),
+            Actions\CreateAction::make()->label('Create New'),
         ];
     }
 
     /**
-     * Handle the record update process.
+     * Hydrate data into the form.
+     */
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['stocks'] = $this->record->stocks->toArray();
+
+        return $data;
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * Route updates through ProductService (Service-First pattern).
      *
-     * @param array{
-     *     name?: string,
-     *     slug?: string,
-     *     brand_id?: int|string|null,
-     *     categories?: int[]|string[],
-     *     tags?: string|string[],
-     *     description?: string|null,
-     *     unit_price?: float|string,
-     *     purchase_price?: float|string,
-     *     discount?: float|string,
-     *     discount_type?: string,
-     *     current_stock?: int,
-     *     shipping_type?: string,
-     *     shipping_cost?: float|string,
-     *     est_shipping_days?: int|null,
-     *     meta_title?: string,
-     *     meta_description?: string,
-     *     published?: bool|int,
-     *     has_warranty?: bool|int,
-     *     thumbnail_img?: mixed,
-     *     photos?: mixed,
-     *     meta_img?: mixed,
-     *     pdf?: mixed,
-     *     colors?: string[],
-     *     choice_no?: int[],
-     *     choice_options?: array<int, array{name: string, values: string[]}>,
-     *     stocks?: array<int, array{variant: string, price: float, sku: string, qty: int, image?: mixed}>
-     * } $data
-     *
-     * @throws \Throwable
+     * The service handles pure business logic; this caller owns
+     * the transaction, error handling, and logging.
      */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        /** @var Product $record */
         return DB::transaction(function () use ($record, $data) {
             try {
-                /** @var ProductService $productService */
-                $productService = app(ProductService::class);
+                app(ProductService::class)->update(
+                    ProductDTO::fromArray($data),
+                    $record
+                );
 
-                return $productService->update($data, $record);
-            } catch (Exception $e) {
-                Log::error('Product update failed (Filament): '.$e->getMessage(), [
+                return $record->fresh();
+            } catch (\Throwable $e) {
+                Log::error('Product update failed', [
                     'product_id' => $record->id,
+                    'user_id' => auth()->id(),
                     'trace' => $e->getTraceAsString(),
-                    'data' => $data,
                 ]);
 
                 throw $e;
@@ -76,25 +72,8 @@ class EditProduct extends EditRecord
         });
     }
 
-    /**
-     * Mutate form data before filling the form on edit.
-     * Converts comma-separated tags string back to an array for the TagsInput component.
-     *
-     * @param  array{
-     *      tags?: string|string[],
-     *      [key: string]: mixed
-     *  }  $data
-     * @return array<string, mixed>
-     */
-    protected function mutateFormDataBeforeFill(array $data): array
+    protected function getRedirectUrl(): string
     {
-        // Convert comma-separated tags to array for TagsInput
-        if (isset($data['tags']) && is_string($data['tags'])) {
-            $data['tags'] = array_filter(explode(',', $data['tags']));
-        }
-
-        // choice_options and stocks are handled by Filament via relationships/casts automatically.
-
-        return $data;
+        return $this->getResource()::getUrl('edit', ['record' => $this->record]);
     }
 }

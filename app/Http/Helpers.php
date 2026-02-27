@@ -7,7 +7,6 @@ use App\Http\Controllers\CommissionController;
 use App\Http\Resources\V2\CarrierCollection;
 use App\Models\AffiliateConfig;
 use App\Models\AffiliateOption;
-use App\Models\AppTranslation;
 use App\Models\Area;
 use App\Models\Attribute;
 use App\Models\AuctionProductBid;
@@ -54,7 +53,6 @@ use App\Models\SellerPackage;
 use App\Models\SellerPackagePayment;
 use App\Models\Shop;
 use App\Models\Tax;
-use App\Models\Translation;
 use App\Models\User;
 use App\Models\UserCoupon;
 use App\Models\Wallet;
@@ -150,7 +148,7 @@ if (! function_exists('filter_products')) {
     function filter_products($products)
     {
 
-        $products = $products->isApprovedPublished()->where('auction_product', 0);
+        $products = $products->isApprovedPublished();
 
         if (! addon_is_activated('wholesale')) {
             $products = $products->where('wholesale_product', 0);
@@ -172,8 +170,10 @@ if (! function_exists('filter_products')) {
 if (! function_exists('get_cached_products')) {
     function get_cached_products($category_id = null)
     {
-        return Cache::remember('products-category-' . $category_id, 86400, function () use ($category_id) {
-            return filter_products(Product::where('category_id', $category_id))->latest()->take(5)->get();
+        return Cache::remember('products-category-'.$category_id, 86400, function () use ($category_id) {
+            return filter_products(Product::whereHas('categories', function ($q) use ($category_id) {
+                $q->where('categories.id', $category_id);
+            }))->latest()->take(5)->get();
         });
     }
 }
@@ -256,24 +256,24 @@ if (! function_exists('format_price')) {
             $temp = number_format($price / 1000000000, get_setting('no_of_decimals'), '.', '');
 
             if ($temp >= 1) {
-                $fomated_price = $temp . 'B';
+                $fomated_price = $temp.'B';
             } else {
                 $temp = number_format($price / 1000000, get_setting('no_of_decimals'), '.', '');
                 if ($temp >= 1) {
-                    $fomated_price = $temp . 'M';
+                    $fomated_price = $temp.'M';
                 }
             }
         }
 
         if (get_setting('symbol_format') == 1) {
-            return currency_symbol() . $fomated_price;
+            return currency_symbol().$fomated_price;
         } elseif (get_setting('symbol_format') == 3) {
-            return currency_symbol() . ' ' . $fomated_price;
+            return currency_symbol().' '.$fomated_price;
         } elseif (get_setting('symbol_format') == 4) {
-            return $fomated_price . ' ' . currency_symbol();
+            return $fomated_price.' '.currency_symbol();
         }
 
-        return $fomated_price . currency_symbol();
+        return $fomated_price.currency_symbol();
     }
 }
 
@@ -553,10 +553,10 @@ if (! function_exists('home_price')) {
             if ($lowest_price == $highest_price) {
                 return format_price(convert_price($lowest_price));
             } else {
-                return format_price(convert_price($lowest_price)) . ' - ' . format_price(convert_price($highest_price));
+                return format_price(convert_price($lowest_price)).' - '.format_price(convert_price($highest_price));
             }
         } else {
-            return $lowest_price . ' - ' . $highest_price;
+            return $lowest_price.' - '.$highest_price;
         }
     }
 }
@@ -601,10 +601,10 @@ if (! function_exists('home_discounted_price')) {
             if ($lowest_price == $highest_price) {
                 return format_price(convert_price($lowest_price));
             } else {
-                return format_price(convert_price($lowest_price)) . ' - ' . format_price(convert_price($highest_price));
+                return format_price(convert_price($lowest_price)).' - '.format_price(convert_price($highest_price));
             }
         } else {
-            return $lowest_price . ' - ' . $highest_price;
+            return $lowest_price.' - '.$highest_price;
         }
     }
 }
@@ -765,58 +765,38 @@ if (! function_exists('renderStarRating')) {
     }
 }
 
-function translate($key, $lang = null, $addslashes = false)
+/**
+ * Translate a UI label string via Laravel's __() backed by spatie/laravel-translation-loader (DB).
+ *
+ * All legacy keys live under the 'ui' group, so __('ui.add_to_cart') is resolved.
+ * The wrapper accepts the same human-readable string the old system used (e.g. "Add to cart")
+ * and normalises it to a snake_case key before lookup.
+ *
+ * @param  string  $key  Human-readable string or pre-normalised key
+ * @param  string|null  $lang  Force a specific locale (null = current app locale)
+ * @param  bool  $addslashes  Escape the result with addslashes()
+ */
+function translate(string $key, ?string $lang = null, bool $addslashes = false): string
 {
-    if ($lang == null) {
-        $lang = App::getLocale();
+    // Normalise to the same snake_case format used by the legacy system
+    $langKey = preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($key)));
+
+    // Temporarily switch locale if a specific language was requested
+    if ($lang !== null) {
+        $previousLocale = app()->getLocale();
+        app()->setLocale($lang);
+        $value = __("ui.{$langKey}");
+        app()->setLocale($previousLocale);
+    } else {
+        $value = __("ui.{$langKey}");
     }
 
-    $lang_key = preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($key)));
-
-    $translations_en = Cache::rememberForever('translations-en', function () {
-        return Translation::where('lang', 'en')->pluck('lang_value', 'lang_key')->toArray();
-    });
-
-    if (! isset($translations_en[$lang_key])) {
-        $translation_def = new Translation;
-        $translation_def->lang = 'en';
-        $translation_def->lang_key = $lang_key;
-        $translation_def->lang_value = str_replace(["\r", "\n", "\r\n"], '', $key);
-        $translation_def->save();
-
-        if (env('DEMO_MODE') != 'On') {
-            $app_translation = new AppTranslation;
-            $app_translation->lang = 'en';
-            $app_translation->lang_key = $lang_key . '_ucf';
-            $app_translation->lang_value = str_replace(["\r", "\n", "\r\n"], '', $key);
-            $app_translation->save();
-        }
-
-        Cache::forget('translations-en');
+    // If __() returns the dotted key itself (not found), fall back to the raw human-readable string
+    if ($value === "ui.{$langKey}") {
+        $value = $key;
     }
 
-    // return user session lang
-    $translation_locale = Cache::rememberForever("translations-{$lang}", function () use ($lang) {
-        return Translation::where('lang', $lang)->pluck('lang_value', 'lang_key')->toArray();
-    });
-    if (isset($translation_locale[$lang_key])) {
-        return $addslashes ? addslashes(trim($translation_locale[$lang_key])) : trim($translation_locale[$lang_key]);
-    }
-
-    // return default lang if session lang not found
-    $translations_default = Cache::rememberForever('translations-' . env('DEFAULT_LANGUAGE', 'en'), function () {
-        return Translation::where('lang', env('DEFAULT_LANGUAGE', 'en'))->pluck('lang_value', 'lang_key')->toArray();
-    });
-    if (isset($translations_default[$lang_key])) {
-        return $addslashes ? addslashes(trim($translations_default[$lang_key])) : trim($translations_default[$lang_key]);
-    }
-
-    // fallback to en lang
-    if (! isset($translations_en[$lang_key])) {
-        return trim($key);
-    }
-
-    return $addslashes ? addslashes(trim($translations_en[$lang_key])) : trim($translations_en[$lang_key]);
+    return $addslashes ? addslashes(trim($value)) : trim($value);
 }
 
 function remove_invalid_charcaters($str)
@@ -826,49 +806,10 @@ function remove_invalid_charcaters($str)
     return str_ireplace(['"'], '\"', $str);
 }
 
-if (! function_exists('translation_tables')) {
-    function translation_tables($uniqueIdentifier)
-    {
-        $noTableAddons = ['african_pg', 'paytm', 'pos_system'];
-        if (! in_array($uniqueIdentifier, $noTableAddons)) {
-            $addons = [];
-            $addons['affiliate'] = [
-                'affiliate_options',
-                'affiliate_configs',
-                'affiliate_users',
-                'affiliate_payments',
-                'affiliate_withdraw_requests',
-                'affiliate_logs',
-                'affiliate_stats',
-            ];
-            $addons['auction'] = ['auction_product_bids'];
-            $addons['club_point'] = ['club_points', 'club_point_details'];
-            $addons['delivery_boy'] = [
-                'delivery_boys',
-                'delivery_histories',
-                'delivery_boy_payments',
-                'delivery_boy_collections',
-            ];
-            $addons['offline_payment'] = ['manual_payment_methods'];
-            $addons['otp_system'] = ['otp_configurations', 'sms_templates'];
-            $addons['refund_request'] = ['refund_requests'];
-            $addons['seller_subscription'] = [
-                'seller_packages',
-                'seller_package_translations',
-                'seller_package_payments',
-            ];
-            $addons['wholesale'] = ['wholesale_prices'];
-
-            foreach ($addons as $key => $addon_tables) {
-                if ($key == $uniqueIdentifier) {
-                    foreach ($addon_tables as $table) {
-                        Schema::dropIfExists($table);
-                    }
-                }
-            }
-        }
-    }
-}
+// Legacy: translation_tables() — commented out, replaced by kenepa/translation-manager
+// if (! function_exists('translation_tables')) {
+//     function translation_tables($uniqueIdentifier) { ... }
+// }
 
 function getShippingCost($carts, $index, $shipping_info = '', $carrier = '')
 {
@@ -1262,7 +1203,7 @@ if (! function_exists('getFileBaseURL')) {
     function getFileBaseURL()
     {
         if (config('filesystems.default') != 'local') {
-            return env(Str::upper(config('filesystems.default')) . '_URL') . '/';
+            return env(Str::upper(config('filesystems.default')).'_URL').'/';
         }
 
         return getBaseURL();
@@ -1358,7 +1299,7 @@ if (! function_exists('formatBytes')) {
         $bytes /= pow(1024, $pow);
         // $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes, $precision).' '.$units[$pow];
     }
 }
 
@@ -1484,7 +1425,7 @@ if (! function_exists('seller_purchase_payment_done')) {
         $seller->product_upload_limit = $seller_package->product_upload_limit;
         $seller->package_invalid_at = date(
             'Y-m-d',
-            strtotime($seller->package_invalid_at . ' +' . $seller_package->duration . 'days')
+            strtotime($seller->package_invalid_at.' +'.$seller_package->duration.'days')
         );
         $seller->save();
 
@@ -1727,8 +1668,14 @@ if (! function_exists('get_session_language')) {
     function get_session_language()
     {
         $language_query = Language::query();
+        $locale = Session::get('locale', Config::get('app.locale'));
+        $language = $language_query->where('code', $locale)->first();
 
-        return $language_query->where('code', Session::get('locale', Config::get('app.locale')))->first();
+        if (! $language) {
+            $language = $language_query->first(); // Fallback to first language
+        }
+
+        return $language;
     }
 }
 
@@ -1890,7 +1837,7 @@ if (! function_exists('get_all_auction_products')) {
     function get_auction_products($limit = null, $paginate = null)
     {
         $product_query = Product::query();
-        $products = $product_query->latest()->isApprovedPublished()->where('auction_product', 1);
+        $products = $product_query->latest()->isApprovedPublished();
         if (get_setting('seller_auction_product') == 0) {
             $products = $products->where('added_by', 'admin');
         }
@@ -1977,7 +1924,7 @@ if (! function_exists('getLastViewedProducts')) {
                         $q1->where('wholesale_product', 0);
                     })
                     ->when(! addon_is_activated('auction'), function ($q2) {
-                        $q2->where('auction_product', 0);
+                        // $q2->where('auction_product', 0); // Column removed
                     })
                     ->when(get_setting('vendor_system_activation') == 0, function ($q3) {
                         $q3->where('added_by', 'admin');
@@ -2114,10 +2061,13 @@ if (! function_exists('get_categories_by_products')) {
     function get_categories_by_products($user_id)
     {
         $product_query = Product::query();
-        $category_ids = $product_query->where(
-            'user_id',
-            $user_id
-        )->isApprovedPublished()->pluck('category_id')->toArray();
+        $category_ids = DB::table('product_categories')
+            ->whereIn('product_id', function ($q) use ($user_id) {
+                $q->select('id')->from('products')->where('user_id', $user_id)->where('approved', 1)->where(
+                    'published',
+                    1
+                );
+            })->distinct()->pluck('category_id')->toArray();
 
         $category_query = Category::query();
 
@@ -2546,7 +2496,7 @@ if (! function_exists('offerUserWelcomeCoupon')) {
             $user_coupon->validation_days = $couponDetails->validation_days;
             $user_coupon->discount = $coupon->discount;
             $user_coupon->discount_type = $coupon->discount_type;
-            $user_coupon->expiry_date = strtotime(date('d-m-Y H:i:s') . ' +' . $couponDetails->validation_days . 'days');
+            $user_coupon->expiry_date = strtotime(date('d-m-Y H:i:s').' +'.$couponDetails->validation_days.'days');
             $user_coupon->save();
         }
     }
@@ -2648,11 +2598,11 @@ if (! function_exists('number_format_short')) {
         // Remove unecessary zeroes after decimal. "1.0" -> "1"; "1.00" -> "1"
         // Intentionally does not affect partials, eg "1.50" -> "1.50"
         if ($precision > 0) {
-            $dotzero = '.' . str_repeat('0', $precision);
+            $dotzero = '.'.str_repeat('0', $precision);
             $n_format = str_replace($dotzero, '', $n_format);
         }
 
-        return $n_format . $suffix;
+        return $n_format.$suffix;
     }
 }
 
@@ -2727,7 +2677,7 @@ if (! function_exists('get_wishlists')) {
                         $q1->where('wholesale_product', 0);
                     })
                     ->when(! addon_is_activated('auction'), function ($q2) {
-                        $q2->where('auction_product', 0);
+                        // $q2->where('auction_product', 0); // Column removed
                     })
                     ->when(get_setting('vendor_system_activation') == 0, function ($q3) {
                         $q3->where('added_by', 'admin');
@@ -3189,15 +3139,15 @@ if (! function_exists('get_element_style_value')) {
 function convertToEmbedUrl($url)
 {
     if (preg_match('/shorts\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     if (preg_match('/v=([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     if (preg_match('/youtu\.be\/([a-zA-Z0-9_-]+)/', $url, $matches)) {
-        return 'https://www.youtube.com/embed/' . $matches[1];
+        return 'https://www.youtube.com/embed/'.$matches[1];
     }
 
     return $url;

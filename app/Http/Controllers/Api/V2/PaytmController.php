@@ -10,7 +10,6 @@ use PaytmWallet;
 
 class PaytmController extends Controller
 {
-
     public function pay(Request $request)
     {
         $payment_type = $request->payment_type;
@@ -33,18 +32,17 @@ class PaytmController extends Controller
                 'callback_url' => route(
                     'api.paytm.callback',
                     [
-                        "payment_type" => $payment_type,
-                        "combined_order_id" => $combined_order_id,
-                        "amount" => $amount,
-                        "user_id" => $user_id
+                        'payment_type' => $payment_type,
+                        'combined_order_id' => $combined_order_id,
+                        'amount' => $amount,
+                        'user_id' => $user_id,
                     ]
-                )
+                ),
 
             ]);
 
             return $payment->receive();
-        }
-        elseif ($payment_type == 'order_re_payment') {
+        } elseif ($payment_type == 'order_re_payment') {
             $order = Order::find($request->order_id);
             $amount = floatval($order->grand_total);
             $payment = PaytmWallet::with('receive');
@@ -57,16 +55,16 @@ class PaytmController extends Controller
                 'callback_url' => route(
                     'api.paytm.callback',
                     [
-                        "payment_type" => $payment_type,
-                        "order_id" => $order->id,
-                        "amount" => $amount,
-                        "user_id" => $user_id
+                        'payment_type' => $payment_type,
+                        'order_id' => $order->id,
+                        'amount' => $amount,
+                        'user_id' => $user_id,
                     ]
-                )
+                ),
             ]);
+
             return $payment->receive();
-        }
-        elseif ($payment_type == 'wallet_payment') {
+        } elseif ($payment_type == 'wallet_payment') {
             $amount = $amount;
             $payment = PaytmWallet::with('receive');
             $payment->prepare([
@@ -78,16 +76,16 @@ class PaytmController extends Controller
                 'callback_url' => route(
                     'api.paytm.callback',
                     [
-                        "payment_type" => $payment_type,
-                        "combined_order_id" => $combined_order_id,
-                        "amount" => $amount,
-                        "user_id" => $user_id
+                        'payment_type' => $payment_type,
+                        'combined_order_id' => $combined_order_id,
+                        'amount' => $amount,
+                        'user_id' => $user_id,
                     ]
-                )
+                ),
             ]);
+
             return $payment->receive();
-        }
-        elseif ($payment_type == 'seller_package_payment' || $payment_type == 'customer_package_payment') {
+        } elseif ($payment_type == 'seller_package_payment' || $payment_type == 'customer_package_payment') {
             $amount = $amount;
             $payment = PaytmWallet::with('receive');
             $payment->prepare([
@@ -99,14 +97,15 @@ class PaytmController extends Controller
                 'callback_url' => route(
                     'api.paytm.callback',
                     [
-                        "payment_type" => $payment_type,
-                        "combined_order_id" => $combined_order_id,
-                        "amount" => $amount,
-                        "user_id" => $user_id,
-                        "package_id" => $request->package_id,
+                        'payment_type' => $payment_type,
+                        'combined_order_id' => $combined_order_id,
+                        'amount' => $amount,
+                        'user_id' => $user_id,
+                        'package_id' => $request->package_id,
                     ]
-                )
+                ),
             ]);
+
             return $payment->receive();
         }
     }
@@ -116,27 +115,23 @@ class PaytmController extends Controller
         $transaction = PaytmWallet::with('receive');
 
         $response = $transaction->response(); // To get raw response as array
-        //Check out response parameters sent by paytm here -> http://paywithpaytm.com/developer/paytm_api_doc?target=interpreting-response-sent-by-paytm
+        // Check out response parameters sent by paytm here -> http://paywithpaytm.com/developer/paytm_api_doc?target=interpreting-response-sent-by-paytm
 
         if ($transaction->isSuccessful()) {
 
             if ($request->payment_type == 'cart_payment') {
                 checkout_done($request->combined_order_id, json_encode($response));
-            }
-            elseif ($request->payment_type == 'order_re_payment') {
+            } elseif ($request->payment_type == 'order_re_payment') {
                 order_re_payment_done($request->order_id, 'Paytm', json_encode($response));
-            }
-            elseif ($request->payment_type == 'wallet_payment') {
+            } elseif ($request->payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Paytm', json_encode($response));
-            }
-            elseif ($request->payment_type == 'seller_package_payment') {
+            } elseif ($request->payment_type == 'seller_package_payment') {
                 seller_purchase_payment_done($request->user_id, $request->package_id, 'Paytm', json_encode($response));
-            }
-            elseif ($request->payment_type == 'customer_package_payment') {
+            } elseif ($request->payment_type == 'customer_package_payment') {
                 customer_purchase_payment_done($request->user_id, $request->package_id, 'Paypal', json_encode($response));
             }
 
-            return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
+            return response()->json(['result' => true, 'message' => translate('Payment is successful')]);
         }
     }
 }

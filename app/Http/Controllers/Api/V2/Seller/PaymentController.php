@@ -8,9 +8,11 @@ use App\Models\Payment;
 
 class PaymentController extends Controller
 {
-    public function getHistory(){
+    public function getHistory()
+    {
         $sellerId = auth()->user()->id;
-        $payments = Payment::orderBy('created_at', 'desc')->where('seller_id',$sellerId)->latest()->paginate(10);;
-        return  SellerPaymentResource::collection($payments);
+        $payments = Payment::orderBy('created_at', 'desc')->where('seller_id', $sellerId)->latest()->paginate(10);
+
+        return SellerPaymentResource::collection($payments);
     }
 }

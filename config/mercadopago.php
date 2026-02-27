@@ -2,9 +2,7 @@
 
 return [
 
-  'key' => env('MERCADOPAGO_KEY', ''),
-  'access' => env('MERCADOPAGO_ACCESS', '')
-
+    'key' => env('MERCADOPAGO_KEY', ''),
+    'access' => env('MERCADOPAGO_ACCESS', ''),
 
 ];
-

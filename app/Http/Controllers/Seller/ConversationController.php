@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Seller;
 
-use Illuminate\Http\Request;
-use App\Models\Conversation;
 use App\Models\BusinessSetting;
+use App\Models\Conversation;
 use App\Models\Message;
-use App\Models\ProductQuery;
 use Auth;
+use Illuminate\Http\Request;
 
 class ConversationController extends Controller
 {
@@ -20,9 +19,11 @@ class ConversationController extends Controller
     {
         if (BusinessSetting::where('type', 'conversation_system')->first()->value == 1) {
             $conversations = Conversation::where('sender_id', Auth::user()->id)->orWhere('receiver_id', Auth::user()->id)->orderBy('updated_at', 'desc')->paginate(5);
+
             return view('seller.conversations.index', compact('conversations'));
         } else {
             flash(translate('Conversation is disabled at this moment'))->warning();
+
             return back();
         }
     }
@@ -42,6 +43,7 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
         }
         $conversation->save();
+
         return view('seller.conversations.show', compact('conversation'));
     }
 
@@ -61,13 +63,13 @@ class ConversationController extends Controller
             $conversation->receiver_viewed = 1;
             $conversation->save();
         }
+
         return view('frontend.partials.messages', compact('conversation'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function message_store(Request $request)
@@ -81,11 +83,10 @@ class ConversationController extends Controller
         $message->save();
 
         $conversation = $message->conversation;
-        $conversation->sender_viewed = "0";
-        $conversation->receiver_viewed = "1";
+        $conversation->sender_viewed = '0';
+        $conversation->receiver_viewed = '1';
         $conversation->save();
 
         return back();
     }
-
 }

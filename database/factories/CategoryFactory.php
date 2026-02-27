@@ -31,9 +31,9 @@ class CategoryFactory extends Factory
             'parent_id' => null,
             'name' => Str::limit($name, 50, ''),
             'commision_rate' => 0.00,
-            'discount' => 0.00,
-            'discount_start_date' => null,
-            'discount_end_date' => null,
+            // 'discount' => 0.00,
+            // 'discount_start_date' => null,
+            // 'discount_end_date' => null,
             'banner' => null,
             'icon' => null,
             'cover_image' => null,
@@ -54,7 +54,7 @@ class CategoryFactory extends Factory
      */
     public function featured(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'featured' => 1,
         ]);
     }
@@ -64,7 +64,7 @@ class CategoryFactory extends Factory
      */
     public function top(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'top' => 1,
         ]);
     }
@@ -74,7 +74,7 @@ class CategoryFactory extends Factory
      */
     public function digital(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'digital' => 1,
         ]);
     }

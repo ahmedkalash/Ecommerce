@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Subscriber;
+use Illuminate\Http\Request;
 
 class SubscriberController extends Controller
 {
@@ -22,6 +22,7 @@ class SubscriberController extends Controller
     public function index()
     {
         $subscribers = Subscriber::orderBy('created_at', 'desc')->paginate(15);
+
         return view('backend.marketing.subscribers.index', compact('subscribers'));
     }
 
@@ -38,7 +39,6 @@ class SubscriberController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -52,6 +52,7 @@ class SubscriberController extends Controller
         } else {
             flash(translate('You are  already a subscriber'))->success();
         }
+
         return back();
     }
 
@@ -80,7 +81,6 @@ class SubscriberController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -99,6 +99,7 @@ class SubscriberController extends Controller
     {
         Subscriber::destroy($id);
         flash(translate('Subscriber has been deleted successfully'))->success();
+
         return redirect()->route('subscribers.index');
     }
 }

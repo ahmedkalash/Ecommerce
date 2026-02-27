@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class WarrantyTranslation extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
-  protected $fillable = ['text', 'lang', 'warranty_id'];
+    protected $fillable = ['text', 'lang', 'warranty_id'];
 
-  public function warranty(){
-    return $this->belongsTo(Warranty::class);
-  }
+    public function warranty()
+    {
+        return $this->belongsTo(Warranty::class);
+    }
 }

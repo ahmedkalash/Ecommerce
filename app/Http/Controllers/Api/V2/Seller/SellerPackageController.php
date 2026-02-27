@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V2\Seller;
 
 use App\Http\Resources\V2\Seller\SellerPackageResource;
-use Illuminate\Http\Request;
 use App\Models\SellerPackage;
 use App\Models\SellerPackagePayment;
+use Illuminate\Http\Request;
 
 class SellerPackageController extends Controller
 {
@@ -13,6 +13,7 @@ class SellerPackageController extends Controller
     {
         if (addon_is_activated('seller_subscription')) {
             $seller_packages = SellerPackage::all();
+
             return SellerPackageResource::collection($seller_packages);
         }
 
@@ -24,11 +25,11 @@ class SellerPackageController extends Controller
         $data['seller_package_id'] = $request->package_id;
         $data['payment_method'] = $request->payment_option;
 
-
         $seller_package = SellerPackage::findOrFail($request->seller_package_id);
 
         if ($seller_package->amount == 0) {
             seller_purchase_payment_done(auth()->user()->id, $request->package_id, $request->amount, 'Free Package', null);
+
             return $this->success(translate('Package purchasing successful'));
         } elseif (
             auth()->user()->shop->seller_package != null &&
@@ -43,7 +44,7 @@ class SellerPackageController extends Controller
         $seller_package = SellerPackage::findOrFail($request->package_id);
 
         if (
-           auth()->user()->shop->seller_package != null &&
+            auth()->user()->shop->seller_package != null &&
             $seller_package->product_upload_limit < auth()->user()->shop->seller_package->product_upload_limit
         ) {
             return $this->failed(translate('You have more uploaded products than this package limit. You need to remove excessive products to downgrade.'));

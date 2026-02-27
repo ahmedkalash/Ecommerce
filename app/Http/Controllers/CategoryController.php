@@ -31,7 +31,7 @@ class CategoryController extends Controller
         $categories = Category::orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
 
@@ -78,7 +78,8 @@ class CategoryController extends Controller
         if ($request->slug != null) {
             $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->slug));
         } else {
-            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)) . '-' . Str::random(5);
+            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '',
+                str_replace(' ', '-', $request->name)).'-'.Str::random(5);
         }
         if ($request->commision_rate != null) {
             $category->commision_rate = $request->commision_rate;
@@ -158,7 +159,8 @@ class CategoryController extends Controller
         if ($request->slug != null) {
             $category->slug = strtolower($request->slug);
         } else {
-            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)) . '-' . Str::random(5);
+            $category->slug = preg_replace('/[^A-Za-z0-9\-]/', '',
+                str_replace(' ', '-', $request->name)).'-'.Str::random(5);
         }
 
         if ($request->commision_rate != null) {
@@ -231,7 +233,7 @@ class CategoryController extends Controller
         $categories = Category::with('sellerDiscounts')->orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
 
@@ -244,7 +246,7 @@ class CategoryController extends Controller
         $categories = Category::orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
 

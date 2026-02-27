@@ -10,12 +10,13 @@ class SellerCategory extends Model
 {
     use HasFactory;
     use PreventDemoModeChanges;
+
     protected $fillable = [
         'seller_id',
         'category_id',
         'discount',
         'discount_start_date',
-        'discount_end_date'
+        'discount_end_date',
     ];
 
     public function category()

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\SubCategory
@@ -13,6 +13,7 @@ use App\Traits\PreventDemoModeChanges;
  * @property int $category_id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory query()
@@ -21,13 +22,12 @@ use App\Traits\PreventDemoModeChanges;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SubCategory whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
-
 class SubCategory extends Model
 {
     use PreventDemoModeChanges;
-
 
     public function category()
     {

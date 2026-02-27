@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Subscriber;
-use Mail;
 use App\Mail\EmailManager;
+use App\Models\Subscriber;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Mail;
 
 class NewsletterController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:send_newsletter'])->only('index');
     }
@@ -19,14 +20,15 @@ class NewsletterController extends Controller
     {
         $users = User::all();
         $subscribers = Subscriber::all();
+
         return view('backend.marketing.newsletters.index', compact('users', 'subscribers'));
     }
 
     public function send(Request $request)
     {
         if (env('MAIL_USERNAME') != null) {
-            //sends newsletter to selected users
-        	if ($request->has('user_emails')) {
+            // sends newsletter to selected users
+            if ($request->has('user_emails')) {
                 foreach ($request->user_emails as $key => $email) {
                     $array['view'] = 'emails.newsletter';
                     $array['subject'] = $request->subject;
@@ -36,12 +38,12 @@ class NewsletterController extends Controller
                     try {
                         Mail::to($email)->queue(new EmailManager($array));
                     } catch (\Exception $e) {
-                        //dd($e);
+                        // dd($e);
                     }
-            	}
+                }
             }
 
-            //sends newsletter to subscribers
+            // sends newsletter to subscribers
             if ($request->has('subscriber_emails')) {
                 foreach ($request->subscriber_emails as $key => $email) {
                     $array['view'] = 'emails.newsletter';
@@ -52,25 +54,27 @@ class NewsletterController extends Controller
                     try {
                         Mail::to($email)->queue(new EmailManager($array));
                     } catch (\Exception $e) {
-                        //dd($e);
+                        // dd($e);
                     }
-            	}
+                }
             }
-        }
-        else {
+        } else {
             flash(translate('Please configure SMTP first'))->error();
+
             return back();
         }
 
-    	flash(translate('Newsletter has been send'))->success();
-    	return redirect()->route('admin.dashboard');
+        flash(translate('Newsletter has been send'))->success();
+
+        return redirect()->route('admin.dashboard');
     }
 
-    public function testEmail(Request $request){
+    public function testEmail(Request $request)
+    {
         $array['view'] = 'emails.newsletter';
-        $array['subject'] = "SMTP Test";
+        $array['subject'] = 'SMTP Test';
         $array['from'] = env('MAIL_FROM_ADDRESS');
-        $array['content'] = "This is a test email.";
+        $array['content'] = 'This is a test email.';
 
         try {
             Mail::to($request->email)->queue(new EmailManager($array));
@@ -79,6 +83,7 @@ class NewsletterController extends Controller
         }
 
         flash(translate('An email has been sent.'))->success();
+
         return back();
     }
 }

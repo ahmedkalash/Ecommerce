@@ -6,7 +6,6 @@ use App\Http\Requests\AddPermissionRequest;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -139,7 +138,7 @@ class RoleController extends Controller
             Permission::create([
                 'name' => $request->name,
                 'group' => $request->group,
-                'guard_name' => 'admin'
+                'guard_name' => 'admin',
             ]);
 
             return back();

@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Category;
 use App\Models\Brand;
-use App\Models\User;
-use App\Models\ProductsImport;
+use App\Models\Category;
 use App\Models\ProductsExport;
-use PDF;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\ProductsImport;
+use App\Models\User;
 use Auth;
-use MyCLabs\Enum\Enum;
-
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use PDF;
 
 class ProductBulkUploadController extends Controller
 {
@@ -30,6 +28,7 @@ class ProductBulkUploadController extends Controller
                 return view('seller.product_bulk_upload.index');
             } else {
                 flash(translate('Your shop is not verified yet!'))->warning();
+
                 return back();
             }
         } elseif (Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'staff') {

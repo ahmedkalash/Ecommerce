@@ -22,6 +22,7 @@ class ProductQueryController extends Controller
     {
         $admin_id = get_admin()->id;
         $queries = ProductQuery::where('seller_id', $admin_id)->latest()->paginate(20);
+
         return view('backend.support.product_query.index', compact('queries'));
     }
 
@@ -31,6 +32,7 @@ class ProductQueryController extends Controller
     public function show($id)
     {
         $query = ProductQuery::find(decrypt($id));
+
         return view('backend.support.product_query.show', compact('query'));
     }
 
@@ -46,20 +48,20 @@ class ProductQueryController extends Controller
         ]);
         $product = Product::find($request->product);
 
-        $query = new ProductQuery();
+        $query = new ProductQuery;
         $query->customer_id = Auth::id();
         $query->seller_id = $product->user_id;
         $query->product_id = $product->id;
         $query->question = $request->question;
         $query->save();
         flash(translate('Your query has been submittes successfully'))->success();
+
         return redirect()->back();
     }
 
     /**
      * Store reply against the question from Admin panel
      */
-
     public function reply(Request $request, $id)
     {
         $this->validate($request, [
@@ -69,6 +71,7 @@ class ProductQueryController extends Controller
         $query->reply = $request->reply;
         $query->save();
         flash(translate('Replied successfully!'))->success();
+
         return redirect()->route('product_query.index');
     }
 }

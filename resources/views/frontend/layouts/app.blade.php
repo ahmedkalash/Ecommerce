@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 @php
-    $rtl = get_session_language()->rtl;
+    $rtl = 0;
 @endphp
 
 @if ($rtl == 1)
@@ -30,7 +30,7 @@
                 @php
                     $meta_image = get_file_by_id(get_setting('meta_image'));
                 @endphp
-                    <!-- Schema.org markup for Google+ -->
+                        <!-- Schema.org markup for Google+ -->
                 <meta itemprop="name" content="{{ get_setting('meta_title') }}">
                 <meta itemprop="description" content="{{ get_setting('meta_description') }}">
                 <meta itemprop="image" content="{{ $meta_image }}">
@@ -64,8 +64,8 @@
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link
-                href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-                rel="stylesheet">
+                    href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+                    rel="stylesheet">
 
             <!-- CSS Files -->
             <link rel="stylesheet" href="{{ static_asset('assets/css/vendors.css') }}">
@@ -248,7 +248,7 @@
 
                 $system_language = get_system_language();
             @endphp
-                <!-- Header -->
+                    <!-- Header -->
             @include('frontend.inc.nav')
 
             @yield('content')
@@ -307,17 +307,17 @@
                             <a href="{{ $custom_alert->link }}" class="d-block h-100 w-100">
                                 <div class="@if ($custom_alert->type == 'small') d-flex @endif">
                                     <img
-                                        class="@if ($custom_alert->type == 'small') h-140px w-120px img-fit @else w-100 @endif"
-                                        src="{{ get_file_by_id($custom_alert->banner) }}" alt="custom_alert">
+                                            class="@if ($custom_alert->type == 'small') h-140px w-120px img-fit @else w-100 @endif"
+                                            src="{{ get_file_by_id($custom_alert->banner) }}" alt="custom_alert">
                                     <div class="text-{{ $custom_alert->text_color }} p-2rem">
                                         {!! $custom_alert->description !!}
                                     </div>
                                 </div>
                             </a>
                             <button
-                                class="absolute-top-right bg-transparent btn btn-circle btn-icon d-flex align-items-center justify-content-center text-{{ $custom_alert->text_color }} hov-text-primary set-session"
-                                data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed"
-                                data-toggle="remove-parent" data-parent=".custom-alert-box">
+                                    class="absolute-top-right bg-transparent btn btn-circle btn-icon d-flex align-items-center justify-content-center text-{{ $custom_alert->text_color }} hov-text-primary set-session"
+                                    data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed"
+                                    data-toggle="remove-parent" data-parent=".custom-alert-box">
                                 <i class="la la-close fs-20"></i>
                             </button>
                         </div>
@@ -380,9 +380,9 @@
                                 @endif
                             </div>
                             <button
-                                class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
-                                data-key="website-popup" data-value="removed" data-toggle="remove-parent"
-                                data-parent=".website-popup">
+                                    class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
+                                    data-key="website-popup" data-value="removed" data-toggle="remove-parent"
+                                    data-parent=".website-popup">
                                 <i class="la la-close fs-20"></i>
                             </button>
                         </div>
@@ -413,9 +413,9 @@
                                     </a>
                                 </div>
                                 <button
-                                    class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
-                                    data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed"
-                                    data-toggle="remove-parent" data-parent=".website-popup">
+                                        class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
+                                        data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed"
+                                        data-toggle="remove-parent" data-parent=".website-popup">
                                     <i class="la la-close fs-20"></i>
                                 </button>
                             </div>
@@ -582,12 +582,18 @@
                             e.preventDefault();
                             var $this = $(this);
                             var locale = $this.data('flag');
-                            $.post('{{ route('language.change') }}', {
+                            /*$.post('{{--{{ route('language.change') }}--}}', {
                                 _token: AIZ.data.csrf,
                                 locale: locale
-                            }, function (data) {
+                            }*/
+                        ,
+
+                            function (data) {
                                 location.reload();
-                            });
+                            }
+
+                        )
+                            ;
 
                         });
                     });

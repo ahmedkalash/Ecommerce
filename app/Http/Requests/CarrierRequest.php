@@ -24,12 +24,12 @@ class CarrierRequest extends FormRequest
     public function rules()
     {
         return [
-            'carrier_name'      => 'required|max:255',
-            'transit_time'      => 'required|max:255',
-            'delimiter1.*'      => 'required',
-            'delimiter2.*'      => 'required',
+            'carrier_name' => 'required|max:255',
+            'transit_time' => 'required|max:255',
+            'delimiter1.*' => 'required',
+            'delimiter2.*' => 'required',
             'carrier_price.*.*' => 'required',
-            'zones'             => 'required_without:shipping_type',
+            'zones' => 'required_without:shipping_type',
         ];
     }
 
@@ -41,13 +41,13 @@ class CarrierRequest extends FormRequest
     public function messages()
     {
         return [
-            'carrier_name.required'         => translate('Carrier name is required'),
-            'carrier_name.max'              => translate('Max 255 characters'),
-            'transit_time.required'         => translate('Transit time is required'),
-            'delimiter1.*.required'         => translate('Delimiter1 is required'),
-            'delimiter2.*.required'         => translate('Delimiter2 is required'),
-            'carrier_price.*.*.required'    => translate('Carrier price is required'),
-            'zones.required'                => translate('Zone is required. If zone is not created, then create zone at first'),
+            'carrier_name.required' => translate('Carrier name is required'),
+            'carrier_name.max' => translate('Max 255 characters'),
+            'transit_time.required' => translate('Transit time is required'),
+            'delimiter1.*.required' => translate('Delimiter1 is required'),
+            'delimiter2.*.required' => translate('Delimiter2 is required'),
+            'carrier_price.*.*.required' => translate('Carrier price is required'),
+            'zones.required' => translate('Zone is required. If zone is not created, then create zone at first'),
         ];
     }
 }

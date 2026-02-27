@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\FlashDealBannerCollection;
 use App\Http\Resources\V2\FlashDealCollection;
-use App\Http\Resources\V2\ProductCollection;
 use App\Http\Resources\V2\ProductMiniCollection;
 use App\Models\FlashDeal;
 use App\Models\Product;
@@ -20,6 +19,7 @@ class FlashDealController extends Controller
 
         return new FlashDealCollection($flash_deals);
     }
+
     public function info($slug)
     {
         $flash_deals = FlashDeal::where('slug', $slug)->where('status', 1)
@@ -29,6 +29,7 @@ class FlashDealController extends Controller
 
         return new FlashDealCollection($flash_deals);
     }
+
     public function banners()
     {
         $flash_deals = FlashDeal::where('status', 1)
@@ -41,13 +42,14 @@ class FlashDealController extends Controller
 
     public function products($id)
     {
-        $flash_deal = FlashDeal::where("slug", $id)->first();
+        $flash_deal = FlashDeal::where('slug', $id)->first();
         $products = collect();
         foreach ($flash_deal->flash_deal_products as $key => $flash_deal_product) {
             if (Product::find($flash_deal_product->product_id) != null) {
                 $products->push(Product::find($flash_deal_product->product_id));
             }
         }
+
         return new ProductMiniCollection($products);
     }
 }

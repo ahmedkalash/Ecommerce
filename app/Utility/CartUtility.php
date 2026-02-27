@@ -2,12 +2,10 @@
 
 namespace App\Utility;
 
-use App\Models\Cart;
 use Cookie;
 
 class CartUtility
 {
-
     public static function create_cart_variant($product, $request)
     {
         $str = null;
@@ -16,22 +14,23 @@ class CartUtility
         }
 
         if (isset($product->choice_options) && count(json_decode($product->choice_options)) > 0) {
-            //Gets all the choice values of customer choice option and generate a string like Black-S-Cotton
+            // Gets all the choice values of customer choice option and generate a string like Black-S-Cotton
             foreach (json_decode($product->choice_options) as $key => $choice) {
                 if ($str != null) {
-                    $str .= '-' . str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
+                    $str .= '-'.str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
                 } else {
-                    $str .= str_replace(' ', '', $request['attribute_id_' . $choice->attribute_id]);
+                    $str .= str_replace(' ', '', $request['attribute_id_'.$choice->attribute_id]);
                 }
             }
         }
+
         return $str;
     }
 
     public static function get_price($product, $product_stock, $quantity)
     {
         $price = $product_stock->price;
-        if ($product->auction_product == 1) {
+        if (addon_is_activated('auction') && $product->auction_product == 1) {
             $price = $product->bids->max('amount');
         }
 
@@ -45,6 +44,7 @@ class CartUtility
         }
 
         $price = self::discount_calculation($product, $price);
+
         return $price;
     }
 
@@ -67,6 +67,7 @@ class CartUtility
                 $price -= $product->discount;
             }
         }
+
         return $price;
     }
 
@@ -103,8 +104,11 @@ class CartUtility
 
     public static function check_auction_in_cart($carts)
     {
+        if (! addon_is_activated('auction')) {
+            return false;
+        }
         foreach ($carts as $cart) {
-            if ($cart->product->auction_product == 1) {
+            if (isset($cart->product->auction_product) && $cart->product->auction_product == 1) {
                 return true;
             }
         }

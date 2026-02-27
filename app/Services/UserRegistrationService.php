@@ -89,7 +89,7 @@ class UserRegistrationService
     protected function notifyAdmin(User $user): void
     {
         // Todo: check this with the emails task
-        if (!get_email_template_data('customer_reg_email_to_admin', 'status')) {
+        if (! get_email_template_data('customer_reg_email_to_admin', 'status')) {
             return;
         }
 
@@ -114,6 +114,7 @@ class UserRegistrationService
         if ($this->shouldAutoVerify()) {
             return redirect()->intended($user->homePage());
         }
+
         return redirect()->route('verification.notice');
     }
 

@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Customer;
+use App\Traits\PreventDemoModeChanges;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Illuminate\Support\Facades\Hash;
-use App\Traits\PreventDemoModeChanges;
 
 class CustomersImport implements ToModel, WithHeadingRow
 {
@@ -15,7 +13,7 @@ class CustomersImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         return new Customer([
-           'user_id'     => $row['user_id'],
+            'user_id' => $row['user_id'],
         ]);
     }
 }

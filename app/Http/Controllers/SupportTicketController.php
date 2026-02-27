@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Ticket;
-use App\Models\User;
-use Auth;
-use App\Models\TicketReply;
 use App\Mail\SupportMailManager;
+use App\Models\Ticket;
+use App\Models\TicketReply;
+use Auth;
+use Illuminate\Http\Request;
 use Mail;
 
 class SupportTicketController extends Controller
@@ -26,6 +25,7 @@ class SupportTicketController extends Controller
     public function index()
     {
         $tickets = Ticket::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->paginate(10);
+
         return view('frontend.user.support_ticket.index', compact('tickets'));
     }
 
@@ -35,9 +35,10 @@ class SupportTicketController extends Controller
         $tickets = Ticket::orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $tickets = $tickets->where('code', 'like', '%' . $sort_search . '%');
+            $tickets = $tickets->where('code', 'like', '%'.$sort_search.'%');
         }
         $tickets = $tickets->paginate(15);
+
         return view('backend.support.support_tickets.index', compact('tickets', 'sort_search'));
     }
 
@@ -54,14 +55,13 @@ class SupportTicketController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //dd();
+        // dd();
         $ticket = new Ticket;
-        $ticket->code = strtotime(date('Y-m-d H:i:s')) . Auth::user()->id;
+        $ticket->code = strtotime(date('Y-m-d H:i:s')).Auth::user()->id;
         $ticket->user_id = Auth::user()->id;
         $ticket->subject = $request->subject;
         $ticket->details = $request->details;
@@ -70,6 +70,7 @@ class SupportTicketController extends Controller
         if ($ticket->save()) {
             $this->send_support_mail_to_admin($ticket);
             flash(translate('Ticket has been sent successfully'))->success();
+
             return redirect()->route('support_ticket.index');
         } else {
             flash(translate('Something went wrong'))->error();
@@ -79,7 +80,7 @@ class SupportTicketController extends Controller
     public function send_support_mail_to_admin($ticket)
     {
         $array['view'] = 'emails.support';
-        $array['subject'] = translate('Support ticket Code is') . ':- ' . $ticket->code;
+        $array['subject'] = translate('Support ticket Code is').':- '.$ticket->code;
         $array['from'] = env('MAIL_FROM_ADDRESS');
         $array['content'] = translate('Hi. A ticket has been created. Please check the ticket.');
         $array['link'] = route('support_ticket.admin_show', encrypt($ticket->id));
@@ -87,13 +88,14 @@ class SupportTicketController extends Controller
         $array['details'] = $ticket->details;
         try {
             Mail::to(get_admin()->email)->queue(new SupportMailManager($array));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 
     public function send_support_reply_email_to_user($ticket, $tkt_reply)
     {
         $array['view'] = 'emails.support';
-        $array['subject'] = translate('Support ticket Code is') . ':- ' . $ticket->code;
+        $array['subject'] = translate('Support ticket Code is').':- '.$ticket->code;
         $array['from'] = env('MAIL_FROM_ADDRESS');
         $array['content'] = translate('Hi. You have a new response for this ticket. Please check the ticket.');
         $array['link'] = $ticket->user->user_type == 'seller' ? route('seller.support_ticket.show', encrypt($ticket->id)) : route('support_ticket.show', encrypt($ticket->id));
@@ -102,7 +104,8 @@ class SupportTicketController extends Controller
 
         try {
             Mail::to($ticket->user->email)->queue(new SupportMailManager($array));
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
     }
 
     public function admin_store(Request $request)
@@ -119,6 +122,7 @@ class SupportTicketController extends Controller
         if ($ticket_reply->save()) {
             flash(translate('Reply has been sent successfully'))->success();
             $this->send_support_reply_email_to_user($ticket_reply->ticket, $ticket_reply);
+
             return back();
         } else {
             flash(translate('Something went wrong'))->error();
@@ -138,6 +142,7 @@ class SupportTicketController extends Controller
         if ($ticket_reply->save()) {
 
             flash(translate('Reply has been sent successfully'))->success();
+
             return back();
         } else {
             flash(translate('Something went wrong'))->error();
@@ -156,6 +161,7 @@ class SupportTicketController extends Controller
         $ticket->client_viewed = 1;
         $ticket->save();
         $ticket_replies = $ticket->ticketreplies;
+
         return view('frontend.user.support_ticket.show', compact('ticket', 'ticket_replies'));
     }
 
@@ -164,6 +170,7 @@ class SupportTicketController extends Controller
         $ticket = Ticket::findOrFail(decrypt($id));
         $ticket->viewed = 1;
         $ticket->save();
+
         return view('backend.support.support_tickets.show', compact('ticket'));
     }
 
@@ -181,7 +188,6 @@ class SupportTicketController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

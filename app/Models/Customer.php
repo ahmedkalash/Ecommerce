@@ -2,17 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class Customer extends Model
 {
-  use PreventDemoModeChanges;
+    use PreventDemoModeChanges;
 
     protected $fillable = [
-      'user_id',
+        'user_id',
     ];
-    public function user(){
-    	return $this->belongsTo(User::class);
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -3,34 +3,33 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\PurchasedResource;
-use App\Http\Resources\V2\PurchaseHistoryMiniCollection;
 use App\Http\Resources\V2\PurchaseHistoryCollection;
 use App\Http\Resources\V2\PurchaseHistoryItemsCollection;
+use App\Http\Resources\V2\PurchaseHistoryMiniCollection;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Utility\CartUtility;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class PurchaseHistoryController extends Controller
 {
     public function index(Request $request)
     {
         $order_query = Order::query();
-        if ($request->payment_status != "" || $request->payment_status != null) {
+        if ($request->payment_status != '' || $request->payment_status != null) {
             $order_query->where('payment_status', $request->payment_status);
         }
-        if ($request->delivery_status != "" || $request->delivery_status != null) {
+        if ($request->delivery_status != '' || $request->delivery_status != null) {
             $delivery_status = $request->delivery_status;
-            $order_query->whereIn("id", function ($query) use ($delivery_status) {
+            $order_query->whereIn('id', function ($query) use ($delivery_status) {
                 $query->select('order_id')
                     ->from('order_details')
                     ->where('delivery_status', $delivery_status);
             });
         }
+
         return new PurchaseHistoryMiniCollection($order_query->where('user_id', auth()->user()->id)->latest()->paginate(5));
     }
 
@@ -47,6 +46,7 @@ class PurchaseHistoryController extends Controller
     {
         $order_id = Order::select('id')->where('id', $id)->where('user_id', auth()->user()->id)->first();
         $order_query = OrderDetail::where('order_id', $order_id->id);
+
         return new PurchaseHistoryItemsCollection($order_query->get());
     }
 
@@ -90,9 +90,10 @@ class PurchaseHistoryController extends Controller
         $check_auction_in_cart = CartUtility::check_auction_in_cart($carts);
         if ($check_auction_in_cart) {
             array_push($failed_msgs, translate('Remove auction product from cart to add products.'));
+
             return response()->json([
                 'success_msgs' => $success_msgs,
-                'failed_msgs' => $failed_msgs
+                'failed_msgs' => $failed_msgs,
             ]);
         }
 
@@ -103,10 +104,11 @@ class PurchaseHistoryController extends Controller
             $product = $orderDetail->product;
 
             if (
-                !$product || $product->published == 0 ||
-                $product->approved == 0 || ($product->wholesale_product && !addon_is_activated("wholesale"))
+                ! $product || $product->published == 0 ||
+                $product->approved == 0 || ($product->wholesale_product && ! addon_is_activated('wholesale'))
             ) {
                 array_push($failed_msgs, translate('An item from this order is not available now.'));
+
                 continue;
             }
 
@@ -114,8 +116,6 @@ class PurchaseHistoryController extends Controller
                 array_push($failed_msgs, translate('You can not re order an auction product.'));
                 break;
             }
-
-
 
             // If product min qty is greater then the ordered qty, then update the order qty
             $order_qty = $orderDetail->quantity;
@@ -126,7 +126,7 @@ class PurchaseHistoryController extends Controller
             $cart = Cart::firstOrNew([
                 'variation' => $orderDetail->variation,
                 'user_id' => $user_id,
-                'product_id' => $product->id
+                'product_id' => $product->id,
             ]);
 
             $product_stock = $product->stocks->where('variant', $orderDetail->variation)->first();
@@ -139,10 +139,11 @@ class PurchaseHistoryController extends Controller
                         if ($cart->exists) {
                             $order_qty = $cart->quantity + $order_qty;
                         }
-                        //If order qty is greater then the product stock, set order qty = current product stock qty
+                        // If order qty is greater then the product stock, set order qty = current product stock qty
                         $quantity = ($quantity >= $order_qty) ? $order_qty : $quantity;
                     } else {
-                        array_push($failed_msgs, $product->getTranslation('name') . ' ' . translate('is stock out.'));
+                        array_push($failed_msgs, $product->getTranslation('name').' '.translate('is stock out.'));
+
                         continue;
                     }
                 }
@@ -151,15 +152,15 @@ class PurchaseHistoryController extends Controller
                 $tax = CartUtility::tax_calculation($product, $price);
 
                 CartUtility::save_cart_data($cart, $product, $price, $tax, $quantity);
-                array_push($success_msgs, $product->getTranslation('name') . ' ' . translate('added to cart.'));
+                array_push($success_msgs, $product->getTranslation('name').' '.translate('added to cart.'));
             } else {
-                array_push($failed_msgs, $product->getTranslation('name') . ' ' . translate(' is stock out.'));
+                array_push($failed_msgs, $product->getTranslation('name').' '.translate(' is stock out.'));
             }
         }
 
         return response()->json([
             'success_msgs' => $success_msgs,
-            'failed_msgs' => $failed_msgs
+            'failed_msgs' => $failed_msgs,
         ]);
     }
 }

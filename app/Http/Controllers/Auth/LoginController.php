@@ -98,7 +98,7 @@ class LoginController extends Controller
 
         if (auth()->user()->isSeller()) {
             // Block unapproved sellers
-            if (!auth()->user()->isShopApproved()) {
+            if (! auth()->user()->isShopApproved()) {
                 auth()->logout();
                 flash(translate('Your seller account is under review. We will notify you once approved.'));
 
@@ -109,7 +109,7 @@ class LoginController extends Controller
 
         }
 
-        if (!auth()->user()->hasVerifiedEmail()) {
+        if (! auth()->user()->hasVerifiedEmail()) {
             return redirect()->route('verification.notice');
         }
 

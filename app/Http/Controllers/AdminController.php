@@ -93,7 +93,9 @@ class AdminController extends Controller
                 $category_ids = \App\Utility\CategoryUtility::children_ids($category->id);
                 $category_ids[] = $category->id;
 
-                $products = Product::with('stocks')->whereIn('category_id', $category_ids)->get();
+                $products = Product::with('stocks')->whereHas('categories', function ($query) use ($category_ids) {
+                    $query->whereIn('categories.id', $category_ids);
+                })->get();
                 $qty = 0;
                 $sale = 0;
                 foreach ($products as $key => $product) {
@@ -104,8 +106,8 @@ class AdminController extends Controller
                         $qty += $stock->qty;
                     }
                 }
-                $qty_data .= $qty . ',';
-                $num_of_sale_data .= $sale . ',';
+                $qty_data .= $qty.',';
+                $num_of_sale_data .= $sale.',';
             }
             $item['num_of_sale_data'] = $num_of_sale_data;
             $item['qty_data'] = $qty_data;
@@ -151,7 +153,8 @@ class AdminController extends Controller
         )
             ->leftJoin('order_details', 'order_details.product_id', '=', 'products.id')
             ->leftJoin('orders', 'orders.id', '=', 'order_details.order_id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('product_categories', 'products.id', '=', 'product_categories.product_id')
+            ->leftJoin('categories', 'product_categories.category_id', '=', 'categories.id')
             ->where('orders.delivery_status', 'delivered')
             ->groupBy('categories.id')
             ->orderBy('total', 'desc')
@@ -173,20 +176,20 @@ class AdminController extends Controller
             ->sum('grand_total');
 
         $data['admin_sale_this_month'] = Order::select(
-            DB::raw('COALESCE(users.user_type, "' . UserType::ADMIN->value . '") as user_type'),
+            DB::raw('COALESCE(users.user_type, "'.UserType::ADMIN->value.'") as user_type'),
             DB::raw('COALESCE(SUM(grand_total), 0) as total_sale')
         )
             ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->whereRaw('users.user_type = "' . UserType::ADMIN->value . '"')
+            ->whereRaw('users.user_type = "'.UserType::ADMIN->value.'"')
             ->whereYear('orders.created_at', Carbon::now()->year)
             ->whereMonth('orders.created_at', Carbon::now()->month)
             ->first();
         $data['seller_sale_this_month'] = Order::select(
-            DB::raw('COALESCE(users.user_type, "' . UserType::SELLER->value . '") as user_type'),
+            DB::raw('COALESCE(users.user_type, "'.UserType::SELLER->value.'") as user_type'),
             DB::raw('COALESCE(SUM(grand_total), 0) as total_sale')
         )
             ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->whereRaw('users.user_type = "' . UserType::SELLER->value . '"')
+            ->whereRaw('users.user_type = "'.UserType::SELLER->value.'"')
             ->whereYear('orders.created_at', Carbon::now()->year)
             ->whereMonth('orders.created_at', Carbon::now()->month)
             ->first();
@@ -199,7 +202,7 @@ class AdminController extends Controller
             DB::raw('DATE_FORMAT(orders.created_at, "%M") AS month')
         )
             ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->whereRaw('users.user_type = "' . UserType::ADMIN->value . '"')
+            ->whereRaw('users.user_type = "'.UserType::ADMIN->value.'"')
             ->whereYear('orders.created_at', '=', date('Y'))
             ->groupBy('month')
             ->orderBy(DB::raw('MONTH(orders.created_at)'), 'asc')
@@ -231,7 +234,7 @@ class AdminController extends Controller
             DB::raw('SUM(grand_total) as total')
         )
             ->leftJoin('users', 'orders.seller_id', '=', 'users.id')
-            ->whereRaw('users.user_type = "' . UserType::SELLER->value . '"')
+            ->whereRaw('users.user_type = "'.UserType::SELLER->value.'"')
             ->groupBy('users.id')
             ->orderBy('total', 'desc')
             ->limit(6)
@@ -249,7 +252,7 @@ class AdminController extends Controller
                                                     when payment_type in ("wallet") then "wallet"
                                                     when payment_type NOT in ("cash_on_delivery") then "others"
                                                     else cast(payment_type as char)
-                                                    end as payment_type, SUM(grand_total)  as total_amount'),)
+                                                    end as payment_type, SUM(grand_total)  as total_amount'), )
             ->where('user_id', '!=', null)
             ->where('seller_id', $admin_id)
             ->groupBy(DB::raw('1'))
@@ -266,20 +269,21 @@ class AdminController extends Controller
 
     public function top_category_products_section(Request $request)
     {
-        $top_categories_products = DB::table(DB::raw('(SELECT products.id product_id, products.name product_name, products.slug product_slug, 0 as auction_product, products.category_id,
+        $top_categories_products = DB::table(DB::raw('(SELECT products.id product_id, products.name product_name, products.slug product_slug, 0 as auction_product, pc.category_id,
                                                         `products`.`thumbnail_img` as `product_thumbnail_img`, od.sales, od.total, od.created_at order_detail_created,
                                                         categories.name AS category_name,
                                                         `categories`.`cover_image`,
-                                                        ROW_NUMBER() OVER (PARTITION BY products.category_id ORDER BY od.sales DESC) rn
+                                                        ROW_NUMBER() OVER (PARTITION BY pc.category_id ORDER BY od.sales DESC) rn
                                                 from products
                                                 INNER JOIN (
                                                 SELECT product_id, SUM(quantity) sales, SUM(price + tax) AS total, created_at
                                                 FROM order_details
-                                                WHERE ' . ($request->interval_type == 'all' ?: 'created_at >= DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')') . '
+                                                WHERE '.($request->interval_type == 'all' ?: 'created_at >= DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')').'
                                                 AND order_details.delivery_status = "delivered"
                                                 GROUP BY product_id
                                                 )  od ON od.product_id = products.id
-                                                LEFT JOIN categories ON products.category_id = categories.id
+                                                INNER JOIN product_categories pc ON pc.product_id = products.id
+                                                LEFT JOIN categories ON pc.category_id = categories.id
                                                 ) t'))
             ->select(DB::raw('category_id, category_name, cover_image, product_id, product_name, product_slug, auction_product, product_thumbnail_img, sales, total, order_detail_created'))
             ->where('rn', '<=', 3)
@@ -314,14 +318,15 @@ class AdminController extends Controller
         )
             ->leftJoin('order_details', 'orders.id', '=', 'order_details.order_id')
             ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('product_categories', 'products.id', '=', 'product_categories.product_id')
+            ->leftJoin('categories', 'product_categories.category_id', '=', 'categories.id')
             ->where('orders.delivery_status', '=', 'delivered')
             ->whereRaw('products.added_by = "admin"');
         if ($request->interval_type != 'all') {
             $inhouse_top_category_query->where(
                 'orders.created_at',
                 '>=',
-                DB::raw('DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')')
+                DB::raw('DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')')
             );
         }
         $inhouse_top_categories = $inhouse_top_category_query->groupBy('categories.name')
@@ -351,7 +356,7 @@ class AdminController extends Controller
             $inhouse_top_brand_query->where(
                 'orders.created_at',
                 '>=',
-                DB::raw('DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')')
+                DB::raw('DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')')
             );
         }
         $inhouse_top_brands = $inhouse_top_brand_query->groupBy('brands.name')
@@ -396,7 +401,7 @@ class AdminController extends Controller
             $new_top_sellers_query->where(
                 'orders.created_at',
                 '>=',
-                DB::raw('DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')')
+                DB::raw('DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')')
             );
         }
 
@@ -408,7 +413,7 @@ class AdminController extends Controller
                 'products.id AS product_id',
                 'products.name',
                 'products.slug AS product_slug',
-                'products.auction_product',
+                '0 AS auction_product',
                 'products.thumbnail_img',
                 DB::raw('SUM(quantity) AS total_quantity, SUM(price * quantity) AS sale')
             )
@@ -421,7 +426,7 @@ class AdminController extends Controller
                 $products_query->where(
                     'order_details.created_at',
                     '>=',
-                    DB::raw('DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')')
+                    DB::raw('DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')')
                 );
             }
             $products_query->groupBy('product_id')
@@ -463,7 +468,7 @@ class AdminController extends Controller
                                             INNER JOIN (
                                                 SELECT product_id, SUM(quantity) sales, SUM(price + tax) AS total, created_at
                                                 FROM order_details
-                                                WHERE ' . ($request->interval_type == 'all' ?: 'created_at >= DATE_SUB(NOW(), INTERVAL 1 ' . $request->interval_type . ')') . '
+                                                WHERE '.($request->interval_type == 'all' ?: 'created_at >= DATE_SUB(NOW(), INTERVAL 1 '.$request->interval_type.')').'
                                                 AND order_details.delivery_status = "delivered"
                                                 GROUP BY product_id
                                             )  od ON od.product_id = products.id
@@ -532,10 +537,10 @@ class AdminController extends Controller
         $files = Storage::disk('public')->allFiles();
         foreach ($files as $key => $file) {
             $file_info[$key]['file_name'] = $file;
-            $file_info[$key]['file_size'] = number_format((int) Storage::disk('public')->size($file) / 1024, 2) . ' KB';
+            $file_info[$key]['file_size'] = number_format((int) Storage::disk('public')->size($file) / 1024, 2).' KB';
             $file_info[$key]['last_modified'] = Carbon::createFromTimestamp(Storage::disk('public')->lastModified($file))->format('d-m-Y h:i:s');
             $file_info[$key]['mime_type'] = Storage::disk('public')->mimeType($file);
-            $file_info[$key]['url'] = '/storage/app/public/' . $file;
+            $file_info[$key]['url'] = '/storage/app/public/'.$file;
         }
 
         return view('backend.system.sitemap_generator', compact('file_info'))->render();
@@ -550,7 +555,7 @@ class AdminController extends Controller
         Artisan::call('optimize:clear');
 
         $base_url = URL('/');
-        $filename = 'sitemap_' . date('Ymdhis') . '.xml';
+        $filename = 'sitemap_'.date('Ymdhis').'.xml';
 
         try {
             SitemapGenerator::create($base_url)->getSitemap()->writeToDisk('public', $filename, true);

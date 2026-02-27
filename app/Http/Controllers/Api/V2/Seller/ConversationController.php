@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api\V2\Seller;
 use App\Http\Resources\V2\MessageCollection;
 use App\Http\Resources\V2\Seller\ConversationCollection;
 use App\Http\Resources\V2\Seller\ConversationResource;
-use Illuminate\Http\Request;
-use App\Models\Conversation;
 use App\Models\BusinessSetting;
+use App\Models\Conversation;
 use App\Models\Message;
+use Illuminate\Http\Request;
 
 class ConversationController extends Controller
 {
@@ -23,26 +23,27 @@ class ConversationController extends Controller
             $conversations = Conversation::where('receiver_id', auth()->user()->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
-            return  ConversationResource::collection($conversations);
+
+            return ConversationResource::collection($conversations);
         } else {
             return $this->failed(translate('Conversation is disabled at this moment'));
         }
     }
 
-
     public function send_message_to_customer(Request $requrest)
     {
-        $message = new Message();
-        $conversation = Conversation::find($requrest->conversation_id)->where("receiver_id",auth()->user()->id)->first();
+        $message = new Message;
+        $conversation = Conversation::find($requrest->conversation_id)->where('receiver_id',
+            auth()->user()->id)->first();
 
-        if($conversation){
-        $message->conversation_id = $requrest->conversation_id;
-        $message->user_id = auth()->user()->id;
-        $message->message = $requrest->message;
-        $message->save();
+        if ($conversation) {
+            $message->conversation_id = $requrest->conversation_id;
+            $message->user_id = auth()->user()->id;
+            $message->message = $requrest->message;
+            $message->save();
 
-        return $this->success(translate('Message send successfully'));
-        }else{
+            return $this->success(translate('Message send successfully'));
+        } else {
             return $this->failed(translate('You cannot send this message.'));
         }
     }
@@ -70,7 +71,8 @@ class ConversationController extends Controller
     {
         $conversation = Conversation::findOrFail($id);
         if ($conversation->receiver_id == auth()->user()->id) {
-            $messages = Message::where("conversation_id",$id)->orderBy('created_at', 'DESC')->get();
+            $messages = Message::where('conversation_id', $id)->orderBy('created_at', 'DESC')->get();
+
             return new MessageCollection($messages);
         } else {
             return $this->failed(translate('You cannot see this message.'));
@@ -91,6 +93,7 @@ class ConversationController extends Controller
         }
         if (Conversation::destroy(decrypt($id))) {
             flash(translate('Conversation has been deleted successfully'))->success();
+
             return back();
         }
     }

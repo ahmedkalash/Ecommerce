@@ -42,7 +42,7 @@ class ImportBaseData extends Migration
      */
     public function down(): void
     {
-        // Disable foreign key checks to avoid constraint errors during drop
+        // Disable foreign key checks to avoid constraint errors during a drop
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         // Get all tables in the database
@@ -97,7 +97,6 @@ class ImportBaseData extends Migration
                 join_paths('for_testing_env', '0.1_app_table.sql'),                // App table (ID 1)
                 join_paths('for_testing_env', '2_business_settings_table.sql'),    // Critical app settings (required)
                 join_paths('for_testing_env', '6.multiple_tables.sql'),            // UI elements (486KB)
-                join_paths('for_testing_env', '10_roles_and_permissions.sql'),     // Roles & Permissions
                 join_paths('for_testing_env', '100_final_db_config.sql'),          // Finalization/COMMIT (required)
             ];
         }
@@ -115,8 +114,6 @@ class ImportBaseData extends Migration
             '6.multiple_tables.sql',            // UI elements (486KB)
             '7_translations_table.sql',         // Entity translations (3.1MB)
             '8_media_table.sql',                // Media Library Dump
-            '9_users_table.sql',                // Demo users
-            '10_roles_and_permissions.sql',     // Roles & Permissions
             '100_final_db_config.sql',          // Finalization/COMMIT
         ];
     }
@@ -135,7 +132,7 @@ class ImportBaseData extends Migration
                 throw new RuntimeException("Critical: Config files (\"0_init_db_config.sql\" and \"100_final_db_config.sql\") must exist: {$filePath}");
             }
             $output = new ConsoleOutput;
-            $output->writeln("<comment>Warning: Data file not found: {$filePath}\n</comment>");
+            $output->writeln("<br><comment>Warning: Data file not found: {$filePath}</comment><br>");
 
             return;
         }

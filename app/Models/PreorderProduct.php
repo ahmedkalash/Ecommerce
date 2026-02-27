@@ -3,21 +3,23 @@
 namespace App\Models;
 
 use App;
+use App\Traits\PreventDemoModeChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\PreventDemoModeChanges;
 
 class PreorderProduct extends Model
 {
     use HasFactory,PreventDemoModeChanges;
 
     protected $guarded = [];
+
     protected $with = ['preorder_product_translations'];
 
     public function getTranslation($field = '', $lang = false)
     {
         $lang = $lang == false ? App::getLocale() : $lang;
         $preorder_product_translation = $this->preorder_product_translations->where('lang', $lang)->first();
+
         return $preorder_product_translation != null ? $preorder_product_translation->$field : $this->$field;
     }
 
@@ -25,7 +27,7 @@ class PreorderProduct extends Model
     {
         return $this->hasMany(PreorderProductTranslation::class);
     }
-    
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -110,10 +112,10 @@ class PreorderProduct extends Model
     {
         return $this->hasMany(PreorderWholesalePrice::class);
     }
-    
+
     public function preorder()
     {
-        return $this->hasMany(Preorder::class,'product_id');
+        return $this->hasMany(Preorder::class, 'product_id');
     }
 
     public function preorderProductQueries()

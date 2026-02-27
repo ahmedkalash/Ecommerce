@@ -7,9 +7,11 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\SpatieLaravelTranslatablePlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -18,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Kenepa\TranslationManager\TranslationManagerPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -26,6 +29,12 @@ class AdminPanelProvider extends PanelProvider
      */
     public function panel(Panel $panel): Panel
     {
+        $supportedLocales = collect(config('app.supported_locales', []))
+            ->pluck('language')
+            ->unique()
+            ->values()
+            ->toArray() ?: ['en'];
+
         return $panel
             ->default()
             ->id('admin')
@@ -54,6 +63,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\AppLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -63,10 +73,19 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroups::CATALOG,
-                NavigationGroups::SHOP_MANAGEMENT,
-                NavigationGroups::USER_MANAGEMENT,
-                NavigationGroups::SETTINGS,
+                NavigationGroup::make(NavigationGroups::CATALOG->value)
+                    ->label(fn () => NavigationGroups::CATALOG->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::SHOP_MANAGEMENT->value)
+                    ->label(fn () => NavigationGroups::SHOP_MANAGEMENT->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::USER_MANAGEMENT->value)
+                    ->label(fn () => NavigationGroups::USER_MANAGEMENT->getLocalizedLabel()),
+                NavigationGroup::make(NavigationGroups::SETTINGS->value)
+                    ->label(fn () => NavigationGroups::SETTINGS->getLocalizedLabel()),
+            ])
+            ->plugins([
+                TranslationManagerPlugin::make(),
+                SpatieLaravelTranslatablePlugin::make()
+                    ->defaultLocales($supportedLocales),
             ]);
     }
 }

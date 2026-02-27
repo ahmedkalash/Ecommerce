@@ -25,14 +25,15 @@ class AuctionProductBidCollection extends ResourceCollection
                     // 'date' => date("d-m-Y", $this->created_at),
                     'date' => $data->created_at->format('d-m-Y'),
                 ];
-            })
+            }),
         ];
     }
+
     public function with($request)
     {
         return [
             'success' => true,
-            'status' => 200
+            'status' => 200,
         ];
     }
 }

@@ -3,15 +3,15 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class OrderNotification extends Notification
 {
     use Queueable;
-    
+
     public $data;
+
     public $className;
 
     /**
@@ -22,7 +22,7 @@ class OrderNotification extends Notification
     public function __construct($order_notification)
     {
         $this->data = $order_notification;
-        $this->className= OrderNotification::class;
+        $this->className = OrderNotification::class;
     }
 
     /**
@@ -45,9 +45,9 @@ class OrderNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -61,12 +61,12 @@ class OrderNotification extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'order_id'      => $this->data['order_id'],
-                'order_code'    => $this->data['order_code'],
-                'user_id'       => $this->data['user_id'],
-                'seller_id'     => $this->data['seller_id'],
-                'status'        => $this->data['status']
-            ]
+                'order_id' => $this->data['order_id'],
+                'order_code' => $this->data['order_code'],
+                'user_id' => $this->data['user_id'],
+                'seller_id' => $this->data['seller_id'],
+                'status' => $this->data['status'],
+            ],
         ];
     }
 }

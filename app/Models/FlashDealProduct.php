@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Traits\PreventDemoModeChanges;
+use Illuminate\Database\Eloquent\Model;
 
 class FlashDealProduct extends Model
 {
     use PreventDemoModeChanges;
 
-    protected $fillable=['flash_deal_id', 'product_id'];
+    protected $fillable = ['flash_deal_id', 'product_id'];
 
     public function product()
     {

@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,7 +11,9 @@ class ShopProductNotification extends Notification
     use Queueable;
 
     public $data;
+
     public $className;
+
     /**
      * Create a new notification instance.
      *
@@ -20,8 +21,8 @@ class ShopProductNotification extends Notification
      */
     public function __construct($data)
     {
-        $this->data  = $data;
-        $this->className= ShopProductNotification::class;
+        $this->data = $data;
+        $this->className = ShopProductNotification::class;
     }
 
     /**
@@ -44,9 +45,9 @@ class ShopProductNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -60,11 +61,11 @@ class ShopProductNotification extends Notification
         return [
             'notification_type_id' => $this->data['notification_type_id'],
             'data' => [
-                'id'        => $this->data['product']['id'],
-                'name'      => $this->data['product']['name'],
-                'status'    => $this->data['status'],
-                'type'      => $this->data['product_type']
-            ]
+                'id' => $this->data['product']['id'],
+                'name' => $this->data['product']['name'],
+                'status' => $this->data['status'],
+                'type' => $this->data['product_type'],
+            ],
         ];
     }
 }

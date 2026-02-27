@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerificationController;
-// VerificationFirstController removed - using standard register-then-verify flow
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -23,7 +22,6 @@ use App\Http\Controllers\DemoController;
 use App\Http\Controllers\FollowSellerController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\NotificationController;
@@ -58,6 +56,9 @@ use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
+
+// VerificationFirstController removed - using standard register-then-verify flow
+// use App\Http\Controllers\LanguageController; // Replaced by kenepa/translation-manager
 
 /*
   |--------------------------------------------------------------------------
@@ -229,8 +230,8 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/track-your-order', 'trackOrder')->name('orders.track');
 });
 
-// Language Switch
-Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
+// Language Switch — Replaced by kenepa/translation-manager
+// Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
 
 // Currency Switch
 Route::post('/currency', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
@@ -431,7 +432,7 @@ Route::group(['middleware' => ['customer', 'verified', 'unbanned']], function ()
     Route::post('/order/re-payment', [CheckoutController::class, 'orderRePayment'])->name('order.re_payment');
 });
 
-Route::get('translation-check/{check}', [LanguageController::class, 'get_translation']);
+// Route::get('translation-check/{check}', [LanguageController::class, 'get_translation']); // Legacy license check
 
 Route::controller(AddressController::class)->group(function () {
     Route::post('/get-states', 'getStates')->name('get-state');
@@ -612,14 +613,6 @@ Route::controller(ContactController::class)->group(function () {
     Route::post('/contact', 'contact')->name('contact');
 });
 
-// --------------------------------- test routes ---------------------------------
-// TEST ROUTES - REMOVE AFTER TESTING
-Route::get('/test', function () {
-    dd(session()->all());
-
-    return 'test';
-})->name('test');
-
 // --------------------------------- Redirects routes ---------------------------------
 
 Route::redirect('/home', '/');
@@ -628,5 +621,7 @@ Route::redirect('/home', '/');
 // the 'get' route, not the 'post'. 'POST /login' remains handled by Auth::routes() for actual authentication
 Route::get('/login', fn () => redirect()->route('user.login'))->name('login');
 
-Route::middleware(['user', 'verified', 'unbanned'])->post('/profile/email-verify',
-    [App\Http\Controllers\User\ProfileController::class, 'verifyEmailCode'])->name('user.email.update.verify.code');
+Route::middleware(['user', 'verified', 'unbanned'])->post(
+    '/profile/email-verify',
+    [App\Http\Controllers\User\ProfileController::class, 'verifyEmailCode']
+)->name('user.email.update.verify.code');

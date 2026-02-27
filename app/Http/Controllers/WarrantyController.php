@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 
 class WarrantyController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_product_warranties'])->only('index');
         $this->middleware(['permission:edit_product_warranty'])->only('edit');
         $this->middleware(['permission:delete_product_warranty'])->only('destroy');
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -22,13 +23,14 @@ class WarrantyController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search =null;
+        $sort_search = null;
         $warranties = Warranty::orderBy('created_at', 'asc');
-        if ($request->has('search')){
+        if ($request->has('search')) {
             $sort_search = $request->search;
             $warranties->where('text', 'like', '%'.$sort_search.'%');
         }
         $warranties = $warranties->paginate(15);
+
         return view('backend.product.warranties.index', compact('warranties', 'sort_search'));
     }
 
@@ -39,18 +41,17 @@ class WarrantyController extends Controller
      */
     public function create()
     {
-        // 
+        //
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $warranty = new Warranty();
+        $warranty = new Warranty;
         $warranty->text = $request->warranty_text;
         $warranty->logo = $request->logo;
         $warranty->save();
@@ -60,6 +61,7 @@ class WarrantyController extends Controller
         $warranty_translation->save();
 
         flash(translate('New Warranty has been added successfully'))->success();
+
         return back();
     }
 
@@ -82,22 +84,22 @@ class WarrantyController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $lang   = $request->lang;
-        $warranty  = Warranty::findOrFail($id);
-        return view('backend.product.warranties.edit', compact('warranty','lang'));
+        $lang = $request->lang;
+        $warranty = Warranty::findOrFail($id);
+
+        return view('backend.product.warranties.edit', compact('warranty', 'lang'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $warranty = Warranty::findOrFail($id);
-        if($request->lang == env("DEFAULT_LANGUAGE")){
+        if ($request->lang == env('DEFAULT_LANGUAGE')) {
             $warranty->text = $request->warranty_text;
         }
         $warranty->logo = $request->logo;
@@ -108,6 +110,7 @@ class WarrantyController extends Controller
         $warranty_translation->save();
 
         flash(translate('Warranty has been updated successfully'))->success();
+
         return back();
     }
 
@@ -124,6 +127,7 @@ class WarrantyController extends Controller
         Warranty::destroy($id);
 
         flash(translate('Warranty has been deleted successfully'))->success();
+
         return back();
     }
 }

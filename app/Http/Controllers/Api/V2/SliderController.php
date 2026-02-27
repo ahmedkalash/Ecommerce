@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Resources\V2\SliderCollection;
-use Cache;
 
 class SliderController extends Controller
 {
@@ -15,7 +14,7 @@ class SliderController extends Controller
         $links = ($get_images != null && $get_links != null) ? json_decode($get_links, true) : [];
         $sliders = [];
         for ($i = 0; $i < count($images); $i++) {
-            $sliders[$i] = ['link' => $links[$i], "image" => $images[$i]];
+            $sliders[$i] = ['link' => $links[$i], 'image' => $images[$i]];
         }
 
         return new SliderCollection($sliders);
@@ -30,8 +29,9 @@ class SliderController extends Controller
 
         $banners = [];
         for ($i = 0; $i < count($images); $i++) {
-            $banners[$i] = ['link' => $links[$i], "image" => $images[$i]];
+            $banners[$i] = ['link' => $links[$i], 'image' => $images[$i]];
         }
+
         return new SliderCollection($banners);
     }
 
@@ -44,8 +44,9 @@ class SliderController extends Controller
 
         $banners = [];
         for ($i = 0; $i < count($images); $i++) {
-            $banners[$i] = ['link' => $links[$i], "image" => $images[$i]];
+            $banners[$i] = ['link' => $links[$i], 'image' => $images[$i]];
         }
+
         return new SliderCollection($banners);
     }
 
@@ -58,8 +59,9 @@ class SliderController extends Controller
 
         $banners = [];
         for ($i = 0; $i < count($images); $i++) {
-            $banners[$i] = ['link' => $links[$i], "image" => $images[$i]];
+            $banners[$i] = ['link' => $links[$i], 'image' => $images[$i]];
         }
+
         return new SliderCollection($banners);
     }
 }

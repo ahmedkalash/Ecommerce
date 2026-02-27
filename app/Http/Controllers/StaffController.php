@@ -10,9 +10,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Illuminate\View\View;
 
 class StaffController extends Controller
 {
@@ -53,7 +53,7 @@ class StaffController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = new Admin();
+            $user = new Admin;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
@@ -89,7 +89,7 @@ class StaffController extends Controller
      */
     public function show(int $id): never
     {
-        throw new NotFoundHttpException();
+        throw new NotFoundHttpException;
     }
 
     /**

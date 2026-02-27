@@ -9,7 +9,7 @@ class CustomerController extends Controller
 {
     public function show()
     {
-        $user = User::where("id",auth()->user()->id)->where("user_type","customer")->get();
+        $user = User::where('id', auth()->user()->id)->where('user_type', 'customer')->get();
 
         return new CustomerCollection($user);
     }

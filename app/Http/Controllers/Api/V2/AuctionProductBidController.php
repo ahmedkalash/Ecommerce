@@ -16,7 +16,7 @@ class AuctionProductBidController extends Controller
     {
         $bid = AuctionProductBid::where('product_id', $request->product_id)->where('user_id', Auth::user()->id)->first();
         if ($bid == null) {
-            $bid =  new AuctionProductBid;
+            $bid = new AuctionProductBid;
             $bid->user_id = Auth::user()->id;
         }
         $bid->product_id = $request->product_id;
@@ -29,12 +29,12 @@ class AuctionProductBidController extends Controller
                     $array['view'] = 'emails.auction_bid';
                     $array['subject'] = translate('Auction Bid');
                     $array['from'] = env('MAIL_FROM_ADDRESS');
-                    $array['content'] = 'Hi! A new user bidded more then you for the product, ' . $product->name . '. ' . 'Highest bid amount: ' . $bid->amount;
+                    $array['content'] = 'Hi! A new user bidded more then you for the product, '.$product->name.'. '.'Highest bid amount: '.$bid->amount;
                     $array['link'] = route('auction-product', $product->slug);
                     try {
                         Mail::to($secound_max_bid->user->email)->queue(new AuctionBidMailManager($array));
                     } catch (\Exception $e) {
-                        //dd($e->getMessage());
+                        // dd($e->getMessage());
                     }
                 }
             }
@@ -50,6 +50,7 @@ class AuctionProductBidController extends Controller
                 'message' => translate('Something Went Wrong'),
             ], 201);
         }
+
         return back();
     }
 }

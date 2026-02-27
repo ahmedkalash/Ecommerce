@@ -9,18 +9,23 @@
         "production": "mix --production"
     },
     "devDependencies": {
-            "axios": "^0.21",
-            "bootstrap": "^4.0.0",
-            "jquery": "^3.2",
-            "laravel-mix": "^6.0.0",
-            "lodash": "^4.17.19",
-            "popper.js": "^1.12",
-            "postcss": "^8.1.14",
-            "resolve-url-loader": "^4.0.0",
-            "sass": "^1.32.8",
-            "sass-loader": "^11.0.1",
-            "vue": "^2.6.12",
-            "vue-loader": "^15.9.6",
-            "vue-template-compiler": "^2.6.12"
+        "autoprefixer": "^10.4.27",
+        "axios": "^0.21",
+        "bootstrap": "^4.0.0",
+        "jquery": "^3.2",
+        "laravel-mix": "^6.0.0",
+        "lodash": "^4.17.19",
+        "popper.js": "^1.12",
+        "postcss": "^8.5.6",
+        "resolve-url-loader": "^4.0.0",
+        "sass": "^1.32.8",
+        "sass-loader": "^11.0.1",
+        "tailwindcss": "^3.4.1",
+        "vue": "^2.6.12",
+        "vue-loader": "^15.9.6",
+        "vue-template-compiler": "^2.6.12"
+    },
+    "dependencies": {
+        "@tailwindcss/vite": "^4.2.1"
     }
 }

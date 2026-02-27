@@ -46,18 +46,18 @@
                                     <h6 class="text-dark mb-3">
                                         <a class="text-reset fw-700 fs-14 hov-text-primary"
                                            href="{{ route('products.category', $child_category->slug) }}">
-                                            {{ $child_category->getTranslation('name') }}
+                                            {{ $child_category->getTranslation('name', 'en') }}
                                         </a>
                                     </h6>
 
                                     <!-- Sub-sub Categories -->
                                     <ul
-                                        class="mb-2 list-unstyled has-transition mh-100 @if ($child_category->childrenCategories->count() > 5) less @endif">
+                                            class="mb-2 list-unstyled has-transition mh-100 @if ($child_category->childrenCategories->count() > 5) less @endif">
                                         @foreach ($child_category->childrenCategories as $key => $second_level_category)
                                             <li class="text-dark mb-2">
                                                 <a class="text-reset fw-400 fs-14 hov-text-primary animate-underline-primary"
                                                    href="{{ route('products.category', $second_level_category->slug) }}">
-                                                    {{ $second_level_category->getTranslation('name') }}
+                                                    {{ $second_level_category->name }}
                                                 </a>
                                             </li>
                                         @endforeach

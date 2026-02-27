@@ -1,152 +1,8 @@
 --
--- Dumping data for table `colors`
+-- Truncate table before insert `countries`
 --
 
-INSERT INTO `colors` (`id`, `name`, `code`, `created_at`, `updated_at`)
-VALUES (1, 'IndianRed', '#CD5C5C', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (2, 'LightCoral', '#F08080', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (3, 'Salmon', '#FA8072', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (4, 'DarkSalmon', '#E9967A', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (5, 'LightSalmon', '#FFA07A', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (6, 'Crimson', '#DC143C', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (7, 'Red', '#FF0000', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (8, 'FireBrick', '#B22222', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (9, 'DarkRed', '#8B0000', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (10, 'Pink', '#FFC0CB', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (11, 'LightPink', '#FFB6C1', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (12, 'HotPink', '#FF69B4', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (13, 'DeepPink', '#FF1493', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (14, 'MediumVioletRed', '#C71585', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (15, 'PaleVioletRed', '#DB7093', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (16, 'LightSalmon', '#FFA07A', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (17, 'Coral', '#FF7F50', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (18, 'Tomato', '#FF6347', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (19, 'OrangeRed', '#FF4500', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (20, 'DarkOrange', '#FF8C00', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (21, 'Orange', '#FFA500', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (22, 'Gold', '#FFD700', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (23, 'Yellow', '#FFFF00', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (24, 'LightYellow', '#FFFFE0', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (25, 'LemonChiffon', '#FFFACD', '2018-11-05 02:12:26', '2018-11-05 02:12:26'),
-       (26, 'LightGoldenrodYellow', '#FAFAD2', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (27, 'PapayaWhip', '#FFEFD5', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (28, 'Moccasin', '#FFE4B5', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (29, 'PeachPuff', '#FFDAB9', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (30, 'PaleGoldenrod', '#EEE8AA', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (31, 'Khaki', '#F0E68C', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (32, 'DarkKhaki', '#BDB76B', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (33, 'Lavender', '#E6E6FA', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (34, 'Thistle', '#D8BFD8', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (35, 'Plum', '#DDA0DD', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (36, 'Violet', '#EE82EE', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (37, 'Orchid', '#DA70D6', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (38, 'Fuchsia', '#FF00FF', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (39, 'Magenta', '#FF00FF', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (40, 'MediumOrchid', '#BA55D3', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (41, 'MediumPurple', '#9370DB', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (42, 'Amethyst', '#9966CC', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (43, 'BlueViolet', '#8A2BE2', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (44, 'DarkViolet', '#9400D3', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (45, 'DarkOrchid', '#9932CC', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (46, 'DarkMagenta', '#8B008B', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (47, 'Purple', '#800080', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (48, 'Indigo', '#4B0082', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (49, 'SlateBlue', '#6A5ACD', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (50, 'DarkSlateBlue', '#483D8B', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (51, 'MediumSlateBlue', '#7B68EE', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (52, 'GreenYellow', '#ADFF2F', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (53, 'Chartreuse', '#7FFF00', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (54, 'LawnGreen', '#7CFC00', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (55, 'Lime', '#00FF00', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (56, 'LimeGreen', '#32CD32', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (57, 'PaleGreen', '#98FB98', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (58, 'LightGreen', '#90EE90', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (59, 'MediumSpringGreen', '#00FA9A', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (60, 'SpringGreen', '#00FF7F', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (61, 'MediumSeaGreen', '#3CB371', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (62, 'SeaGreen', '#2E8B57', '2018-11-05 02:12:27', '2018-11-05 02:12:27'),
-       (63, 'ForestGreen', '#228B22', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (64, 'Green', '#008000', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (65, 'DarkGreen', '#006400', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (66, 'YellowGreen', '#9ACD32', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (67, 'OliveDrab', '#6B8E23', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (68, 'Olive', '#808000', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (69, 'DarkOliveGreen', '#556B2F', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (70, 'MediumAquamarine', '#66CDAA', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (71, 'DarkSeaGreen', '#8FBC8F', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (72, 'LightSeaGreen', '#20B2AA', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (73, 'DarkCyan', '#008B8B', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (74, 'Teal', '#008080', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (75, 'Aqua', '#00FFFF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (76, 'Cyan', '#00FFFF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (77, 'LightCyan', '#E0FFFF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (78, 'PaleTurquoise', '#AFEEEE', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (79, 'Aquamarine', '#7FFFD4', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (80, 'Turquoise', '#40E0D0', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (81, 'MediumTurquoise', '#48D1CC', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (82, 'DarkTurquoise', '#00CED1', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (83, 'CadetBlue', '#5F9EA0', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (84, 'SteelBlue', '#4682B4', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (85, 'LightSteelBlue', '#B0C4DE', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (86, 'PowderBlue', '#B0E0E6', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (87, 'LightBlue', '#ADD8E6', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (88, 'SkyBlue', '#87CEEB', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (89, 'LightSkyBlue', '#87CEFA', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (90, 'DeepSkyBlue', '#00BFFF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (91, 'DodgerBlue', '#1E90FF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (92, 'CornflowerBlue', '#6495ED', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (93, 'MediumSlateBlue', '#7B68EE', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (94, 'RoyalBlue', '#4169E1', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (95, 'Blue', '#0000FF', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (96, 'MediumBlue', '#0000CD', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (97, 'DarkBlue', '#00008B', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (98, 'Navy', '#000080', '2018-11-05 02:12:28', '2018-11-05 02:12:28'),
-       (99, 'MidnightBlue', '#191970', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (100, 'Cornsilk', '#FFF8DC', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (101, 'BlanchedAlmond', '#FFEBCD', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (102, 'Bisque', '#FFE4C4', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (103, 'NavajoWhite', '#FFDEAD', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (104, 'Wheat', '#F5DEB3', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (105, 'BurlyWood', '#DEB887', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (106, 'Tan', '#D2B48C', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (107, 'RosyBrown', '#BC8F8F', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (108, 'SandyBrown', '#F4A460', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (109, 'Goldenrod', '#DAA520', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (110, 'DarkGoldenrod', '#B8860B', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (111, 'Peru', '#CD853F', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (112, 'Chocolate', '#D2691E', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (113, 'SaddleBrown', '#8B4513', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (114, 'Sienna', '#A0522D', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (115, 'Brown', '#A52A2A', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (116, 'Maroon', '#800000', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (117, 'White', '#FFFFFF', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (118, 'Snow', '#FFFAFA', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (119, 'Honeydew', '#F0FFF0', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (120, 'MintCream', '#F5FFFA', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (121, 'Azure', '#F0FFFF', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (122, 'AliceBlue', '#F0F8FF', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (123, 'GhostWhite', '#F8F8FF', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (124, 'WhiteSmoke', '#F5F5F5', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (125, 'Seashell', '#FFF5EE', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (126, 'Beige', '#F5F5DC', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (127, 'OldLace', '#FDF5E6', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (128, 'FloralWhite', '#FFFAF0', '2018-11-05 02:12:29', '2018-11-05 02:12:29'),
-       (129, 'Ivory', '#FFFFF0', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (130, 'AntiqueWhite', '#FAEBD7', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (131, 'Linen', '#FAF0E6', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (132, 'LavenderBlush', '#FFF0F5', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (133, 'MistyRose', '#FFE4E1', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (134, 'Gainsboro', '#DCDCDC', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (135, 'LightGrey', '#D3D3D3', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (136, 'Silver', '#C0C0C0', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (137, 'DarkGray', '#A9A9A9', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (138, 'Gray', '#808080', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (139, 'DimGray', '#696969', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (140, 'LightSlateGray', '#778899', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (141, 'SlateGray', '#708090', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (142, 'DarkSlateGray', '#2F4F4F', '2018-11-05 02:12:30', '2018-11-05 02:12:30'),
-       (143, 'Black', '#000000', '2018-11-05 02:12:30', '2018-11-05 02:12:30');
-
+TRUNCATE TABLE `countries`;
 --
 -- Dumping data for table `countries`
 --
@@ -399,6 +255,12 @@ VALUES (1, 'AF', 'Afghanistan', 0, 0, '2021-04-06 01:06:30', '2021-10-11 00:34:1
        (245, 'ZM', 'Zambia', 0, 0, '2021-04-06 01:06:30', NULL, NULL),
        (246, 'ZW', 'Zimbabwe', 0, 0, '2021-04-06 01:06:30', NULL, NULL);
 
+
+--
+-- Truncate table before insert `currencies`
+--
+
+TRUNCATE TABLE `currencies`;
 --
 -- Dumping data for table `currencies`
 --
@@ -430,6 +292,12 @@ VALUES (1, 'U.S. Dollar', '$', 1.00000, 1, 'USD', '2018-10-09 11:35:08', '2018-1
        (27, 'Taka', '৳', 84.00000, 1, 'BDT', '2018-10-09 11:35:08', '2018-12-02 05:16:13'),
        (28, 'Indian Rupee', 'Rs', 68.45000, 1, 'INR', '2019-07-07 10:33:46', '2025-05-24 10:33:46');
 
+
+--
+-- Truncate table before insert `custom_alerts`
+--
+
+TRUNCATE TABLE `custom_alerts`;
 --
 -- Dumping data for table `custom_alerts`
 --
@@ -440,6 +308,11 @@ VALUES (1, 1, 'small', NULL, '#',
         '<p>We use cookie for better user experience, check our policy <a href=\"https://demo.activeitzone.com/ecommerce/privacypolicy\">here</a>&nbsp;</p>',
         'dark', '#ffffff', '2024-03-26 20:02:20', '2024-03-27 17:21:29');
 
+--
+-- Truncate table before insert `dynamic_popups`
+--
+
+TRUNCATE TABLE `dynamic_popups`;
 --
 -- Dumping data for table `dynamic_popups`
 --
@@ -455,12 +328,22 @@ VALUES (1, 1, 'Subscribe to Our Newsletter',
         NULL, '2025-03-27 16:32:51', '2025-03-27 22:33:24');
 
 --
+-- Truncate table before insert `elements`
+--
+
+TRUNCATE TABLE `elements`;
+--
 -- Dumping data for table `elements`
 --
 
 INSERT INTO `elements` (`id`, `name`, `created_at`, `updated_at`)
 VALUES (1, 'Header', '2025-07-28 00:02:29', '2025-07-28 00:02:29');
 
+--
+-- Truncate table before insert `element_styles`
+--
+
+TRUNCATE TABLE `element_styles`;
 --
 -- Dumping data for table `element_styles`
 --
@@ -495,6 +378,12 @@ VALUES (1, 1, 'top_header_bg_color', '#ffffff', '2025-07-28 04:46:27', '2025-07-
        (27, 5, 'top_header_text_color', '#ffffff', '2025-07-28 08:18:41', '2025-07-29 00:05:50'),
        (28, 5, 'middle_header_text_color', '#ffffff', '2025-07-28 08:18:41', '2025-07-29 01:15:43');
 
+
+--
+-- Truncate table before insert `element_types`
+--
+
+TRUNCATE TABLE `element_types`;
 --
 -- Dumping data for table `element_types`
 --
@@ -506,6 +395,11 @@ VALUES (1, 1, 'Header 1', 0, '2025-07-28 01:54:52', '2025-07-29 05:13:41'),
        (4, 1, 'Header 4', 0, '2025-07-28 01:56:52', '2025-07-29 05:13:41'),
        (5, 1, 'Header 5', 0, '2025-07-28 02:41:11', '2025-07-29 05:13:41');
 
+--
+-- Truncate table before insert `email_templates`
+--
+
+TRUNCATE TABLE `email_templates`;
 --
 -- Dumping data for table `email_templates`
 --
@@ -729,6 +623,12 @@ VALUES (50, 'seller', 'seller_payout_email_to_seller', 'Payout Received', 'Payme
         '<span id=\"docs-internal-guid-7441a6d7-7fff-62b9-67a0-909d5d4ae5dd\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\"><b>Dear [[seller_name]],</b></span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Congratulations! Your shop has been approved and is now part of the <span style=\"font-size: 14.6667px;\">[[store_name]]</span> seller network.</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">You can now log in, manage your store, and start listing your products.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Here are your account details:</span></p><ul style=\"margin-bottom: 0px; padding-inline-start: 48px;\"><li dir=\"ltr\" style=\"list-style-type: disc; font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:0pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Name:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" font-size:=\"\" 14.6667px;=\"\" text-wrap:=\"\" wrap;=\"\" background-color:=\"\" transparent;\"=\"\">[[seller_name]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Email:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" font-size:=\"\" 14.6667px;=\"\" text-wrap:=\"\" wrap;=\"\" background-color:=\"\" transparent;\"=\"\">[[seller_email]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;\" role=\"presentation\"><span style=\"font-size: 11pt;\" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Shop Name</span><span style=\"font-size: 11pt; font-weight: 700; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">: </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[seller_shop_name]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;\" role=\"presentation\"><span style=\"font-size: 11pt;\" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Address</span><span style=\"font-size: 11pt; font-weight: 700; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">: </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[seller_shop_address]]</span></p></li><li dir=\"ltr\" style=\"list-style-type: disc; font-family: Arial, sans-serif; background-color: transparent; font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-variant-position: normal; vertical-align: baseline; white-space: pre;\" aria-level=\"1\"><p dir=\"ltr\" style=\"line-height: 1.38; margin-top: 0pt; margin-bottom: 12pt;\" role=\"presentation\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-weight:=\"\" 700;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\">Registration Date:</span><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" text-wrap:=\"\" wrap;\"=\"\"> </span><span style=\"font-size: 14.6667px; background-color: transparent;\">[[date]]</span></p></li></ul><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">To access your seller account, please log in </span><a href=\"[[login_url]]\" target=\"_blank\">here</a><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">If you need any assistance, our seller support team is available to help you with any questions or issues. Contact us at <span style=\"font-family: Roboto, sans-serif; font-size: 14.6667px;\">[[admin_email]]</span>.</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:12pt;margin-bottom:12pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">We are excited to see your products in our marketplace and look forward to your success!</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\">Best regards,</span></p><p dir=\"ltr\" style=\"line-height:1.38;margin-top:0pt;margin-bottom:0pt;\"><span style=\"font-size: 11pt; font-family: \" roboto=\"\" slab\",=\"\" serif;=\"\" background-color:=\"\" transparent;=\"\" font-variant-numeric:=\"\" normal;=\"\" font-variant-east-asian:=\"\" font-variant-alternates:=\"\" font-variant-position:=\"\" vertical-align:=\"\" baseline;=\"\" white-space-collapse:=\"\" preserve;\"=\"\"><b>The <span style=\"font-size: 14.6667px;\">[[store_name]]</span> Team</b></span></p></span>',
         1, 1, 1, NULL, '2025-08-06 12:53:37', '2025-08-06 12:53:37');
 
+
+--
+-- Truncate table before insert `flash_deals`
+--
+
+TRUNCATE TABLE `flash_deals`;
 --
 -- Dumping data for table `flash_deals`
 --
@@ -744,6 +644,11 @@ VALUES (1, 'Flash Sale', 1698796800, 1767743940, 1, 1, NULL, NULL, '153', 'flash
        (4, 'End of Season', 1612483200, 1748908740, 1, 0, NULL, NULL, '154', 'end-of-season-ehVld',
         '2024-01-09 12:34:25', '2024-01-09 12:35:54');
 
+--
+-- Truncate table before insert `flash_deal_products`
+--
+
+TRUNCATE TABLE `flash_deal_products`;
 --
 -- Dumping data for table `flash_deal_products`
 --
@@ -771,6 +676,11 @@ VALUES (1, 3, 13, 0.00, NULL, '2024-01-09 12:26:58', '2024-01-09 12:26:58'),
        (19, 1, 20, 0.00, NULL, '2024-01-09 12:36:52', '2024-01-09 12:36:52');
 
 --
+-- Truncate table before insert `flash_deal_translations`
+--
+
+TRUNCATE TABLE `flash_deal_translations`;
+--
 -- Dumping data for table `flash_deal_translations`
 --
 
@@ -780,6 +690,12 @@ VALUES (1, 1, 'Flash Sale', 'en', '2023-12-17 15:00:33', '2023-12-17 15:00:33'),
        (3, 3, 'Winter Sale', 'en', '2023-12-17 15:11:20', '2023-12-17 15:11:20'),
        (4, 4, 'End of Season', 'en', '2024-01-09 12:34:25', '2024-01-09 12:34:25');
 
+
+--
+-- Truncate table before insert `home_categories`
+--
+
+TRUNCATE TABLE `home_categories`;
 --
 -- Dumping data for table `home_categories`
 --
@@ -789,6 +705,11 @@ VALUES (1, 1, '[\"1\"]', 1, '2019-03-12 06:38:23', '2019-03-12 06:38:23'),
        (2, 2, '[\"10\"]', 1, '2019-03-12 06:44:54', '2019-03-12 06:44:54');
 
 --
+-- Truncate table before insert `languages`
+--
+
+TRUNCATE TABLE `languages`;
+--
 -- Dumping data for table `languages`
 --
 
@@ -797,6 +718,11 @@ VALUES (1, 'English', 'en', 'en', 0, 1, '2019-01-20 12:13:20', '2019-01-20 12:13
        (3, 'Bangla', 'bd', 'bn', 0, 1, '2019-02-17 06:35:37', '2019-02-18 06:49:51'),
        (4, 'Arabic', 'sa', 'ar', 1, 1, '2019-04-28 18:34:12', '2019-04-28 18:34:12');
 
+--
+-- Truncate table before insert `notification_types`
+--
+
+TRUNCATE TABLE `notification_types`;
 --
 -- Dumping data for table `notification_types`
 --
@@ -864,6 +790,11 @@ VALUES (1, 'admin', 'order_placed_admin', 'Order Placed', NULL, 'Order: [[order_
         '2024-08-22 05:45:04', '2024-08-22 05:45:04');
 
 --
+-- Truncate table before insert `pages`
+--
+
+TRUNCATE TABLE `pages`;
+--
 -- Dumping data for table `pages`
 --
 
@@ -885,6 +816,11 @@ VALUES (1, 'home_page', 'Home Page', 'home', NULL, NULL, NULL, NULL, NULL, '2020
         '{\"description\":null,\"address\":null,\"phone\":null,\"email\":null}', NULL, NULL, NULL, NULL,
         '2024-08-25 07:22:32', '2024-08-25 07:22:32');
 
+--
+-- Truncate table before insert `payment_methods`
+--
+
+TRUNCATE TABLE `payment_methods`;
 --
 -- Dumping data for table `payment_methods`
 --
@@ -917,124 +853,17 @@ VALUES (1, 'paypal', 0, NULL, '2024-05-18 23:31:18', '2024-05-18 23:31:18'),
        (25, 'tap', 0, NULL, '2024-07-14 06:16:47', '2024-07-14 06:16:47');
 
 --
+-- Truncate table before insert `products`
+--
+--
 -- Dumping data for table `products`
+-- OMITTED SEED DATA FOR products
+--
+--
+-- Truncate table before insert `product_categories`
 --
 
-INSERT INTO `products` (`id`, `name`, `added_by`, `user_id`, `category_id`, `brand_id`, `tags`, `description`,
-                        `published`, `approved`, `shipping_type`, `shipping_cost`, `est_shipping_days`, `meta_title`,
-                        `meta_description`, `slug`, `rating`, `barcode`, `digital`, `file_name`, `file_path`,
-                        `external_link`, `external_link_btn`, `wholesale_product`, `frequently_bought_selection_type`,
-                        `has_warranty`, `warranty_id`, `warranty_note_id`, `created_at`, `updated_at`)
-VALUES (1, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell Gaiter Hoodie', 'admin', 9, 1, 3, '',
-        '<div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Navy Shirt</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Style Code</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">LRSHCSLFL01619</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Closure</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Button</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fit</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Slim</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Pure Cotton</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Sleeve</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Half Sleeve</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Pattern</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Checkered</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Reversible</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">No</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Collar</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Spread</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Color</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Dark Blue</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Fabric Care</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Gentle Machine Wash</div></div><div class=\"row\" style=\"flex-direction: row; margin: 0px; padding: 0px; width: 749.672px; color: rgb(33, 33, 33); font-family: Roboto, Arial, sans-serif; font-size: 14px;\"><div class=\"col col-3-12 _2H87wv\" style=\"width: 187.406px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top; color: rgb(135, 135, 135);\">Suitable For</div><div class=\"col col-9-12 _2vZqPX\" style=\"width: 562.25px; padding: 0px 0px 24px; margin: 0px; display: inline-block; vertical-align: top;\">Western Wear</div><div><br></div></div>',
-        1, 1, 'free', 0.00, 4, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshell Gaiter Hoodie',
-        'Navy ShirtStyle CodeLRSHCSLFL01619ClosureButtonFitSlimFabricPure CottonSleeveHalf SleevePatternCheckeredReversibleNoCollarSpreadColorDark BlueFabric CareGentle Machine WashSuitable ForWestern Wear',
-        'legendary-whitetails-mens-huntguard-bullfrog-technical-softshell-gaiter-hoodie', 0.00, NULL, 0, NULL, NULL,
-        NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 11:12:23', '2024-01-09 12:34:25'),
-       (2,
-        'Women\'s Christmas Sweatshirt Casual Fashion Printing Long Sleeve O-Neck Pullover Top Blouse Wool Sweater, S-3XLc',
-        'admin', 9, 2, 4, 'Women\'s Christmas',
-        '<p>\"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?\"<br></p>',
-        1, 1, 'free', 0.00, 4,
-        'Women\'s Christmas Sweatshirt Casual Fashion Printing Long Sleeve O-Neck Pullover Top Blouse Wool Sweater, S-3XLc',
-        '\"But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?\"',
-        'womens-christmas-sweatshirt-casual-fashion-printing-long-sleeve-o-neck-pullover-top-blouse-wool-sweater-s-3xlc',
-        0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 11:16:03',
-        '2024-01-09 12:34:25'),
-       (3,
-        'ESR for iPhone 15 Pro Max Case with MagSafe, Supports Magnetic Charging, Slim Liquid Silicone Case, Shock Absorbing, Screen and Camera Protection, Cloud Series, Light Tan',
-        'admin', 9, 4, 11, '',
-        '<p><span style=\"font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"</span><br></p>',
-        1, 1, 'free', 0.00, 4,
-        'ESR for iPhone 15 Pro Max Case with MagSafe, Supports Magnetic Charging, Slim Liquid Silicone Case, Shock Absorbing, Screen and Camera Protection, Cloud Series, Light Tan',
-        '\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"',
-        'esr-for-iphone-15-pro-max-case-with-magsafe-supports-magnetic-charging-slim-liquid-silicone-case-shock-absorbing-screen-and-camera-protection-cloud-series-light-tan',
-        0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 11:59:25',
-        '2024-01-08 13:14:45'),
-       (4,
-        'HUAWEI Mate 50 Pro Dual-SIM 256GB ROM + 8GB RAM (Only GSM | No CDMA) Factory Unlocked 4G/LTE Smartphone (Black) - International Version',
-        'admin', 9, 4, 10, '',
-        '<p><span style=\"font-family: &quot;Open Sans&quot;, Arial, sans-serif; font-size: 14px; text-align: justify;\">\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"</span><br></p>',
-        1, 1, 'free', 0.00, 4,
-        'HUAWEI Mate 50 Pro Dual-SIM 256GB ROM + 8GB RAM (Only GSM | No CDMA) Factory Unlocked 4G/LTE Smartphone (Black) - International Version',
-        '\"On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.\"',
-        'huawei-mate-50-pro-dual-sim-256gb-rom-8gb-ram-only-gsm-no-cdma-factory-unlocked-4glte-smartphone-black-international-version',
-        0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 12:06:29',
-        '2024-01-09 12:34:25'),
-       (5, 'Premium executive estate with plenty of cargo capacity', 'admin', 9, 5, 1, '',
-        '<p>Premium executive estate with plenty of cargo capacity<br></p>', 1, 1, 'free', 0.00, NULL,
-        'Premium executive estate with plenty of cargo capacity',
-        'Premium executive estate with plenty of cargo capacity',
-        'premium-executive-estate-with-plenty-of-cargo-capacity', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product',
-        0, NULL, NULL, '2023-12-14 13:22:30', '2024-01-09 12:36:51'),
-       (6, 'Philips Rice Cooker 0.6L', 'admin', 9, 17, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Rice Cooker 0.6L</h2>', 1, 1, 'free', 0.00, 4,
-        'Philips Rice Cooker 0.6L', 'Philips Rice Cooker 0.6L', 'philips-rice-cooker-06l', 0.00, NULL, 0, NULL, NULL,
-        NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 13:56:49', '2024-01-09 12:36:51'),
-       (7, 'Philips Mixer Grinder HL7555/00', 'admin', 9, 17, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philips Mixer Grinder HL7555/00</h2>', 1, 1, 'free', 0.00, 3,
-        'Philips Mixer Grinder HL7555/00', 'Philips Mixer Grinder HL7555/00', 'philips-mixer-grinder-hl755500', 0.00,
-        NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 14:00:49', '2024-01-09 12:36:51'),
-       (8, 'Philipps Airfryer XXL', 'admin', 9, 17, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Philipps Airfryer XXL</h2>', 1, 1, 'free', 0.00, 3,
-        'Philipps Airfryer XXL', 'Philipps Airfryer XXL', 'philipps-airfryer-xxl', 0.00, NULL, 0, NULL, NULL, NULL,
-        NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 14:02:05', '2024-01-09 12:36:51'),
-       (9, 'Disney Men\'s Mickey and Friends Button Down Shirt', 'admin', 9, 1, NULL, '', NULL, 1, 1, 'free', 0.00,
-        NULL, 'Disney Men\'s Mickey and Friends Button Down Shirt', '',
-        'disney-mens-mickey-and-friends-button-down-shirt', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0,
-        NULL, NULL, '2023-12-14 14:06:04', '2024-01-08 12:38:57'),
-       (10, 'The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress', 'admin', 9, 2, NULL, '',
-        '<h2 class=\"mb-2 fs-16 fw-700 text-dark\">The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress</h2>', 1,
-        1, 'free', 0.00, 3, 'The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress',
-        'The Children\'s Place Women\'s Fall Plaid Long Sleeve Dress',
-        'the-childrens-place-womens-fall-plaid-long-sleeve-dress', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product',
-        0, NULL, NULL, '2023-12-14 14:07:34', '2024-01-08 12:41:05'),
-       (11, 'Berne Men\'s Heritage Thermal-Lined Full-Zip Hooded Sweatshirt', 'seller', 3, 1, NULL, '', NULL, 1, 1,
-        'free', 0.00, NULL, 'Berne Men\'s Heritage Thermal-Lined Full-Zip Hooded Sweatshirt', '',
-        'berne-mens-heritage-thermal-lined-full-zip-hooded-sweatshirt', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0,
-        'product', 0, NULL, NULL, '2023-12-14 14:59:08', '2024-01-09 12:36:51'),
-       (12, 'Self Design, Embellished, Embroidered Satin Blend, Net Semi Stitched Flared/A-line Gown', 'seller', 3, 2,
-        NULL, '', NULL, 1, 1, 'free', 0.00, NULL,
-        'Self Design, Embellished, Embroidered Satin Blend, Net Semi Stitched Flared/A-line Gown', '',
-        'self-design-embellished-embroidered-satin-blend-net-semi-stitched-flareda-line-gown', 0.00, NULL, 0, NULL,
-        NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 15:00:45', '2024-01-08 13:09:38'),
-       (13, 'VredeVogel Women\'s Cotton Silk Blend Straight Kurta with Trouser Pant & Banarasi Silk Dupatta', 'seller',
-        3, 2, NULL, '', NULL, 1, 1, 'free', 0.00, NULL,
-        'VredeVogel Women\'s Cotton Silk Blend Straight Kurta with Trouser Pant & Banarasi Silk Dupatta', '',
-        'vredevogel-womens-cotton-silk-blend-straight-kurta-with-trouser-pant-banarasi-silk-dupatta', 0.00, NULL, 0,
-        NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 15:04:11', '2024-01-08 12:33:17'),
-       (14, 'Adidas Fitness Tights for Women', 'seller', 3, 2, NULL, '', NULL, 1, 1, 'free', 0.00, 3,
-        'Adidas Fitness Tights for Women', '', 'adidas-fitness-tights-for-women', 0.00, NULL, 0, NULL, NULL, NULL, NULL,
-        0, 'product', 0, NULL, NULL, '2023-12-14 15:18:23', '2024-01-09 12:36:51'),
-       (15, 'Adidas Men\'s Originals Poly Tape Shorts', 'seller', 3, 1, 14, '', NULL, 1, 1, 'free', 0.00, 5,
-        'Adidas Men\'s Originals Poly Tape Shorts', '', 'adidas-mens-originals-poly-tape-shorts', 0.00, NULL, 0, NULL,
-        NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 15:22:25', '2024-01-09 12:36:51'),
-       (16, 'AirPods Max', 'seller', 3, 4, NULL, '', NULL, 1, 1, 'free', 0.00, 4, 'AirPods Max', '', 'airpods-max',
-        0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-14 15:25:12',
-        '2024-01-09 12:36:52'),
-       (17, 'Apple - AirPods Max', 'admin', 9, 4, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Apple - AirPods Max</h2>', 1, 1, 'free', 0.00, 4,
-        'Apple - AirPods Max', 'Apple - AirPods Max', 'apple-airpods-max', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0,
-        'product', 0, NULL, NULL, '2023-12-17 13:24:38', '2024-01-08 10:29:26'),
-       (18, 'OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max', 'admin', 9, 4, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max</h2>',
-        1, 1, 'free', 0.00, 4, 'OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max',
-        'OtterBox Symmetry Fitted Hard Shell Case for iPhone 15 Pro Max',
-        'otterbox-symmetry-fitted-hard-shell-case-for-iphone-15-pro-max', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0,
-        'product', 0, NULL, NULL, '2023-12-17 13:26:12', '2024-01-09 12:36:52'),
-       (19, 'Men\'s Hoodies', 'admin', 9, 1, NULL, '', '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Men\'s Hoodies</h2>',
-        1, 1, 'free', 0.00, 5, 'Men\'s Hoodies', 'Men\'s Hoodies', 'mens-hoodies', 0.00, NULL, 0, NULL, NULL, NULL,
-        NULL, 0, 'product', 0, NULL, NULL, '2023-12-17 13:58:39', '2024-01-09 12:36:52'),
-       (20, 'Fleck Splash Round Kitchen Mat', 'admin', 9, 17, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">Fleck Splash Round Kitchen Mat</h2>', 1, 1, 'free', 0.00, 4,
-        'Fleck Splash Round Kitchen Mat', 'Fleck Splash Round Kitchen Mat', 'fleck-splash-round-kitchen-mat', 0.00,
-        NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL, '2023-12-17 14:14:58', '2024-01-08 10:22:08'),
-       (21, '2 Piece Wellness Anti-Fatigue Mat Set', 'admin', 9, 17, NULL, '',
-        '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">2 Piece Wellness Anti-Fatigue Mat Set</h2>', 1, 1, 'free', 0.00, 2,
-        '2 Piece Wellness Anti-Fatigue Mat Set', '2 Piece Wellness Anti-Fatigue Mat Set',
-        '2-piece-wellness-anti-fatigue-mat-set', 0.00, NULL, 0, NULL, NULL, NULL, NULL, 0, 'product', 0, NULL, NULL,
-        '2023-12-17 14:21:19', '2024-01-08 10:20:40');
-
+TRUNCATE TABLE `product_categories`;
 --
 -- Dumping data for table `product_categories`
 --
@@ -1129,6 +958,12 @@ VALUES (2, 1),
        (22, 30),
        (22, 31);
 
+
+--
+-- Truncate table before insert `product_stocks`
+--
+
+TRUNCATE TABLE `product_stocks`;
 --
 -- Dumping data for table `product_stocks`
 --
@@ -1158,6 +993,11 @@ VALUES (1, 22, '', NULL, 5.32, 233, NULL, NULL, '2024-01-08 10:20:40', '2024-01-
        (21, 7, '', NULL, 12.00, 109, 'youtube', NULL, '2024-01-08 13:17:03', '2024-01-08 13:17:03', 1, 1);
 
 --
+-- Truncate table before insert `product_taxes`
+--
+
+TRUNCATE TABLE `product_taxes`;
+--
 -- Dumping data for table `product_taxes`
 --
 
@@ -1183,7 +1023,12 @@ VALUES (1, 22, 3, 0.00, 'amount', '2024-01-08 10:20:40', '2024-01-08 10:20:40'),
        (19, 12, 3, 0.00, 'amount', '2024-01-08 13:12:38', '2024-01-08 13:12:38'),
        (20, 4, 3, 0.00, 'amount', '2024-01-08 13:14:45', '2024-01-08 13:14:45'),
        (21, 7, 3, 0.00, 'amount', '2024-01-08 13:17:03', '2024-01-08 13:17:03');
+/*
+--
+-- Truncate table before insert `product_translations`
+--
 
+TRUNCATE TABLE `product_translations`;
 --
 -- Dumping data for table `product_translations`
 --
@@ -1241,7 +1086,12 @@ VALUES (1, 2, 'Legendary Whitetails Men\'s Huntguard Bullfrog Technical Softshel
        (21, 22, '2 Piece Wellness Anti-Fatigue Mat Set',
         '<h2 class=\"mb-4 fs-16 fw-700 text-dark\">2 Piece Wellness Anti-Fatigue Mat Set</h2>', 'en',
         '2023-12-17 14:21:19', '2023-12-17 14:21:19');
+*/
+--
+-- Truncate table before insert `searches`
+--
 
+TRUNCATE TABLE `searches`;
 --
 -- Dumping data for table `searches`
 --
@@ -1250,6 +1100,11 @@ INSERT INTO `searches` (`id`, `query`, `count`, `created_at`, `updated_at`)
 VALUES (2, 'dcs', 1, '2020-03-08 00:29:09', '2020-03-08 00:29:09'),
        (3, 'das', 3, '2020-03-08 00:29:15', '2020-03-08 00:29:50');
 
+--
+-- Truncate table before insert `sellers`
+--
+
+TRUNCATE TABLE `sellers`;
 --
 -- Dumping data for table `sellers`
 --
@@ -1261,6 +1116,11 @@ VALUES (1, 3, 0.00, 0, 0, 1,
         '[{\"type\":\"text\",\"label\":\"Name\",\"value\":\"Mr. Seller\"},{\"type\":\"select\",\"label\":\"Marital Status\",\"value\":\"Married\"},{\"type\":\"multi_select\",\"label\":\"Company\",\"value\":\"[\\\"Company\\\"]\"},{\"type\":\"select\",\"label\":\"Gender\",\"value\":\"Male\"},{\"type\":\"file\",\"label\":\"Image\",\"value\":\"uploads\\/verification_form\\/CRWqFifcbKqibNzllBhEyUSkV6m1viknGXMEhtiW.png\"}]',
         1, 78.40, NULL, NULL, NULL, NULL, 0, '2018-10-07 04:42:57', '2020-01-26 04:21:11');
 
+--
+-- Truncate table before insert `shops`
+--
+
+TRUNCATE TABLE `shops`;
 --
 -- Dumping data for table `shops`
 --
@@ -1298,6 +1158,12 @@ VALUES (1, 3, 'Demo Seller Shop', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Hou
         0.00, 0.00, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
         0, '2024-01-09 12:18:07', '2024-01-09 12:21:53');
 
+
+--
+-- Truncate table before insert `taxes`
+--
+
+TRUNCATE TABLE `taxes`;
 --
 -- Dumping data for table `taxes`
 --

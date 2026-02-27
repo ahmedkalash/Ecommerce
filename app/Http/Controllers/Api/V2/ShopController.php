@@ -8,9 +8,9 @@ use App\Http\Resources\V2\ShopCollection;
 use App\Http\Resources\V2\ShopDetailsCollection;
 use App\Models\Product;
 use App\Models\Shop;
-use Illuminate\Http\Request;
 use App\Utility\SearchUtility;
 use Cache;
+use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
@@ -18,15 +18,15 @@ class ShopController extends Controller
     {
         $shop_query = Shop::query();
 
-        if ($request->name != null && $request->name != "") {
-            $shop_query->where("name", 'like', "%{$request->name}%");
+        if ($request->name != null && $request->name != '') {
+            $shop_query->where('name', 'like', "%{$request->name}%");
             SearchUtility::store($request->name);
         }
 
         return new ShopCollection($shop_query->whereIn('user_id', verified_sellers_id())->paginate(10));
 
-        //remove this , this is for testing
-        //return new ShopCollection($shop_query->paginate(10));
+        // remove this , this is for testing
+        // return new ShopCollection($shop_query->paginate(10));
     }
 
     public function info($id)
@@ -42,6 +42,7 @@ class ShopController extends Controller
     public function allProducts($id)
     {
         $shop = Shop::findOrFail($id);
+
         return new ProductCollection(Product::where('user_id', $shop->user_id)->where('published', 1)->latest()->paginate(10));
     }
 
@@ -72,7 +73,5 @@ class ShopController extends Controller
         });
     }
 
-    public function brands($id)
-    {
-    }
+    public function brands($id) {}
 }

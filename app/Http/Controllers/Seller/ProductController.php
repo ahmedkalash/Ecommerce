@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Seller;
 
 use AizPackages\CombinationGenerate\Services\CombinationService;
+use App\DTOs\ProductDTO;
 use App\Http\Requests\ProductRequest;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductCategory;
 use App\Models\ProductTranslation;
 use App\Models\User;
 use App\Notifications\ShopProductNotification;
@@ -17,9 +17,9 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductService;
 use App\Services\ProductStockService;
 use App\Services\ProductTaxService;
-use Artisan;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 
 class ProductController extends Controller
@@ -60,7 +60,7 @@ class ProductController extends Controller
         $products = Product::where('user_id', Auth::user()->id)->where('digital', 0)->where('auction_product', 0)->where('wholesale_product', 0)->orderBy('created_at', 'desc');
         if ($request->has('search')) {
             $search = $request->search;
-            $products = $products->where('name', 'like', '%' . $search . '%');
+            $products = $products->where('name', 'like', '%'.$search.'%');
         }
         $products = $products->paginate(10);
 
@@ -86,29 +86,10 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
-        if (addon_is_activated('seller_subscription')) {
-            if (! seller_package_validity_check()) {
-                flash(translate('Please upgrade your package.'))->warning();
+        // Create Product via Service with DTO
+        $product = $this->productService->store(ProductDTO::fromArray($request->all()));
 
-                return redirect()->route('seller.products');
-            }
-        }
-
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]));
         $request->merge(['product_id' => $product->id]);
-
-        // /Product categories
-        $product->categories()->attach($request->category_ids);
 
         // VAT & Tax
         if ($request->tax_id) {
@@ -119,10 +100,6 @@ class ProductController extends Controller
                 'product_id',
             ]));
         }
-
-        // Product Stock
-        // Pass complete request data so Service can extract what it needs (including video_link, etc.)
-        $this->productStockService->store($request->all(), $product);
 
         // Frequently Bought Products
         $this->frequentlyBoughtProductService->store($request->only([
@@ -183,27 +160,10 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
-        // Product
-        $product = $this->productService->update($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type',
-        ]), $product);
+        // Update Product via Service with DTO
+        $product = $this->productService->update(ProductDTO::fromArray($request->all()), $product);
 
         $request->merge(['product_id' => $product->id]);
-
-        // Product categories
-        $product->categories()->sync($request->category_ids);
-
-        // Product Stock
-        // Note: productStockService->store handles logic to update/create
-        $this->productStockService->store($request->all(), $product);
 
         // VAT & Tax
         if ($request->tax_id) {
@@ -262,7 +222,7 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 $data = [];
                 foreach ($request[$name] as $key => $item) {
                     array_push($data, $item);
@@ -295,7 +255,7 @@ class ProductController extends Controller
 
         if ($request->has('choice_no')) {
             foreach ($request->choice_no as $key => $no) {
-                $name = 'choice_options_' . $no;
+                $name = 'choice_options_'.$no;
                 $data = [];
                 foreach ($request[$name] as $key => $item) {
                     array_push($data, $item);
@@ -316,7 +276,7 @@ class ProductController extends Controller
         $html = '';
 
         foreach ($all_attribute_values as $row) {
-            $html .= '<option value="' . $row->value . '">' . $row->value . '</option>';
+            $html .= '<option value="'.$row->value.'">'.$row->value.'</option>';
         }
 
         echo json_encode($html);
@@ -368,22 +328,11 @@ class ProductController extends Controller
             }
         }
 
-        // Product
-        $product_new = $this->productService->product_duplicate_store($product);
+        // Duplicate Product and its relationships via Service
+        $product_new = $this->productService->duplicate($product);
 
-        // Product Stock
-        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
-
-        // VAT & Tax
+        // VAT & Tax Duplication (Still needed if not in ProductService::duplicate)
         $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
-
-        // Product Categories
-        foreach ($product->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
-            ]);
-        }
 
         flash(translate('Product has been duplicated successfully'))->success();
 
@@ -433,7 +382,7 @@ class ProductController extends Controller
             ->orderBy('name', 'asc');
         if ($request->has('search')) {
             $sort_search = $request->search;
-            $categories = $categories->where('name', 'like', '%' . $sort_search . '%');
+            $categories = $categories->where('name', 'like', '%'.$sort_search.'%');
         }
         $categories = $categories->paginate(15);
 

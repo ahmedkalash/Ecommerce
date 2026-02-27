@@ -1,24 +1,20 @@
 <?php
 
-
 namespace App\Http\Controllers\Api\V2;
 
-
-use App\Models\BusinessSetting;
-use App\Utility\NagadUtility;
 use App\Models\CombinedOrder;
 use App\Models\Order;
-use App\Models\User;
-use App\Models\Wallet;
+use App\Utility\NagadUtility;
 use Illuminate\Http\Request;
 
 class NagadController
 {
-
     private $amount = null;
+
     private $tnx = null;
 
     private $nagadHost;
+
     private $tnx_status = false;
 
     private $merchantAdditionalInfo = [];
@@ -27,9 +23,9 @@ class NagadController
     {
         date_default_timezone_set('Asia/Dhaka');
         if (config('nagad.sandbox_mode') === 'sandbox') {
-            $this->nagadHost = "http://sandbox.mynagad.com:10080/";
+            $this->nagadHost = 'http://sandbox.mynagad.com:10080/';
         } else {
-            $this->nagadHost = "https://api.mynagad.com/";
+            $this->nagadHost = 'https://api.mynagad.com/';
         }
     }
 
@@ -58,35 +54,34 @@ class NagadController
         return $this->getSession($request->payment_type);
     }
 
-
     public function getSession($payment_type)
     {
 
-        $DateTime = Date('YmdHis');
+        $DateTime = date('YmdHis');
         $MerchantID = config('nagad.merchant_id');
-        //$invoice_no = 'Inv'.Date('YmdH').rand(1000, 10000);
-        $invoice_no = $this->tnx_status ? $this->tnx : 'Inv' . Date('YmdH') . rand(1000, 10000);
+        // $invoice_no = 'Inv'.Date('YmdH').rand(1000, 10000);
+        $invoice_no = $this->tnx_status ? $this->tnx : 'Inv'.date('YmdH').rand(1000, 10000);
         $merchantCallbackURL = route('app.nagad.callback_url', ['payment_type' => $payment_type]);
 
         $SensitiveData = [
             'merchantId' => $MerchantID,
             'datetime' => $DateTime,
             'orderId' => $invoice_no,
-            'challenge' => NagadUtility::generateRandomString()
+            'challenge' => NagadUtility::generateRandomString(),
         ];
 
-        $PostData = array(
-            'accountNumber' => config('nagad.merchant_number'), //optional
+        $PostData = [
+            'accountNumber' => config('nagad.merchant_number'), // optional
             'dateTime' => $DateTime,
             'sensitiveData' => NagadUtility::EncryptDataWithPublicKey(json_encode($SensitiveData)),
-            'signature' => NagadUtility::SignatureGenerate(json_encode($SensitiveData))
-        );
+            'signature' => NagadUtility::SignatureGenerate(json_encode($SensitiveData)),
+        ];
 
-        $ur = $this->nagadHost . "api/dfs/check-out/initialize/" . $MerchantID . "/" . $invoice_no;
+        $ur = $this->nagadHost.'api/dfs/check-out/initialize/'.$MerchantID.'/'.$invoice_no;
         $Result_Data = NagadUtility::HttpPostMethod($ur, $PostData);
 
         if (isset($Result_Data['sensitiveData']) && isset($Result_Data['signature'])) {
-            if ($Result_Data['sensitiveData'] != "" && $Result_Data['signature'] != "") {
+            if ($Result_Data['sensitiveData'] != '' && $Result_Data['signature'] != '') {
 
                 $PlainResponse = json_decode(NagadUtility::DecryptDataWithPrivateKey($Result_Data['sensitiveData']), true);
 
@@ -95,14 +90,13 @@ class NagadController
                     $paymentReferenceId = $PlainResponse['paymentReferenceId'];
                     $randomserver = $PlainResponse['challenge'];
 
-                    $SensitiveDataOrder = array(
+                    $SensitiveDataOrder = [
                         'merchantId' => $MerchantID,
                         'orderId' => $invoice_no,
                         'currencyCode' => '050',
                         'amount' => $this->amount,
-                        'challenge' => $randomserver
-                    );
-
+                        'challenge' => $randomserver,
+                    ];
 
                     // $merchantAdditionalInfo = '{"no_of_seat": "1", "Service_Charge":"20"}';
                     if ($this->tnx !== '') {
@@ -111,32 +105,32 @@ class NagadController
                     // echo $merchantAdditionalInfo;
                     // exit();
 
-                    $PostDataOrder = array(
+                    $PostDataOrder = [
                         'sensitiveData' => NagadUtility::EncryptDataWithPublicKey(json_encode($SensitiveDataOrder)),
                         'signature' => NagadUtility::SignatureGenerate(json_encode($SensitiveDataOrder)),
                         'merchantCallbackURL' => $merchantCallbackURL,
-                        'additionalMerchantInfo' => (object)$this->merchantAdditionalInfo
-                    );
+                        'additionalMerchantInfo' => (object) $this->merchantAdditionalInfo,
+                    ];
 
                     // echo json_encode($PostDataOrder);
                     // exit();
 
-                    $OrderSubmitUrl = $this->nagadHost . "api/dfs/check-out/complete/" . $paymentReferenceId;
+                    $OrderSubmitUrl = $this->nagadHost.'api/dfs/check-out/complete/'.$paymentReferenceId;
                     $Result_Data_Order = NagadUtility::HttpPostMethod($OrderSubmitUrl, $PostDataOrder);
-                    //dd($Result_Data_Order);
-                    if ($Result_Data_Order['status'] == "Success") {
+                    // dd($Result_Data_Order);
+                    if ($Result_Data_Order['status'] == 'Success') {
                         return response()->json([
                             'data' => $Result_Data_Order,
                             'result' => true,
                             'url' => $Result_Data_Order['callBackUrl'],
-                            'message' => translate('Redirect Url is found')
+                            'message' => translate('Redirect Url is found'),
                         ]);
                     } else {
                         return response()->json([
                             'data' => $Result_Data_Order,
                             'result' => false,
                             'url' => '',
-                            'message' => translate('Could not generate payment link')
+                            'message' => translate('Could not generate payment link'),
                         ]);
                     }
                 } else {
@@ -144,7 +138,7 @@ class NagadController
                         'data' => $PlainResponse,
                         'result' => false,
                         'url' => '',
-                        'message' => translate('Payment reference id or challenge is missing')
+                        'message' => translate('Payment reference id or challenge is missing'),
                     ]);
                 }
             } else {
@@ -152,7 +146,7 @@ class NagadController
                     'data' => null,
                     'result' => false,
                     'url' => '',
-                    'message' => translate('Sensitive data or Signature is empty')
+                    'message' => translate('Sensitive data or Signature is empty'),
                 ]);
             }
         } else {
@@ -160,28 +154,29 @@ class NagadController
                 'data' => null,
                 'result' => false,
                 'url' => '',
-                'message' => translate('Sensitive data or Signature is missing')
+                'message' => translate('Sensitive data or Signature is missing'),
             ]);
         }
     }
 
     public function verify(Request $request, $payment_type)
     {
-        $Query_String = explode("&", explode("?", $_SERVER['REQUEST_URI'])[1]);
+        $Query_String = explode('&', explode('?', $_SERVER['REQUEST_URI'])[1]);
         $payment_ref_id = substr($Query_String[2], 15);
-        $url = $this->nagadHost . "api/dfs/verify/payment/" . $payment_ref_id;
+        $url = $this->nagadHost.'api/dfs/verify/payment/'.$payment_ref_id;
         $json = NagadUtility::HttpGet($url);
         if (json_decode($json)->status == 'Success') {
             return response()->json([
                 'result' => true,
                 'message' => translate('Payment Processing'),
-                'payment_details' => $json
+                'payment_details' => $json,
             ]);
         }
+
         return response()->json([
             'result' => false,
             'message' => translate('Payment failed !'),
-            'payment_details' => ''
+            'payment_details' => '',
         ]);
     }
 
@@ -193,21 +188,17 @@ class NagadController
 
             if ($payment_type == 'cart_payment') {
                 checkout_done($request->combined_order_id, $request->payment_details);
-            }
-            elseif ($payment_type == 'order_re_payment') {
+            } elseif ($payment_type == 'order_re_payment') {
                 order_re_payment_done($request->order_id, 'Nagad', $request->payment_details);
-            }
-            elseif ($payment_type == 'wallet_payment') {
+            } elseif ($payment_type == 'wallet_payment') {
                 wallet_payment_done($request->user_id, $request->amount, 'Nagad', $request->payment_details);
-            }
-            elseif ($payment_type == 'seller_package_payment') {
+            } elseif ($payment_type == 'seller_package_payment') {
                 seller_purchase_payment_done($request->user_id, $request->package_id, 'Nagad', $request->payment_details);
-            }
-            elseif ($payment_type == 'customer_package_payment') {
+            } elseif ($payment_type == 'customer_package_payment') {
                 customer_purchase_payment_done($request->user_id, $request->package_id, 'Nagad', $request->payment_details);
             }
 
-            return response()->json(['result' => true, 'message' => translate("Payment is successful")]);
+            return response()->json(['result' => true, 'message' => translate('Payment is successful')]);
         } catch (\Exception $e) {
             return response()->json(['result' => false, 'message' => $e->getMessage()]);
         }

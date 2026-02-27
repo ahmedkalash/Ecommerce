@@ -10,7 +10,6 @@ class UserService
      * Check if a user is banned.
      *
      * @param  string|User  $userOrEmail  Email address or User model instance
-     * @return bool
      */
     public static function isBanned(string|User $userOrEmail): bool
     {
