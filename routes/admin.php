@@ -326,7 +326,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prev
     Route::resource('profile', ProfileController::class);
 
     // Business Settings
-    Route::controller(BusinessSettingsController::class)->group(function () {
+    /* Route::controller(BusinessSettingsController::class)->group(function () {
         Route::post('/business-settings/update', 'update')->name('business_settings.update');
         Route::post(
             '/business-settings/update/activation',
@@ -380,7 +380,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prev
 
         // Header Selection
         Route::post('/select-header', 'select_header')->name('settings.select-header');
-    });
+    }); */
 
     // Currency
     Route::controller(CurrencyController::class)->group(function () {
@@ -709,7 +709,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:admin', 'admin', 'prev
     Route::view('/system/server-status', 'backend.system.server_status')->name('system_server');
     Route::view('/system/import-demo-data', 'backend.system.import_demo_data')->name('import_demo_data');
 
-    Route::post('/import-data', [BusinessSettingsController::class, 'import_data'])->name('import_data');
+    // Route::post('/import-data', [BusinessSettingsController::class, 'import_data'])->name('import_data');
 
     // uploaded files
     Route::resource('/uploaded-files', AizUploadController::class);

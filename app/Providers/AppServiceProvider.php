@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Filament\Forms\Components\Select;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -15,8 +16,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Schema::defaultStringLength(191);
+        Schema::defaultStringLength(255);
         Paginator::useBootstrap();
+
+        Select::configureUsing(function (Select $select) {
+            $select->native(false);
+        });
     }
 
     /**

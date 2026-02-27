@@ -6,9 +6,23 @@ use App\Enums\ShippingType;
 use App\Enums\UserType;
 use App\Enums\VideoProvider;
 use Illuminate\Support\Str;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Data;
 
-readonly class ProductDTO
+class ProductDTO extends Data
 {
+    /*
+     * By default, this package will automatically generate the following rules:
+     * required when a property cannot be null
+     * nullable when a property can be null
+     * numeric when a property type is int
+     * string when a property type is string
+     * boolean when a property type is bool
+     * numeric when a property type is float
+     * array when a property type is array
+     * enum:* when a property type is a native enum
+     * */
+
     /**
      * @param  string  $name  Product name
      * @param  string|null  $slug  Unique slug (auto-generated if null)
@@ -41,7 +55,9 @@ readonly class ProductDTO
      * @param  array<string, mixed>  $extra_attributes  Additional schemaless metadata
      */
     public function __construct(
-        public string $name,
+        #[Max(255)]
+        public readonly string $name,
+        #[Max(255)]
         public ?string $slug = null,
         public array $categories = [],
         public ?int $brand_id = null,

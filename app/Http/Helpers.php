@@ -12,7 +12,6 @@ use App\Models\Attribute;
 use App\Models\AuctionProductBid;
 use App\Models\BlogCategory;
 use App\Models\Brand;
-use App\Models\BusinessSetting;
 use App\Models\Carrier;
 use App\Models\Cart;
 use App\Models\Category;
@@ -1233,14 +1232,22 @@ if (! function_exists('isUnique')) {
 if (! function_exists('get_setting')) {
     function get_setting($key, $default = null, $lang = false)
     {
+        // Try Spatie Settings Bridge first for migrated settings
+        if (class_exists(\App\Settings\SpatieSettingsBridge::class)) {
+            $mappedValue = \App\Settings\SpatieSettingsBridge::get($key);
+            if ($mappedValue !== null) {
+                return $mappedValue;
+            }
+        }
+
         $settings = Cache::remember('business_settings', 86400, function () {
-            return BusinessSetting::all();
+            return App\Models\BusinessSetting::all();
         });
 
         if ($lang == false) {
             $setting = $settings->where('type', $key)->first();
         } else {
-            $setting = $settings->where('type', $key)->where('lang', $lang)->first();
+            $setting = $settings->where('type', $key)->where('lang', env('DEFAULT_LANGUAGE'))->first();
             $setting = ! $setting ? $settings->where('type', $key)->first() : $setting;
         }
 
