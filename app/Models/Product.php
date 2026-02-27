@@ -28,7 +28,6 @@ class Product extends Model implements HasMedia
         'published',
         'approved',
         'featured',
-        // 'seller_featured', 'todays_deal', 'cash_on_delivery', 'unit', 'min_qty' removed
         'shipping_type',
         'shipping_cost',
         'est_shipping_days',
@@ -101,6 +100,9 @@ class Product extends Model implements HasMedia
         }
         foreach (array_keys($this->getTranslations('meta_title')) as $locale) {
             $data["meta_title_{$locale}"] = $this->getTranslation('meta_title', $locale, false);
+        }
+        foreach (array_keys($this->getTranslations('meta_description')) as $locale) {
+            $data["meta_description_{$locale}"] = $this->getTranslation('meta_description', $locale, false);
         }
 
         return $data;
