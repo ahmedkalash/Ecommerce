@@ -80,7 +80,7 @@
                                 </ul>
                             </div>
                         @endif
-                        <form action="{{ route('colors.store') }}" method="POST">
+                        <form action="{{ (Route::has('colors.store') ? route('colors.store') : '#') }}" method="POST">
                             @csrf
                             <div class="form-group mb-3">
                                 <label for="name">{{ translate('Name') }}</label>
@@ -130,7 +130,7 @@
                 var value = 0;
             }
             
-            $.post('{{ route('business_settings.update.activation') }}', {_token:'{{ csrf_token() }}', type:type, value:value}, function(data){
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {_token:'{{ csrf_token() }}', type:type, value:value}, function(data){
                 if(data == 1){
                     AIZ.plugins.notify('success', '{{ translate('Settings updated successfully') }}');
                 }

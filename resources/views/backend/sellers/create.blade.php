@@ -4,7 +4,7 @@
 @if (env('MAIL_USERNAME') == null && env('MAIL_PASSWORD') == null)
     <div class="alert alert-info d-flex align-items-center">
         {{ translate('You need to configure SMTP correctly to to add Seller.') }}
-        <a class="alert-link ml-2" href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+        <a class="alert-link ml-2" href="{{ (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') }}">{{ translate('Configure Now') }}</a>
     </div>
 @endif
 

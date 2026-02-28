@@ -301,7 +301,7 @@
                         </g>
                     </svg>
                     <p class="mt-3 mb-3 fs-16 fw-700">{{translate('Are you sure you want to locate this Custom Alert?')}}</p>
-                    <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="types[]" value="custom_alert_location">
                         <input type="hidden" name="custom_alert_location" value="">

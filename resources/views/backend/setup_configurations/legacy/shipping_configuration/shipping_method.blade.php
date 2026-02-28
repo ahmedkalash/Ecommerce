@@ -7,10 +7,10 @@
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center pb-3 mx-4">
                 <h5 class="mb-2 mb-lg-0 font-weight-bold">{{ translate('Select Shipping Method') }}</h5>
                 <a class="font-weight-bold"
-                   href="{{route('shipping_configuration.index')}}">{{ translate('Go to Shipping Configuration Page') }}</a>
+                   href="{{(Route::has('shipping_configuration.index') ? route('shipping_configuration.index') : '#')}}">{{ translate('Go to Shipping Configuration Page') }}</a>
             </div>
 
-            <form action="{{ route('shipping_configuration.update') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ (Route::has('shipping_configuration.update') ? route('shipping_configuration.update') : '#') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="type" value="shipping_type">
 

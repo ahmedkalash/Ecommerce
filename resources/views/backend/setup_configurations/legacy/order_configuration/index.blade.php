@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <h5 class="mb-0 h6">{{translate('Minimum Order Amount Settings')}}</h5>
                 </div>
-                <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     <div class="card-body">
                         @csrf
                         <div class="form-group row">

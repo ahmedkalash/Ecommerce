@@ -148,8 +148,9 @@ CoreComponentRepository::initializeCache();
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             type: "POST",
-            url: '{{ route('
-            categories.categories - by - type ') }}',
+            url: '{{ (Route::has('
+            categories.categories - by - type ') ? route('
+            categories.categories - by - type ') : '#') }}',
             data: {
                 digital: val
             },

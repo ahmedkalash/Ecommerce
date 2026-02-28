@@ -8,7 +8,7 @@
                     <h3 class="mb-0 h6">{{translate('Google reCAPTCHA Setting')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('google_recaptcha.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('google_recaptcha.update') ? route('google_recaptcha.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-md-4">
@@ -237,7 +237,7 @@
 
             var value = ($(el).is(':checked')) ? 1 : 0;
 
-            $.post('{{ route('business_settings.update.activation') }}', {
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 type: type,
                 value: value

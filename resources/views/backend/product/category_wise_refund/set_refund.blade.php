@@ -16,7 +16,7 @@
         @if(get_setting('refund_type') != 'category_based_refund')
             <div class="alert alert-info mt-2 text-center">
                 <p class="pt-3 font-weight-bold text-danger">{{ translate(' Category Based Refund is not Activated, Active ') }}
-                    <a href="{{ route('refund_time_config') }}">{{ translate('Here') }}</a>
+                    <a href="{{ (Route::has('refund_time_config') ? route('refund_time_config') : '#') }}">{{ translate('Here') }}</a>
                 </p>
             </div>
         @endif
@@ -187,7 +187,7 @@
             $(this).prop('disabled', true).text('{{ translate('Saving...') }}');
 
             $.ajax({
-                url: '{{ route('categories.update-refund-settings') }}',
+                url: '{{ (Route::has('categories.update-refund-settings') ? route('categories.update-refund-settings') : '#') }}',
                 type: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',

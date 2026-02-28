@@ -8,7 +8,7 @@
                     <h5 class="mb-0 h6">{{translate('Facebook Chat Setting')}}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('facebook_chat.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('facebook_chat.update') ? route('facebook_chat.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-md-3">

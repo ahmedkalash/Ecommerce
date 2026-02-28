@@ -18,6 +18,7 @@ class CategoryManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
         $this->admin = User::factory()->create(['user_type' => 'admin']);
     }
 
@@ -50,11 +51,10 @@ class CategoryManagementTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('categories', [
-            'name' => 'New Filament Category',
-            'slug' => 'new-filament-category',
-            'featured' => 1,
-        ]);
+        $category = Category::where('slug', 'new-filament-category')->first();
+        $this->assertNotNull($category);
+        $this->assertEquals('New Filament Category', $category->name);
+        $this->assertEquals(1, $category->featured);
     }
 
     /** @test */
@@ -72,10 +72,8 @@ class CategoryManagementTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
-            'name' => 'Updated Filament Name',
-        ]);
+        $category->refresh();
+        $this->assertEquals('Updated Filament Name', $category->name);
     }
 
     /** @test */

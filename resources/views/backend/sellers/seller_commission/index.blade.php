@@ -23,7 +23,7 @@
                 <div class="card-header">
                     <h3 class="mb-0 h6 text-center">{{translate('Commission Type')}}</h3>
                 </div>
-                <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="types[]" value="seller_commission_type">
                     <div class="card-body">
@@ -53,7 +53,7 @@
                   <h5 class="mb-0 h6">{{translate('Withdraw Seller Amount')}}</h5>
               </div>
               <div class="card-body">
-                  <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                  <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                   	@csrf
                     <div class="form-group row">
                         <label class="col-md-4 col-from-label">{{translate('Minimum Seller Amount Withdraw')}}</label>
@@ -80,7 +80,7 @@
                     <h5 class="mb-0 h6">{{translate('Fixed Commission Rate')}}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                    <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group row">
                             <label class="col-md-4 col-from-label">{{translate('Seller Commission')}}</label>
@@ -147,7 +147,7 @@
                 var value = 0;
             }
 
-            $.post('{{ route('business_settings.update.activation') }}', {_token:'{{ csrf_token() }}', type:type, value:value}, function(data){
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {_token:'{{ csrf_token() }}', type:type, value:value}, function(data){
                 if(data == 1){
                     AIZ.plugins.notify('success', '{{ translate('Settings updated successfully') }}');
                     toggleCommissionInputs(value);

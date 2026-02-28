@@ -11,7 +11,7 @@
                         <h5 class="mb-0 h6">{{ translate('Default Language') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('env_key_update.update') }}" method="POST">
+                        <form class="form-horizontal" action="{{ (Route::has('env_key_update.update') ? route('env_key_update.update') : '#') }}" method="POST">
                             @csrf
                             <div class="form-group row">
                                 <div class="col-lg-3">
@@ -41,7 +41,7 @@
                         <h5 class="mb-0 h6">{{ translate('Import App Translations') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('app-translations.import') }}" method="POST" enctype="multipart/form-data">
+                        <form class="form-horizontal" action="{{ (Route::has('app-translations.import') ? route('app-translations.import') : '#') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="form-group row">
                                 <div class="col-lg-3">
@@ -93,7 +93,7 @@
 <div class="aiz-titlebar text-left mt-2 mb-3">
 	<div class="align-items-center">
 		<div class="text-md-right">
-			<a href="{{ route('languages.create') }}" class="btn btn-circle btn-info">
+			<a href="{{ (Route::has('languages.create') ? route('languages.create') : '#') }}" class="btn btn-circle btn-info">
 				<span>{{translate('Add New Language')}}</span>
 			</a>
 		</div>
@@ -183,7 +183,7 @@
             else{
                 var status = 0;
             }
-            $.post('{{ route('languages.update_rtl_status') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
+            $.post('{{ (Route::has('languages.update_rtl_status') ? route('languages.update_rtl_status') : '#') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
                 if(data == 1){
                     location.reload();
                 }
@@ -205,7 +205,7 @@
             else{
                 var status = 0;
             }
-            $.post('{{ route('languages.update-status') }}', {
+            $.post('{{ (Route::has('languages.update-status') ? route('languages.update-status') : '#') }}', {
                     _token : '{{ csrf_token() }}',
                     id : el.value,
                     status : status

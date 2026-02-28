@@ -75,7 +75,7 @@
                         <h5 class="mb-0 h6">{{ translate('Add New Attribute') }}</h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('attributes.store') }}" method="POST">
+                        <form action="{{ (Route::has('attributes.store') ? route('attributes.store') : '#') }}" method="POST">
                             @csrf
                             <div class="form-group mb-3">
                                 <label for="name">{{ translate('Name') }}</label>

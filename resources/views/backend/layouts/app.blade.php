@@ -1,5 +1,5 @@
 <!doctype html>
-@if (\App\Models\Language::where('code', Session::get('locale', Config::get('app.locale')))->first()->rtl == 1)
+@if (optional(\App\Models\Language::where('code', Session::get('locale', Config::get('app.locale')))->first())->rtl == 1)
     <html dir="rtl" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     @else
         <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -28,7 +28,7 @@
 
             <!-- aiz core css -->
             <link rel="stylesheet" href="{{ static_asset('assets/css/vendors.css') }}">
-            @if (\App\Models\Language::where('code', Session::get('locale', Config::get('app.locale')))->first()->rtl == 1)
+            @if (optional(\App\Models\Language::where('code', Session::get('locale', Config::get('app.locale')))->first())->rtl == 1)
                 <link rel="stylesheet" href="{{ static_asset('assets/css/bootstrap-rtl.min.css') }}">
             @endif
             <link rel="stylesheet" href="{{ static_asset('assets/css/aiz-core.css?v=') }}{{ rand(1000,9999) }}">
@@ -175,7 +175,7 @@
                         e.preventDefault();
                         var $this = $(this);
                         var locale = $this.data('flag');
-                        $.post('{{ route('language.change') }}', {
+                        $.post('{{ (Route::has('language.change') ? route('language.change') : '#') }}', {
                             _token: '{{ csrf_token() }}',
                             locale: locale
                         }, function (data) {

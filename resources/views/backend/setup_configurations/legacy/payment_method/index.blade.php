@@ -60,7 +60,7 @@
                 var value = 0;
             }
 
-            $.post('{{ route('payment.activation') }}', {
+            $.post('{{ (Route::has('payment.activation') ? route('payment.activation') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 id: id,
                 value: value
@@ -86,7 +86,7 @@
                 var value = 0;
             }
 
-            $.post('{{ route('business_settings.update.activation') }}', {
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 type: type,
                 value: value

@@ -8,7 +8,7 @@
                     <h5 class="mb-0 h6">{{translate('SMTP Settings')}}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('env_key_update.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('env_key_update.update') ? route('env_key_update.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <input type="hidden" name="types[]" value="MAIL_DRIVER">

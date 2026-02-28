@@ -37,7 +37,7 @@
     						<h6 class="mb-0">{{ translate('Footer Info Widget') }}</h6>
     					</div>
     					<div class="card-body">
-                            <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
 								<!-- Title -->
     							<div class="form-group">
@@ -67,7 +67,7 @@
     						<h6 class="mb-0">{{ translate('About Widget') }}</h6>
     					</div>
     					<div class="card-body">
-    						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+    						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
     							@csrf
 								<!-- Footer Logo -->
     							<div class="form-group">
@@ -119,7 +119,7 @@
     						<h6 class="mb-0">{{ translate('Contact Info Widget') }}</h6>
     					</div>
     					<div class="card-body">
-                            <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
     							@csrf
 								<!-- Contact address -->
                                 <div class="form-group">
@@ -155,7 +155,7 @@
     						<h6 class="mb-0">{{ translate('Link Widget One') }}</h6>
     					</div>
     					<div class="card-body">
-                            <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
 								<!-- Title -->
     							<div class="form-group">
@@ -240,7 +240,7 @@
     	<div class="card-header">
     		<h6 class="fw-600 mb-0">{{ translate('Footer Bottom') }}</h6>
     	</div>
-        <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
             @csrf
            <div class="card-body">
 				<!-- Copyright Widget -->

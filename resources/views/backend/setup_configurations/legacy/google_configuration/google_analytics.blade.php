@@ -8,7 +8,7 @@
                     <h5 class="mb-0 h6">{{ translate('Facebook Pixel Setting') }}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('facebook_pixel.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('facebook_pixel.update') ? route('facebook_pixel.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-lg-3">
@@ -71,7 +71,7 @@
                     <h5 class="mb-0 h6">{{translate('Google Analytics Setting')}}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('google_analytics.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('google_analytics.update') ? route('google_analytics.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-lg-3">

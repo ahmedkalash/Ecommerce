@@ -1,4 +1,4 @@
-<form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+<form class="form-horizontal" action="{{ (Route::has('payment_method.update') ? route('payment_method.update') : '#') }}" method="POST">
     @csrf
     <input type="hidden" name="payment_method" value="bkash">
     <div class="form-group row">

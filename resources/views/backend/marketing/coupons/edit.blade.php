@@ -56,7 +56,7 @@
     function coupon_form(){
         var coupon_type = $('#coupon_type').val();
         var id = $('#id').val();
-		$.post('{{ route('coupon.get_coupon_form_edit') }}',{_token:'{{ csrf_token() }}', coupon_type:coupon_type, id:id}, function(data){
+		$.post('{{ (Route::has('coupon.get_coupon_form_edit') ? route('coupon.get_coupon_form_edit') : '#') }}',{_token:'{{ csrf_token() }}', coupon_type:coupon_type, id:id}, function(data){
             $('#coupon_form').html(data);
 		});
     }

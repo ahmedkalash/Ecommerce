@@ -39,7 +39,7 @@
                 <div class="aiz-topbar-item mr-3">
                     <div class="d-flex align-items-center">
                         <a class="btn btn-topbar has-transition btn-icon btn-circle btn-light p-0 hov-bg-primary hov-svg-white d-flex align-items-center justify-content-center"
-                           href="{{ route('poin-of-sales.index') }}" target="_blank" data-toggle="tooltip"
+                           href="{{ (Route::has('poin-of-sales.index') ? route('poin-of-sales.index') : '#') }}" target="_blank" data-toggle="tooltip"
                            data-title="{{ translate('POS') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="13.79" height="16" viewBox="0 0 13.79 16">
                                 <g id="_371925cdd3f531725a9fa8f3ebf8fe9e" data-name="371925cdd3f531725a9fa8f3ebf8fe9e"
@@ -85,7 +85,7 @@
                     @endcan
                     @if (addon_is_activated('preorder'))
                         <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['all_orders.index']) }}"
-                           href="{{ route('all_preorder.list') }}">{{ translate('Preorders') }}</a>
+                           href="{{ (Route::has('all_preorder.list') ? route('all_preorder.list') : '#') }}">{{ translate('Preorders') }}</a>
                     @endif
                     @can('earning_report')
                         <a class="aiz-topbar-menu fs-13 fw-600 d-flex align-items-center justify-content-center {{ areActiveRoutes(['earning_payout_report.index']) }}"

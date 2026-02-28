@@ -74,3 +74,5 @@ _ide_helper.php
 /app/Livewire/
 /resources/views/livewire/
 /resources/views/test.blade.php
+/fastkart-theme/
+/fastkart-template/

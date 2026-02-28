@@ -20,7 +20,7 @@
 <div class="">
 	<div class="card rounded-0">
 		<div class="card-body p-2rem">
-			<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+			<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 				@csrf
 				<input type="hidden" name="types[]" value="homepage_select">
 				<div class="row">

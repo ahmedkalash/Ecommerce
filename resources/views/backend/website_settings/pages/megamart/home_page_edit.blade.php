@@ -180,7 +180,7 @@
 
 					<!-- Home Slider -->
 					<div class="tab-pane fade" id="home_slider" role="tabpanel" aria-labelledby="home-slider-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="home_slider">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_slider_images">
@@ -336,7 +336,7 @@
 
 					<!-- Flash Deals -->
 					<div class="tab-pane fade" id="flash_deals" role="tabpanel" aria-labelledby="flash-deals-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="flash_deals">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -400,7 +400,7 @@
 
 					<!-- Today's Deal -->
 					<div class="tab-pane fade" id="todays_deal" role="tabpanel" aria-labelledby="todays-deal-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="todays_deal">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -514,7 +514,7 @@
 
 					<!-- Banner Level 1 -->
 					<div class="tab-pane fade" id="banner_1" role="tabpanel" aria-labelledby="banner-1-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_1">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner1_images">
@@ -624,7 +624,7 @@
 
 					<!-- Preorder Banner 1 -->
 					<div class="tab-pane fade" id="preorder_banner_1" role="tabpanel" aria-labelledby="preorder-banner-2-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="preorder_banner_1">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_preorder_banner_1_images">
@@ -734,7 +734,7 @@
 
 					<!-- Banner Level 2 -->
 					<div class="tab-pane fade" id="banner_2" role="tabpanel" aria-labelledby="banner-2-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_2">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner2_images">
@@ -844,7 +844,7 @@
 
 					<!-- Banner Level 3 -->
 					<div class="tab-pane fade" id="banner_3" role="tabpanel" aria-labelledby="banner-3-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_3">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner3_images">
@@ -954,7 +954,7 @@
 
 					<!-- Banner Level 4 -->
 					<div class="tab-pane fade" id="banner_4" role="tabpanel" aria-labelledby="banner-4-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_4">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner4_images">
@@ -1064,7 +1064,7 @@
 
 					<!-- Top Brands -->
 					<div class="tab-pane fade" id="brands" role="tabpanel" aria-labelledby="brands-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="brands">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -1090,7 +1090,7 @@
 
 					<!-- Banner Level 5 -->
 					<div class="tab-pane fade" id="banner_5" role="tabpanel" aria-labelledby="banner-5-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_5">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner5_images">
@@ -1200,7 +1200,7 @@
 
 					<!-- Banner Level 6 -->
 					<div class="tab-pane fade" id="banner_6" role="tabpanel" aria-labelledby="banner-6-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="banner_6">
 							<input type="hidden" name="types[][{{ $lang }}]" value="home_banner6_images">
@@ -1311,7 +1311,7 @@
 					@if(addon_is_activated('auction'))
 					<!-- Auction Banner -->
 					<div class="tab-pane fade" id="auction" role="tabpanel" aria-labelledby="auction-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="auction">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -1344,7 +1344,7 @@
 					@if(get_setting('coupon_system') == 1)
 					<!-- Coupon system -->
 					<div class="tab-pane fade" id="coupon" role="tabpanel" aria-labelledby="coupon-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="coupon">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -1395,7 +1395,7 @@
 
 					<!-- Classifieds -->
 					<div class="tab-pane fade" id="classifieds" role="tabpanel" aria-labelledby="classifieds-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="classifieds">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -1420,7 +1420,7 @@
 					</div>
 					<!-- newestPreorder -->
 					<div class="tab-pane fade" id="newestPreorder" role="tabpanel" aria-labelledby="newestPreorder-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="newestPreorder">
 							<div class="bg-white p-3 p-sm-2rem">
@@ -1446,7 +1446,7 @@
 
 					<!-- Featured Preorder -->
 					<div class="tab-pane fade" id="featuredPreorder" role="tabpanel" aria-labelledby="banner-1-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="featuredPreorder">
 							<input type="hidden" name="types[][{{ $lang }}]" value="featuredPreorder_images">
@@ -1556,7 +1556,7 @@
 
 					<!-- Category Wise Products -->
 					<div class="tab-pane fade" id="home_categories" role="tabpanel" aria-labelledby="home-categories-tab">
-						<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+						<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 							@csrf
 							<input type="hidden" name="tab" value="home_categories">
 							<div class="bg-white p-3 p-sm-2rem">

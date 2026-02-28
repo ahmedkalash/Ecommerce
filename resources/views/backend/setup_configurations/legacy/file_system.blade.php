@@ -9,7 +9,7 @@
                     <h3 class="fs-18 mb-0 text-center">{{translate('S3 File System Credentials')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('payment_method.update') ? route('payment_method.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <input type="hidden" name="types[]" value="AWS_ACCESS_KEY_ID">
@@ -79,7 +79,7 @@
                     <h3 class="fs-18 mb-0 text-center">{{translate('Backblaze File System Credentials')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('payment_method.update') ? route('payment_method.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <input type="hidden" name="types[]" value="BACKBLAZE_ACCESS_KEY_ID">
@@ -205,7 +205,7 @@
                     <h3 class="fs-18 mb-0 text-center">{{translate('Cache & Session Driver')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('payment_method.update') ? route('payment_method.update') : '#') }}" method="POST">
                         <input type="hidden" name="payment_method" value="paypal">
                         @csrf
                         <div class="form-group row">
@@ -251,7 +251,7 @@
                     <h3 class="fs-18 mb-0 text-center">{{translate('Redis Configuration (If you use redis as any of the drivers)')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('payment_method.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('payment_method.update') ? route('payment_method.update') : '#') }}" method="POST">
                         <input type="hidden" name="payment_method" value="paypal">
                         @csrf
                         <div class="form-group row">
@@ -321,7 +321,7 @@
             }
 
 
-            $.post('{{ route('business_settings.update.activation') }}', {
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 type: type,
                 value: value_type

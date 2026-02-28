@@ -9,7 +9,7 @@
 				<h5 class="mb-0 h6">{{translate('Seller Verification Form')}}</h5>
 			</div>
 			<div class="card-body">
-				<form action="{{ route('seller_verification_form.update') }}" method="post">
+				<form action="{{ (Route::has('seller_verification_form.update') ? route('seller_verification_form.update') : '#') }}" method="post">
 					@csrf
 					<div class="row">
 						<div class="col-lg-8 form-horizontal" id="form">

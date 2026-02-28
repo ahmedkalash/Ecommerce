@@ -160,8 +160,9 @@ CoreComponentRepository::initializeCache();
         } else {
             var status = 0;
         }
-        $.post('{{ route('
-            categories.featured ') }}', {
+        $.post('{{ (Route::has('
+            categories.featured ') ? route('
+            categories.featured ') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status

@@ -13,7 +13,7 @@
                     <h3 class="mb-0 h6">{{ translate('Google Map Setting') }}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('google-map.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('google-map.update') ? route('google-map.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-md-4">
@@ -73,7 +73,7 @@
                         <h3 class="mb-0 h6">{{ translate('Default Location Setting') }}</h3>
                     </div>
                     <div class="card-body">
-                        <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST"
+                        <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST"
                               enctype="multipart/form-data">
                             @csrf
 

@@ -10,7 +10,7 @@
                 <h5 class="mb-0 h6">{{translate('System Default Currency')}}</h5>
             </div>
             <div class="card-body">
-                <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST">
+                <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST">
                     @csrf
                     <div class="form-group row">
                         <div class="col-lg-3">
@@ -41,7 +41,7 @@
                 <h5 class="mb-0 h6">{{translate('Set Currency Formats')}}</h5>
             </div>
             <div class="card-body">
-                <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST">
+                <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST">
                     @csrf
                     <div class="form-group row">
                         <input type="hidden" name="types[]" value="symbol_format">

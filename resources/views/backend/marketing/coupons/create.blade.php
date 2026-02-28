@@ -8,7 +8,7 @@
                 <h5 class="mb-0 h6">{{translate('Coupon Information Adding')}}</h5>
             </div>
             <div class="card-body">
-              <form class="form-horizontal" action="{{ route('coupon.store') }}" method="POST" enctype="multipart/form-data">
+              <form class="form-horizontal" action="{{ (Route::has('coupon.store') ? route('coupon.store') : '#') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -49,7 +49,7 @@
 
     function coupon_form(){
         var coupon_type = $('#coupon_type').val();
-		$.post('{{ route('coupon.get_coupon_form') }}',{_token:'{{ csrf_token() }}', coupon_type:coupon_type}, function(data){
+		$.post('{{ (Route::has('coupon.get_coupon_form') ? route('coupon.get_coupon_form') : '#') }}',{_token:'{{ csrf_token() }}', coupon_type:coupon_type}, function(data){
             $('#coupon_form').html(data);
 		});
     }

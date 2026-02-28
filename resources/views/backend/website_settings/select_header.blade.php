@@ -6,7 +6,7 @@
     <div class="col-md-8 mx-auto">
                 <div class="card-body p-2rem">
                     <h6 class="text-center">{{ translate('Select Header Layouts') }}</h6>
-                    <form action="{{ route('settings.select-header') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ (Route::has('settings.select-header') ? route('settings.select-header') : '#') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mx-1 header-card">

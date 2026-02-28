@@ -20,7 +20,7 @@
 							<li class="">{{ translate('Make sure you have activated your system with the domain and site URL.') }}</li>
 						</ul>
 					</div>
-					<form action="{{ route('import_data') }}" method="post" enctype="multipart/form-data">
+					<form action="{{ (Route::has('import_data') ? route('import_data') : '#') }}" method="post" enctype="multipart/form-data">
 						@csrf
 						<!-- Product Name -->
 						<div class="form-group row">

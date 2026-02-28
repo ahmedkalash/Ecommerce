@@ -11,6 +11,12 @@ class CategoryRefactorTest extends TestCase
 {
     use DatabaseTransactions;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        app()->setLocale('en');
+    }
+
     /**
      * Test product category relationship via pivot table.
      */
@@ -18,13 +24,15 @@ class CategoryRefactorTest extends TestCase
     {
         // 1. Create Categories
         $cat1 = Category::create([
+            'name' => 'Cat 1',
             'parent_id' => null,
             'slug' => 'cat-1',
-            'digital' => 0, // Assuming required field based on Service
-        ]); // Use minimal fields or factory if available?
+            'digital' => 0,
+        ]);
         // Let's assume minimal fields work or use raw create.
 
         $cat2 = Category::create([
+            'name' => 'Cat 2',
             'parent_id' => $cat1->id,
             'slug' => 'cat-2',
             'digital' => 0,
@@ -62,8 +70,8 @@ class CategoryRefactorTest extends TestCase
      */
     public function test_product_category_sync()
     {
-        $cat1 = Category::create(['slug' => 'sync-1', 'digital' => 0]);
-        $cat2 = Category::create(['slug' => 'sync-2', 'digital' => 0]);
+        $cat1 = Category::create(['name' => 'Sync 1', 'slug' => 'sync-1', 'digital' => 0]);
+        $cat2 = Category::create(['name' => 'Sync 2', 'slug' => 'sync-2', 'digital' => 0]);
 
         $product = Product::factory()->create([
             'name' => 'Sync Product',

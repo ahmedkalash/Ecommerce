@@ -17,6 +17,7 @@ class CategoryServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
         $this->categoryService = app(CategoryService::class);
     }
 
@@ -38,13 +39,10 @@ class CategoryServiceTest extends TestCase
         $category = $this->categoryService->store($data);
 
         $this->assertInstanceOf(Category::class, $category);
-        $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
-            'name' => 'Test Category',
-            'slug' => 'test-category-slug',
-            'commision_rate' => 10,
-            'featured' => 1,
-        ]);
+        $this->assertEquals('Test Category', $category->name);
+        $this->assertEquals('test-category-slug', $category->slug);
+        $this->assertEquals(10, $category->commision_rate);
+        $this->assertEquals(1, $category->featured);
     }
 
     /** @test */

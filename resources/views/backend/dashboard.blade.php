@@ -8,7 +8,7 @@
             <div class="alert alert-info d-flex align-items-center">
                 {{ translate('Please Configure SMTP Setting to work all email sending functionality') }},
                 <a class="alert-link ml-2"
-                   href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+                   href="{{ (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') }}">{{ translate('Configure Now') }}</a>
             </div>
         </div>
     @endif
@@ -338,7 +338,7 @@
                                         <img src="{{ static_asset('assets/img/multivendor.jpg') }}"
                                              alt="{{ translate('multivendor') }}" class="h-100 img-fit">
                                     </div>
-                                    <a href="{{ route('activation.index') }}"
+                                    <a href="{{ (Route::has('activation.index') ? route('activation.index') : '#') }}"
                                        class="mt-4 fs-13 fw-600 text-info hov-text-primary animate-underline-primary">
                                         {{ translate('Activate Vendor System') }}
                                     </a>

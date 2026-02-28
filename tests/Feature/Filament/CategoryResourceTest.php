@@ -20,6 +20,7 @@ class CategoryResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
 
         // 1. Create user and Admin model
         $user = User::factory()->create([
@@ -72,11 +73,10 @@ class CategoryResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('categories', [
-            'name' => 'Electronics',
-            'slug' => 'electronics',
-            'featured' => 1,
-        ]);
+        $category = Category::where('slug', 'electronics')->first();
+        $this->assertNotNull($category);
+        $this->assertEquals('Electronics', $category->name);
+        $this->assertEquals(1, $category->featured);
     }
 
     public function test_category_slug_must_be_unique_on_create()
@@ -111,11 +111,9 @@ class CategoryResourceTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
-            'name' => 'Updated Category Name',
-            'slug' => 'old-slug', // Slug usually unaffected, but can be updated.
-        ]);
+        $category->refresh();
+        $this->assertEquals('Updated Category Name', $category->name);
+        $this->assertEquals('old-slug', $category->slug);
     }
 
     public function test_can_delete_a_category()
@@ -145,9 +143,9 @@ class CategoryResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('categories', [
-            'name' => 'Child Cat',
-            'parent_id' => $parentCategory->id,
-        ]);
+        $category = Category::where('slug', 'child-cat')->first();
+        $this->assertNotNull($category);
+        $this->assertEquals('Child Cat', $category->name);
+        $this->assertEquals($parentCategory->id, $category->parent_id);
     }
 }

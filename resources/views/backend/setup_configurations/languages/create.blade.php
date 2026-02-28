@@ -8,7 +8,7 @@
                 <h5 class="mb-0 h6">{{translate('Language Information')}}</h5>
             </div>
             <div class="card-body">
-                <form class="form-horizontal" action="{{ route('languages.store') }}" method="POST" enctype="multipart/form-data">
+                <form class="form-horizontal" action="{{ (Route::has('languages.store') ? route('languages.store') : '#') }}" method="POST" enctype="multipart/form-data">
                 	@csrf
                     <div class="form-group row">
                         <div class="col-lg-3">

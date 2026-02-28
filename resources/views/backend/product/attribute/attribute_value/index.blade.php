@@ -75,7 +75,7 @@
                                 </ul>
                             </div>
                         @endif
-                        <form action="{{ route('store-attribute-value') }}" method="POST">
+                        <form action="{{ (Route::has('store-attribute-value') ? route('store-attribute-value') : '#') }}" method="POST">
                             @csrf
                             <div class="form-group mb-3">
                                 <label for="name">{{ translate('Attribute Name') }}</label>

@@ -7,7 +7,7 @@
     <div class="">
         <div class="alert alert-info d-flex align-items-center">
             {{ translate('Please Configure SMTP Setting to work all email sending functionality') }},
-            <a class="alert-link ml-2" href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+            <a class="alert-link ml-2" href="{{ (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') }}">{{ translate('Configure Now') }}</a>
         </div>
     </div>
 @endif

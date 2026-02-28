@@ -8,7 +8,7 @@
 		</div>
         @can('add_coupon')
             <div class="col-md-6 text-md-right">
-                <a href="{{ route('coupon.create') }}" class="btn btn-circle btn-info">
+                <a href="{{ (Route::has('coupon.create') ? route('coupon.create') : '#') }}" class="btn btn-circle btn-info">
                     <span>{{translate('Add New Coupon')}}</span>
                 </a>
             </div>
@@ -93,7 +93,7 @@
             else{
                 var status = 0;
             }
-            $.post('{{ route('coupon.update_status') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
+            $.post('{{ (Route::has('coupon.update_status') ? route('coupon.update_status') : '#') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
                 if(data == 1){
                     AIZ.plugins.notify('success', '{{ translate('Coupon Status updated successfully') }}');
                 }

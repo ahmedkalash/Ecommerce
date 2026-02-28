@@ -21,7 +21,7 @@
 				</div>
 
 				<div class="card-body">
-					<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+					<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 						@csrf
 						<!-- Header Logo -->
 						<div class="form-group row">

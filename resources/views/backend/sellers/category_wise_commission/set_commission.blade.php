@@ -19,11 +19,11 @@
                 get that commission unless you change individually.</p>
             @if (get_setting('category_wise_commission') != 1)
                 <p class="font-weight-bold text-danger">{{ translate('Commission Type is not Category Based, set commission type ') }}
-                    <a href="{{ route('business_settings.vendor_commission') }}">{{ translate('Here') }}</a></p>
+                    <a href="{{ (Route::has('business_settings.vendor_commission') ? route('business_settings.vendor_commission') : '#') }}">{{ translate('Here') }}</a></p>
             @endif
             @if (get_setting('vendor_commission_activation') != 1)
                 <p class="font-weight-bold text-danger">{{ translate(' Seller Commission is not Activated, Active ') }}
-                    <a href="{{ route('business_settings.vendor_commission') }}">{{ translate('Here') }}</a></p>
+                    <a href="{{ (Route::has('business_settings.vendor_commission') ? route('business_settings.vendor_commission') : '#') }}">{{ translate('Here') }}</a></p>
             @endif
         </div>
 

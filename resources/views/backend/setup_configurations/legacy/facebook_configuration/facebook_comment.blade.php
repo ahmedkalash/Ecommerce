@@ -8,7 +8,7 @@
                     <h5 class="mb-0 h6">{{translate('Facebook Comment Setting')}}</h5>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('facebook-comment.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('facebook-comment.update') ? route('facebook-comment.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-md-5">

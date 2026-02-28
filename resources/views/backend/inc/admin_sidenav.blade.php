@@ -84,7 +84,7 @@
                         <ul class="aiz-side-nav-list level-2">
                             @can('pos_manager')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('poin-of-sales.index')}}"
+                                    <a href="{{(Route::has('poin-of-sales.index') ? (Route::has('poin-of-sales.index') ? route('poin-of-sales.index') : '#') : '#')}}"
                                        class="aiz-side-nav-link {{ areActiveRoutes(['poin-of-sales.index', 'poin-of-sales.create'])}}">
                                         <span class="aiz-side-nav-text">{{translate('POS Manager')}}</span>
                                     </a>
@@ -92,7 +92,7 @@
                             @endcan
                             @can('pos_configuration')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('poin-of-sales.activation')}}" class="aiz-side-nav-link">
+                                    <a href="{{(Route::has('poin-of-sales.activation') ? (Route::has('poin-of-sales.activation') ? route('poin-of-sales.activation') : '#') : '#')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('POS Configuration')}}</span>
                                     </a>
                                 </li>
@@ -240,7 +240,7 @@
 
                             @can('view_product_attributes')
                                 {{-- <li class="aiz-side-nav-item">
-                                            <a href="{{route('attributes.index')}}"
+                                            <a href="{{(Route::has('attributes.index') ? (Route::has('attributes.index') ? route('attributes.index') : '#') : '#')}}"
                                 class="aiz-side-nav-link {{ areActiveRoutes(['attributes.index','attributes.create','attributes.edit','attributes.show','edit-attribute-value'.''])}}">
                                 <span class="aiz-side-nav-text">{{translate('Attribute')}}</span>
                                 </a>
@@ -248,7 +248,7 @@
                             @endcan
                             @can('view_colors')
                                 {{-- <li class="aiz-side-nav-item">
-                                    <a href="{{route('colors')}}"
+                                    <a href="{{(Route::has('colors') ? (Route::has('colors') ? route('colors') : '#') : '#')}}"
                                 class="aiz-side-nav-link {{ areActiveRoutes(['colors','colors.edit'])}}">
                                 <span class="aiz-side-nav-text">{{translate('Colors')}}</span>
                                 </a>
@@ -325,14 +325,14 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('preorder_dashboard')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('preorder.dashboard')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('preorder.dashboard') ? (Route::has('preorder.dashboard') ? route('preorder.dashboard') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Dashboard')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('add_preorder_product')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('preorder-product.create')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('preorder-product.create') ? (Route::has('preorder-product.create') ? route('preorder-product.create') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Add New Preorder products')}}</span>
                                         </a>
@@ -340,7 +340,7 @@
                                 @endcan
                                 @can('view_all_preorder_products')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('preorder-product.index')}}"
+                                        <a href="{{(Route::has('preorder-product.index') ? (Route::has('preorder-product.index') ? route('preorder-product.index') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['preorder-product.edit'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Preorder Products')}}</span>
                                         </a>
@@ -396,7 +396,7 @@
                                             @endphp
                                             @can('view_all_preorders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('all_preorder.list') }}"
+                                                    <a href="{{ (Route::has('all_preorder.list') ? (Route::has('all_preorder.list') ? route('all_preorder.list') : '#') : '#') }}"
                                                        class="aiz-side-nav-link {{ areActiveRoutes(['preorder-order.show'])}} }}">
                                                 <span
                                                         class="aiz-side-nav-text">{{translate('All Orders')}} <span
@@ -406,7 +406,7 @@
                                             @endcan
                                             @can('view_all_inhouse_preorders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('inhouse_preorder.list') }}"
+                                                    <a href="{{ (Route::has('inhouse_preorder.list') ? (Route::has('inhouse_preorder.list') ? route('inhouse_preorder.list') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                                 <span class="aiz-side-nav-text">{{translate('Inhouse Orders')}} <span
                                                             class="badge badge-info ml-1">{{ $inhouse_preorders_count ?: '' }}</span></span>
@@ -415,7 +415,7 @@
                                             @endcan
                                             @can('view_all_seller_preorders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('seller_preorder.list') }}"
+                                                    <a href="{{ (Route::has('seller_preorder.list') ? (Route::has('seller_preorder.list') ? route('seller_preorder.list') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                                 <span
                                                         class="aiz-side-nav-text">{{translate('Seller Orders')}} <span
@@ -425,7 +425,7 @@
                                             @endcan
                                             @can('view_all_delayed_prepayment_preorders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('delayed_prepayment_preorders.list') }}"
+                                                    <a href="{{ (Route::has('delayed_prepayment_preorders.list') ? (Route::has('delayed_prepayment_preorders.list') ? route('delayed_prepayment_preorders.list') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                                 <span class="aiz-side-nav-text">{{translate('Delayed Prepayment')}} <span
                                                             class="badge badge-info ml-1">{{ $delayed_prepayment_preorders_count ?: '' }}</span></span>
@@ -434,7 +434,7 @@
                                             @endcan
                                             @can('view_all_final_preorders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('delayed_final_orders.list') }}"
+                                                    <a href="{{ (Route::has('delayed_final_orders.list') ? (Route::has('delayed_final_orders.list') ? route('delayed_final_orders.list') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                                 <span class="aiz-side-nav-text">{{translate('Delayed Final Orders')}} <span
                                                             class="badge badge-info ml-1">{{ $delayed_final_orders_count ?: '' }}</span></span>
@@ -446,7 +446,7 @@
                                 @endcan
                                 @can('view_preorder_seller_commission_history')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('preorder-commission-history') }}" class="aiz-side-nav-link">
+                                        <a href="{{ (Route::has('preorder-commission-history') ? (Route::has('preorder-commission-history') ? route('preorder-commission-history') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate("Preorder Commission History")}}</span>
                                         </a>
@@ -454,7 +454,7 @@
                                 @endcan
                                 @can('preorder_settings')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('preorder-settings') }}"
+                                        <a href="{{ (Route::has('preorder-settings') ? (Route::has('preorder-settings') ? route('preorder-settings') : '#') : '#') }}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['faqs.create', 'faq.edit'])}}">
                                             <span class="aiz-side-nav-text">{{translate("Preorder Settings")}}</span>
                                         </a>
@@ -466,7 +466,7 @@
                                             $preorderConversation = get_non_viewed_preorder_conversations();
                                         @endphp
                                         <li class="aiz-side-nav-item">
-                                            <a href="{{ route('preorder-conversations.admin_index') }}"
+                                            <a href="{{ (Route::has('preorder-conversations.admin_index') ? (Route::has('preorder-conversations.admin_index') ? route('preorder-conversations.admin_index') : '#') : '#') }}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['preorder-conversations.admin_index','preorder-conversations.admin_show']) }}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Preorder Product Conversation') }}</span>
@@ -481,7 +481,7 @@
                                 @can('view_all_preorder_product_queries')
                                     @if (get_setting('product_query_activation') == 1)
                                         <li class="aiz-side-nav-item">
-                                            <a href="{{ route('preorder.product_query.index') }}"
+                                            <a href="{{ (Route::has('preorder.product_query.index') ? (Route::has('preorder.product_query.index') ? route('preorder.product_query.index') : '#') : '#') }}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['preorder.product_query.index','preorder.product_query.show']) }}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Preorder Product Queries') }}</span>
@@ -491,7 +491,7 @@
                                 @endcan
                                 @can('view_all_preorder_product_reviews')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('preorder.product_reviews.index') }}"
+                                        <a href="{{ (Route::has('preorder.product_reviews.index') ? (Route::has('preorder.product_reviews.index') ? route('preorder.product_reviews.index') : '#') : '#') }}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['preorder.product_detail_reviews']) }}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Preorder Product Reviews') }}</span>
@@ -500,7 +500,7 @@
                                 @endcan
                                 @can('view_all_faqs')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('faqs.index') }}"
+                                        <a href="{{ (Route::has('faqs.index') ? (Route::has('faqs.index') ? route('faqs.index') : '#') : '#') }}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['faqs.create', 'faq.edit'])}}">
                                             <span class="aiz-side-nav-text">{{translate("FAQs")}}</span>
                                         </a>
@@ -508,7 +508,7 @@
                                 @endcan
                                 @can('view_all_preorder_notification_types')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('preorder-notification-types.index') }}"
+                                        <a href="{{ (Route::has('preorder-notification-types.index') ? (Route::has('preorder-notification-types.index') ? route('preorder-notification-types.index') : '#') : '#') }}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['preorder.notification-type.edit'])}}">
                             <span
                                     class="aiz-side-nav-text">{{translate('Preorder Notification Types')}}</span>
@@ -659,7 +659,7 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('add_wholesale_product')
                                     <li class="aiz-side-nav-item">
-                                        <a class="aiz-side-nav-link" href="{{route('wholesale_product_create.admin')}}">
+                                        <a class="aiz-side-nav-link" href="{{(Route::has('wholesale_product_create.admin') ? (Route::has('wholesale_product_create.admin') ? route('wholesale_product_create.admin') : '#') : '#')}}">
                             <span
                                     class="aiz-side-nav-text">{{translate('Add New Wholesale Product')}}</span>
                                         </a>
@@ -676,7 +676,7 @@
                                 @endcan
                                 @can('view_inhouse_wholesale_products')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('wholesale_products.in_house')}}"
+                                        <a href="{{(Route::has('wholesale_products.in_house') ? (Route::has('wholesale_products.in_house') ? route('wholesale_products.in_house') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_edit.admin']) }}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('In House Wholesale Products') }}</span>
@@ -686,7 +686,7 @@
                                 @if (get_setting('vendor_system_activation') == 1)
                                     @can('view_sellers_wholesale_products')
                                         <li class="aiz-side-nav-item">
-                                            <a href="{{route('wholesale_products.seller')}}"
+                                            <a href="{{(Route::has('wholesale_products.seller') ? (Route::has('wholesale_products.seller') ? route('wholesale_products.seller') : '#') : '#')}}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['wholesale_product_edit.admin']) }}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Seller Wholesale Products') }}</span>
@@ -800,21 +800,21 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('view_all_delivery_boy')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boys.index')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('delivery-boys.index') ? (Route::has('delivery-boys.index') ? route('delivery-boys.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('All Delivery Boy')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('add_delivery_boy')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boys.create')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('delivery-boys.create') ? (Route::has('delivery-boys.create') ? route('delivery-boys.create') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Add Delivery Boy')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('delivery_boy_payment_history')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boys-payment-histories')}}"
+                                        <a href="{{(Route::has('delivery-boys-payment-histories') ? (Route::has('delivery-boys-payment-histories') ? route('delivery-boys-payment-histories') : '#') : '#')}}"
                                            class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Payment Histories')}}</span>
                                         </a>
@@ -822,7 +822,7 @@
                                 @endcan
                                 @can('collected_histories_from_delivery_boy')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boys-collection-histories')}}"
+                                        <a href="{{(Route::has('delivery-boys-collection-histories') ? (Route::has('delivery-boys-collection-histories') ? route('delivery-boys-collection-histories') : '#') : '#')}}"
                                            class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Collected Histories')}}</span>
                                         </a>
@@ -830,14 +830,14 @@
                                 @endcan
                                 @can('order_cancle_request_by_delivery_boy')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boy.cancel-request')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('delivery-boy.cancel-request') ? (Route::has('delivery-boy.cancel-request') ? route('delivery-boy.cancel-request') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Cancel Request')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('delivery_boy_configuration')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('delivery-boy-configuration')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('delivery-boy-configuration') ? (Route::has('delivery-boy-configuration') ? route('delivery-boy-configuration') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Configuration')}}</span>
                                         </a>
                                     </li>
@@ -875,7 +875,7 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('view_refund_requests')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('refund_requests_all')}}"
+                                        <a href="{{(Route::has('refund_requests_all') ? (Route::has('refund_requests_all') ? route('refund_requests_all') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['refund_requests_all', 'admin.reason_show'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Refund Requests')}}</span>
                                         </a>
@@ -884,21 +884,21 @@
 
                                 @can('view_approved_refund_requests')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('paid_refund')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('paid_refund') ? (Route::has('paid_refund') ? route('paid_refund') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Approved Refunds')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('view_rejected_refund_requests')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('rejected_refund')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('rejected_refund') ? (Route::has('rejected_refund') ? route('rejected_refund') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Rejected Refunds')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('refund_request_configuration')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('refund_time_config')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('refund_time_config') ? (Route::has('refund_time_config') ? route('refund_time_config') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Refund Configuration')}}</span>
                                         </a>
                                     </li>
@@ -906,7 +906,7 @@
 
                                 @can('set_category_wise_refund')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('categories_wise_product_refund')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('categories_wise_product_refund') ? (Route::has('categories_wise_product_refund') ? route('categories_wise_product_refund') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Category Based Refund')}}</span>
                                         </a>
@@ -1024,14 +1024,14 @@
                                         </a>
                                     </li>
                                 @endcan
-                                @can('seller_commission_configuration')
+{{--                                 @can('seller_commission_configuration')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('business_settings.vendor_commission') }}"
+                                        <a href="{{ (Route::has('business_settings.vendor_commission') ? (Route::has('business_settings.vendor_commission') ? route('business_settings.vendor_commission') : '#') : '#') }}"
                                            class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{ translate('Seller Commission') }}</span>
                                         </a>
                                     </li>
-                                @endcan
+                                @endcan --}}
                                 @can('set_seller_based_commission')
                                     <li class="aiz-side-nav-item">
                                         <a href="{{ route('seller_based_commission') }}" class="aiz-side-nav-link">
@@ -1051,7 +1051,7 @@
                                 @if (addon_is_activated('seller_subscription'))
                                     @can('view_all_seller_packages')
                                         <li class="aiz-side-nav-item">
-                                            <a href="{{ route('seller_packages.index') }}"
+                                            <a href="{{ (Route::has('seller_packages.index') ? (Route::has('seller_packages.index') ? route('seller_packages.index') : '#') : '#') }}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['seller_packages.index', 'seller_packages.create', 'seller_packages.edit'])}}">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Seller Packages') }}</span>
@@ -1069,7 +1069,7 @@
                                 @endif
                                 @can('seller_verification_form_configuration')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('seller_verification_form.index') }}"
+                                        <a href="{{ (Route::has('seller_verification_form.index') ? (Route::has('seller_verification_form.index') ? route('seller_verification_form.index') : '#') : '#') }}"
                                            class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{ translate('Seller Verification Form') }}</span>
@@ -1373,7 +1373,7 @@
                             @endcanany
                             @if (addon_is_activated('otp_system') && auth('admin')->user()->can('send_bulk_sms'))
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('sms.index')}}" class="aiz-side-nav-link">
+                                    <a href="{{(Route::has('sms.index') ? (Route::has('sms.index') ? route('sms.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{ translate('Bulk SMS') }}</span>
                                         @if (env("DEMO_MODE") == "On")
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="14.001"
@@ -1395,7 +1395,7 @@
                             @endcan
                             @if (get_setting('coupon_system') == 1 && auth('admin')->user()->can('view_all_coupons') )
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('coupon.index')}}"
+                                    <a href="{{(Route::has('coupon.index') ? (Route::has('coupon.index') ? route('coupon.index') : '#') : '#')}}"
                                        class="aiz-side-nav-link {{ areActiveRoutes(['coupon.index','coupon.create','coupon.edit'])}}">
                                         <span class="aiz-side-nav-text">{{ translate('Coupon') }}</span>
                                     </a>
@@ -1530,7 +1530,7 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('affiliate_registration_form_config')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('affiliate.configs')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('affiliate.configs') ? (Route::has('affiliate.configs') ? route('affiliate.configs') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Affiliate Registration Form')}}</span>
                                         </a>
@@ -1538,7 +1538,7 @@
                                 @endcan
                                 @can('affiliate_configurations')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('affiliate.index')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('affiliate.index') ? (Route::has('affiliate.index') ? route('affiliate.index') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Affiliate Configurations')}}</span>
                                         </a>
@@ -1546,7 +1546,7 @@
                                 @endcan
                                 @can('view_affiliate_users')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('affiliate.users')}}"
+                                        <a href="{{(Route::has('affiliate.users') ? (Route::has('affiliate.users') ? route('affiliate.users') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['affiliate.users', 'affiliate_users.show_verification_request', 'affiliate_user.payment_history'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Affiliate Users')}}</span>
                                         </a>
@@ -1554,14 +1554,14 @@
                                 @endcan
                                 @can('view_all_referral_users')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('refferals.users')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('refferals.users') ? (Route::has('refferals.users') ? route('refferals.users') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Referral Users')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('view_affiliate_withdraw_requests')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('affiliate.withdraw_requests')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('affiliate.withdraw_requests') ? (Route::has('affiliate.withdraw_requests') ? route('affiliate.withdraw_requests') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Affiliate Withdraw Requests')}}</span>
                                         </a>
@@ -1569,7 +1569,7 @@
                                 @endcan
                                 @can('view_affiliate_logs')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('affiliate.logs.admin')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('affiliate.logs.admin') ? (Route::has('affiliate.logs.admin') ? route('affiliate.logs.admin') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('Affiliate Logs')}}</span>
                                         </a>
                                     </li>
@@ -1618,7 +1618,7 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('club_point_configurations')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('club_points.configs') }}" class="aiz-side-nav-link">
+                                        <a href="{{ (Route::has('club_points.configs') ? (Route::has('club_points.configs') ? route('club_points.configs') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Club Point Configurations')}}</span>
                                         </a>
@@ -1626,7 +1626,7 @@
                                 @endcan
                                 @can('set_club_points')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('set_product_points')}}"
+                                        <a href="{{(Route::has('set_product_points') ? (Route::has('set_product_points') ? route('set_product_points') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['set_product_points', 'product_club_point.edit'])}}">
                                             <span class="aiz-side-nav-text">{{translate('Set Product Point')}}</span>
                                         </a>
@@ -1634,7 +1634,7 @@
                                 @endcan
                                 @can('view_users_club_points')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('club_points.index')}}"
+                                        <a href="{{(Route::has('club_points.index') ? (Route::has('club_points.index') ? route('club_points.index') : '#') : '#')}}"
                                            class="aiz-side-nav-link {{ areActiveRoutes(['club_points.index', 'club_point.details'])}}">
                                             <span class="aiz-side-nav-text">{{translate('User Points')}}</span>
                                         </a>
@@ -1672,20 +1672,20 @@
                             <ul class="aiz-side-nav-list level-2">
                                 @can('otp_configurations')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('otp.login_configuration') }}" class="aiz-side-nav-link">
+                                        <a href="{{ (Route::has('otp.login_configuration') ? (Route::has('otp.login_configuration') ? route('otp.login_configuration') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('OTP Login Configuration')}}</span>
                                         </a>
                                     </li>
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{ route('otp.configconfiguration') }}" class="aiz-side-nav-link">
+                                        <a href="{{ (Route::has('otp.configconfiguration') ? (Route::has('otp.configconfiguration') ? route('otp.configconfiguration') : '#') : '#') }}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('OTP Configurations')}}</span>
                                         </a>
                                     </li>
                                 @endcan
                                 @can('sms_templates')
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('sms-templates.index')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('sms-templates.index') ? (Route::has('sms-templates.index') ? route('sms-templates.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                             <span class="aiz-side-nav-text">{{translate('SMS Templates')}}</span>
                                         </a>
                                     </li>
@@ -1729,7 +1729,7 @@
                         <ul class="aiz-side-nav-list level-2">
                             @can('payment_methods_configurations')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('payment_method.index')}}" class="aiz-side-nav-link">
+                                    <a href="{{ (Route::has('payment_method.index') ? (Route::has('payment_method.index') ? route('payment_method.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Payment Methods')}}</span>
                                     </a>
                                 </li>
@@ -1739,7 +1739,7 @@
                             <!-- Cybersource Addon -->
                             @if (addon_is_activated('cybersource') && auth('admin')->user()->can('cybersource_pg_configuration'))
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('cybersource_configuration')}}" class="aiz-side-nav-link">
+                                    <a href="{{(Route::has('cybersource_configuration') ? (Route::has('cybersource_configuration') ? route('cybersource_configuration') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Cybersource Payment Gateway')}}</span>
                                         @if (env("DEMO_MODE") == "On")
@@ -1762,7 +1762,7 @@
                             <!-- Paytm Addon -->
                             @if (addon_is_activated('paytm') && auth('admin')->user()->can('asian_payment_gateway_configuration'))
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('paytm.index')}}" class="aiz-side-nav-link">
+                                    <a href="{{(Route::has('paytm.index') ? (Route::has('paytm.index') ? route('paytm.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Asian Payment Gateway')}}</span>
                                         @if (env("DEMO_MODE") == "On")
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="14.001"
@@ -1781,7 +1781,7 @@
                             @if(addon_is_activated('african_pg'))
                                 @canany(['african_pg_configuration','african_pg_credentials_configuration'])
                                     <li class="aiz-side-nav-item">
-                                        <a href="{{route('african_credentials.index')}}" class="aiz-side-nav-link">
+                                        <a href="{{(Route::has('african_credentials.index') ? (Route::has('african_credentials.index') ? route('african_credentials.index') : '#') : '#')}}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('African Payment Gateway')}}</span>
                                             @if (env("DEMO_MODE") == "On")
@@ -1822,7 +1822,7 @@
                                         <ul class="aiz-side-nav-list level-3">
                                             @can('view_all_manual_payment_methods')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('manual_payment_methods.index') }}"
+                                                    <a href="{{ (Route::has('manual_payment_methods.index') ? (Route::has('manual_payment_methods.index') ? route('manual_payment_methods.index') : '#') : '#') }}"
                                                        class="aiz-side-nav-link {{ areActiveRoutes(['manual_payment_methods.index', 'manual_payment_methods.create', 'manual_payment_methods.edit'])}}">
                                     <span
                                             class="aiz-side-nav-text">{{translate('Manual Payment Methods')}}</span>
@@ -1831,7 +1831,7 @@
                                             @endcan
                                             @can('view_all_offline_payment_orders')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('offline_payment_orders.index') }}"
+                                                    <a href="{{ (Route::has('offline_payment_orders.index') ? (Route::has('offline_payment_orders.index') ? route('offline_payment_orders.index') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                     <span
                                             class="aiz-side-nav-text">{{translate('Offline Payment Orders')}}</span>
@@ -1840,7 +1840,7 @@
                                             @endcan
                                             @can('view_all_offline_wallet_recharges')
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('offline_wallet_recharge_request.index') }}"
+                                                    <a href="{{ (Route::has('offline_wallet_recharge_request.index') ? (Route::has('offline_wallet_recharge_request.index') ? route('offline_wallet_recharge_request.index') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                     <span
                                             class="aiz-side-nav-text">{{translate('Offline Wallet Recharge')}}</span>
@@ -1851,7 +1851,7 @@
                                             @if(get_setting('classified_product') == 1 &&
                                             auth('admin')->user()->can('view_all_offline_customer_package_payments'))
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('offline_customer_package_payment_request.index') }}"
+                                                    <a href="{{ (Route::has('offline_customer_package_payment_request.index') ? (Route::has('offline_customer_package_payment_request.index') ? route('offline_customer_package_payment_request.index') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                     <span class="aiz-side-nav-text">{{translate('Offline Customer Package
                                             Payments')}}</span>
@@ -1861,7 +1861,7 @@
                                             @if (addon_is_activated('seller_subscription') &&
                                             auth('admin')->user()->can('view_all_offline_seller_package_payments'))
                                                 <li class="aiz-side-nav-item">
-                                                    <a href="{{ route('offline_seller_package_payment_request.index') }}"
+                                                    <a href="{{ (Route::has('offline_seller_package_payment_request.index') ? (Route::has('offline_seller_package_payment_request.index') ? route('offline_seller_package_payment_request.index') : '#') : '#') }}"
                                                        class="aiz-side-nav-link">
                                     <span
                                             class="aiz-side-nav-text">{{translate('Offline Seller Package Payments')}}</span>
@@ -2008,14 +2008,14 @@
                         <ul class="aiz-side-nav-list level-2">
                             @can('features_activation')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('activation.index')}}" class="aiz-side-nav-link">
+                                    <a href="{{(Route::has('activation.index') ? (Route::has('activation.index') ? route('activation.index') : '#') : '#')}}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Features activation')}}</span>
                                     </a>
                                 </li>
                             @endcan
                             @can('language_setup')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{route('languages.index')}}"
+                                    <a href="{{(Route::has('languages.index') ? (Route::has('languages.index') ? route('languages.index') : '#') : '#')}}"
                                        class="aiz-side-nav-link {{ areActiveRoutes(['languages.index', 'languages.create', 'languages.store', 'languages.show', 'languages.edit'])}}">
                                         <span class="aiz-side-nav-text">{{translate('Languages')}}</span>
                                     </a>
@@ -2046,7 +2046,7 @@
                             @endcan
                             @can('smtp_settings')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('smtp_settings.index') }}" class="aiz-side-nav-link">
+                                    <a href="{{ (Route::has('smtp_settings.index') ? (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') : '#') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('SMTP Settings')}}</span>
                                     </a>
                                 </li>
@@ -2054,14 +2054,14 @@
 
                             @can('order_configuration')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('order_configuration.index') }}" class="aiz-side-nav-link">
+                                    <a href="{{ (Route::has('order_configuration.index') ? (Route::has('order_configuration.index') ? route('order_configuration.index') : '#') : '#') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Order Configuration')}}</span>
                                     </a>
                                 </li>
                             @endcan
                             @can('file_system_&_cache_configuration')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('file_system.index') }}" class="aiz-side-nav-link">
+                                    <a href="{{ (Route::has('file_system.index') ? (Route::has('file_system.index') ? route('file_system.index') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span class="aiz-side-nav-text">{{translate('File System & Cache
                                     Configuration')}}</span>
                                     </a>
@@ -2069,7 +2069,7 @@
                             @endcan
                             @can('social_media_logins')
                                 <li class="aiz-side-nav-item">
-                                    <a href="{{ route('social_login.index') }}" class="aiz-side-nav-link">
+                                    <a href="{{ (Route::has('social_login.index') ? (Route::has('social_login.index') ? route('social_login.index') : '#') : '#') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Social media Logins')}}</span>
                                     </a>
                                 </li>
@@ -2083,7 +2083,7 @@
                                     <ul class="aiz-side-nav-list level-3">
                                         {{-- @can('facebook_chat')
                                                     <li class="aiz-side-nav-item">
-                                                        <a href="{{ route('facebook_chat.index') }}" class="aiz-side-nav-link">
+                                                        <a href="{{ (Route::has('facebook_chat.index') ? (Route::has('facebook_chat.index') ? route('facebook_chat.index') : '#') : '#') }}" class="aiz-side-nav-link">
                                         <span class="aiz-side-nav-text">{{translate('Facebook Chat')}}</span>
                                         </a>
                                 </li>
@@ -2092,7 +2092,7 @@
 
                                         @can('whatsapp_chat')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('whatsapp_chat.index') }}" class="aiz-side-nav-link">
+                                                <a href="{{ (Route::has('whatsapp_chat.index') ? (Route::has('whatsapp_chat.index') ? route('whatsapp_chat.index') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('WhatsApp Chat')}}</span>
                                                 </a>
@@ -2101,7 +2101,7 @@
 
                                         @can('facebook_comment')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('facebook-comment') }}" class="aiz-side-nav-link">
+                                                <a href="{{ (Route::has('facebook-comment') ? (Route::has('facebook-comment') ? route('facebook-comment') : '#') : '#') }}" class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Facebook Comment')}}</span>
                                                 </a>
@@ -2119,7 +2119,7 @@
                                     <ul class="aiz-side-nav-list level-3">
                                         @can('analytics_tools_configuration')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('google_analytics.index') }}"
+                                                <a href="{{ (Route::has('google_analytics.index') ? (Route::has('google_analytics.index') ? route('google_analytics.index') : '#') : '#') }}"
                                                    class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Analytics Tools')}}</span>
@@ -2128,7 +2128,7 @@
                                         @endcan
                                         @can('google_recaptcha_configuration')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('google_recaptcha.index') }}"
+                                                <a href="{{ (Route::has('google_recaptcha.index') ? (Route::has('google_recaptcha.index') ? route('google_recaptcha.index') : '#') : '#') }}"
                                                    class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Google reCAPTCHA')}}</span>
@@ -2137,14 +2137,14 @@
                                         @endcan
                                         @can('google_map_setting')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('google-map.index') }}" class="aiz-side-nav-link">
+                                                <a href="{{ (Route::has('google-map.index') ? (Route::has('google-map.index') ? route('google-map.index') : '#') : '#') }}" class="aiz-side-nav-link">
                                                     <span class="aiz-side-nav-text">{{translate('Google Map')}}</span>
                                                 </a>
                                             </li>
                                         @endcan
                                         @can('google_firebase_setting')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{ route('google-firebase.index') }}"
+                                                <a href="{{ (Route::has('google-firebase.index') ? (Route::has('google-firebase.index') ? route('google-firebase.index') : '#') : '#') }}"
                                                    class="aiz-side-nav-link">
                             <span
                                     class="aiz-side-nav-text">{{translate('Google Firebase')}}</span>
@@ -2165,7 +2165,7 @@
 
                                         @can('select_shipping_methods')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{route('shipping_configuration.shipping_method')}}"
+                                                <a href="{{(Route::has('shipping_configuration.shipping_method') ? (Route::has('shipping_configuration.shipping_method') ? route('shipping_configuration.shipping_method') : '#') : '#')}}"
                                                    class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.shipping_method'])}}">
                             <span
                                     class="aiz-side-nav-text">{{translate('Select Shipping Method')}}</span>
@@ -2174,7 +2174,7 @@
                                         @endcan
                                         @can('shipping_configuration')
                                             <li class="aiz-side-nav-item">
-                                                <a href="{{route('shipping_configuration.index')}}"
+                                                <a href="{{(Route::has('shipping_configuration.index') ? (Route::has('shipping_configuration.index') ? route('shipping_configuration.index') : '#') : '#')}}"
                                                    class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index','shipping_configuration.edit','shipping_configuration.update'])}}">
                             <span
                                     class="aiz-side-nav-text">{{translate('Shipping Configuration')}}</span>

@@ -10,7 +10,7 @@
                 <h1 class="mb-0 h6">{{translate('Sytem Settings')}}</h1>
             </div>
             <div class="card-body">
-                <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- System Name -->
                     <div class="form-group row">
@@ -126,7 +126,7 @@
                 <h6 class="fw-600 mb-0">{{ translate('General Settings') }}</h6>
             </div>
             <div class="card-body">
-                <form action="{{ route('business_settings.update') }}" method="POST">
+                <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST">
                     @csrf
                     <!-- Website Base Color -->
                     <div class="form-group row">
@@ -210,7 +210,7 @@
                 <h6 class="fw-600 mb-0">{{ translate('Image Watermark') }}</h6>
             </div>
             <div class="card-body">
-                <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- Use Image Watermark (During Upload) -->
                     <div class="form-group row">
@@ -311,7 +311,7 @@
                 <h6 class="fw-600 mb-0">{{ translate('Global SEO') }}</h6>
             </div>
             <div class="card-body">
-                <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- Meta Title -->
                     <div class="form-group row">
@@ -367,7 +367,7 @@
                 <h6 class="fw-600 mb-0">{{ translate('Custom Script') }}</h6>
             </div>
             <div class="card-body">
-                <form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <!-- Header custom script -->
                     <div class="form-group row">

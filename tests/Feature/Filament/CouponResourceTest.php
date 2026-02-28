@@ -19,6 +19,7 @@ class CouponResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
 
         // Ensure we have an admin user with the correct type/permissions to view the Filament panel
         // This project uses 'admin' user_type for backend access and requires email verification.
@@ -111,10 +112,9 @@ class CouponResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('coupons', [
-            'code' => 'NEWYEAR26',
-            'label' => 'New Year Sale',
-        ]);
+        $coupon = \App\Models\Coupon::where('code', 'NEWYEAR26')->first();
+        $this->assertNotNull($coupon);
+        $this->assertEquals('New Year Sale', $coupon->label);
     }
 
     public function test_can_update_coupon()
@@ -134,10 +134,8 @@ class CouponResourceTest extends TestCase
             ->call('save')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('coupons', [
-            'id' => $coupon->id,
-            'label' => 'Updated Label',
-        ]);
+        $coupon->refresh();
+        $this->assertEquals('Updated Label', $coupon->label);
     }
 
     public function test_can_delete_coupon()

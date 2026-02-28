@@ -22,6 +22,7 @@ class ProductCreationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
         // Assuming there is an admin user factory or seeder
         $this->admin = User::factory()->create(['user_type' => 'admin', 'email' => 'admin@example.com']);
     }
@@ -61,12 +62,11 @@ class ProductCreationTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('products', [
-            'name' => 'New Product',
-            'slug' => 'new-product',
-            'user_id' => $this->admin->id,
-            'added_by' => 'admin',
-        ]);
+        $product = Product::where('slug', 'new-product')->first();
+        $this->assertNotNull($product);
+        $this->assertEquals('New Product', $product->name);
+        $this->assertEquals($this->admin->id, $product->user_id);
+        $this->assertEquals('admin', $product->added_by);
 
         $this->assertDatabaseHas('product_stocks', [
             'sku' => 'SKU-001',

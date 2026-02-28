@@ -11,7 +11,7 @@
 </div>
 <div class="card rounded-0">
 	<div class="card-body p-2rem">
-		<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+		<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 			@csrf
 			<input type="hidden" name="types[]" value="authentication_layout_select">
 			@php $authentication_layout = get_setting('authentication_layout_select'); @endphp
@@ -104,7 +104,7 @@
 
 <div class="card">
 	<div class="card-body">
-		<form action="{{ route('business_settings.update') }}" method="POST">
+		<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST">
 			@csrf
 
 			<div class="row">

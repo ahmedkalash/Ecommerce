@@ -211,7 +211,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure SMTP correctly to enable this feature.') }} <a
-                                href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+                                href="{{ (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -351,7 +351,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure SMTP correctly to enable this feature.') }}
-                        <a href="{{ route('smtp_settings.index') }}">{{ translate('Configure Now') }}</a>
+                        <a href="{{ (Route::has('smtp_settings.index') ? route('smtp_settings.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -415,7 +415,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure Facebook Client correctly to enable this feature') }}. <a
-                                href="{{ route('social_login.index') }}">{{ translate('Configure Now') }}</a>
+                                href="{{ (Route::has('social_login.index') ? route('social_login.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -436,7 +436,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure Google Client correctly to enable this feature') }}. <a
-                                href="{{ route('social_login.index') }}">{{ translate('Configure Now') }}</a>
+                                href="{{ (Route::has('social_login.index') ? route('social_login.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -457,7 +457,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure Twitter Client correctly to enable this feature') }}. <a
-                                href="{{ route('social_login.index') }}">{{ translate('Configure Now') }}</a>
+                                href="{{ (Route::has('social_login.index') ? route('social_login.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -478,7 +478,7 @@
                     <div class="alert"
                          style="color: #004085;background-color: #cce5ff;border-color: #b8daff;margin-bottom:0;margin-top:10px;">
                         {{ translate('You need to configure Apple Client correctly to enable this feature') }}. <a
-                                href="{{ route('social_login.index') }}">{{ translate('Configure Now') }}</a>
+                                href="{{ (Route::has('social_login.index') ? route('social_login.index') : '#') }}">{{ translate('Configure Now') }}</a>
                     </div>
                 </div>
             </div>
@@ -503,7 +503,7 @@
                 var value = 0;
             }
 
-            $.post('{{ route('business_settings.update.activation') }}', {
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {
                     _token: '{{ csrf_token() }}',
                     type: type,
                     value: value

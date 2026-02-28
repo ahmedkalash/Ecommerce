@@ -4,7 +4,7 @@
 <div class="col-lg-6 mx-auto">
     <div class="card">
         <div class="card-body" style="background-color: #fcfcfc; min-height:460px;">
-            <form class="form-horizontal" action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form class="form-horizontal" action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @php
                     $notification_show_type = get_setting('notification_show_type');

@@ -8,7 +8,7 @@
                     <h3 class="mb-0 h6">{{translate('Google Firebase Setting')}}</h3>
                 </div>
                 <div class="card-body">
-                    <form class="form-horizontal" action="{{ route('google-firebase.update') }}" method="POST">
+                    <form class="form-horizontal" action="{{ (Route::has('google-firebase.update') ? route('google-firebase.update') : '#') }}" method="POST">
                         @csrf
                         <div class="form-group row">
                             <div class="col-md-4">

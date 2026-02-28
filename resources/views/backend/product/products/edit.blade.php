@@ -802,7 +802,7 @@
                                     @else
                                         <p>
                                             {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}
-                                            <a href="{{route('activation.index')}}"
+                                            <a href="{{(Route::has('activation.index') ? route('activation.index') : '#')}}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index','shipping_configuration.edit','shipping_configuration.update'])}}">
                                     <span
                                             class="aiz-side-nav-text">{{translate('Cash Payment Activation')}}</span>
@@ -862,7 +862,7 @@
                                     @else
                                         <p>
                                             {{ translate('Product wise shipping cost is disable. Shipping cost is configured from here') }}
-                                            <a href="{{route('shipping_configuration.shipping_method')}}"
+                                            <a href="{{(Route::has('shipping_configuration.shipping_method') ? route('shipping_configuration.shipping_method') : '#')}}"
                                                class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.shipping_method'])}}">
                                                 <span class="aiz-side-nav-text">{{translate('Shipping Method')}}</span>
                                             </a>
@@ -1157,8 +1157,9 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 type: "POST",
-                url: '{{ route('
-            products.add - more - choice - option ') }}',
+                url: '{{ (Route::has('
+            products.add - more - choice - option ') ? route('
+            products.add - more - choice - option ') : '#') }}',
                 data: {
                     attribute_id: i
                 },
@@ -1215,8 +1216,9 @@
         function update_sku() {
             $.ajax({
                 type: "POST",
-                url: '{{ route('
-            products.sku_combination_edit ') }}',
+                url: '{{ (Route::has('
+            products.sku_combination_edit ') ? route('
+            products.sku_combination_edit ') : '#') }}',
                 data: $('#choice_form').serialize(),
                 success: function (data) {
                     $('#sku_combination').html(data);
@@ -1294,8 +1296,9 @@
             var productID = $('input[name=id]').val();
             var searchKey = $('input[name=search_keyword]').val();
             var fqBroughCategory = $('select[name=fq_brough_category]').val();
-            $.post('{{ route('
-            product.search ') }}', {
+            $.post('{{ (Route::has('
+            product.search ') ? route('
+            product.search ') : '#') }}', {
                     _token: AIZ.data.csrf,
                     product_id: productID,
                     search_key: searchKey,
@@ -1321,8 +1324,9 @@
 
             var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
 
-            $.post('{{ route('
-            get - selected - products ') }}', {
+            $.post('{{ (Route::has('
+            get - selected - products ') ? route('
+            get - selected - products ') : '#') }}', {
                     _token: AIZ.data.csrf,
                     product_ids: productIds
                 },
@@ -1373,7 +1377,7 @@
             const categoryId = $mainCategoryRadio.val();
             $.ajax({
                 type: 'POST',
-                url: '{{ route("admin.products.check_refundable_category") }}',
+                url: '{{ (Route::has('admin.products.check_refundable_category') ? route('admin.products.check_refundable_category') : '#') }}',
                 data: {
                     _token: '{{ csrf_token() }}',
                     category_id: categoryId
@@ -1411,8 +1415,9 @@
 
 
         function noteModal(noteType) {
-            $.post('{{ route('
-            get_notes ') }}', {
+            $.post('{{ (Route::has('
+            get_notes ') ? route('
+            get_notes ') : '#') }}', {
                     _token: '{{ @csrf_token() }}',
                     note_type: noteType
                 },

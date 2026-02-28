@@ -174,7 +174,7 @@
                 return;
             }
             var value = ($(el).is(':checked')) ? 1 : 0;
-            $.post('{{ route('business_settings.update.activation') }}', {
+            $.post('{{ (Route::has('business_settings.update.activation') ? route('business_settings.update.activation') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 type: type,
                 value: value

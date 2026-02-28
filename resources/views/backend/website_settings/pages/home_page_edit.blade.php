@@ -30,7 +30,7 @@
 				<div class="alert alert-info">
 					{{ translate('We have limited banner height to maintain UI. We had to crop from both left & right side in view for different devices to make it responsive. Before designing banner keep these points in mind.') }}
 				</div>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Photos & Links') }}</label>
@@ -136,7 +136,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label class="col-from-label">{{ translate("Large Banner") }}</label>
@@ -192,7 +192,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Banner & Links') }}</label>
@@ -298,7 +298,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Banner & Links') }}</label>
@@ -406,7 +406,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Banner & Links') }}</label>
@@ -515,7 +515,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					
 					<div class="form-group">
@@ -545,7 +545,7 @@
 				<h6 class="mb-0">{{ translate('Coupon Section') }}</h6>
 			</div>
 			<div class="card-body">
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Background Color') }}</label>
@@ -576,7 +576,7 @@
 				<h6 class="mb-0">{{ translate('Home Categories') }}</h6>
 			</div>
 			<div class="card-body">
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Categories') }}</label>
@@ -655,7 +655,7 @@
 						</li>
 					@endforeach
 				</ul>
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group">
 						<label>{{ translate('Large Banner') }}</label>
@@ -694,7 +694,7 @@
 				<h6 class="mb-0">{{ translate('Top 12') }}</h6>
 			</div>
 			<div class="card-body">
-				<form action="{{ route('business_settings.update') }}" method="POST" enctype="multipart/form-data">
+				<form action="{{ (Route::has('business_settings.update') ? route('business_settings.update') : '#') }}" method="POST" enctype="multipart/form-data">
 					@csrf
 					<div class="form-group row">
 						<label class="col-md-2 col-from-label">{{translate('Top Brands (Max 12)')}}</label>

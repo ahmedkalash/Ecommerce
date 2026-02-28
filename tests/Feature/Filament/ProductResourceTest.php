@@ -22,6 +22,7 @@ class ProductResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        app()->setLocale('en');
 
         // 1. Create user and Admin model
         $user = User::factory()->create([
@@ -123,13 +124,10 @@ class ProductResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('products', [
-            'name' => 'New Product',
-            'slug' => 'new-product',
-            'brand_id' => $brand->id,
-        ]);
-
         $product = Product::where('slug', 'new-product')->first();
+        $this->assertNotNull($product);
+        $this->assertEquals('New Product', $product->name);
+        $this->assertEquals($brand->id, $product->brand_id);
 
         $this->assertCount(2, $product->stocks);
         $this->assertDatabaseHas('product_stocks', [

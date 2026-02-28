@@ -95,7 +95,7 @@
                     <div class="card-header">
                         <h5 class="mb-0 h6">{{translate('Flat Rate Shipping Cost')}}</h5>
                     </div>
-                    <form action="{{ route('shipping_configuration.update') }}" method="POST"
+                    <form action="{{ (Route::has('shipping_configuration.update') ? route('shipping_configuration.update') : '#') }}" method="POST"
                           enctype="multipart/form-data">
                         <div class="card-body">
                             <span>{{ translate('Flat Rate Shipping Cost calculation: How many products a customer purchase, doesn\'t matter. Shipping cost is fixed') }}.</span>
@@ -120,7 +120,7 @@
                     <div class="card-header">
                         <h5 class="mb-0 h6">{{translate('Seller Wise Shipping Cost')}}</h5>
                     </div>
-                    <form action="{{ route('shipping_configuration.update') }}" method="POST"
+                    <form action="{{ (Route::has('shipping_configuration.update') ? route('shipping_configuration.update') : '#') }}" method="POST"
                           enctype="multipart/form-data">
                         <div class="card-body">
                             <span>{{ translate('Each seller has a fixed shipping rate. Admin can set their rate here, and sellers set theirs from their panel. If a customer buys from multiple sellers, shipping costs are added together') }}.</span>
@@ -165,7 +165,7 @@
     <script type="text/javascript">
         function update_status(el) {
             var status = el.checked ? 1 : 0;
-            $.post('{{ route('shipping_configuration.state') }}', {
+            $.post('{{ (Route::has('shipping_configuration.state') ? route('shipping_configuration.state') : '#') }}', {
                 _token: '{{ csrf_token() }}',
                 type: 'has_state',
                 has_state: status
