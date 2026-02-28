@@ -1173,14 +1173,10 @@ if (! function_exists('get_file_by_path')) {
 if (! function_exists('static_asset')) {
     /**
      * Generate an asset path for the application.
-     *
-     * @param  string  $path
-     * @param  bool|null  $secure
-     * @return string
      */
-    function static_asset($path, $secure = null)
+    function static_asset(string $path, ?bool $secure = null): string
     {
-        return app('url')->asset($path, $secure);
+        return asset($path, $secure);
     }
 }
 
