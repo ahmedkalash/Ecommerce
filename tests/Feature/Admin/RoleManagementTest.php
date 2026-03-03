@@ -23,7 +23,7 @@ class RoleManagementTest extends TestCase
         // Create a super admin to run tests
         $user = \App\Models\User::factory()->admin()->create([
             'name' => 'Super Admin',
-            'email' => 'admin_' . uniqid() . '@example.com',
+            'email' => 'admin_'.uniqid().'@example.com',
             'password' => bcrypt('password'),
         ]);
         $this->admin = Admin::find($user->id);
@@ -76,7 +76,7 @@ class RoleManagementTest extends TestCase
         $perm1 = Permission::firstOrCreate(['name' => 'perm_1', 'guard_name' => 'admin', 'group' => 'test']);
         $perm2 = Permission::firstOrCreate(['name' => 'perm_2', 'guard_name' => 'admin', 'group' => 'test']);
 
-        $roleName = 'Test Role ' . uniqid();
+        $roleName = 'Test Role '.uniqid();
         $data = [
             'name' => $roleName,
             'permissions' => ['perm_1', 'perm_2'],
@@ -95,7 +95,7 @@ class RoleManagementTest extends TestCase
     /** @test */
     public function role_edit_page_is_accessible()
     {
-        $role = Role::create(['name' => 'Editable Role ' . uniqid(), 'guard_name' => 'admin']);
+        $role = Role::create(['name' => 'Editable Role '.uniqid(), 'guard_name' => 'admin']);
 
         $response = $this->actingAs($this->admin, 'admin')->get(route('roles.edit', $role->id));
 
@@ -107,8 +107,8 @@ class RoleManagementTest extends TestCase
     /** @test */
     public function role_can_be_updated()
     {
-        $role = Role::create(['name' => 'Old Role Name ' . uniqid(), 'guard_name' => 'admin']);
-        $newRoleName = 'New Role Name ' . uniqid();
+        $role = Role::create(['name' => 'Old Role Name '.uniqid(), 'guard_name' => 'admin']);
+        $newRoleName = 'New Role Name '.uniqid();
 
         $perm = Permission::firstOrCreate(['name' => 'perm_3', 'guard_name' => 'admin', 'group' => 'test']);
 
@@ -132,7 +132,7 @@ class RoleManagementTest extends TestCase
     /** @test */
     public function role_can_be_deleted()
     {
-        $role = Role::create(['name' => 'Deletable Role ' . uniqid(), 'guard_name' => 'admin']);
+        $role = Role::create(['name' => 'Deletable Role '.uniqid(), 'guard_name' => 'admin']);
 
         $response = $this->actingAs($this->admin, 'admin')->get(route('roles.destroy', $role->id));
 
@@ -143,7 +143,7 @@ class RoleManagementTest extends TestCase
     /** @test */
     public function a_new_permission_can_be_added()
     {
-        $permName = 'new_test_perm_' . uniqid();
+        $permName = 'new_test_perm_'.uniqid();
         $groupName = 'test_group';
 
         $data = [

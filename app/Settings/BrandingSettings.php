@@ -12,14 +12,6 @@ class BrandingSettings extends Settings
 
     public ?string $site_icon = null;
 
-    public ?string $system_logo_white = null;
-
-    public ?string $system_logo_black = null;
-
-    public ?string $admin_login_background = null;
-
-    public ?string $admin_login_page_image = null;
-
     public static function group(): string
     {
         return 'branding';
