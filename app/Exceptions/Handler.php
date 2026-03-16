@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use App\Utility\NgeniusUtility;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -42,6 +43,17 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        if ($e instanceof ThrottleRequestsException) {
+            $time = $e->getHeaders()['Retry-After'] ?? 60;
+            $time = $time >= 60
+                ? ceil($time / 60).' '.__('customer/general.minutes')
+                : $time.' '.__('customer/general.seconds');
+
+            toast(__('auth.throttle_with_time', ['time' => $time]), 'error');
+
+            return redirect()->back();
+        }
+
         if ($e instanceof Redirectingexception) {
             return redirect()->back();
         }

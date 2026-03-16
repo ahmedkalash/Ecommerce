@@ -24,8 +24,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required_without:phone', 'nullable', 'email', 'string', 'max:190'],
-            'phone' => ['required_without:email', 'nullable', 'string', 'min:6', 'max:20'],
+            'email' => ['required_without:phone', 'nullable', 'email', 'string'],
+            'phone' => ['required_without:email', 'nullable', 'string'],
             'password' => ['required', 'string'],
             'remember' => ['nullable'], // Checkbox sends "on", not boolean
             'g-recaptcha-response' => RecaptchaService::validationRules(RecaptchaAction::CUSTOMER_LOGIN),

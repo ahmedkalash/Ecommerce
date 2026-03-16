@@ -56,6 +56,8 @@ use App\Http\Controllers\SupportTicketController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
+use App\Services\LocaleService;
+use Illuminate\Support\Facades\Route;
 
 // VerificationFirstController removed - using standard register-then-verify flow
 // use App\Http\Controllers\LanguageController; // Replaced by kenepa/translation-manager
@@ -70,7 +72,42 @@ use App\Http\Controllers\WishlistController;
   | contains the "web" middleware group. Now create something great!
   |
  */
+// ---------------------------------------------------- new routes ----------------------------------------------------
 
+// Login
+Route::controller(LoginController::class)->group(function () {
+    /**
+     * @see vendor/laravel/ui/src/AuthRouteMethods.php
+     * @see app/Livewire/Auth/Login.php
+     */
+    Route::group(['middleware' => ['prevent-back-history']], function () {
+        Route::get('/user/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
+        Route::post('logout', 'logout')->name('logout');
+
+        // Auth::routes(['verify' => true]);
+    });
+});
+
+// Register
+Route::controller(RegisterController::class)->group(function () {
+    Route::get('/users/registration', 'showRegistrationForm')->name('user.registration');
+});
+
+Route::controller(VerificationController::class)->group(function () {
+    Route::get('email/verify', 'show')->name('verification.notice');
+    Route::get('email/verify/{id}/{hash}', 'verify')->name('verification.verify');
+    Route::post('email/resend', 'resend')->name('verification.resend');
+
+});
+
+// Language Switch — Replaced by kenepa/translation-manager
+Route::get('/language/{locale}', function (string $locale) {
+    app(LocaleService::class)->setCurrentLocale($locale);
+
+    return back();
+})->name('language.switch');
+
+// ---------------------------------------------------- old routes ----------------------------------------------------
 Route::controller(DemoController::class)->group(function () {
     Route::get('/demo/cron_1', 'cron_1');
     Route::get('/demo/cron_2', 'cron_2');
@@ -98,33 +135,16 @@ Route::group(['middleware' => ['auth:admin,web']], function () {
     });
 });
 
-Route::group(['middleware' => ['prevent-back-history']], function () {
-    /**@see vendor/laravel/ui/src/AuthRouteMethods.php */
-    Auth::routes(['verify' => true]);
-});
-
-// Register
-Route::controller(RegisterController::class)->group(function () {
-    Route::get('/users/registration', 'showRegistrationForm')->name('user.registration');
-});
-
 // Login
 Route::controller(LoginController::class)->group(function () {
     /**
-     * There are 2 routes for login, one of them exist in AuthRouteMethods file: get('login', 'Auth\LoginController@showLoginForm')->name('login');
-     * The '/login' route will be redirected to '/users/login'
-     *
      * @see vendor/laravel/ui/src/AuthRouteMethods.php
      */
-    Route::get('/users/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
-
     Route::get('/seller/login', 'showSellerLoginForm')->name('seller.login')->middleware('handle-demo-login');
     Route::get(
         '/deliveryboy/login',
         'showDeliveryBoyLoginForm'
     )->name('deliveryboy.login')->middleware('handle-demo-login');
-    Route::get('/logout', 'logout');
-    // Route::get('/handle-demo-login', 'handle_demo_login')->name('handleDemoLogin');
 });
 
 // Customer Account Management
@@ -134,12 +154,6 @@ Route::controller(CustomerAccountController::class)->group(function () {
 
 // Social Login
 Route::controller(SocialLoginController::class)->group(function () {
-    /**
-     * There are 2 routes for login, one of them exist in AuthRouteMethods file: get('login', 'Auth\LoginController@showLoginForm')->name('login');
-     * The '/login' route will be redirected to '/users/login'
-     *
-     * @see vendor/laravel/ui/src/AuthRouteMethods.php
-     */
     Route::get('/social-login/redirect/{provider}', 'redirectToProvider')->name('social.login');
     Route::get('/social-login/{provider}/callback', 'handleProviderCallback')->name('social.callback');
     // Apple Callback
@@ -229,9 +243,6 @@ Route::controller(HomeController::class)->group(function () {
 
     Route::get('/track-your-order', 'trackOrder')->name('orders.track');
 });
-
-// Language Switch — Replaced by kenepa/translation-manager
-// Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
 
 // Currency Switch
 Route::post('/currency', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
@@ -617,7 +628,7 @@ Route::controller(ContactController::class)->group(function () {
 
 Route::redirect('/home', '/');
 
-// Note: do not use this "Route::redirect('/login', '/users/login')" to redirect as we only need to redirect
+// Note: do not use this "Route::redirect('/login', '/user/login')" to redirect as we only need to redirect
 // the 'get' route, not the 'post'. 'POST /login' remains handled by Auth::routes() for actual authentication
 Route::get('/login', fn () => redirect()->route('user.login'))->name('login');
 

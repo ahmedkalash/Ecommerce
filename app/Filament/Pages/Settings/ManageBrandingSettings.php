@@ -8,6 +8,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
+use Illuminate\Support\Facades\Storage;
 
 class ManageBrandingSettings extends SettingsPage
 {
@@ -40,30 +41,34 @@ class ManageBrandingSettings extends SettingsPage
                     ->schema([
                         FileUpload::make('header_logo')
                             ->label(__('admin/settings.branding.fields.header_logo'))
-                            ->image(),
+                            ->image()
+                            ->directory('settings'),
                         FileUpload::make('footer_logo')
                             ->label(__('admin/settings.branding.fields.footer_logo'))
-                            ->image(),
+                            ->image()
+                            ->directory('settings'),
                         FileUpload::make('site_icon')
                             ->label(__('admin/settings.branding.fields.site_icon'))
-                            ->image(),
-                        FileUpload::make('system_logo_white')
-                            ->label(__('admin/settings.branding.fields.system_logo_white'))
-                            ->image(),
-                        FileUpload::make('system_logo_black')
-                            ->label(__('admin/settings.branding.fields.system_logo_black'))
-                            ->image(),
-                    ])->columns(2),
-
-                Section::make(__('admin/settings.branding.sections.login_page'))
-                    ->schema([
-                        FileUpload::make('admin_login_background')
-                            ->label(__('admin/settings.branding.fields.admin_login_background'))
-                            ->image(),
-                        FileUpload::make('admin_login_page_image')
-                            ->label(__('admin/settings.branding.fields.admin_login_page_image'))
-                            ->image(),
+                            ->image()
+                            ->directory('settings'),
                     ])->columns(2),
             ]);
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $settings = app(static::$settings);
+        $fileFields = ['header_logo', 'footer_logo', 'site_icon'];
+
+        foreach ($fileFields as $field) {
+            $oldFile = $settings->{$field} ?? null;
+            $newFile = $data[$field] ?? null;
+
+            if ($oldFile && $oldFile !== $newFile) {
+                Storage::disk('public')->delete($oldFile);
+            }
+        }
+
+        return $data;
     }
 }

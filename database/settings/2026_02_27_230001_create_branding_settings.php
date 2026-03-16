@@ -9,5 +9,6 @@ class CreateBrandingSettings extends SettingsMigration
         $this->migrator->add('branding.header_logo', '');
         $this->migrator->add('branding.footer_logo', '');
         $this->migrator->add('branding.site_icon', '');
+        $this->migrator->add('branding.system_logo_black', '');
     }
 }

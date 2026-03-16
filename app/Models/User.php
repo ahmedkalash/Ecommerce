@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\UserType;
 use App\Models\Traits\User\UserRelationships;
 use App\Notifications\EmailVerificationNotification;
 use App\Notifications\ResetPasswordNotification;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -125,5 +127,15 @@ class User extends Authenticatable implements FilamentUser, HasMedia, MustVerify
     public function isBanned(): bool
     {
         return $this->banned == 1;
+    }
+
+    protected static function booted(): void
+    {
+        parent::booted();
+
+        // Apply global scope to filter only admin and staff users
+        static::addGlobalScope('customers', function (Builder $query) {
+            $query->whereIn('user_type', [UserType::CUSTOMER]);
+        });
     }
 }

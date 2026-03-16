@@ -100,7 +100,9 @@ return [
     |
     */
 
-    'locale' => env('DEFAULT_LANGUAGE', 'en_US'),
+    'locale' => env('DEFAULT_LANGUAGE', 'en'),
+
+    'full_locale' => env('DEFAULT_FULL_LOCALE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -127,8 +129,8 @@ return [
     */
 
     'supported_locales' => [
-        'en_US' => ['language' => 'en', 'region' => 'US', 'name' => 'English (US)', 'dir' => 'ltr'],
-        'ar_SA' => ['language' => 'ar', 'region' => 'SA', 'name' => 'العربية (السعودية)', 'dir' => 'rtl'],
+        'en_US' => ['language' => 'en', 'region' => 'US', 'name' => 'English (US)', 'dir' => 'ltr', 'flag' => 'assets/images/country/us.png'],
+        'ar_SA' => ['language' => 'ar', 'region' => 'SA', 'name' => 'العربية (السعودية)', 'dir' => 'rtl', 'flag' => 'assets/images/country/ksa.png'],
     ],
 
     /*

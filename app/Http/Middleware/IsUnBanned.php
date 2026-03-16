@@ -4,14 +4,14 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class IsUnbanned
+class IsUnBanned
 {
     public function handle($request, Closure $next)
     {
-        if (auth()->check() && auth()->user()->banned) {
+        if (auth()->check() && auth()->user()->isBanned()) {
             auth()->logout();
 
-            flash(translate('You are banned'));
+            flash(__('auth.banned'))->error();
 
             return redirect()->route('user.login');
         }

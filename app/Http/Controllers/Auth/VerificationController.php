@@ -48,12 +48,14 @@ class VerificationController extends Controller
      **/
     public function show(Request $request)
     {
-        return view('auth.'.get_setting('authentication_layout_select').'.verify_email');
+        return $request->user()->hasVerifiedEmail()
+            ? redirect($this->redirectPath())
+            : view('frontend.auth.verify');
     }
 
     protected function verified(Request $request): void
     {
-        flash(translate('Your email has been verified successfully'))->success();
+        toast(__('auth.email_verified'), 'success');
     }
 
     public function emailChangeCallback(Request $request)
@@ -70,7 +72,7 @@ class VerificationController extends Controller
 
                 auth()->login($user, true);
 
-                flash(translate('Email Changed successfully'))->success();
+                toast(__('auth.email_changed'), 'success');
                 if ($user->user_type == 'seller') {
                     return redirect()->route('seller.dashboard');
                 }
@@ -79,7 +81,7 @@ class VerificationController extends Controller
             }
         }
 
-        flash(translate('Email was not verified. Please resend your mail!'))->error();
+        toast(__('auth.email_not_verified_resend'), 'error');
 
         return redirect()->route('dashboard');
     }

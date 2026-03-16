@@ -36,8 +36,6 @@ class Admin extends User
      */
     protected static function booted(): void
     {
-        parent::booted();
-
         // Apply global scope to filter only admin and staff users
         static::addGlobalScope('admin_users', function (Builder $query) {
             $query->whereIn('user_type', [UserType::ADMIN->value, UserType::STAFF->value]);
