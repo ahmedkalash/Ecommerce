@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Enums\RecaptchaAction;
 use App\Http\Controllers\Controller;
-use App\Services\RecaptchaService;
 use App\Services\UserService;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ForgotPasswordController extends Controller
 {
@@ -39,19 +38,44 @@ class ForgotPasswordController extends Controller
     }
 
     /**
+     * Display the form to request a password reset link.
+     *
+     * @return View
+     */
+    public function showLinkRequestForm()
+    {
+        return view('frontend.auth.forgot-password');
+    }
+
+    /**
      * Send a reset link to the given user.
      *
      * @return RedirectResponse|JsonResponse
      */
     public function sendResetLinkEmail(Request $request)
     {
-        $request->validate(RecaptchaService::validationRules(RecaptchaAction::FORGOT_PASSWORD));
-
         // Check if a user is banned
         if (UserService::isBanned($request->email)) {
-            return back()->withErrors(['email' => translate('Your account has been banned.')]);
+            return back()->withErrors(['email' => __('customer/auth.banned')]);
         }
 
         return $this->baseSendResetLinkEmail($request);
+    }
+
+    /**
+     * Get the response for a successful password reset link.
+     *
+     * @param  string  $response
+     * @return RedirectResponse|JsonResponse
+     */
+    protected function sendResetLinkResponse(Request $request, $response)
+    {
+        if ($request->wantsJson()) {
+            return new JsonResponse(['message' => trans($response)], 200);
+        }
+
+        toast(trans($response), 'success');
+
+        return back();
     }
 }

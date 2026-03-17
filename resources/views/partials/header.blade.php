@@ -1048,7 +1048,7 @@
                                                             <a href="../email-templete/order-success.html">{{ __('customer/header.nav_order_success') }}</a>
                                                         </li>
                                                         <li>
-                                                            <a href="../email-templete/reset-password.html">{{ __('customer/header.nav_reset_password') }}</a>
+                                                            <a href="{{ route('password.request') }}">{{ __('customer/header.nav_reset_password') }}</a>
                                                         </li>
                                                         <li>
                                                             <a href="../email-templete/welcome.html">{{ __('customer/header.nav_welcome_template') }}</a>

@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ResetPasswordController extends Controller
@@ -48,7 +49,7 @@ class ResetPasswordController extends Controller
         $request->validate($this->rules(), $this->validationErrorMessages());
 
         if (UserService::isBanned($request->email)) {
-            flash(translate('Your account has been banned.'))->error();
+            toast(__('customer/auth.banned'), 'error');
 
             return back()->withInput($request->only('email'));
         }
@@ -63,9 +64,47 @@ class ResetPasswordController extends Controller
      */
     public function showResetForm(Request $request, ?string $token = null)
     {
-        return view('auth.'.get_setting('authentication_layout_select').'.reset_password')->with(
+        return view('frontend.auth.reset-password')->with(
             ['token' => $token, 'email' => $request->email]
         );
+    }
+
+    /**
+     * Get the response for a successful password reset.
+     *
+     * @param  string  $response
+     * @return RedirectResponse|JsonResponse
+     */
+    protected function sendResetResponse(Request $request, $response)
+    {
+        if ($request->wantsJson()) {
+            return new JsonResponse(['message' => trans($response)], 200);
+        }
+
+        toast(trans($response), 'success');
+
+        return redirect($this->redirectPath());
+    }
+
+    /**
+     * Get the response for a failed password reset.
+     *
+     * @param  string  $response
+     * @return RedirectResponse
+     */
+    protected function sendResetFailedResponse(Request $request, $response)
+    {
+        if ($request->wantsJson()) {
+            throw ValidationException::withMessages([
+                'email' => [trans($response)],
+            ]);
+        }
+
+        toast(trans($response), 'error');
+
+        return redirect()->back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**
@@ -73,6 +112,6 @@ class ResetPasswordController extends Controller
      */
     public function redirectPath()
     {
-        return auth()->user()->homePage();
+        return auth()->user() ? auth()->user()->homePage() : '/';
     }
 }

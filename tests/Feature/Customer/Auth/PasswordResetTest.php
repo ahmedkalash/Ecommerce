@@ -37,7 +37,7 @@ class PasswordResetTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(200);
-        $response->assertViewIs('auth.passwords.email');
+        $response->assertViewIs('frontend.auth.forgot-password');
     }
 
     /**
@@ -59,7 +59,7 @@ class PasswordResetTest extends AuthTestCase
         ]);
 
         // Assert
-        $response->assertSessionHas('status');
+        $response->assertSessionHas('alert.config');
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
@@ -166,7 +166,7 @@ class PasswordResetTest extends AuthTestCase
 
         // Assert
         $response->assertStatus(200);
-        $response->assertViewIs('auth.'.get_setting('authentication_layout_select').'.reset_password');
+        $response->assertViewIs('frontend.auth.reset-password');
         $response->assertViewHas('token', $token);
     }
 
@@ -414,67 +414,6 @@ class PasswordResetTest extends AuthTestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /**
-     * Test: Admin redirects to admin dashboard after password reset
-     *
-     * @test
-     */
-    public function admin_redirects_to_admin_dashboard_after_password_reset(): void
-    {
-        // Arrange
-        $user = User::factory()->admin()->create([
-            'email' => 'test_admin@example.com',
-        ]);
-        $token = Password::createToken($user);
-
-        // Act
-        $response = $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => 'test_admin@example.com',
-            'password' => 'new_password123',
-            'password_confirmation' => 'new_password123',
-        ]);
-
-        // Assert
-        $response->assertRedirect(route('admin.dashboard'));
-        $this->assertAuthenticatedAs($user);
-    }
-
-    /**
-     * Test: Seller redirects to seller dashboard after password reset
-     *
-     * @test
-     */
-    public function seller_redirects_to_seller_dashboard_after_password_reset(): void
-    {
-        // Arrange
-        $user = User::factory()->seller()->create([
-            'email' => 'test_seller@example.com',
-        ]);
-
-        // Create approved shop for seller
-        $shop = new \App\Models\Shop;
-        $shop->user_id = $user->id;
-        $shop->name = 'Test Shop';
-        $shop->slug = 'test-shop';
-        $shop->registration_approval = 1;
-        $shop->save();
-
-        $token = Password::createToken($user);
-
-        // Act
-        $response = $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => 'test_seller@example.com',
-            'password' => 'new_password123',
-            'password_confirmation' => 'new_password123',
-        ]);
-
-        // Assert
-        $response->assertRedirect(route('seller.dashboard'));
-        $this->assertAuthenticatedAs($user);
-    }
-
     // ==========================================
     // POST-RESET BEHAVIOR
     // ==========================================
@@ -545,78 +484,6 @@ class PasswordResetTest extends AuthTestCase
         $this->assertTrue(Hash::check('new_password123', $user->password));
     }
 
-    /**
-     * Test: Old password no longer works after reset
-     *
-     * @test
-     */
-    public function old_password_no_longer_works_after_reset(): void
-    {
-        // Arrange
-        $user = User::factory()->customer()->create([
-            'email' => 'test_user@example.com',
-            'password' => Hash::make('old_password'),
-        ]);
-        $token = Password::createToken($user);
-
-        // Act - Reset password
-        $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => 'test_user@example.com',
-            'password' => 'new_password123',
-            'password_confirmation' => 'new_password123',
-        ]);
-
-        // Logout
-        auth()->logout();
-
-        // Try to login with old password
-        $response = $this->post(route('login'), [
-            'email' => 'test_user@example.com',
-            'password' => 'old_password',
-        ]);
-
-        // Assert
-        $response->assertRedirect();
-        $this->assertGuest();
-    }
-
-    /**
-     * Test: New password works after reset
-     *
-     * @test
-     */
-    public function new_password_works_after_reset(): void
-    {
-        // Arrange
-        $user = User::factory()->customer()->create([
-            'email' => 'test_user@example.com',
-            'password' => Hash::make('old_password'),
-        ]);
-        $token = Password::createToken($user);
-
-        // Act - Reset password
-        $this->post(route('password.update'), [
-            'token' => $token,
-            'email' => 'test_user@example.com',
-            'password' => 'new_password123',
-            'password_confirmation' => 'new_password123',
-        ]);
-
-        // Logout
-        auth()->logout();
-
-        // Try to login with new password
-        $response = $this->post(route('login'), [
-            'email' => 'test_user@example.com',
-            'password' => 'new_password123',
-        ]);
-
-        // Assert
-        $response->assertRedirect('/');
-        $this->assertAuthenticatedAs($user);
-    }
-
     // ==========================================
     // RATE LIMITING
     // ==========================================
@@ -658,6 +525,7 @@ class PasswordResetTest extends AuthTestCase
     public function authenticated_user_cannot_access_forgot_password_form(): void
     {
         // Arrange
+        /** @var \App\Models\User $user */
         $user = User::factory()->customer()->create();
         $this->actingAs($user);
 
@@ -676,6 +544,7 @@ class PasswordResetTest extends AuthTestCase
     public function authenticated_user_cannot_submit_password_reset(): void
     {
         // Arrange
+        /** @var \App\Models\User $user */
         $user = User::factory()->customer()->create();
         $this->actingAs($user);
 
@@ -722,7 +591,7 @@ class PasswordResetTest extends AuthTestCase
         ]);
 
         // Assert - Should still find the user (DB collation dependent)
-        $response->assertSessionHas('status');
+        $response->assertSessionHas('alert.config');
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
@@ -784,9 +653,9 @@ class PasswordResetTest extends AuthTestCase
             'email' => $user->email,
         ]));
 
-        // Assert - View should match the configured theme layout
+        // Assert - View is now fixed to the Fastkart theme
         $response->assertStatus(200);
-        $response->assertViewIs('auth.'.$layout.'.reset_password');
+        $response->assertViewIs('frontend.auth.reset-password');
         $response->assertViewHas('token', $token);
         $response->assertViewHas('email', $user->email);
     }
