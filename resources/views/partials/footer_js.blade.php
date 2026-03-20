@@ -4,6 +4,9 @@
 <!-- jquery ui-->
 <script src="{{asset('assets/js/jquery-ui.min.js')}}"></script>
 
+<!-- Price Range Js -->
+<script src="{{asset('assets/js/ion.rangeSlider.min.js')}}"></script>
+
 <!-- Bootstrap js-->
 <script src="{{asset('assets/js/bootstrap/bootstrap.bundle.min.js')}}"></script>
 <script src="{{asset('assets/js/bootstrap/bootstrap-notify.min.js')}}"></script>

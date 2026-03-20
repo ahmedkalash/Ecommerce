@@ -244,6 +244,7 @@ if (! function_exists('currency_symbol')) {
 if (! function_exists('format_price')) {
     function format_price($price, $isMinimize = false)
     {
+        $price = (float) $price;
         if (get_setting('decimal_separator') == 1) {
             $fomated_price = number_format($price, get_setting('no_of_decimals'));
         } else {
@@ -2576,6 +2577,7 @@ if (! function_exists('get_single_cart')) {
 if (! function_exists('number_format_short')) {
     function number_format_short($n, $precision = 1)
     {
+        $n = (float) $n;
         if ($n < 900) {
             // 0 - 900
             $n_format = number_format($n, $precision);

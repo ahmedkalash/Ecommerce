@@ -41,12 +41,16 @@
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/bulk-style.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/vendors/animate.css')}}">
 
+    <!-- ion.rangeSlider css -->
+    <link rel="stylesheet" type="text/css" href="{{asset('assets/css/vendors/ion.rangeSlider.min.css')}}">
+
     <!-- Template css -->
     <link id="color-link" rel="stylesheet" type="text/css" href="{{asset('assets/css/style.css')}}">
     @yield('head_css')
     @yield('head_js')
     {{-- SweetAlert2 --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    @livewireStyles
 </head>
 
 <body class="bg-effect">

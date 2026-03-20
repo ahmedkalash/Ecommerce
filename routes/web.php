@@ -20,6 +20,7 @@ use App\Http\Controllers\CustomerPackageController;
 use App\Http\Controllers\CustomerProductController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\FollowSellerController;
+use App\Http\Controllers\Frontend\ProductListingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\MessageController;
@@ -74,22 +75,25 @@ use Illuminate\Support\Facades\Route;
  */
 // ---------------------------------------------------- new routes ----------------------------------------------------
 
+// Language Switch — Replaced by kenepa/translation-manager
+Route::get('/language/{locale}', function (string $locale) {
+    app(LocaleService::class)->setCurrentLocale($locale);
+
+    return back();
+})->name('language.switch');
+
 // Login
 Route::controller(LoginController::class)->group(function () {
-    /**
-     * @see vendor/laravel/ui/src/AuthRouteMethods.php
-     * @see app/Livewire/Auth/Login.php
-     */
+    /**@see app/Livewire/Auth/Login.php */
     Route::group(['middleware' => ['prevent-back-history']], function () {
         Route::get('/user/login', 'showLoginForm')->name('user.login')->middleware('handle-demo-login');
         Route::post('logout', 'logout')->name('logout');
-
-        // Auth::routes(['verify' => true]);
     });
 });
 
 // Register
 Route::controller(RegisterController::class)->group(function () {
+    /**@see app/Livewire/Auth/Register.php */
     Route::get('/users/registration', 'showRegistrationForm')->name('user.registration');
 });
 
@@ -97,15 +101,40 @@ Route::controller(VerificationController::class)->group(function () {
     Route::get('email/verify', 'show')->name('verification.notice');
     Route::get('email/verify/{id}/{hash}', 'verify')->name('verification.verify');
     Route::post('email/resend', 'resend')->name('verification.resend');
-
 });
 
-// Language Switch — Replaced by kenepa/translation-manager
-Route::get('/language/{locale}', function (string $locale) {
-    app(LocaleService::class)->setCurrentLocale($locale);
+Route::controller(VerificationController::class)->group(function () {
+    Route::get('/email/verify', 'show')->name('verification.notice');
+    Route::get('/email/verify/{code}', 'verify')->name('email.verification.confirmation');
+    Route::get('/email/resend', 'resend')->name('verification.resend');
+    Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
+});
 
-    return back();
-})->name('language.switch');
+// Standard Password Reset Routes
+Route::controller(ForgotPasswordController::class)->group(function () {
+    Route::get('password/reset', 'showLinkRequestForm')->name('password.request');
+    Route::post('password/email', 'sendResetLinkEmail')->name('password.email');
+});
+
+Route::controller(ResetPasswordController::class)->group(function () {
+    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset');
+    Route::post('password/reset', 'reset')->name('password.update');
+});
+
+// Search / Catalog (Hybrid Controller + Livewire Fragment)
+Route::controller(ProductListingController::class)->group(function () {
+    Route::get('/products', 'index')->name('products.index');
+    Route::get('/category/{category_slug}', 'index')->name('products.category');
+    Route::get('/brand/{brand_slug}', 'index')->name('products.brand');
+});
+
+Route::controller(SearchController::class)->group(function () {
+    // Route::get('/search', 'index')->name('search');
+    Route::get('/suggestion?keyword={search}', 'index')->name('suggestion.search');
+    Route::post('/ajax-search', 'ajax_search')->name('search.ajax');
+    // Route::get('/category/{category_slug}', 'listingByCategory')->name('products.category');
+    // Route::get('/brand/{brand_slug}', 'listingByBrand')->name('products.brand');
+});
 
 // ---------------------------------------------------- old routes ----------------------------------------------------
 Route::controller(DemoController::class)->group(function () {
@@ -158,24 +187,6 @@ Route::controller(SocialLoginController::class)->group(function () {
     Route::get('/social-login/{provider}/callback', 'handleProviderCallback')->name('social.callback');
     // Apple Callback
     Route::post('/apple-callback', 'handleAppleCallback');
-});
-
-Route::controller(VerificationController::class)->group(function () {
-    Route::get('/email/verify', 'show')->name('verification.notice');
-    Route::get('/email/verify/{code}', 'verify')->name('email.verification.confirmation');
-    Route::get('/email/resend', 'resend')->name('verification.resend');
-    Route::get('/email-change/callback', 'emailChangeCallback')->name('email_change.callback');
-});
-
-// Standard Password Reset Routes
-Route::controller(ForgotPasswordController::class)->group(function () {
-    Route::get('password/reset', 'showLinkRequestForm')->name('password.request');
-    Route::post('password/email', 'sendResetLinkEmail')->name('password.email');
-});
-
-Route::controller(ResetPasswordController::class)->group(function () {
-    Route::get('password/reset/{token}', 'showResetForm')->name('password.reset');
-    Route::post('password/reset', 'reset')->name('password.update');
 });
 
 Route::resource('shops', ShopController::class)->middleware('handle-demo-login');
@@ -261,15 +272,6 @@ Route::controller(CustomerProductController::class)->group(function () {
     Route::get('/customer-products?city={city_id}', 'search')->name('customer_products.city');
     Route::get('/customer-products?q={search}', 'search')->name('customer_products.search');
     Route::get('/customer-product/{slug}', 'customer_product')->name('customer.product');
-});
-
-// Search
-Route::controller(SearchController::class)->group(function () {
-    Route::get('/search', 'index')->name('search');
-    Route::get('/search?keyword={search}', 'index')->name('suggestion.search');
-    Route::post('/ajax-search', 'ajax_search')->name('search.ajax');
-    Route::get('/category/{category_slug}', 'listingByCategory')->name('products.category');
-    Route::get('/brand/{brand_slug}', 'listingByBrand')->name('products.brand');
 });
 
 // Cart
