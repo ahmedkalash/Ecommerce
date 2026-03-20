@@ -369,7 +369,7 @@
             <i class="fa-solid fa-gear"></i>
         </button>
 
-        <div class="theme-setting-2">
+        <div class="theme-setting-2">root
             <div class="theme-box">
                 <ul>
                     <li>
