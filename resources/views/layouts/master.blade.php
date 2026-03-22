@@ -6,6 +6,10 @@
 <html lang="{{LocaleService::getCurrentLocaleLangCode()}}"
       dir="{{LocaleService::getCurrentLocaleDir()}}">
 
+@php
+    $isRtl = LocaleService::getCurrentLocaleDir() === 'rtl';
+@endphp
+
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -32,7 +36,8 @@
           href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
 
     <!-- bootstrap css -->
-    <link id="rtl-link" rel="stylesheet" type="text/css" href="{{asset('assets/css/vendors/bootstrap.css')}}">
+    <link id="rtl-link" rel="stylesheet" type="text/css"
+          href="{{ $isRtl ? asset('assets/css/vendors/bootstrap.rtl.css') : asset('assets/css/vendors/bootstrap.css') }}">
 
     <!-- wow css -->
     <link rel="stylesheet" href="{{asset('assets/css/animate.min.css')}}">
@@ -48,12 +53,151 @@
     <link id="color-link" rel="stylesheet" type="text/css" href="{{asset('assets/css/style.css')}}">
     @yield('head_css')
     @yield('head_js')
+
+    <!-- Theme Mode Script (Prevents FOUC) -->
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme-mode');
+            if (theme === 'dark') {
+                document.getElementById('color-link').setAttribute('href', '{{asset('assets/css/dark.css')}}');
+            }
+        })();
+    </script>
+
+    {{-- Header right-side-menu styles (SCSS was never compiled, so we replicate the rules here) --}}
+    <style>
+        .rightside-box {
+            display: flex;
+            align-items: center;
+        }
+
+        .right-side-menu {
+            display: flex;
+            align-items: center;
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .right-side-menu .right-side {
+            position: relative;
+            padding-right: 32px;
+        }
+
+        .right-side-menu .right-side:last-child {
+            padding-right: 0;
+        }
+
+        .right-side-menu .right-side:last-child::before {
+            content: none;
+        }
+
+        .right-side-menu .right-side::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 24px;
+            right: 14px;
+            background-color: rgba(119, 119, 119, 0.5);
+        }
+
+        .right-side-menu .right-side .delivery-login-box {
+            display: flex;
+            align-items: center;
+            cursor: default;
+        }
+
+        .right-side-menu .right-side .delivery-login-box .delivery-icon .feather {
+            margin-right: 14px;
+            stroke-width: 1.5;
+        }
+
+        .right-side-menu .right-side .delivery-login-box .delivery-detail h6 {
+            margin-bottom: 3px;
+        }
+
+        .right-side-menu .right-side .delivery-login-box .delivery-detail h5 {
+            font-weight: 500;
+        }
+
+        .right-side-menu .right-side .header-badge {
+            padding-right: 9px;
+        }
+
+        .right-side-menu .right-side .header-wishlist .feather {
+            stroke-width: 1.5;
+        }
+
+        .right-side-menu .right-side .header-wishlist:focus {
+            box-shadow: none;
+        }
+
+        .right-side-menu .right-side .header-wishlist span {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ff7272;
+            font-size: 12px;
+            padding: 0;
+            border-radius: 2px;
+        }
+
+        /* RTL overrides for the right-side-menu */
+        [dir="rtl"] .right-side-menu {
+            padding-right: 0;
+        }
+
+        [dir="rtl"] .right-side-menu .right-side {
+            padding-right: unset;
+            padding-left: 32px;
+        }
+
+        [dir="rtl"] .right-side-menu .right-side:last-child {
+            padding-left: 0;
+        }
+
+        [dir="rtl"] .right-side-menu .right-side::before {
+            right: unset;
+            left: 14px;
+        }
+
+        [dir="rtl"] .right-side-menu .right-side .delivery-login-box .delivery-icon .feather {
+            margin-right: unset;
+            margin-left: 14px;
+        }
+
+        [dir="rtl"] .right-side-menu .right-side .header-wishlist span {
+            right: 0 !important;
+        }
+    </style>
+
+    @if($isRtl)
+        <!-- RTL specific style overrides -->
+        <style>
+            .breadcrumb-section .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+                content: "\f104" !important;
+                font-family: "Font Awesome 6 Free" !important;
+                font-weight: 900 !important;
+            }
+        </style>
+    @endif
+
     {{-- SweetAlert2 --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     @livewireStyles
 </head>
 
-<body class="bg-effect">
+<body class="bg-effect {{ $isRtl ? 'rtl' : 'ltr' }}">
+<script>
+    if (localStorage.getItem('theme-mode') === 'dark') {
+        document.body.classList.add('dark');
+        document.body.classList.remove('light');
+    }
+</script>
 
 <!-- Loader Start -->
 <div class="fullpage-loader">
@@ -369,7 +513,7 @@
             <i class="fa-solid fa-gear"></i>
         </button>
 
-        <div class="theme-setting-2">root
+        <div class="theme-setting-2">
             <div class="theme-box">
                 <ul>
                     <li>
@@ -392,16 +536,6 @@
                         <div class="theme-setting-button">
                             <button class="btn btn-2 outline" id="darkButton">Dark</button>
                             <button class="btn btn-2 unline" id="lightButton">Light</button>
-                        </div>
-                    </li>
-
-                    <li>
-                        <div class="setting-name">
-                            <h4>RTL</h4>
-                        </div>
-                        <div class="theme-setting-button rtl">
-                            <button class="btn btn-2 rtl-unline">LTR</button>
-                            <button class="btn btn-2 rtl-outline">RTL</button>
                         </div>
                     </li>
                 </ul>

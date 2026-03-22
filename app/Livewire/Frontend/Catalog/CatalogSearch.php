@@ -5,6 +5,9 @@ namespace App\Livewire\Frontend\Catalog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductStock;
+use Illuminate\Database\Eloquent\Builder as eloquentBuilder;
+use Laravel\Scout\Builder as scoutBuilder;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -86,57 +89,15 @@ class CatalogSearch extends Component
         $this->resetPage();
     }
 
-    public function render(): \Illuminate\View\View
+    public function render()
     {
-        $categories = Category::withCount('products')
-            ->with(['childrenCategories' => fn ($q) => $q->withCount('products')])
-            ->whereNull('parent_id')
-            ->orderBy('name', 'asc')
-            ->get();
+        $scoutProductIds = $this->getResultApproximateCount();
 
-        $brands = Brand::orderBy('name', 'asc')->get();
+        $categories = $this->categoriesForFiltersQuery($scoutProductIds)->get();
 
-        $query = Product::search($this->search)->query(function ($query) {
-            $query->isApprovedPublished()->with(['taxes', 'media', 'stocks', 'categories', 'brand']);
+        $brands = $this->brandsForFiltersQuery($scoutProductIds)->get();
 
-            if (! empty($this->selectedCategories)) {
-                $query->whereHas('categories', function ($q) {
-                    $q->whereIn('slug', $this->selectedCategories);
-                });
-            }
-
-            if (! empty($this->selectedBrands)) {
-                $query->whereHas('brand', function ($q) {
-                    $q->whereIn('slug', $this->selectedBrands);
-                });
-            }
-
-            if ($this->min_price !== null && $this->max_price !== null) {
-                $query->whereHas('stocks', function ($q) {
-                    $q->whereBetween('price', [$this->min_price, $this->max_price]);
-                });
-            }
-
-            match ($this->sort_by) {
-                'newest' => $query->orderBy('created_at', 'desc'),
-                'oldest' => $query->orderBy('created_at', 'asc'),
-                'price-asc' => $query->orderBy(
-                    \App\Models\ProductStock::select('price')
-                        ->whereColumn('product_id', 'products.id')
-                        ->orderBy('price', 'asc')
-                        ->limit(1),
-                    'asc'
-                ),
-                'price-desc' => $query->orderBy(
-                    \App\Models\ProductStock::select('price')
-                        ->whereColumn('product_id', 'products.id')
-                        ->orderBy('price', 'asc')
-                        ->limit(1),
-                    'desc'
-                ),
-                default => $query->orderBy('id', 'desc'),
-            };
-        });
+        $query = $this->applySearchAndFiltersQuery();
 
         $products = $query->paginate(12);
 
@@ -145,5 +106,132 @@ class CatalogSearch extends Component
             'categories' => $categories,
             'brands' => $brands,
         ]);
+    }
+
+    private function categoriesForFiltersQuery(?array $scoutProductIds = null): eloquentBuilder
+    {
+        $countClosure = function (eloquentBuilder $q) use ($scoutProductIds) {
+            $q->isApprovedPublished();
+
+            if ($scoutProductIds !== null) {
+                $q->whereIn('products.id', $scoutProductIds);
+            }
+
+            if (! empty($this->selectedBrands)) {
+                $q->whereHas('brand', function (eloquentBuilder $qb) {
+                    $qb->whereIn('slug', $this->selectedBrands);
+                });
+            }
+
+            if ($this->min_price !== null) {
+                $q->whereHas('stocks', function (eloquentBuilder $qs) {
+                    $qs->where('price', '>=', $this->min_price);
+                });
+            }
+
+            if ($this->max_price !== null) {
+                $q->whereHas('stocks', function (eloquentBuilder $qs) {
+                    $qs->where('price', '<=', $this->max_price);
+                });
+            }
+        };
+
+        return Category::query()->withCount(['products' => $countClosure])
+            ->with(['childrenCategories' => fn ($q) => $q->withCount(['products' => $countClosure])])
+            ->whereNull('parent_id')
+            ->orderBy('name');
+    }
+
+    private function brandsForFiltersQuery(?array $scoutProductIds = null): eloquentBuilder
+    {
+        $countClosure = function (eloquentBuilder $q) use ($scoutProductIds) {
+            $q->isApprovedPublished();
+
+            if ($scoutProductIds !== null) {
+                $q->whereIn('products.id', $scoutProductIds);
+            }
+
+            if (! empty($this->selectedCategories)) {
+                $q->whereHas('categories', function (eloquentBuilder $qc) {
+                    $qc->whereIn('slug', $this->selectedCategories);
+                });
+            }
+
+            if ($this->min_price !== null) {
+                $q->whereHas('stocks', function (eloquentBuilder $qs) {
+                    $qs->where('price', '>=', $this->min_price);
+                });
+            }
+
+            if ($this->max_price !== null) {
+                $q->whereHas('stocks', function (eloquentBuilder $qs) {
+                    $qs->where('price', '<=', $this->max_price);
+                });
+            }
+        };
+
+        return Brand::query()->withCount(['products' => $countClosure])
+            ->orderBy('name');
+    }
+
+    private function applySearchAndFiltersQuery(): scoutBuilder
+    {
+        return Product::search($this->search)->query(function (eloquentBuilder $query) {
+            $query->isApprovedPublished()->with(['taxes', 'media', 'stocks', 'categories', 'brand']);
+
+            if (! empty($this->selectedCategories)) {
+                $query->whereHas('categories', function (eloquentBuilder $q) {
+                    $q->whereIn('slug', $this->selectedCategories);
+                });
+            }
+
+            if (! empty($this->selectedBrands)) {
+                $query->whereHas('brand', function (eloquentBuilder $q) {
+                    $q->whereIn('slug', $this->selectedBrands);
+                });
+            }
+
+            if ($this->min_price !== null) {
+                $query->whereHas('stocks', function (eloquentBuilder $q) {
+                    $q->where('price', '>=', $this->min_price);
+                });
+            }
+
+            if ($this->max_price !== null) {
+                $query->whereHas('stocks', function (eloquentBuilder $q) {
+                    $q->where('price', '<=', $this->max_price);
+                });
+            }
+
+            match ($this->sort_by) {
+                'newest' => $query->orderBy('created_at', 'desc'),
+                'oldest' => $query->orderBy('created_at'),
+                'price-asc' => $query->orderBy(
+                    ProductStock::select('price')
+                        ->whereColumn('product_id', 'products.id')
+                        ->orderBy('price', 'asc')
+                        ->limit(1),
+                    'asc'
+                ),
+                'price-desc' => $query->orderBy(
+                    ProductStock::select('price')
+                        ->whereColumn('product_id', 'products.id')
+                        ->orderBy('price', 'asc')
+                        ->limit(1),
+                    'desc'
+                ),
+                default => $query->orderBy('id', 'desc'),
+            };
+        });
+    }
+
+    private function getResultApproximateCount(): ?array
+    {
+        $scoutProductIds = null;
+        if (! empty($this->search)) {
+            $scoutProductIds = Product::search($this->search)->take(10000)->keys()->toArray();
+        }
+
+        return $scoutProductIds;
     }
 }

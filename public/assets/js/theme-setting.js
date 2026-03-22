@@ -18,6 +18,7 @@ $("#darkButton").on("click", function () {
     document
         .getElementById("color-link")
         .setAttribute("href", "../assets/css/dark.css");
+    localStorage.setItem("theme-mode", "dark");
 });
 
 $("#lightButton").on("click", function () {
@@ -27,22 +28,5 @@ $("#lightButton").on("click", function () {
     document
         .getElementById("color-link")
         .setAttribute("href", "../assets/css/style.css");
-    console
-});
-
-/*========================
-   RTL setting js
-   ==========================*/
-$(".rtl").on("click", function () {
-    if ($("body").hasClass("ltr")) {
-        $("html").attr("dir", "rtl");
-        $("body").removeClass("ltr");
-        $("body").addClass("rtl");
-        $("#rtl-link").attr("href", "../assets/css/vendors/bootstrap.rtl.css");
-    } else {
-        $("html").attr("dir", "");
-        $("body").removeClass("rtl");
-        $("body").addClass("ltr");
-        $("#rtl-link").attr("href", "../assets/css/vendors/bootstrap.css");
-    }
+    localStorage.setItem("theme-mode", "light");
 });

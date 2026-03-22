@@ -108,11 +108,6 @@ class Category extends Model implements HasMedia
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
-    public function attributes(): BelongsToMany
-    {
-        return $this->belongsToMany(Attribute::class);
-    }
-
     public function sizeChart(): BelongsTo
     {
         return $this->belongsTo(SizeChart::class, 'id', 'category_id');

@@ -17,6 +17,6 @@ class AffiliateUser extends Model
 
     public function affiliate_payments()
     {
-        return $this->hasMany(AffiliatePayment::class)->orderBy('created_at', 'desc')->paginate(12);
+        return $this->hasMany(AffiliatePayment::class)->orderBy('created_at', 'desc');
     }
 }

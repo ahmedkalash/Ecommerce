@@ -126,128 +126,149 @@
 
                         <!-- Mobile Header Search Livewire Component -->
                         <livewire:frontend.header-search type="mobile"/>
-                        <ul class="right-side-menu">
-
-                            <li class="right-side">
-                                <a href="wishlist.html" class="btn p-0 position-relative header-wishlist">
-                                    <i data-feather="heart"></i>
-                                </a>
-                            </li>
-                            <li class="right-side">
-                                <div class="onhover-dropdown header-badge">
-                                    <button type="button" class="btn p-0 position-relative header-wishlist">
-                                        <i data-feather="shopping-cart"></i>
-                                        <span class="position-absolute top-0 start-100 translate-middle badge">2
-                                                        <span class="visually-hidden">unread messages</span>
-                                                    </span>
-                                    </button>
-
-                                    <div class="onhover-div">
-                                        <ul class="cart-list">
-                                            <li class="product-box-contain">
-                                                <div class="drop-cart">
-                                                    <a href="product-left-thumbnail.html" class="drop-image">
-                                                        <img src="{{asset('assets/images/vegetable/product/1.png')}}"
-                                                             class="blur-up lazyload" alt="">
-                                                    </a>
-
-                                                    <div class="drop-contain">
-                                                        <a href="product-left-thumbnail.html">
-                                                            <h5>Fantasy Crunchy Choco Chip Cookies</h5>
-                                                        </a>
-                                                        <h6><span>1 x</span> $80.58</h6>
-                                                        <button class="close-button close_button">
-                                                            <i class="fa-solid fa-xmark"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </li>
-
-                                            <li class="product-box-contain">
-                                                <div class="drop-cart">
-                                                    <a href="product-left-thumbnail.html" class="drop-image">
-                                                        <img src="{{asset('assets/images/vegetable/product/2.png')}}"
-                                                             class="blur-up lazyload" alt="">
-                                                    </a>
-
-                                                    <div class="drop-contain">
-                                                        <a href="product-left-thumbnail.html">
-                                                            <h5>Peanut Butter Bite Premium Butter Cookies 600 g
-                                                            </h5>
-                                                        </a>
-                                                        <h6><span>1 x</span> $25.68</h6>
-                                                        <button class="close-button close_button">
-                                                            <i class="fa-solid fa-xmark"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </ul>
-
-                                        <div class="price-box">
-                                            <h5>{{ __('customer/header.total') }}</h5>
-                                            <h4 class="theme-color fw-bold">$106.58</h4>
+                        <div class="rightside-box">
+                            <ul class="right-side-menu">
+                                <li class="right-side">
+                                    <div class="delivery-login-box">
+                                        <div class="delivery-icon">
+                                            <div class="search-box">
+                                                <i data-feather="search"></i>
+                                            </div>
                                         </div>
+                                    </div>
+                                </li>
+                                <li class="right-side">
+                                    <a href="javascript:void(0)" class="delivery-login-box">
+                                        <div class="delivery-icon">
+                                            <i data-feather="phone-call"></i>
+                                        </div>
+                                        <div class="delivery-detail">
+                                            <h6>24/7 Delivery</h6>
+                                            <h5>+91 888 104 2340</h5>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li class="right-side">
+                                    <a href="javascript:void(0)" class="btn p-0 position-relative header-wishlist">
+                                        <i data-feather="heart"></i>
+                                    </a>
+                                </li>
+                                <li class="right-side">
+                                    <div class="onhover-dropdown header-badge">
+                                        <button type="button" class="btn p-0 position-relative header-wishlist">
+                                            <i data-feather="shopping-cart"></i>
+                                            <span class="position-absolute top-0 start-100 translate-middle badge">2
+                                            <span class="visually-hidden">unread messages</span>
+                                        </span>
+                                        </button>
 
-                                        <div class="button-group">
-                                            <a href="cart.html"
-                                               class="btn btn-sm cart-button">{{ __('customer/header.view_cart') }}</a>
-                                            <a href="checkout.html" class="btn btn-sm cart-button theme-bg-color
+                                        <div class="onhover-div">
+                                            <ul class="cart-list">
+                                                <li class="product-box-contain">
+                                                    <div class="drop-cart">
+                                                        <a href="product-left-thumbnail.html" class="drop-image">
+                                                            <img src="{{asset('assets/images/vegetable/product/1.png')}}"
+                                                                 class="blur-up lazyload" alt="">
+                                                        </a>
+
+                                                        <div class="drop-contain">
+                                                            <a href="product-left-thumbnail.html">
+                                                                <h5>Fantasy Crunchy Choco Chip Cookies</h5>
+                                                            </a>
+                                                            <h6><span>1 x</span> $80.58</h6>
+                                                            <button class="close-button close_button">
+                                                                <i class="fa-solid fa-xmark"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li class="product-box-contain">
+                                                    <div class="drop-cart">
+                                                        <a href="product-left-thumbnail.html" class="drop-image">
+                                                            <img src="{{asset('assets/images/vegetable/product/2.png')}}"
+                                                                 class="blur-up lazyload" alt="">
+                                                        </a>
+
+                                                        <div class="drop-contain">
+                                                            <a href="product-left-thumbnail.html">
+                                                                <h5>Peanut Butter Bite Premium Butter Cookies 600 g
+                                                                </h5>
+                                                            </a>
+                                                            <h6><span>1 x</span> $25.68</h6>
+                                                            <button class="close-button close_button">
+                                                                <i class="fa-solid fa-xmark"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+
+                                            <div class="price-box">
+                                                <h5>{{ __('customer/header.total') }}</h5>
+                                                <h4 class="theme-color fw-bold">$106.58</h4>
+                                            </div>
+
+                                            <div class="button-group">
+                                                <a href="javascript:void(0)"
+                                                   class="btn btn-sm cart-button">{{ __('customer/header.view_cart') }}</a>
+                                                <a href="javascript:void(0)" class="btn btn-sm cart-button theme-bg-color
                                                         text-white">{{ __('customer/header.checkout') }}</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                            <li class="right-side onhover-dropdown">
-                                <div class="delivery-login-box">
-                                    <div class="delivery-icon">
-                                        <i data-feather="user"></i>
+                                </li>
+                                <li class="right-side onhover-dropdown">
+                                    <div class="delivery-login-box">
+                                        <div class="delivery-icon">
+                                            <i data-feather="user"></i>
+                                        </div>
+                                        <div class="delivery-detail">
+                                            @auth
+                                                <h6>{{ __('customer/header.hello') }} ,{{ Auth::user()->name }}</h6>
+                                                <h5>{{ __('customer/header.my_account') }}</h5>
+                                            @else
+                                                <h6>{{ __('customer/header.hello') }}</h6>
+                                                <h5>{{ __('customer/header.log_in') }}
+                                                    / {{ __('customer/header.register') }}</h5>
+                                            @endauth
+                                        </div>
                                     </div>
-                                    <div class="delivery-detail">
-                                        @auth
-                                            <h6>{{ __('customer/header.hello') }} ,{{ Auth::user()->name }}</h6>
-                                            <h5>{{ __('customer/header.my_account') }}</h5>
-                                        @else
-                                            <h6>{{ __('customer/header.log_in') }}
-                                                / {{ __('customer/header.register') }}</h6>
-                                        @endauth
 
+                                    <div class="onhover-div onhover-div-login">
+                                        <ul class="user-box-name">
+                                            @auth
+                                                <li class="product-box-contain">
+                                                    <i></i>
+                                                    <a href="#">{{ __('customer/header.dashboard')}}</a>
+                                                </li>
+                                                <li class="product-box-contain">
+                                                    <form method="POST" action="{{ route('logout') }}">
+                                                        @csrf
+                                                        <a href="#"
+                                                           onclick="event.preventDefault(); this.closest('form').submit();">
+                                                            {{ __('customer/header.logout')}}
+                                                        </a>
+                                                    </form>
+                                                </li>
+                                            @else
+                                                <li class="product-box-contain">
+                                                    <i></i>
+                                                    <a href="{{ route('user.login') }}">{{ __('customer/header.log_in') }}</a>
+                                                </li>
+
+                                                <li class="product-box-contain">
+                                                    <a href="{{ route('user.registration') }}">{{ __('customer/header.register') }}</a>
+                                                </li>
+                                                <li class="product-box-contain">
+                                                    <a href="{{ route('password.request') }}">{{ __('customer/header.forgot_password') }}</a>
+                                                </li>
+                                            @endauth
+                                        </ul>
                                     </div>
-                                </div>
-
-                                <div class="onhover-div onhover-div-login">
-                                    <ul class="user-box-name">
-                                        @auth
-                                            <li class="product-box-contain">
-                                                <i></i>
-                                                <a href="#">{{ __('customer/header.dashboard')}}</a>
-                                            </li>
-                                            <li class="product-box-contain">
-                                                <form method="POST" action="{{ route('logout') }}">
-                                                    @csrf
-                                                    <a href="#"
-                                                       onclick="event.preventDefault(); this.closest('form').submit();">
-                                                        {{ __('customer/header.logout')}}
-                                                    </a>
-                                                </form>
-                                            </li>
-                                        @else
-                                            <li class="product-box-contain">
-                                                <i></i>
-                                                <a href="{{ route('user.login') }}">{{ __('customer/header.log_in') }}</a>
-                                            </li>
-
-                                            <li class="product-box-contain">
-                                                <a href="{{ route('user.registration') }}">{{ __('customer/header.register') }}</a>
-                                            </li>
-                                            <li class="product-box-contain">
-                                                <a href="{{ route('password.request') }}">{{ __('customer/header.forgot_password') }}</a>
-                                            </li>
-                                        @endauth
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

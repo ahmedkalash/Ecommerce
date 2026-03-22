@@ -1,3 +1,10 @@
+@php
+    use \Illuminate\Database\Eloquent\Collection;use Illuminate\Pagination\LengthAwarePaginator;
+    /**@var Collection<App\Models\Product>|LengthAwarePaginator<App\Models\Product> $products*/
+    /**@var Collection<App\Models\Category> $categories*/
+    /**@var Collection<App\Models\Brand> $brands*/
+@endphp
+
 <div class="row">
     <!-- Sidebar Start -->
     <div class="col-custom-3 wow fadeInUp">
@@ -135,10 +142,10 @@
                         <div id="collapseThree" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <div class="d-flex align-items-center mb-2">
-                                    <input type="number" class="form-control" wire:model.lazy="min_price"
+                                    <input type="number" class="form-control" wire:model.change="min_price"
                                            placeholder="{{ __('customer/catalog.min') }}" min="0">
                                     <span class="mx-2">-</span>
-                                    <input type="number" class="form-control" wire:model.lazy="max_price"
+                                    <input type="number" class="form-control" wire:model.change="max_price"
                                            placeholder="{{ __('customer/catalog.max') }}" min="0">
                                 </div>
                             </div>
@@ -163,12 +170,31 @@
                 <div class="category-dropdown">
                     <h5 class="text-content">{{ __('customer/catalog.sort_by') }}</h5>
                     <div class="dropdown">
-                        <select class="form-select" wire:model.live="sort_by">
-                            <option value="newest">{{ __('customer/catalog.newest') }}</option>
-                            <option value="oldest">{{ __('customer/catalog.oldest') }}</option>
-                            <option value="price-asc">{{ __('customer/catalog.price_asc') }}</option>
-                            <option value="price-desc">{{ __('customer/catalog.price_desc') }}</option>
-                        </select>
+                        @php
+                            $sortOptions = [
+                                'newest' => __('customer/catalog.newest'),
+                                'oldest' => __('customer/catalog.oldest'),
+                                'price-asc' => __('customer/catalog.price_asc'),
+                                'price-desc' => __('customer/catalog.price_desc'),
+                            ];
+                        @endphp
+                        <button class="dropdown-toggle" type="button" id="dropdownMenuButton1"
+                                data-bs-toggle="dropdown">
+                            <span>{{ $sortOptions[$sort_by] ?? __('customer/catalog.sort_by') }}</span> <i
+                                    class="fa-solid fa-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach($sortOptions as $key => $label)
+                                <li>
+                                    <a class="dropdown-item {{ $sort_by === $key ? 'active' : '' }}"
+                                       id="{{ $key }}"
+                                       href="javascript:void(0)"
+                                       wire:click="$set('sort_by', '{{ $key }}')">
+                                        {{ $label }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
